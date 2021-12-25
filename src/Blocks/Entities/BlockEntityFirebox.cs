@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
 
@@ -14,7 +15,9 @@ namespace GlassMaking.Blocks
         protected virtual float fuelDurationModifier => 0.8f;
         protected virtual int maxFuelCount => 16;
 
-        private ItemStack contents = null;//TODO: save stack until burning
+        private ItemStack contents = null;
+
+        private BlockRendererFirebox renderer = null;
 
         private bool burning = false;
         private float temperature = 20;
@@ -35,6 +38,13 @@ namespace GlassMaking.Blocks
             {
                 contents.ResolveBlockOrItem(Api.World);
                 ApplyFuelParameters();
+            }
+            if(api.Side == EnumAppSide.Client)
+            {
+                ICoreClientAPI coreClientAPI = (ICoreClientAPI)api;
+                renderer = new BlockRendererFirebox(Pos, coreClientAPI);
+                coreClientAPI.Event.RegisterRenderer(renderer, EnumRenderStage.Opaque, "glassmaking:firebox");
+                UpdateRendererFull();
             }
             RegisterGameTickListener(OnCommonTick, 200);
         }
@@ -62,6 +72,44 @@ namespace GlassMaking.Blocks
                 var calendar = Api.World.Calendar;
                 dsc.AppendLine("Burn time: " + ((fuelLevel + GetFuelCount() * fuelBurnDuration) * 3600 / (calendar.SpeedOfTime * calendar.CalendarSpeedMul)).ToString("0"));
             }
+        }
+
+        public override void OnBlockUnloaded()
+        {
+            base.OnBlockUnloaded();
+            renderer?.Dispose();
+        }
+
+        public override void OnBlockRemoved()
+        {
+            renderer?.Dispose();
+            base.OnBlockRemoved();
+        }
+
+        public override void FromTreeAttributes(ITreeAttribute tree, IWorldAccessor worldAccessForResolve)
+        {
+            base.FromTreeAttributes(tree, worldAccessForResolve);
+            contents = tree.GetItemstack("fuelStack");
+            fuelLevel = tree.GetFloat("fuelLevel");
+            temperature = tree.GetFloat("temperature", 20);
+            burning = tree.GetBool("burning");
+            lastTickTime = tree.GetDouble("lastTickTotalHours");
+            if(contents != null && Api?.World != null)
+            {
+                contents.ResolveBlockOrItem(Api.World);
+                ApplyFuelParameters();
+            }
+            UpdateRendererFull();
+        }
+
+        public override void ToTreeAttributes(ITreeAttribute tree)
+        {
+            base.ToTreeAttributes(tree);
+            tree.SetItemstack("fuelStack", contents);
+            tree.SetFloat("fuelLevel", fuelLevel);
+            tree.SetFloat("temperature", temperature);
+            tree.SetBool("burning", burning);
+            tree.SetDouble("lastTickTotalHours", lastTickTime);
         }
 
         public bool TryAdd(IPlayer byPlayer, ItemSlot slot, int count)
@@ -92,6 +140,7 @@ namespace GlassMaking.Blocks
                         fuelLevel = fuelBurnDuration;
                         contents.StackSize--;
                     }
+                    UpdateRendererFull();
                 }
                 else
                 {
@@ -123,6 +172,7 @@ namespace GlassMaking.Blocks
             fuelLevel = fuelBurnDuration;
             if(contents.StackSize > 0) contents.StackSize--;
             lastTickTime = Api.World.Calendar.TotalHours;
+            UpdateRendererFull();
             MarkDirty(true);
         }
 
@@ -237,6 +287,7 @@ namespace GlassMaking.Blocks
                                 burning = fuelLevel > 0;
                                 if(!burning) contents = null;
                             }
+                            UpdateRendererFull();
                             MarkDirty(true);
                         }
                     }
@@ -244,7 +295,11 @@ namespace GlassMaking.Blocks
                     {
                         fuelLevel = (float)burnTime;
                         burning = fuelLevel > 0;
-                        if(!burning) contents = null;
+                        if(!burning)
+                        {
+                            contents = null;
+                            UpdateRendererFull();
+                        }
                     }
                 }
             }
@@ -255,6 +310,7 @@ namespace GlassMaking.Blocks
                 temperature = Math.Max(20, temperature - (float)(hours * TEMP_DECREASE_PER_HOUR));
                 lastTickTime = totalHours;
             }
+            if(Api.Side == EnumAppSide.Client) UpdateRendererParameters();
         }
 
         private int GetFuelCount()
@@ -272,29 +328,18 @@ namespace GlassMaking.Blocks
             fuelBurnDuration *= 1f / 3600f;
         }
 
-        public override void FromTreeAttributes(ITreeAttribute tree, IWorldAccessor worldAccessForResolve)
+        private void UpdateRendererFull()
         {
-            base.FromTreeAttributes(tree, worldAccessForResolve);
-            contents = tree.GetItemstack("fuelStack");
-            fuelLevel = tree.GetFloat("fuelLevel");
-            temperature = tree.GetFloat("temperature", 20);
-            burning = tree.GetBool("burning");
-            lastTickTime = tree.GetDouble("lastTickTotalHours");
-            if(contents != null && Api?.World != null)
+            if(Api != null && Api.Side == EnumAppSide.Client && renderer != null)
             {
-                contents.ResolveBlockOrItem(Api.World);
-                ApplyFuelParameters();
+                renderer.SetHeight(GetFuelCount() + (burning ? 1 : 0));
+                UpdateRendererParameters();
             }
         }
 
-        public override void ToTreeAttributes(ITreeAttribute tree)
+        private void UpdateRendererParameters()
         {
-            base.ToTreeAttributes(tree);
-            tree.SetItemstack("fuelStack", contents);
-            tree.SetFloat("fuelLevel", fuelLevel);
-            tree.SetFloat("temperature", temperature);
-            tree.SetBool("burning", burning);
-            tree.SetDouble("lastTickTotalHours", lastTickTime);
+            renderer.SetParameters(burning, Math.Min(128, (int)((temperature / 1500f) * 128)));
         }
     }
 }
