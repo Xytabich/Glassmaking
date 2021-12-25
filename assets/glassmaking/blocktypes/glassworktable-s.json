@@ -1,0 +1,24 @@
+{
+    "code": "glassworktables",
+    "class": "Horizontal2BMultiblockSurrogate",
+    "blockmaterial": "Wood",
+    "variantgroups": [
+        {
+            "code": "side",
+            "loadFromProperties": "abstract/horizontalorientation"
+        }
+    ],
+    "creativeinventory": {},
+    "replaceable": 400,
+    "resistance": 3.5,
+    "maxStackSize": 1,
+    "lightAbsorption": 3,
+    "shape": { "base": "game:block/basic/nothing" },
+    "sidesolid": {
+        "up": true,
+        "all": false
+    },
+    "sideopaque": {
+        "all": false
+    }
+}

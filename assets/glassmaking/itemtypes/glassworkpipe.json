@@ -1,0 +1,57 @@
+{
+    "code": "glasswork_pipe",
+    "class": "glassmaking:glassworkpipe",
+    "maxstacksize": 1,
+    "shape": { "base": "item/glassworkpipe" },
+    "creativeinventory": {
+        "general": [ "*" ],
+        "items": [ "*" ],
+        "tools": [ "*" ]
+    },
+    "attributes": {
+        "maxglass": 100
+    },
+    "storageFlags": 257,
+    "fpHandTransform": {
+        "rotation": {
+            "x": -127,
+            "y": -30,
+            "z": -30
+        },
+        "origin": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": -0.5
+        }
+    },
+    "tpHandTransform": {
+        "translation": {
+            "x": -4.5,
+            "y": -0.9,
+            "z": -0.9
+        },
+        "rotation": {
+            "x": 0,
+            "y": 90,
+            "z": 0
+        }
+    },
+    "guiTransform": {
+        "translation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "rotation": {
+            "x": 160,
+            "y": -20,
+            "z": 0
+        },
+        "origin": {
+            "x": 0.25,
+            "y": -0.25,
+            "z": -0.5
+        },
+        "scale": 1.1
+    }
+}

@@ -1,0 +1,51 @@
+{
+    "code": "glassworktable",
+    "class": "glassmaking:glassworktable",
+    "entityclass": "glassmaking:glassworktable",
+    "blockmaterial": "Wood",
+    "behaviors": [
+        { "name": "Horizontal2BMultiblock" }
+    ],
+    "variantgroups": [
+        {
+            "code": "side",
+            "loadFromProperties": "abstract/horizontalorientation"
+        }
+    ],
+    "attributes": {
+        "surrogate": "glassmaking:glassworktables-{side}"
+    },
+    "creativeinventory": {
+        "general": [ "*-north" ],
+        "construction": [ "*-north" ]
+    },
+    "replaceable": 400,
+    "resistance": 3.5,
+    "maxStackSize": 1,
+    "lightAbsorption": 3,
+    "shapeByType": {
+        "*-north": {
+            "base": "block/glasstable",
+            "rotateY": 0
+        },
+        "*-east": {
+            "base": "block/glasstable",
+            "rotateY": 270
+        },
+        "*-south": {
+            "base": "block/glasstable",
+            "rotateY": 180
+        },
+        "*-west": {
+            "base": "block/glasstable",
+            "rotateY": 90
+        }
+    },
+    "sidesolid": {
+        "up": true,
+        "all": false
+    },
+    "sideopaque": {
+        "all": false
+    }
+}
