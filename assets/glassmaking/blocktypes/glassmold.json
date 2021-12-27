@@ -28,27 +28,57 @@
         }
     ],
     "attributes": {
-        "output": {
-            "type": "item",
-            "code": "glassmaking:glasspart-{outtype}-raw"
+        "glassmold": {
+            "output": {
+                "type": "item",
+                "code": "glassmaking:glasspart-{outtype}-raw"
+            }
         }
     },
     "attributesByType": {
         "glassmold-burned-sphere-small": {
-            "requiredUnits": 26
+            "glassmold": {
+                "recipe": [
+                    {
+                        "code": "game:plain",
+                        "amount": 26
+                    }
+                ]
+            }
         },
         "glassmold-burned-sphere-medium": {
-            "requiredUnits": 98
+            "glassmold": {
+                "recipe": [
+                    {
+                        "code": "game:plain",
+                        "amount": 98
+                    }
+                ]
+            }
         },
         "glassmold-burned-sphere-large": {
-            "requiredUnits": 218
+            "glassmold": {
+                "recipe": [
+                    {
+                        "code": "game:plain",
+                        "amount": 218
+                    }
+                ]
+            }
         },
         "*-glassshape": {
-            "output": {
-                "type": "block",
-                "code": "testmod:glassshape"
-            },
-            "requiredUnits": 128
+            "glassmold": {
+                "output": {
+                    "type": "block",
+                    "code": "testmod:glassshape"
+                },
+                "recipe": [
+                    {
+                        "code": "game:plain",
+                        "amount": 128
+                    }
+                ]
+            }
         }
     },
     "combustiblePropsByType": {

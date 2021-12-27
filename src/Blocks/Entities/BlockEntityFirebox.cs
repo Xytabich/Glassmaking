@@ -6,7 +6,7 @@ using Vintagestory.API.Datastructures;
 
 namespace GlassMaking.Blocks
 {
-    public class BlockEntityFirebox : BlockEntity
+    public class BlockEntityFirebox : BlockEntity, ITimeBasedHeatSource
     {
         private const float TEMP_INCREASE_PER_HOUR = 1500;
         private const float TEMP_DECREASE_PER_HOUR = 2000;
@@ -18,6 +18,8 @@ namespace GlassMaking.Blocks
         private ItemStack contents = null;
 
         private BlockRendererFirebox renderer = null;
+
+        private ITimeBasedHeatReceiver receiver = null;
 
         private bool burning = false;
         private float temperature = 20;
@@ -39,6 +41,7 @@ namespace GlassMaking.Blocks
                 contents.ResolveBlockOrItem(Api.World);
                 ApplyFuelParameters();
             }
+            SetReceiver(api.World.BlockAccessor.GetBlockEntity(Pos.UpCopy()) as ITimeBasedHeatReceiver);
             if(api.Side == EnumAppSide.Client)
             {
                 ICoreClientAPI coreClientAPI = (ICoreClientAPI)api;
@@ -112,6 +115,22 @@ namespace GlassMaking.Blocks
             tree.SetDouble("lastTickTotalHours", lastTickTime);
         }
 
+        public void SetReceiver(ITimeBasedHeatReceiver receiver)
+        {
+            if(this.receiver != receiver)
+            {
+                if(this.receiver != null) this.receiver.SetHeatSource(null);
+                this.receiver = receiver;
+                if(receiver != null) receiver.SetHeatSource(this);
+            }
+        }
+
+        public ItemStack[] GetDropItems()
+        {
+            if(contents == null || contents.StackSize < 1) return null;
+            return new ItemStack[] { contents.Clone() };
+        }
+
         public bool TryAdd(IPlayer byPlayer, ItemSlot slot, int count)
         {
             var combustibleProps = slot.Itemstack.Collectible.CombustibleProps;
@@ -119,11 +138,11 @@ namespace GlassMaking.Blocks
             if(burning)
             {
                 if(contents == null) return false;
-                if(!contents.Equals(Api.World, slot.Itemstack)) return false;
+                if(!contents.Satisfies(slot.Itemstack)) return false;
             }
             else
             {
-                if(contents != null && !contents.Equals(Api.World, slot.Itemstack)) return false;
+                if(contents != null && !contents.Satisfies(slot.Itemstack)) return false;
             }
 
             int consume = Math.Min(maxFuelCount - GetFuelCount(), Math.Min(slot.Itemstack.StackSize, count));
@@ -131,7 +150,7 @@ namespace GlassMaking.Blocks
             {
                 if(contents == null)
                 {
-                    contents = slot.Itemstack.Clone();
+                    contents = slot.Itemstack.GetEmptyClone();
                     contents.StackSize = consume;
                     if(!burning && temperature >= 300)
                     {
@@ -156,6 +175,7 @@ namespace GlassMaking.Blocks
                 }
                 slot.MarkDirty();
                 MarkDirty(true);
+                return true;
             }
             return false;
         }
@@ -181,10 +201,18 @@ namespace GlassMaking.Blocks
             return temperature > 20;
         }
 
-        /// <summary>
-        /// Returns how long in hours the specified temperature was kept until the current World.Calendar.TotalHours
-        /// </summary>
-        public double GetTempElapsedTime(double startTime, float temperature)
+        public float GetTemperature()
+        {
+            return temperature;
+        }
+
+        public double GetLastTickTime()
+        {
+            double totalHours = Api.World.Calendar.TotalHours;
+            return lastTickTime > totalHours ? totalHours : lastTickTime;
+        }
+
+        public double CalcTempElapsedTime(double startTime, float temperature)
         {
             if(fuelTemperature < temperature) return 0;
 
@@ -250,66 +278,70 @@ namespace GlassMaking.Blocks
 
         private void OnCommonTick(float dt)
         {
-            if(burning)
+            double totalHours = Api.World.Calendar.TotalHours;
+            if(Api.Side == EnumAppSide.Client)
             {
-                double hours = Api.World.Calendar.TotalHours - lastTickTime;
+                System.Diagnostics.Debug.WriteLine(totalHours + ":" + lastTickTime + ":" + dt);
+            }
+            if(receiver != null) receiver.OnHeatSourceTick(dt);
+            if(totalHours < lastTickTime) lastTickTime = totalHours;
+            if(burning && totalHours > lastTickTime)
+            {
+                double hours = totalHours - GetLastTickTime();
+                int fuelCount = GetFuelCount();
+                double burnTime = fuelLevel + fuelBurnDuration * fuelCount;
+                if(temperature < fuelTemperature)
+                {
+                    double time = Math.Min((fuelTemperature - temperature) / TEMP_INCREASE_PER_HOUR, Math.Min(hours, burnTime));
+                    temperature += (float)(time * TEMP_INCREASE_PER_HOUR);
+                    hours -= time;
+                    burnTime -= time;
+                    lastTickTime += time;
+                }
+                else if(temperature > fuelTemperature)
+                {
+                    temperature = Math.Max(fuelTemperature, temperature - (float)(hours * TEMP_DECREASE_PER_HOUR));
+                }
                 if(hours > 0)
                 {
-                    int fuelCount = GetFuelCount();
-                    double burnTime = fuelLevel + fuelBurnDuration * fuelCount;
-                    if(temperature < fuelTemperature)
+                    var time = Math.Min(burnTime, hours);
+                    burnTime -= time;
+                    lastTickTime += time;
+                }
+                if(fuelCount > 0)
+                {
+                    int usedFuelCount = fuelCount - (int)Math.Floor(burnTime / fuelBurnDuration);
+                    fuelLevel = (float)(burnTime % fuelBurnDuration);
+                    if(usedFuelCount > 0)
                     {
-                        double time = Math.Min((fuelTemperature - temperature) / TEMP_INCREASE_PER_HOUR, Math.Min(hours, burnTime));
-                        temperature += (float)(time * TEMP_INCREASE_PER_HOUR);
-                        hours -= time;
-                        burnTime -= time;
-                        lastTickTime += time;
-                    }
-                    else if(temperature > fuelTemperature)
-                    {
-                        temperature = Math.Max(fuelTemperature, temperature - (float)(hours * TEMP_DECREASE_PER_HOUR));
-                    }
-                    if(hours > 0)
-                    {
-                        var time = Math.Min(burnTime, hours);
-                        burnTime -= time;
-                        lastTickTime += time;
-                    }
-                    if(fuelCount > 0)
-                    {
-                        int usedFuelCount = fuelCount - (int)Math.Floor(burnTime / fuelBurnDuration);
-                        fuelLevel = (float)(burnTime % fuelBurnDuration);
-                        if(usedFuelCount > 0)
+                        contents.StackSize -= usedFuelCount;
+                        if(contents.StackSize <= 0)
                         {
-                            contents.StackSize -= usedFuelCount;
-                            if(contents.StackSize <= 0)
-                            {
-                                burning = fuelLevel > 0;
-                                if(!burning) contents = null;
-                            }
-                            UpdateRendererFull();
-                            MarkDirty(true);
+                            burning = fuelLevel > 0;
+                            if(!burning) contents = null;
                         }
+                        UpdateRendererFull();
+                        MarkDirty(true);
                     }
-                    else
+                }
+                else
+                {
+                    fuelLevel = (float)burnTime;
+                    burning = fuelLevel > 0;
+                    if(!burning)
                     {
-                        fuelLevel = (float)burnTime;
-                        burning = fuelLevel > 0;
-                        if(!burning)
-                        {
-                            contents = null;
-                            UpdateRendererFull();
-                        }
+                        contents = null;
+                        UpdateRendererFull();
                     }
                 }
             }
             if(!burning && temperature > 20)
             {
-                var totalHours = Api.World.Calendar.TotalHours;
                 double hours = totalHours - lastTickTime;
                 temperature = Math.Max(20, temperature - (float)(hours * TEMP_DECREASE_PER_HOUR));
-                lastTickTime = totalHours;
             }
+            lastTickTime = totalHours;
+
             if(Api.Side == EnumAppSide.Client) UpdateRendererParameters();
         }
 

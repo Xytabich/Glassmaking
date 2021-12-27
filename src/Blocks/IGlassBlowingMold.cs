@@ -4,7 +4,7 @@ namespace GlassMaking.Blocks
 {
     public interface IGlassBlowingMold
     {
-        bool CanReceiveGlass(int count);
+        bool CanReceiveGlass(int count, AssetLocation code);
 
         int GetRequiredAmount();
 

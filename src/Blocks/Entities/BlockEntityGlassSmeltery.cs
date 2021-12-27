@@ -1,9 +1,14 @@
-﻿using Vintagestory.API.Common;
+﻿using GlassMaking.Common;
+using System;
+using System.Text;
+using Vintagestory.API.Common;
+using Vintagestory.API.Config;
+using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Blocks
 {
-    public class BlockEntityGlassSmeltery : BlockEntity, IBlockEntityContainer
+    public class BlockEntityGlassSmeltery : BlockEntity, IBlockEntityContainer, ITimeBasedHeatReceiver
     {
         private const float BUBBLING_TEMPERATURE = 1450;
         private const float MELTING_TEMPERATURE = 1300;
@@ -12,14 +17,17 @@ namespace GlassMaking.Blocks
         private const double PROCESS_HOURS_PER_UNIT = 0.001;
         private const double BUBBLING_PROCESS_MULTIPLIER = 3;
 
+        protected virtual int maxGlassAmount => 200;
+
         IInventory IBlockEntityContainer.Inventory => inventory;
         string IBlockEntityContainer.InventoryClassName => inventory.ClassName;
 
-        private BlockEntityFirebox heatSource = null;
-        private double processProgress;
+        private ITimeBasedHeatSource heatSource = null;
+
         private SmelteryState state;
-        private int glassAmount;//TODO: drop glass on broke
-        private AssetLocation glassType;
+        private int glassAmount;
+        private AssetLocation glassCode;
+        private double processProgress;
 
         private GlassSmelteryInventory inventory = new GlassSmelteryInventory(null, null);
 
@@ -27,51 +35,119 @@ namespace GlassMaking.Blocks
         {
             base.Initialize(api);
             inventory.LateInitialize("glasswork:glasssmeltery-" + Pos.X + "/" + Pos.Y + "/" + Pos.Z, api);
-            RegisterGameTickListener(OnCommonTick, 200);
-            //TODO: на клиенте надо показывать, если стейт containsglass и температура рабочая - contains liquid glass, иначе - contains solidified glass
         }
 
-        private void OnCommonTick(float dt)
+        public override void GetBlockInfo(IPlayer forPlayer, StringBuilder dsc)
         {
-            if(state == SmelteryState.Empty || heatSource == null || !heatSource.IsHeatedUp()) return;
-            double timeOffset = 0;
-            if(state == SmelteryState.ContainsMix)
+            base.GetBlockInfo(forPlayer, dsc);
+            if(heatSource != null)
             {
-                if(heatSource.GetTempElapsedTime(timeOffset, MELTING_TEMPERATURE) > 0)
+                switch(state)
                 {
-                    state = SmelteryState.Melting;
+                    case SmelteryState.ContainsMix:
+                        dsc.AppendLine("Contains: " + glassAmount + "x " + Lang.Get(GlassBlend.GetBlendNameCode(glassCode)));
+                        break;
+                    case SmelteryState.Melting:
+                        dsc.AppendLine("Contains: " + glassAmount + "x " + Lang.Get(GlassBlend.GetBlendNameCode(glassCode)));
+                        dsc.AppendLine("Melting progress: " + (processProgress / (glassAmount * PROCESS_HOURS_PER_UNIT) * 100).ToString("0") + "%");
+                        dsc.AppendLine("Temperature: " + heatSource.CalcCurrentTemperature().ToString("0"));
+                        break;
+                    case SmelteryState.Bubbling:
+                        dsc.AppendLine("Contains: " + glassAmount + "x " + Lang.Get(GlassBlend.GetBlendNameCode(glassCode)));
+                        dsc.AppendLine("Bubbling progress: " + (processProgress / (glassAmount * PROCESS_HOURS_PER_UNIT * BUBBLING_PROCESS_MULTIPLIER) * 100).ToString("0") + "%");
+                        dsc.AppendLine("Temperature: " + heatSource.CalcCurrentTemperature().ToString("0"));
+                        break;
+                    case SmelteryState.ContainsGlass:
+                        dsc.AppendLine("Contains melt: " + glassAmount + "x " + Lang.Get(GlassBlend.GetBlendNameCode(glassCode)));
+                        dsc.AppendLine("Temperature: " + heatSource.CalcCurrentTemperature().ToString("0"));
+                        break;
                 }
             }
-            if(state == SmelteryState.Melting)
+        }
+
+        public override void ToTreeAttributes(ITreeAttribute tree)
+        {
+            base.ToTreeAttributes(tree);
+            tree.SetInt("state", (int)state);
+            if(state != SmelteryState.Empty)
             {
-                double timeLeft = glassAmount * PROCESS_HOURS_PER_UNIT - processProgress;
-                double time = heatSource.GetTempElapsedTime(timeOffset, MELTING_TEMPERATURE);
-                if(time >= timeLeft)
+                tree.SetInt("glassamount", glassAmount);
+                tree.SetString("glasscode", glassCode.ToShortString());
+                if(state == SmelteryState.ContainsMix)
                 {
-                    timeOffset += timeLeft;
-                    processProgress = 0;
-                    state = SmelteryState.Bubbling;
-                    MarkDirty();
+                    inventory.ToTreeAttributes(tree.GetOrAddTreeAttribute("inventory"));
                 }
-                else
+                else if(state != SmelteryState.ContainsGlass)
                 {
-                    processProgress += time;
+                    tree.SetDouble("progress", processProgress);
                 }
             }
-            if(state == SmelteryState.Bubbling)
+        }
+
+        public override void FromTreeAttributes(ITreeAttribute tree, IWorldAccessor worldAccessForResolve)
+        {
+            base.FromTreeAttributes(tree, worldAccessForResolve);
+            state = (SmelteryState)tree.GetInt("state");
+            if(state != SmelteryState.Empty)
             {
-                double timeLeft = glassAmount * BUBBLING_PROCESS_MULTIPLIER - processProgress;
-                double time = heatSource.GetTempElapsedTime(timeOffset, BUBBLING_TEMPERATURE);
-                if(time >= timeLeft)
+                glassAmount = tree.GetInt("glassamount");
+                glassCode = new AssetLocation(tree.GetString("glasscode"));
+                if(state == SmelteryState.ContainsMix)
                 {
-                    state = SmelteryState.ContainsGlass;
-                    MarkDirty();
+                    inventory.FromTreeAttributes(tree.GetTreeAttribute("inventory"));
                 }
-                else
+                else if(state != SmelteryState.ContainsGlass)
                 {
-                    processProgress += time;
+                    processProgress = tree.GetDouble("progress");
                 }
             }
+        }
+
+        public bool TryAdd(IPlayer byPlayer, ItemSlot slot, int count)
+        {
+            if(glassAmount >= maxGlassAmount || heatSource == null) return false;
+
+            GlassBlend blend = slot.Itemstack.ItemAttributes?[GlassBlend.PROPERTY_NAME]?.AsObject<GlassBlend>(null, slot.Itemstack.Collectible.Code.Domain);
+            if(blend == null) blend = GlassBlend.FromTreeAttributes(slot.Itemstack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
+            if(blend != null && blend.amount > 0 && (glassCode == null || glassCode.Equals(blend.code)) && (blend.amount + glassAmount) <= maxGlassAmount)
+            {
+                if(glassCode == null) glassCode = blend.code.Clone();
+                if(state == SmelteryState.Bubbling || state == SmelteryState.ContainsGlass)
+                {
+                    if(heatSource.CalcCurrentTemperature() >= MELTING_TEMPERATURE)
+                    {
+                        state = SmelteryState.Melting;
+                        processProgress = PROCESS_HOURS_PER_UNIT * glassAmount;
+                    }
+                    else
+                    {
+                        state = SmelteryState.ContainsMix;
+                    }
+                }
+                int consume = Math.Min(Math.Min(count, slot.Itemstack.StackSize), (maxGlassAmount - glassAmount) / blend.amount);
+                var item = slot.TakeOut(consume);
+                if(state == SmelteryState.Empty || state == SmelteryState.ContainsMix)
+                {
+                    inventory.AddItem(item);
+                    state = SmelteryState.ContainsMix;
+                }
+                glassAmount += blend.amount * consume;
+                MarkDirty(true);
+                return true;
+            }
+            return false;
+        }
+
+        public ItemStack[] GetDropItems()
+        {
+            var items = inventory.GetItems();
+            if(glassAmount >= 5)
+            {
+                var shards = new ItemStack(Api.World.GetItem(new AssetLocation("glassmaking", "glassshards")), glassAmount / 5);
+                new GlassBlend(glassCode, 5).ToTreeAttributes(shards.Attributes.GetOrAddTreeAttribute(GlassBlend.PROPERTY_NAME));
+                items.Add(shards);
+            }
+            return items.ToArray();
         }
 
         public int GetGlassAmount()
@@ -86,9 +162,18 @@ namespace GlassMaking.Blocks
             return 0;
         }
 
+        public AssetLocation GetGlassCode()
+        {
+            return glassCode;
+        }
+
         public void RemoveGlass(int amount)
         {
-
+            glassAmount -= amount;
+            if(glassAmount <= 0)
+            {
+                state = SmelteryState.Empty;
+            }
         }
 
         public void SpawnGlassUseParticles(IWorldAccessor world, BlockSelection blockSel, IPlayer byPlayer)
@@ -108,6 +193,57 @@ namespace GlassMaking.Blocks
                 EnumParticleModel.Quad,
                 byPlayer
             );
+        }
+
+        void ITimeBasedHeatReceiver.SetHeatSource(ITimeBasedHeatSource heatSource)
+        {
+            this.heatSource = heatSource;
+        }
+
+        void ITimeBasedHeatReceiver.OnHeatSourceTick(float dt)
+        {
+            if(state == SmelteryState.Empty || !heatSource.IsHeatedUp()) return;
+            double timeOffset = 0;
+            if(state == SmelteryState.ContainsMix)
+            {
+                if(heatSource.CalcTempElapsedTime(timeOffset, MELTING_TEMPERATURE) > 0)
+                {
+                    state = SmelteryState.Melting;
+                    processProgress = 0;
+                    inventory.Clear();
+                    MarkDirty();
+                }
+            }
+            if(state == SmelteryState.Melting)
+            {
+                double timeLeft = glassAmount * PROCESS_HOURS_PER_UNIT - processProgress;
+                double time = heatSource.CalcTempElapsedTime(timeOffset, MELTING_TEMPERATURE);
+                if(time >= timeLeft)
+                {
+                    timeOffset += timeLeft;
+                    processProgress = 0;
+                    state = SmelteryState.Bubbling;
+                    MarkDirty();
+                }
+                else
+                {
+                    processProgress += time;
+                }
+            }
+            if(state == SmelteryState.Bubbling)
+            {
+                double timeLeft = glassAmount * PROCESS_HOURS_PER_UNIT * BUBBLING_PROCESS_MULTIPLIER - processProgress;
+                double time = heatSource.CalcTempElapsedTime(timeOffset, BUBBLING_TEMPERATURE);
+                if(time >= timeLeft)
+                {
+                    state = SmelteryState.ContainsGlass;
+                    MarkDirty();
+                }
+                else
+                {
+                    processProgress += time;
+                }
+            }
         }
 
         private enum SmelteryState

@@ -1,6 +1,7 @@
 ﻿using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
+using Vintagestory.API.Util;
 
 namespace GlassMaking.Blocks
 {
@@ -27,9 +28,12 @@ namespace GlassMaking.Blocks
                             return true;
                         }
                     }
-                    if(be.TryAdd(byPlayer, slot, (!byPlayer.Entity.Controls.Sneak) ? 1 : 5) && world.Side == EnumAppSide.Client)
+                    if(be.TryAdd(byPlayer, slot, (!byPlayer.Entity.Controls.Sneak) ? 1 : 5))
                     {
-                        (byPlayer as IClientPlayer).TriggerFpAnimation(EnumHandInteract.HeldItemInteract);
+                        if(world.Side == EnumAppSide.Client)
+                        {
+                            (byPlayer as IClientPlayer).TriggerFpAnimation(EnumHandInteract.HeldItemInteract);
+                        }
                     }
                 }
             }
@@ -63,14 +67,27 @@ namespace GlassMaking.Blocks
             base.OnBlockBroken(world, pos, byPlayer, dropQuantityMultiplier);
         }
 
-        //TODO: если нижний blockentity стал null - убрать ссылку из entity получателя тепла
-        //public override void OnNeighbourBlockChange(IWorldAccessor world, BlockPos pos, BlockPos neibpos)
-        //{
-        //    base.OnNeighbourBlockChange(world, pos, neibpos);
-        //    if(neibpos.Y == pos.Y - 1)
-        //    {
-        //        
-        //    }
-        //}
+        public override ItemStack[] GetDrops(IWorldAccessor world, BlockPos pos, IPlayer byPlayer, float dropQuantityMultiplier = 1)
+        {
+            var items = base.GetDrops(world, pos, byPlayer, dropQuantityMultiplier);
+            if(items == null) items = new ItemStack[0];
+            var be = world.BlockAccessor.GetBlockEntity(pos) as BlockEntityFirebox;
+            if(be != null) items = items.Append(be.GetDropItems() ?? new ItemStack[0]);
+            return items;
+        }
+
+        public override void OnNeighbourBlockChange(IWorldAccessor world, BlockPos pos, BlockPos neibpos)
+        {
+            base.OnNeighbourBlockChange(world, pos, neibpos);
+            if(neibpos == pos.UpCopy())
+            {
+                var be = world.BlockAccessor.GetBlockEntity(pos) as BlockEntityFirebox;
+                if(be != null)
+                {
+                    var receiver = world.BlockAccessor.GetBlockEntity(neibpos) as ITimeBasedHeatReceiver;
+                    be.SetReceiver(receiver);
+                }
+            }
+        }
     }
 }

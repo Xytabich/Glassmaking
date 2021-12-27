@@ -70,7 +70,7 @@ namespace GlassMaking.Items
             var itemstack = slot.Itemstack;
             if(firstEvent)
             {
-                if((blockSel == null || byEntity.World.BlockAccessor.GetBlock(blockSel.Position).Id == 0) && itemstack.Attributes.HasAttribute("radii"))
+                if((blockSel == null || byEntity.World.BlockAccessor.GetBlock(blockSel.Position).Id == 0))
                 {
                     //var bytes = itemstack.Attributes.GetBytes("radii");
                     //int minCost = int.MaxValue;
@@ -137,7 +137,7 @@ namespace GlassMaking.Items
                 }
                 else
                 {
-                    if(itemstack.Attributes.HasAttribute("radii"))
+                    if(itemstack.Attributes.HasAttribute("radii") && itemstack.Attributes.HasAttribute("glasscode"))
                     {
                         var form = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position) as IGlassBlowingMold;
                         if(form != null)
@@ -150,7 +150,7 @@ namespace GlassMaking.Items
                                 int outer = ((bytes[i] >> 4) & 15) + 1;
                                 count += (outer * outer) - (inner * inner);
                             }
-                            if(form.CanReceiveGlass(count))
+                            if(form.CanReceiveGlass(count, new AssetLocation(itemstack.Attributes.GetString("glasscode"))))
                             {
                                 byEntity.World.RegisterCallback(delegate (IWorldAccessor world, BlockPos pos, float dt) {
                                     if(byEntity.Controls.HandUse == EnumHandInteract.HeldItemInteract)
@@ -171,7 +171,8 @@ namespace GlassMaking.Items
                     var source = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityGlassSmeltery;
                     if(source != null)
                     {
-                        if(CanAddGlass(byEntity, slot, source.GetGlassAmount(), (!byEntity.Controls.Sneak) ? 1 : 5))
+                        int amount = source.GetGlassAmount();
+                        if(amount > 0 && CanAddGlass(byEntity, slot, amount, source.GetGlassCode(), (!byEntity.Controls.Sneak) ? 1 : 5))
                         {
                             if(byEntity.World.Side == EnumAppSide.Server)
                             {
@@ -190,7 +191,7 @@ namespace GlassMaking.Items
         {
             if(blockSel == null) return false;
             var itemstack = slot.Itemstack;
-            if(itemstack.Attributes.HasAttribute("radii"))
+            if(itemstack.Attributes.HasAttribute("radii") && itemstack.Attributes.HasAttribute("glasscode"))
             {
                 var form = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position) as IGlassBlowingMold;
                 if(form != null)
@@ -203,7 +204,7 @@ namespace GlassMaking.Items
                         int outer = ((bytes[i] >> 4) & 15) + 1;
                         count += (outer * outer) - (inner * inner);
                     }
-                    if(form.CanReceiveGlass(count))
+                    if(form.CanReceiveGlass(count, new AssetLocation(itemstack.Attributes.GetString("glasscode"))))
                     {
                         float speed = 1.5f;
                         if(api.Side == EnumAppSide.Client)
@@ -234,6 +235,7 @@ namespace GlassMaking.Items
                                 quantity -= shardsItem.MaxStackSize;
                             }
                             itemstack.Attributes.RemoveAttribute("radii");
+                            itemstack.Attributes.RemoveAttribute("glasscode");
                             slot.MarkDirty();
                             return false;
                         }
@@ -271,7 +273,8 @@ namespace GlassMaking.Items
             var source = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityGlassSmeltery;
             if(source != null)
             {
-                if(CanAddGlass(byEntity, slot, source.GetGlassAmount(), (!byEntity.Controls.Sneak) ? 1 : 5))
+                int amount = source.GetGlassAmount();
+                if(CanAddGlass(byEntity, slot, amount, source.GetGlassCode(), (!byEntity.Controls.Sneak) ? 1 : 5))
                 {
                     float speed = 1.5f;
                     if(api.Side == EnumAppSide.Client)
@@ -291,7 +294,7 @@ namespace GlassMaking.Items
                         if(slot.Itemstack.TempAttributes.GetFloat("lastAddGlassTime") + useTime <= secondsUsed)
                         {
                             slot.Itemstack.TempAttributes.SetFloat("lastAddGlassTime", (float)Math.Floor(secondsUsed));
-                            if(AddGlass(byEntity, slot, source.GetGlassAmount(), (!byEntity.Controls.Sneak) ? 1 : 5, out int consumed))
+                            if(amount > 0 && AddGlass(byEntity, slot, amount, source.GetGlassCode(), (!byEntity.Controls.Sneak) ? 1 : 5, out int consumed))
                             {
                                 source.RemoveGlass(consumed);
                                 slot.MarkDirty();
@@ -327,12 +330,17 @@ namespace GlassMaking.Items
             return base.OnHeldAttackCancel(secondsPassed, slot, byEntity, blockSelection, entitySel, cancelReason);
         }
 
-        protected virtual bool CanAddGlass(EntityAgent byEntity, ItemSlot slot, int available, int factor)
+        protected virtual bool CanAddGlass(EntityAgent byEntity, ItemSlot slot, int available, AssetLocation code, int factor)
         {
-            return true;
+            string contentCode = slot.Itemstack.Attributes.GetString("glasscode");
+            if(string.IsNullOrEmpty(contentCode) || contentCode == code.ToShortString())
+            {
+                return true;
+            }
+            return false;
         }
 
-        protected virtual bool AddGlass(EntityAgent byEntity, ItemSlot slot, int available, int factor, out int consumed)
+        protected virtual bool AddGlass(EntityAgent byEntity, ItemSlot slot, int available, AssetLocation code, int factor, out int consumed)
         {
             consumed = factor;
             var itemstack = slot.Itemstack;
@@ -359,6 +367,7 @@ namespace GlassMaking.Items
                 //TODO: consumed count
             }
             itemstack.Attributes.SetBytes("radii", bytes);
+            itemstack.Attributes.SetString("glasscode", code.ToShortString());
             return true;
         }
 

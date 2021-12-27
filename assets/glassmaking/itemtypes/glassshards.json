@@ -4,7 +4,10 @@
     "heldTpIdleAnimation": "holdbothhands",
     "shape": { "base": "item/resource/crushed/glassshards" },
     "attributes": {
-        "glassunits": 5,
+        "glassblend": {
+            "code": "game:plain",
+            "amount": 5
+        },
         "displaycaseable": true,
         "shelvable": true,
         "onDisplayTransform": {

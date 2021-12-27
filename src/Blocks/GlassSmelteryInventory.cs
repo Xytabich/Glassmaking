@@ -8,6 +8,8 @@ namespace GlassMaking.Blocks
 {
     public class GlassSmelteryInventory : InventoryBase
     {
+        public override int Count => slots.Count;
+
         private List<ItemSlot> slots = new List<ItemSlot>();
 
         public GlassSmelteryInventory(string className, string instanceID, ICoreAPI api) : base(className, instanceID, api)
@@ -17,8 +19,6 @@ namespace GlassMaking.Blocks
         public GlassSmelteryInventory(string inventoryID, ICoreAPI api) : base(inventoryID, api)
         {
         }
-
-        public override int Count => slots.Count;
 
         public override ItemSlot this[int slotId]
         {
@@ -38,9 +38,28 @@ namespace GlassMaking.Blocks
             }
         }
 
+        public void AddItem(ItemStack itemStack)
+        {
+            slots.Add(NewSlot(slots.Count));
+            slots[slots.Count - 1].Itemstack = itemStack;
+            //TODO: merge or add
+        }
+
+        public void Clear()
+        {
+            slots.Clear();
+        }
+
+        public List<ItemStack> GetItems()
+        {
+            return slots.ConvertAll(s => s.Itemstack);
+        }
+
         public override void FromTreeAttributes(ITreeAttribute tree)
         {
             slots.Clear();
+            if(tree == null) return;
+
             int count = tree.GetInt("qslots", 0);
             var treeSlots = tree.GetTreeAttribute("slots");
             if(treeSlots != null && count > 0)
