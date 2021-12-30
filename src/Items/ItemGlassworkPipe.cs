@@ -7,12 +7,48 @@ using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Util;
-using Vintagestory.Client.NoObf;
 
 namespace GlassMaking.Items
 {
     public class ItemGlassworkPipe : Item
     {
+        private const int RADIAL_SECTIONS_VERTICES = 8;
+        private const int RADIAL_SECTION_INDICES = (RADIAL_SECTIONS_VERTICES + 1) * 2;
+        private const int CAP_SECTION_INDICES = RADIAL_SECTIONS_VERTICES + 2;
+
+        private static readonly int[] radialSectionTriangles = {
+            0, 9,  1, 1, 9,  10,
+            1, 10, 2, 2, 10, 11,
+            2, 11, 3, 3, 11, 12,
+            3, 12, 4, 4, 12, 13,
+            4, 13, 5, 5, 13, 14,
+            5, 14, 6, 6, 14, 15,
+            6, 15, 7, 7, 15, 16,
+            7, 16, 8, 8, 16, 17,
+        };
+
+        private static readonly int[] capTriangles = {
+            0, 1, 2,
+            0, 2, 3,
+            0, 3, 4,
+            0, 4, 5,
+            0, 5, 6,
+            0, 6, 7,
+            0, 7, 8,
+            0, 8, 9
+        };
+
+        private static readonly int[] capTrianglesInverted = {
+            9, 0, 1,
+            9, 1, 2,
+            9, 2, 3,
+            9, 3, 4,
+            9, 4, 5,
+            9, 5, 6,
+            9, 6, 7,
+            9, 7, 8
+        };
+
         private const int MAX_RADIUS = 15;
 
         private static int nextMeshRefId = 0;
@@ -434,123 +470,85 @@ namespace GlassMaking.Items
 
         private MeshData GenMesh(ICoreClientAPI capi, byte[] radii)
         {
-            var mesh = new MeshData(24, 36).WithColorMaps().WithRenderpasses();
+            var mesh = new MeshData(24, 36).WithColorMaps().WithRenderpasses().WithNormals();
             var texture = capi.Tesselator.GetTexSource(capi.World.GetBlock(new AssetLocation("glass-plain")))["material"];
 
-            int lastInner = 0, lastOuter = 0;
-            int innerRadius, outerRadius;
-            for(int i = 0; i < radii.Length; i++)
+            if(radii.Length > 0)
             {
-                innerRadius = radii[i] & 15;
-                outerRadius = ((radii[i] >> 4) & 15);
-                GenerateLayer(capi, mesh, i, innerRadius, outerRadius);
-                if(innerRadius > lastInner) GenerateSide(capi, mesh, i - 1, lastInner, innerRadius, BlockFacing.indexSOUTH);
-                if(innerRadius < lastInner) GenerateSide(capi, mesh, i, innerRadius, lastInner, BlockFacing.indexNORTH);
-                if(outerRadius > lastOuter) GenerateSide(capi, mesh, i, lastOuter, outerRadius, BlockFacing.indexNORTH);
-                if(outerRadius < lastOuter) GenerateSide(capi, mesh, i - 1, outerRadius, lastOuter, BlockFacing.indexSOUTH);
-                lastInner = innerRadius;
-                lastOuter = outerRadius;
+                bool addCap = true;
+                int innerRadius, outerRadius;
+                AddVertice(mesh, 0, 0, -2.5f, 0, 0);
+                for(int i = 0; i < radii.Length; i++)
+                {
+                    innerRadius = radii[i] & 15;
+                    if(innerRadius == 0)
+                    {
+                        addCap = true;
+                        AddVertice(mesh, 0, 0, i + 0.5f, i / 32f, 0);
+                        GenearateCapFaces(mesh, true);
+                    }
+                    else
+                    {
+                        GenerateRadialVertices(mesh, i, innerRadius, true);
+                        if(addCap)
+                        {
+                            GenearateCapFaces(mesh, false);
+                            addCap = false;
+                        }
+                        else GenerateRadialFaces(mesh);
+                    }
+                }
+                AddVertice(mesh, 0, 0, -3.5f, 0, 0);
+                for(int i = 0; i < radii.Length; i++)
+                {
+                    outerRadius = ((radii[i] >> 4) & 15) + 1;
+                    GenerateRadialVertices(mesh, i, outerRadius, false);
+                    if(i == 0) GenearateCapFaces(mesh, false);
+                    else GenerateRadialFaces(mesh);
+                }
+                AddVertice(mesh, 0, 0, radii.Length + 0.5f, radii.Length / 32f, 0);
+                GenearateCapFaces(mesh, true);
             }
-            GenerateSide(capi, mesh, radii.Length - 1, 0, lastOuter, BlockFacing.indexSOUTH);
             mesh.SetTexPos(texture);
             return mesh;
         }
 
-        private void GenerateLayer(ICoreClientAPI capi, MeshData mesh, int index, int innerRadius, int outerRadius)
+        private void GenerateRadialVertices(MeshData mesh, int offset, int radius, bool invertNormal)
         {
-            var segment = GetOrCreateSegment(capi, outerRadius);
-            AddCubeFace(mesh, segment.maxCoords[0], 0, index, index, 0, BlockFacing.indexEAST);
-            AddCubeFace(mesh, -segment.maxCoords[0], 0, index, index, 0, BlockFacing.indexWEST);
-            AddCubeFace(mesh, 0, segment.maxCoords[0], index, index, 0, BlockFacing.indexUP);
-            AddCubeFace(mesh, 0, -segment.maxCoords[0], index, index, 0, BlockFacing.indexDOWN);
-            for(int i = 1; i < segment.maxCoords.Length; i++)
+            float u = 1f / 32f;
+            float v = radius / (16f * RADIAL_SECTIONS_VERTICES);
+            float step = GameMath.PI * 2f / RADIAL_SECTIONS_VERTICES;
+            for(int i = 0; i <= RADIAL_SECTIONS_VERTICES; i++)
             {
-                AddCubeFace(mesh, segment.maxCoords[i], i, index, index, i, BlockFacing.indexEAST);
-                AddCubeFace(mesh, -segment.maxCoords[i], i, index, index, i, BlockFacing.indexWEST);
-                AddCubeFace(mesh, segment.maxCoords[i], -i, index, index, i, BlockFacing.indexEAST);
-                AddCubeFace(mesh, -segment.maxCoords[i], -i, index, index, i, BlockFacing.indexWEST);
-                AddCubeFace(mesh, i, segment.maxCoords[i], index, index, i, BlockFacing.indexUP);
-                AddCubeFace(mesh, i, -segment.maxCoords[i], index, index, i, BlockFacing.indexDOWN);
-                AddCubeFace(mesh, -i, segment.maxCoords[i], index, index, i, BlockFacing.indexUP);
-                AddCubeFace(mesh, -i, -segment.maxCoords[i], index, index, i, BlockFacing.indexDOWN);
-            }
-            if(innerRadius != 0)
-            {
-                innerRadius--;
-                segment = GetOrCreateSegment(capi, innerRadius);
-                AddCubeFace(mesh, segment.minCoords[0], 0, index, index, 0, BlockFacing.indexWEST);
-                AddCubeFace(mesh, -segment.minCoords[0], 0, index, index, 0, BlockFacing.indexEAST);
-                AddCubeFace(mesh, 0, segment.minCoords[0], index, index, 0, BlockFacing.indexDOWN);
-                AddCubeFace(mesh, 0, -segment.minCoords[0], index, index, 0, BlockFacing.indexUP);
-                for(int i = 1; i < segment.minCoords.Length - 1; i++)
-                {
-                    AddCubeFace(mesh, segment.minCoords[i], i, index, index, i, BlockFacing.indexWEST);
-                    AddCubeFace(mesh, -segment.minCoords[i], i, index, index, i, BlockFacing.indexEAST);
-                    AddCubeFace(mesh, segment.minCoords[i], -i, index, index, i, BlockFacing.indexWEST);
-                    AddCubeFace(mesh, -segment.minCoords[i], -i, index, index, i, BlockFacing.indexEAST);
-                    AddCubeFace(mesh, i, segment.minCoords[i], index, index, i, BlockFacing.indexDOWN);
-                    AddCubeFace(mesh, i, -segment.minCoords[i], index, index, i, BlockFacing.indexUP);
-                    AddCubeFace(mesh, -i, segment.minCoords[i], index, index, i, BlockFacing.indexDOWN);
-                    AddCubeFace(mesh, -i, -segment.minCoords[i], index, index, i, BlockFacing.indexUP);
-                }
+                AddVertice(mesh, GameMath.FastSin(step * i) * radius, GameMath.FastCos(step * i) * radius, offset, offset * u, i * v);
             }
         }
 
-        private void GenerateSide(ICoreClientAPI capi, MeshData mesh, int index, int innerRadius, int outerRadius, int face)
+        private void AddVertice(MeshData mesh, float x, float y, float z, float u, float v)
         {
-            if(innerRadius == 0)
+            float scale = 1f / 16f;
+            mesh.AddVertexWithFlags(x * scale, y * scale, z * scale, u, v, int.MaxValue, 255);
+            var vec = new Vec3f(x, y, 0).Normalize();
+            mesh.AddNormal(vec.X, vec.Y, vec.Z);
+        }
+
+        private void GenerateRadialFaces(MeshData mesh)
+        {
+            int index = mesh.VerticesCount - RADIAL_SECTION_INDICES;
+            for(int i = 0; i < radialSectionTriangles.Length; i++)
             {
-                var segment = GetOrCreateSegment(capi, outerRadius);
-                GenerateSideColumn(mesh, 0, index, segment.maxCoords[0], -1, face);
-                for(int i = 1; i < segment.maxCoords.Length; i++)
-                {
-                    GenerateSideColumn(mesh, i, index, segment.maxCoords[i], -1, face);
-                    GenerateSideColumn(mesh, -i, index, segment.maxCoords[i], -1, face);
-                }
-            }
-            else
-            {
-                innerRadius--;
-                var outerSegment = GetOrCreateSegment(capi, outerRadius);
-                var innerSegment = GetOrCreateSegment(capi, innerRadius);
-                GenerateSideColumn(mesh, 0, index, outerSegment.maxCoords[0], innerSegment.maxCoords[0], face);
-                for(int i = 1; i < innerSegment.maxCoords.Length; i++)
-                {
-                    GenerateSideColumn(mesh, i, index, outerSegment.maxCoords[i], innerSegment.maxCoords[i], face);
-                    GenerateSideColumn(mesh, -i, index, outerSegment.maxCoords[i], innerSegment.maxCoords[i], face);
-                }
-                for(int i = innerSegment.maxCoords.Length; i < outerSegment.maxCoords.Length; i++)
-                {
-                    GenerateSideColumn(mesh, i, index, outerSegment.maxCoords[i], -1, face);
-                    GenerateSideColumn(mesh, -i, index, outerSegment.maxCoords[i], -1, face);
-                }
+                mesh.AddIndex(radialSectionTriangles[i] + index);
             }
         }
 
-        private void GenerateSideColumn(MeshData mesh, int x, int z, int halfHeight, int halfHole, int face)
+        private void GenearateCapFaces(MeshData mesh, bool invert)
         {
-            if(halfHole == -1)
+            int index = mesh.VerticesCount - CAP_SECTION_INDICES;
+            var indices = invert ? capTrianglesInverted : capTriangles;
+            for(int i = 0; i < indices.Length; i++)
             {
-                halfHole++;
-                AddCubeFace(mesh, x, 0, z, x, 0, face);
+                mesh.AddIndex(indices[i] + index);
             }
-            for(int i = halfHole + 1; i <= halfHeight; i++)
-            {
-                AddCubeFace(mesh, x, i, z, x, i, face);
-                AddCubeFace(mesh, x, -i, z, x, i, face);
-            }
-        }
-
-        private void AddCubeFace(MeshData mesh, int x, int y, int z, int u, int v, int face)
-        {
-            var tx = x / 16f;
-            var ty = y / 16f;
-            var tz = z / 16f;
-            float uoffset = (((u % 32) + 32) % 32) / 16f;
-            float voffset = (((v % 32) + 32) % 32) / 16f;
-            int[] flags = new int[4];
-            flags[0] = (flags[1] = (flags[2] = (flags[3] = 255 | BlockFacing.AllVertexFlagsNormals[face])));
-            ModelCubeUtilExt.AddFace(mesh, BlockFacing.ALLFACES[face], new Vec3f(tx, ty, tz), new Vec3f(1f / 16f, 1f / 16f, 1f / 16f), new Vec2f(uoffset, voffset), new Vec2f(1f / 16f, 1f / 16f), int.MaxValue, ModelCubeUtilExt.EnumShadeMode.On, flags, 1f, null, 0, 0, 3);
         }
 
         public override void OnModifiedInInventorySlot(IWorldAccessor world, ItemSlot slot, ItemStack extractedStack = null)
@@ -565,15 +563,6 @@ namespace GlassMaking.Items
                     mesh.isDirty = true;
                 }
             }
-        }
-
-        private SegmentInfo GetOrCreateSegment(ICoreClientAPI capi, int radius)
-        {
-            return ObjectCacheUtil.GetOrCreate(capi, "glassmaking:circlesegment" + radius, delegate {
-                var info = new SegmentInfo();
-                GenerateSegment(radius, out info.minCoords, out info.maxCoords);
-                return info;
-            });
         }
 
         private void GenerateSegment(int radius, out int[] minCoords, out int[] maxCoords)
