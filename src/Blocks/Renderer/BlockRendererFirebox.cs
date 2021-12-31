@@ -16,7 +16,7 @@ namespace GlassMaking.Blocks
         private BlockPos pos;
         private ICoreClientAPI api;
 
-        private MeshRef cubeModelRef;
+        private MeshRef meshRef = null;
 
         private int contentHeight = 0;
 
@@ -36,12 +36,12 @@ namespace GlassMaking.Blocks
             if(this.contentHeight != contentHeight)
             {
                 this.contentHeight = contentHeight;
-                cubeModelRef?.Dispose();
+                meshRef?.Dispose();
                 if(contentHeight != 0)
                 {
                     MeshData cube = CubeMeshUtil.GetCube(0.3125f, contentHeight / 48f, new Vec3f(0f, 1f / 32f, 0f));
                     cube.Flags = new int[24];
-                    cubeModelRef = api.Render.UploadMesh(cube);
+                    meshRef = api.Render.UploadMesh(cube);
                 }
             }
         }
@@ -64,7 +64,7 @@ namespace GlassMaking.Blocks
                 standardShaderProgram.ModelMatrix = ModelMat.Identity().Translate((0.5f + pos.X) - cameraPos.X, pos.Y - cameraPos.Y + contentHeight / 48f, (0.5f + pos.Z) - cameraPos.Z).Values;
                 standardShaderProgram.ViewMatrix = render.CameraMatrixOriginf;
                 standardShaderProgram.ProjectionMatrix = render.CurrentProjectionMatrix;
-                render.RenderMesh(cubeModelRef);
+                render.RenderMesh(meshRef);
                 standardShaderProgram.Stop();
             }
         }
@@ -72,6 +72,7 @@ namespace GlassMaking.Blocks
         public void Dispose()
         {
             api.Event.UnregisterRenderer(this, EnumRenderStage.Opaque);
+            meshRef?.Dispose();
         }
     }
 }

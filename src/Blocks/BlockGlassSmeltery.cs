@@ -33,5 +33,19 @@ namespace GlassMaking.Blocks
             if(be != null) items = items.Append(be.GetDropItems() ?? new ItemStack[0]);
             return items;
         }
+
+        public override void OnUnloaded(ICoreAPI api)
+        {
+            base.OnUnloaded(api);
+            if(api.Side == EnumAppSide.Client)
+            {
+                var bathMesh = ObjectCacheUtil.TryGet<MeshRef>(api, "glassmaking:glass-smeltery-shape");
+                if(bathMesh != null)
+                {
+                    bathMesh.Dispose();
+                    ObjectCacheUtil.Delete(api, "glassmaking:glass-smeltery-shape");
+                }
+            }
+        }
     }
 }

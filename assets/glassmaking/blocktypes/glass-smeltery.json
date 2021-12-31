@@ -24,19 +24,19 @@
 	"lightAbsorption": 3,
 	"shapeByType": {
 		"*-north": {
-			"base": "block/glass-smeltery-working",
+			"base": "block/glass-smeltery/item",
 			"rotateY": 0
 		},
 		"*-east": {
-			"base": "block/glass-smeltery-working",
+			"base": "block/glass-smeltery/item",
 			"rotateY": 270
 		},
 		"*-south": {
-			"base": "block/glass-smeltery-working",
+			"base": "block/glass-smeltery/item",
 			"rotateY": 180
 		},
 		"*-west": {
-			"base": "block/glass-smeltery-working",
+			"base": "block/glass-smeltery/item",
 			"rotateY": 90
 		}
 	},

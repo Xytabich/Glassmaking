@@ -2,13 +2,13 @@
 
 namespace GlassMaking.Blocks
 {
-    public class HeatedBlockBase : Block, IHeatedBlock
+    public class HeatedBlockBase : Block, IHeaterPlaceableBlock
     {
-        public virtual bool TryPlaceBlock(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, ItemStack itemstack, BlockEntityFirebox firebox)
+        public virtual bool TryPlaceBlock(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, ItemStack itemstack, string side)
         {
             if(world.BlockAccessor.GetBlock(blockSel.Position.UpCopy()).IsReplacableBy(itemstack.Block))
             {
-                world.GetBlock(CodeWithVariant("side", firebox.Block.Variant["side"])).DoPlaceBlock(world, byPlayer, blockSel, itemstack);
+                world.GetBlock(CodeWithVariant("side", side)).DoPlaceBlock(world, byPlayer, blockSel, itemstack);
                 return true;
             }
             return false;

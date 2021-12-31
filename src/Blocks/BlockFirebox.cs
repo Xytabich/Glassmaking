@@ -16,15 +16,16 @@ namespace GlassMaking.Blocks
                 BlockEntityFirebox be = world.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityFirebox;
                 if(be != null)
                 {
-                    if(itemstack.Class == EnumItemClass.Block && itemstack.Block is IHeatedBlock block)
+                    if(itemstack.Class == EnumItemClass.Block && itemstack.Block is IHeaterPlaceableBlock block)
                     {
-                        if(block.TryPlaceBlock(world, byPlayer, new BlockSelection { Position = blockSel.Position.UpCopy(), Face = BlockFacing.UP }, itemstack, be))
+                        if(block.TryPlaceBlock(world, byPlayer, new BlockSelection { Position = blockSel.Position.UpCopy(), Face = BlockFacing.UP }, itemstack, Variant["side"]))
                         {
                             world.PlaySoundAt(Sounds?.Place, blockSel.Position.X, blockSel.Position.Y + 1, blockSel.Position.Z, byPlayer, true, 16f);
                             if(byPlayer.WorldData.CurrentGameMode != EnumGameMode.Creative)
                             {
                                 byPlayer.InventoryManager.ActiveHotbarSlot.TakeOut(1);
                             }
+                            be.SetReceiver(world.BlockAccessor.GetBlockEntity(blockSel.Position.UpCopy()) as ITimeBasedHeatReceiver);
                             return true;
                         }
                     }
@@ -63,7 +64,7 @@ namespace GlassMaking.Blocks
         {
             var upPos = pos.UpCopy();
             var block = world.BlockAccessor.GetBlock(upPos);
-            if(block is IHeatedBlock) block.OnBlockBroken(world, upPos, byPlayer, dropQuantityMultiplier);
+            if(block is IHeaterPlaceableBlock) block.OnBlockBroken(world, upPos, byPlayer, dropQuantityMultiplier);
             base.OnBlockBroken(world, pos, byPlayer, dropQuantityMultiplier);
         }
 
@@ -84,8 +85,7 @@ namespace GlassMaking.Blocks
                 var be = world.BlockAccessor.GetBlockEntity(pos) as BlockEntityFirebox;
                 if(be != null)
                 {
-                    var receiver = world.BlockAccessor.GetBlockEntity(neibpos) as ITimeBasedHeatReceiver;
-                    be.SetReceiver(receiver);
+                    be.SetReceiver(world.BlockAccessor.GetBlockEntity(neibpos) as ITimeBasedHeatReceiver);
                 }
             }
         }

@@ -27,7 +27,18 @@ namespace GlassMaking.Items
             7, 16, 8, 8, 16, 17,
         };
 
-        private static readonly int[] capTriangles = {
+        private static readonly int[] radialSectionTrianglesInverted = {
+            0, 1, 9,  9,  1, 10,
+            1, 2, 10, 10, 2, 11,
+            2, 3, 11, 11, 3, 12,
+            3, 4, 12, 12, 4, 13,
+            4, 5, 13, 13, 5, 14,
+            5, 6, 14, 14, 6, 15,
+            6, 7, 15, 15, 7, 16,
+            7, 8, 16, 16, 8, 17,
+        };
+
+        private static readonly int[] capTrianglesUp = {
             0, 1, 2,
             0, 2, 3,
             0, 3, 4,
@@ -38,7 +49,7 @@ namespace GlassMaking.Items
             0, 8, 9
         };
 
-        private static readonly int[] capTrianglesInverted = {
+        private static readonly int[] capTrianglesDown = {
             9, 0, 1,
             9, 1, 2,
             9, 2, 3,
@@ -47,6 +58,28 @@ namespace GlassMaking.Items
             9, 5, 6,
             9, 6, 7,
             9, 7, 8
+        };
+
+        private static readonly int[] capTrianglesUpInverted = {
+            1, 0, 2,
+            2, 0, 3,
+            3, 0, 4,
+            4, 0, 5,
+            5, 0, 6,
+            6, 0, 7,
+            7, 0, 8,
+            8, 0, 9
+        };
+
+        private static readonly int[] capTrianglesDownInverted = {
+            0, 9, 1,
+            1, 9, 2,
+            2, 9, 3,
+            3, 9, 4,
+            4, 9, 5,
+            5, 9, 6,
+            6, 9, 7,
+            7, 9, 8
         };
 
         private const int MAX_RADIUS = 15;
@@ -484,7 +517,7 @@ namespace GlassMaking.Items
                     if(innerRadius == 0)
                     {
                         AddVertice(mesh, 0, 0, i + 0.5f, i / 32f, 0);
-                        if(!addCap) GenearateCapFaces(mesh, true);
+                        if(!addCap) GenearateCapFaces(mesh, true, true);
                         addCap = true;
                     }
                     else
@@ -492,10 +525,10 @@ namespace GlassMaking.Items
                         GenerateRadialVertices(mesh, i, innerRadius, true);
                         if(addCap)
                         {
-                            GenearateCapFaces(mesh, false);
+                            GenearateCapFaces(mesh, false, true);
                             addCap = false;
                         }
-                        else GenerateRadialFaces(mesh);
+                        else GenerateRadialFaces(mesh, true);
                     }
                 }
                 AddVertice(mesh, 0, 0, -3.5f, 0, 0);
@@ -503,11 +536,11 @@ namespace GlassMaking.Items
                 {
                     outerRadius = ((radii[i] >> 4) & 15) + 1;
                     GenerateRadialVertices(mesh, i, outerRadius, false);
-                    if(i == 0) GenearateCapFaces(mesh, false);
-                    else GenerateRadialFaces(mesh);
+                    if(i == 0) GenearateCapFaces(mesh, false, false);
+                    else GenerateRadialFaces(mesh, false);
                 }
                 AddVertice(mesh, 0, 0, radii.Length + 0.5f, radii.Length / 32f, 0);
-                GenearateCapFaces(mesh, true);
+                GenearateCapFaces(mesh, true, false);
             }
             mesh.SetTexPos(texture);
             return mesh;
@@ -532,19 +565,20 @@ namespace GlassMaking.Items
             mesh.AddNormal(vec.X, vec.Y, vec.Z);
         }
 
-        private void GenerateRadialFaces(MeshData mesh)
+        private void GenerateRadialFaces(MeshData mesh, bool invert)
         {
             int index = mesh.VerticesCount - RADIAL_SECTION_INDICES;
-            for(int i = 0; i < radialSectionTriangles.Length; i++)
+            var indices = invert ? radialSectionTrianglesInverted : radialSectionTriangles;
+            for(int i = 0; i < indices.Length; i++)
             {
-                mesh.AddIndex(radialSectionTriangles[i] + index);
+                mesh.AddIndex(indices[i] + index);
             }
         }
 
-        private void GenearateCapFaces(MeshData mesh, bool invert)
+        private void GenearateCapFaces(MeshData mesh, bool isDown, bool invert)
         {
             int index = mesh.VerticesCount - CAP_SECTION_INDICES;
-            var indices = invert ? capTrianglesInverted : capTriangles;
+            var indices = isDown ? (invert ? capTrianglesDownInverted : capTrianglesDown) : (invert ? capTrianglesUpInverted : capTrianglesUp);
             for(int i = 0; i < indices.Length; i++)
             {
                 mesh.AddIndex(indices[i] + index);

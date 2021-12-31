@@ -1,10 +1,12 @@
 ﻿using GlassMaking.Common;
 using System;
 using System.Text;
+using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
+using Vintagestory.API.Util;
 
 namespace GlassMaking.Blocks
 {
@@ -22,7 +24,11 @@ namespace GlassMaking.Blocks
         IInventory IBlockEntityContainer.Inventory => inventory;
         string IBlockEntityContainer.InventoryClassName => inventory.ClassName;
 
+        private BlockRendererGlassSmeltery renderer = null;
+
         private ITimeBasedHeatSource heatSource = null;
+
+        private MeshData coverMesh;
 
         private SmelteryState state;
         private int glassAmount;
@@ -35,6 +41,21 @@ namespace GlassMaking.Blocks
         {
             base.Initialize(api);
             inventory.LateInitialize("glasswork:glasssmeltery-" + Pos.X + "/" + Pos.Y + "/" + Pos.Z, api);
+            if(api.Side == EnumAppSide.Client)
+            {
+                ICoreClientAPI capi = (ICoreClientAPI)api;
+                var asset = capi.Assets.TryGet(new AssetLocation(Block.Code.Domain, "shapes/block/glass-smeltery/cover.json"));
+                capi.Tesselator.TesselateShape(Block, asset.ToObject<Shape>(), out coverMesh, new Vec3f(0f, GetRotation(), 0f));
+                var bathSource = capi.Tesselator.GetTexSource(Block);
+                var bathMesh = ObjectCacheUtil.GetOrCreate(capi, "glassmaking:glass-smeltery-" + Block.Variant["side"], () => {
+                    asset = capi.Assets.TryGet(new AssetLocation(Block.Code.Domain, "shapes/block/glass-smeltery/bath.json"));
+                    capi.Tesselator.TesselateShape("glassmaking:glass-smeltery-shape", asset.ToObject<Shape>(), out var bath, bathSource, new Vec3f(0f, GetRotation(), 0f));
+                    return capi.Render.UploadMesh(bath);
+                });
+                renderer = new BlockRendererGlassSmeltery(Pos, capi, bathMesh, bathSource["inside"].atlasTextureId);
+                capi.Event.RegisterRenderer(renderer, EnumRenderStage.Opaque, "glassmaking:firebox");
+                UpdateRendererFull();
+            }
         }
 
         public override void GetBlockInfo(IPlayer forPlayer, StringBuilder dsc)
@@ -101,6 +122,26 @@ namespace GlassMaking.Blocks
                     processProgress = tree.GetDouble("progress");
                 }
             }
+            UpdateRendererFull();
+        }
+
+        public override bool OnTesselation(ITerrainMeshPool mesher, ITesselatorAPI tessThreadTesselator)
+        {
+            mesher.AddMeshData(coverMesh);
+            base.OnTesselation(mesher, tessThreadTesselator);
+            return true;
+        }
+
+        public override void OnBlockUnloaded()
+        {
+            base.OnBlockUnloaded();
+            renderer?.Dispose();
+        }
+
+        public override void OnBlockRemoved()
+        {
+            renderer?.Dispose();
+            base.OnBlockRemoved();
         }
 
         public bool TryAdd(IPlayer byPlayer, ItemSlot slot, int count)
@@ -132,6 +173,7 @@ namespace GlassMaking.Blocks
                     state = SmelteryState.ContainsMix;
                 }
                 glassAmount += blend.amount * consume;
+                UpdateRendererFull();
                 MarkDirty(true);
                 return true;
             }
@@ -211,7 +253,8 @@ namespace GlassMaking.Blocks
                     state = SmelteryState.Melting;
                     processProgress = 0;
                     inventory.Clear();
-                    MarkDirty();
+                    UpdateRendererFull();
+                    MarkDirty(true);
                 }
             }
             if(state == SmelteryState.Melting)
@@ -244,6 +287,43 @@ namespace GlassMaking.Blocks
                     processProgress += time;
                 }
             }
+
+            if(Api.Side == EnumAppSide.Client) UpdateRendererParameters();
+        }
+
+        private void UpdateRendererFull()
+        {
+            if(Api != null && Api.Side == EnumAppSide.Client && renderer != null)
+            {
+                renderer.SetHeight((float)glassAmount / maxGlassAmount);
+                UpdateRendererParameters();
+            }
+        }
+
+        private void UpdateRendererParameters()
+        {
+            renderer.SetParameters(state == SmelteryState.ContainsMix, Math.Min(223, (int)((heatSource == null ? 0 : heatSource.GetTemperature() / 1500f) * 223)));
+        }
+
+        private int GetRotation()
+        {
+            int result = 0;
+            switch(Block.LastCodePart())
+            {
+                case "north":
+                    result = 0;
+                    break;
+                case "east":
+                    result = 270;
+                    break;
+                case "south":
+                    result = 180;
+                    break;
+                case "west":
+                    result = 90;
+                    break;
+            }
+            return result;
         }
 
         private enum SmelteryState
