@@ -483,9 +483,9 @@ namespace GlassMaking.Items
                     innerRadius = radii[i] & 15;
                     if(innerRadius == 0)
                     {
-                        addCap = true;
                         AddVertice(mesh, 0, 0, i + 0.5f, i / 32f, 0);
-                        GenearateCapFaces(mesh, true);
+                        if(!addCap) GenearateCapFaces(mesh, true);
+                        addCap = true;
                     }
                     else
                     {
@@ -516,7 +516,7 @@ namespace GlassMaking.Items
         private void GenerateRadialVertices(MeshData mesh, int offset, int radius, bool invertNormal)
         {
             float u = 1f / 32f;
-            float v = radius / (16f * RADIAL_SECTIONS_VERTICES);
+            float v = radius / (8f * RADIAL_SECTIONS_VERTICES);
             float step = GameMath.PI * 2f / RADIAL_SECTIONS_VERTICES;
             for(int i = 0; i <= RADIAL_SECTIONS_VERTICES; i++)
             {
