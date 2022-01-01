@@ -13,6 +13,11 @@
         bool IsHeatedUp();
 
         /// <summary>
+        /// Does the fire burn at the source (if the source is powered by fuel)
+        /// </summary>
+        bool IsBurning();
+
+        /// <summary>
         /// What tempature was calculated on the last tick
         /// </summary>
         float GetTemperature();

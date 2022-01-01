@@ -3,6 +3,7 @@ using System.Text;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
+using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Blocks
 {
@@ -10,6 +11,9 @@ namespace GlassMaking.Blocks
     {
         private const float TEMP_INCREASE_PER_HOUR = 1500;
         private const float TEMP_DECREASE_PER_HOUR = 2000;
+
+        private static SimpleParticleProperties smokeParticles;
+        private static AdvancedParticleProperties fireParticles;
 
         protected virtual float fuelTemperatureModifier => 1.1f;
         protected virtual float fuelDurationModifier => 0.8f;
@@ -196,6 +200,11 @@ namespace GlassMaking.Blocks
             MarkDirty(true);
         }
 
+        public bool IsBurning()
+        {
+            return burning;
+        }
+
         public bool IsHeatedUp()
         {
             return temperature > 20;
@@ -279,10 +288,6 @@ namespace GlassMaking.Blocks
         private void OnCommonTick(float dt)
         {
             double totalHours = Api.World.Calendar.TotalHours;
-            if(Api.Side == EnumAppSide.Client)
-            {
-                System.Diagnostics.Debug.WriteLine(totalHours + ":" + lastTickTime + ":" + dt);
-            }
             if(receiver != null) receiver.OnHeatSourceTick(dt);
             if(totalHours < lastTickTime) lastTickTime = totalHours;
             if(burning && totalHours > lastTickTime)
@@ -342,7 +347,11 @@ namespace GlassMaking.Blocks
             }
             lastTickTime = totalHours;
 
-            if(Api.Side == EnumAppSide.Client) UpdateRendererParameters();
+            if(Api.Side == EnumAppSide.Client)
+            {
+                UpdateRendererParameters();
+                if(burning) EmitParticles();
+            }
         }
 
         private int GetFuelCount()
@@ -364,14 +373,56 @@ namespace GlassMaking.Blocks
         {
             if(Api != null && Api.Side == EnumAppSide.Client && renderer != null)
             {
-                renderer.SetHeight(GetFuelCount() + (burning ? 1 : 0));
+                renderer.SetHeight(GetFuelHeight());
                 UpdateRendererParameters();
             }
+        }
+
+        private int GetFuelHeight()
+        {
+            return GetFuelCount() + (burning ? 1 : 0);
         }
 
         private void UpdateRendererParameters()
         {
             renderer.SetParameters(burning, Math.Min(128, (int)((temperature / 1500f) * 128)));
+        }
+
+        private void EmitParticles()
+        {
+            if(Api.World.GetLockFreeBlockAccessor().GetBlockId(Pos.X, Pos.Y + 1, Pos.Z) == 0)
+            {
+                double fuelOffset = GetFuelHeight() / 24.0 + 1.0 / 16;
+                smokeParticles.MinPos.Set(Pos.X + 0.5 - 0.3125, Pos.Y + fuelOffset, Pos.Z + 0.5 - 0.3125);
+                fireParticles.basePos.Set(Pos.X + 0.5, Pos.Y + fuelOffset, Pos.Z + 0.5);
+                Api.World.SpawnParticles(smokeParticles);
+                Api.World.SpawnParticles(fireParticles);
+            }
+        }
+
+        static BlockEntityFirebox()
+        {
+            smokeParticles = new SimpleParticleProperties(1f, 2.5f, ColorUtil.ToRgba(150, 80, 80, 80), new Vec3d(), new Vec3d(0.75, 0.0, 0.75), new Vec3f(-0.03125f, 0.1f, -0.03125f), new Vec3f(0.03125f, 0.5f, 0.03125f), 2f, -0.00625f, 0.2f, 1f, EnumParticleModel.Quad);
+            smokeParticles.SizeEvolve = new EvolvingNatFloat(EnumTransformFunction.LINEAR, -0.25f);
+            smokeParticles.SelfPropelled = true;
+            smokeParticles.WindAffected = true;
+            smokeParticles.WindAffectednes = 0.3f;
+            smokeParticles.AddPos.Set(0.625, 0.0, 0.625);
+            fireParticles = new AdvancedParticleProperties();
+            fireParticles.HsvaColor = new NatFloat[] { new NatFloat(20, 20, EnumDistribution.UNIFORM), new NatFloat(255, 50, EnumDistribution.UNIFORM), new NatFloat(255, 50, EnumDistribution.UNIFORM), new NatFloat(255, 0, EnumDistribution.UNIFORM) };
+            fireParticles.OpacityEvolve = new EvolvingNatFloat(EnumTransformFunction.QUADRATIC, -16f);
+            fireParticles.GravityEffect = new NatFloat(-0.01f, 0, EnumDistribution.UNIFORM);
+            fireParticles.PosOffset = new NatFloat[] { new NatFloat(0, 0.3125f, EnumDistribution.UNIFORM), new NatFloat(0, 0, EnumDistribution.UNIFORM), new NatFloat(0, 0.3125f, EnumDistribution.UNIFORM) };
+            fireParticles.Velocity = new NatFloat[] { new NatFloat(0, 0.025f, EnumDistribution.UNIFORM), new NatFloat(0.18f, 0, EnumDistribution.UNIFORM), new NatFloat(0, 0.025f, EnumDistribution.UNIFORM) };
+            fireParticles.Quantity = new NatFloat(1f, 1.5f, EnumDistribution.UNIFORM);
+            fireParticles.LifeLength = new NatFloat(0.75f, 0.25f, EnumDistribution.UNIFORM);
+            fireParticles.Size = new NatFloat(0.25f, 0.05f, EnumDistribution.UNIFORM);
+            fireParticles.SizeEvolve = new EvolvingNatFloat(EnumTransformFunction.LINEARINCREASE, -0.25f);
+            fireParticles.ParticleModel = EnumParticleModel.Quad;
+            fireParticles.VertexFlags = 128;
+            fireParticles.WindAffectednes = 0.7f;
+            fireParticles.WindAffectednesAtPos = 0.3f;
+            fireParticles.SelfPropelled = true;
         }
     }
 }

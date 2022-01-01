@@ -19,6 +19,8 @@ namespace GlassMaking.Blocks
         private const double PROCESS_HOURS_PER_UNIT = 0.001;
         private const double BUBBLING_PROCESS_MULTIPLIER = 3;
 
+        private static SimpleParticleProperties smokeParticles;
+
         protected virtual int maxGlassAmount => 200;
 
         IInventory IBlockEntityContainer.Inventory => inventory;
@@ -244,51 +246,68 @@ namespace GlassMaking.Blocks
 
         void ITimeBasedHeatReceiver.OnHeatSourceTick(float dt)
         {
-            if(state == SmelteryState.Empty || !heatSource.IsHeatedUp()) return;
-            double timeOffset = 0;
-            if(state == SmelteryState.ContainsMix)
+            if(state != SmelteryState.Empty && heatSource.IsHeatedUp())
             {
-                if(heatSource.CalcTempElapsedTime(timeOffset, MELTING_TEMPERATURE) > 0)
+                double timeOffset = 0;
+                if(state == SmelteryState.ContainsMix)
                 {
-                    state = SmelteryState.Melting;
-                    processProgress = 0;
-                    inventory.Clear();
-                    UpdateRendererFull();
-                    MarkDirty(true);
+                    if(heatSource.CalcTempElapsedTime(timeOffset, MELTING_TEMPERATURE) > 0)
+                    {
+                        state = SmelteryState.Melting;
+                        processProgress = 0;
+                        inventory.Clear();
+                        UpdateRendererFull();
+                        MarkDirty(true);
+                    }
                 }
-            }
-            if(state == SmelteryState.Melting)
-            {
-                double timeLeft = glassAmount * PROCESS_HOURS_PER_UNIT - processProgress;
-                double time = heatSource.CalcTempElapsedTime(timeOffset, MELTING_TEMPERATURE);
-                if(time >= timeLeft)
+                if(state == SmelteryState.Melting)
                 {
-                    timeOffset += timeLeft;
-                    processProgress = 0;
-                    state = SmelteryState.Bubbling;
-                    MarkDirty();
+                    double timeLeft = glassAmount * PROCESS_HOURS_PER_UNIT - processProgress;
+                    double time = heatSource.CalcTempElapsedTime(timeOffset, MELTING_TEMPERATURE);
+                    if(time >= timeLeft)
+                    {
+                        timeOffset += timeLeft;
+                        processProgress = 0;
+                        state = SmelteryState.Bubbling;
+                        MarkDirty();
+                    }
+                    else
+                    {
+                        processProgress += time;
+                    }
                 }
-                else
+                if(state == SmelteryState.Bubbling)
                 {
-                    processProgress += time;
-                }
-            }
-            if(state == SmelteryState.Bubbling)
-            {
-                double timeLeft = glassAmount * PROCESS_HOURS_PER_UNIT * BUBBLING_PROCESS_MULTIPLIER - processProgress;
-                double time = heatSource.CalcTempElapsedTime(timeOffset, BUBBLING_TEMPERATURE);
-                if(time >= timeLeft)
-                {
-                    state = SmelteryState.ContainsGlass;
-                    MarkDirty();
-                }
-                else
-                {
-                    processProgress += time;
+                    double timeLeft = glassAmount * PROCESS_HOURS_PER_UNIT * BUBBLING_PROCESS_MULTIPLIER - processProgress;
+                    double time = heatSource.CalcTempElapsedTime(timeOffset, BUBBLING_TEMPERATURE);
+                    if(time >= timeLeft)
+                    {
+                        state = SmelteryState.ContainsGlass;
+                        MarkDirty();
+                    }
+                    else
+                    {
+                        processProgress += time;
+                    }
                 }
             }
 
-            if(Api.Side == EnumAppSide.Client) UpdateRendererParameters();
+            if(Api.Side == EnumAppSide.Client)
+            {
+                UpdateRendererParameters();
+                if(heatSource.IsBurning()) EmitParticles();
+            }
+        }
+
+        private void EmitParticles()
+        {
+            if(Api.World.Rand.Next(5) > 0)
+            {
+                GetSmokeParameters(out var x, out var z, out var wx, out var wz);
+                smokeParticles.MinPos.Set(Pos.X + 0.5 + x, Pos.Y + 0.75f, Pos.Z + 0.5 + z);
+                smokeParticles.AddPos.Set(wx, 0.0, wz);
+                Api.World.SpawnParticles(smokeParticles);
+            }
         }
 
         private void UpdateRendererFull()
@@ -308,7 +327,7 @@ namespace GlassMaking.Blocks
         private int GetRotation()
         {
             int result = 0;
-            switch(Block.LastCodePart())
+            switch(Block.Variant["side"])
             {
                 case "north":
                     result = 0;
@@ -324,6 +343,49 @@ namespace GlassMaking.Blocks
                     break;
             }
             return result;
+        }
+
+        private void GetSmokeParameters(out double x, out double z, out double wx, out double wz)
+        {
+            x = 0;
+            z = 0;
+            wx = 0.25;
+            wz = 0.25;
+            switch(Block.Variant["side"])
+            {
+                case "north":
+                    x = -0.3125;
+                    z = -0.3125;
+                    wx = 0.625;
+                    wz = 0.1875;
+                    break;
+                case "east":
+                    x = 0.125;
+                    z = -0.3125;
+                    wx = 0.1875;
+                    wz = 0.625;
+                    break;
+                case "south":
+                    x = -0.3125;
+                    z = 0.125;
+                    wx = 0.625;
+                    wz = 0.1875;
+                    break;
+                case "west":
+                    x = -0.3125;
+                    z = -0.3125;
+                    wx = 0.1875;
+                    wz = 0.625;
+                    break;
+            }
+        }
+
+        static BlockEntityGlassSmeltery()
+        {
+            smokeParticles = new SimpleParticleProperties(1f, 1f, ColorUtil.ToRgba(128, 110, 110, 110), new Vec3d(), new Vec3d(), new Vec3f(-0.2f, 0.3f, -0.2f), new Vec3f(0.2f, 0.3f, 0.2f), 2f, 0f, 0.5f, 1f, EnumParticleModel.Quad);
+            smokeParticles.SelfPropelled = true;
+            smokeParticles.OpacityEvolve = new EvolvingNatFloat(EnumTransformFunction.LINEAR, -255f);
+            smokeParticles.SizeEvolve = new EvolvingNatFloat(EnumTransformFunction.LINEAR, 2f);
         }
 
         private enum SmelteryState

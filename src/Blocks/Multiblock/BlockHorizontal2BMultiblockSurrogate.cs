@@ -19,6 +19,18 @@ namespace GlassMaking.Blocks
             mainSideFace = BlockFacing.HORIZONTALS_ANGLEORDER[(face.HorizontalAngleIndex + 3) % 4];
         }
 
+        public override ItemStack OnPickBlock(IWorldAccessor world, BlockPos pos)
+        {
+            if(TryGetMainBlock(world.BlockAccessor, ref pos, out Block block))
+            {
+                return block.OnPickBlock(world, pos.AddCopy(mainSideFace));
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         public override ItemStack[] GetDrops(IWorldAccessor world, BlockPos pos, IPlayer byPlayer, float dropQuantityMultiplier = 1)
         {
             return new ItemStack[0];
