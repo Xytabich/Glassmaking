@@ -1,5 +1,6 @@
 ﻿using GlassMaking.Blocks;
 using GlassMaking.Items;
+using GlassMaking.Tools;
 using System.Collections.Generic;
 using Vintagestory.API.Common;
 using Vintagestory.API.Server;
@@ -32,6 +33,10 @@ namespace GlassMaking
             api.RegisterBlockEntityClass("glassmaking:glassworktable", typeof(BlockEntityGlassworktable));
 
             api.RegisterBlockBehaviorClass("Horizontal2BMultiblock", typeof(BlockBehaviorHorizontal2BMultiblock));
+
+            RegisterGlassBlowingTool(new AssetLocation("glasspipe"), new GlasspipeBlowingTool());
+
+            glassblowingRecipes = api.RegisterRecipeRegistry<RecipeRegistryGeneric<GlassBlowingRecipe>>("glassblowing").Recipes;
         }
 
         public override void StartServerSide(ICoreServerAPI api)
@@ -40,7 +45,6 @@ namespace GlassMaking
             base.StartServerSide(api);
 
             api.Event.SaveGameLoaded += OnSaveGameLoaded;
-            glassblowingRecipes = api.RegisterRecipeRegistry<RecipeRegistryGeneric<GlassBlowingRecipe>>("glassblowing").Recipes;
         }
 
         public void RegisterGlassBlowingTool(AssetLocation code, IGlassBlowingTool tool)
@@ -50,7 +54,11 @@ namespace GlassMaking
 
         public IGlassBlowingTool GetGlassBlowingTool(AssetLocation code)
         {
-            return tools[code.ToShortString()];
+            if(tools.TryGetValue(code.ToShortString(), out var tool))
+            {
+                return tool;
+            }
+            return null;
         }
 
         private void OnSaveGameLoaded()

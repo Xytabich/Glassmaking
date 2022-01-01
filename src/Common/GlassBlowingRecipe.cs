@@ -26,7 +26,7 @@ namespace GlassMaking
 
         public IRecipeIngredient[] Ingredients { get; } = new IRecipeIngredient[0];
 
-        public IRecipeOutput Output => throw new NotImplementedException();
+        public IRecipeOutput Output => output;
 
         public bool Resolve(IWorldAccessor world, string sourceForErrorLogging)
         {
@@ -44,6 +44,11 @@ namespace GlassMaking
             for(int i = 0; i < steps.Length; i++)
             {
                 var tool = system.GetGlassBlowingTool(steps[i].tool);
+                if(tool == null)
+                {
+                    world.Logger.Error("Failed resolving a glassblowing tool with code {0} in {1}", steps[i].tool, sourceForErrorLogging);
+                    return false;
+                }
                 var step = tool.GetStepInstance();
                 step.tool = steps[i].tool.Clone();
                 step.shape = steps[i].GenRadii();
@@ -67,6 +72,7 @@ namespace GlassMaking
             writer.Write(resolvedSteps.Length);
             for(int i = 0; i < resolvedSteps.Length; i++)
             {
+                writer.Write(resolvedSteps[i].tool);
                 resolvedSteps[i].ToBytes(writer);
             }
             output.ToBytes(writer);
@@ -79,8 +85,10 @@ namespace GlassMaking
             var system = resolver.Api.ModLoader.GetModSystem<GlassMakingMod>();
             for(int i = 0; i < resolvedSteps.Length; i++)
             {
-                var tool = system.GetGlassBlowingTool(reader.ReadAssetLocation());
+                var code = reader.ReadAssetLocation();
+                var tool = system.GetGlassBlowingTool(code);
                 resolvedSteps[i] = tool.GetStepInstance();
+                resolvedSteps[i].tool = code;
                 resolvedSteps[i].FromBytes(reader, resolver);
             }
             output = new JsonItemStack();
@@ -163,7 +171,6 @@ namespace GlassMaking
 
         public virtual void ToBytes(BinaryWriter writer)
         {
-            writer.Write(tool);
             if(shape == null) writer.Write(0);
             else
             {
@@ -178,7 +185,6 @@ namespace GlassMaking
 
         public virtual void FromBytes(BinaryReader reader, IWorldAccessor resolver)
         {
-            tool = reader.ReadAssetLocation();
             int length = reader.ReadInt32();
             shape = new int[length, 2];
             for(int i = 0; i < length; i++)

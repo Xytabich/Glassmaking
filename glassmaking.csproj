@@ -99,6 +99,7 @@
     <Compile Include="src\GlassMakingMod.cs" />
     <Compile Include="src\Items\ItemGlassBlend.cs" />
     <Compile Include="src\Items\ItemGlassworkPipe.cs" />
+    <Compile Include="src\Tools\GlasspipeBlowingTool.cs" />
     <Compile Include="src\Utils.cs" />
   </ItemGroup>
   <ItemGroup />

@@ -1,0 +1,29 @@
+﻿using Vintagestory.API.Common;
+using Vintagestory.API.Datastructures;
+
+namespace GlassMaking.Tools
+{
+    public class GlasspipeBlowingTool : IGlassBlowingTool
+    {
+        public GlassBlowingToolStep GetStepInstance()
+        {
+            return new ToolStep();
+        }
+
+        private class ToolStep : GlassBlowingToolStep
+        {
+            public override GlassBlowingToolStep Clone()
+            {
+                return new ToolStep() {
+                    tool = tool.Clone(),
+                    shape = shape == null ? null : (int[,])shape.Clone()
+                };
+            }
+
+            public override bool Resolve(JsonObject attributes, IWorldAccessor world, string sourceForErrorLogging)
+            {
+                return true;
+            }
+        }
+    }
+}
