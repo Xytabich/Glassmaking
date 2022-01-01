@@ -1,11 +1,18 @@
 ﻿using GlassMaking.Blocks;
 using GlassMaking.Items;
+using System.Collections.Generic;
 using Vintagestory.API.Common;
+using Vintagestory.API.Server;
+using Vintagestory.ServerMods;
 
 namespace GlassMaking
 {
     public class GlassMakingMod : ModSystem
     {
+        private ICoreServerAPI sapi;
+        private List<GlassBlowingRecipe> glassblowingRecipes;
+        private Dictionary<string, IGlassBlowingTool> tools = new Dictionary<string, IGlassBlowingTool>();
+
         public override void Start(ICoreAPI api)
         {
             base.Start(api);
@@ -25,6 +32,36 @@ namespace GlassMaking
             api.RegisterBlockEntityClass("glassmaking:glassworktable", typeof(BlockEntityGlassworktable));
 
             api.RegisterBlockBehaviorClass("Horizontal2BMultiblock", typeof(BlockBehaviorHorizontal2BMultiblock));
+        }
+
+        public override void StartServerSide(ICoreServerAPI api)
+        {
+            this.sapi = api;
+            base.StartServerSide(api);
+
+            api.Event.SaveGameLoaded += OnSaveGameLoaded;
+            glassblowingRecipes = api.RegisterRecipeRegistry<RecipeRegistryGeneric<GlassBlowingRecipe>>("glassblowing").Recipes;
+        }
+
+        public void RegisterGlassBlowingTool(AssetLocation code, IGlassBlowingTool tool)
+        {
+            tools.Add(code.ToShortString(), tool);
+        }
+
+        public IGlassBlowingTool GetGlassBlowingTool(AssetLocation code)
+        {
+            return tools[code.ToShortString()];
+        }
+
+        private void OnSaveGameLoaded()
+        {
+            sapi.ModLoader.GetModSystem<RecipeLoader>().LoadRecipes<GlassBlowingRecipe>("glassblowing recipe", "recipes/glassblowing", RegisterGlassblowingRecipe);
+        }
+
+        private void RegisterGlassblowingRecipe(GlassBlowingRecipe r)
+        {
+            r.recipeId = glassblowingRecipes.Count;//TODO: resolve
+            glassblowingRecipes.Add(r);
         }
     }
 }

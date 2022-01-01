@@ -92,7 +92,9 @@
     <Compile Include="src\Blocks\Renderer\BlockRendererFirebox.cs" />
     <Compile Include="src\Blocks\Renderer\BlockRendererGlassSmeltery.cs" />
     <Compile Include="src\Common\GlassBlend.cs" />
+    <Compile Include="src\Common\GlassBlowingRecipe.cs" />
     <Compile Include="src\Common\GlassMoldRecipe.cs" />
+    <Compile Include="src\Common\IGlassBlowingTool.cs" />
     <Compile Include="src\Common\SimpleTextureSource.cs" />
     <Compile Include="src\GlassMakingMod.cs" />
     <Compile Include="src\Items\ItemGlassBlend.cs" />

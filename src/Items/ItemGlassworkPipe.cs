@@ -82,7 +82,7 @@ namespace GlassMaking.Items
             7, 9, 8
         };
 
-        private const int MAX_RADIUS = 15;
+        private const int MAX_RADIUS = 16;
 
         private static int nextMeshRefId = 0;
 

@@ -1,13 +1,18 @@
-﻿using Vintagestory.API.Common;
-using Vintagestory.API.MathTools;
+﻿using System.IO;
+using Vintagestory.API.Common;
 
 namespace GlassMaking
 {
-    internal static class Utils
+    public static class Utils
     {
-        public static bool IsBlockLoaded(this IBlockAccessor accessor, BlockPos pos)
+        public static void Write(this BinaryWriter writer, AssetLocation location)
         {
-            return accessor.GetChunkAtBlockPos(pos) != null;
+            writer.Write(location.ToShortString());
+        }
+
+        public static AssetLocation ReadAssetLocation(this BinaryReader reader)
+        {
+            return new AssetLocation(reader.ReadString());
         }
     }
 }
