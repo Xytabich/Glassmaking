@@ -50,7 +50,7 @@ namespace GlassMaking
                     return false;
                 }
                 var step = tool.GetStepInstance();
-                step.tool = steps[i].tool.Clone();
+                step.tool = steps[i].tool;
                 step.shape = steps[i].GenRadii();
                 if(!step.Resolve(steps[i].attributes, world, sourceForErrorLogging))
                 {
@@ -85,7 +85,7 @@ namespace GlassMaking
             var system = resolver.Api.ModLoader.GetModSystem<GlassMakingMod>();
             for(int i = 0; i < resolvedSteps.Length; i++)
             {
-                var code = reader.ReadAssetLocation();
+                var code = reader.ReadString();
                 var tool = system.GetGlassBlowingTool(code);
                 resolvedSteps[i] = tool.GetStepInstance();
                 resolvedSteps[i].tool = code;
@@ -116,7 +116,7 @@ namespace GlassMaking
 
     public sealed class JsonGlassBlowingToolStep
     {
-        public AssetLocation tool;
+        public string tool;
 
         public string[] shape;
 
@@ -161,7 +161,7 @@ namespace GlassMaking
 
     public abstract class GlassBlowingToolStep
     {
-        public AssetLocation tool;
+        public string tool;
 
         public int[,] shape;
 

@@ -15,7 +15,7 @@ namespace GlassMaking.Tools
             public override GlassBlowingToolStep Clone()
             {
                 return new ToolStep() {
-                    tool = tool.Clone(),
+                    tool = tool,
                     shape = shape == null ? null : (int[,])shape.Clone()
                 };
             }

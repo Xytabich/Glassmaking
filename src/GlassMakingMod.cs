@@ -34,7 +34,7 @@ namespace GlassMaking
 
             api.RegisterBlockBehaviorClass("Horizontal2BMultiblock", typeof(BlockBehaviorHorizontal2BMultiblock));
 
-            RegisterGlassBlowingTool(new AssetLocation("glasspipe"), new GlasspipeBlowingTool());
+            RegisterGlassBlowingTool("glasspipe", new GlasspipeBlowingTool());
 
             glassblowingRecipes = api.RegisterRecipeRegistry<RecipeRegistryGeneric<GlassBlowingRecipe>>("glassblowing").Recipes;
         }
@@ -47,14 +47,14 @@ namespace GlassMaking
             api.Event.SaveGameLoaded += OnSaveGameLoaded;
         }
 
-        public void RegisterGlassBlowingTool(AssetLocation code, IGlassBlowingTool tool)
+        public void RegisterGlassBlowingTool(string code, IGlassBlowingTool tool)
         {
-            tools.Add(code.ToShortString(), tool);
+            tools.Add(code, tool);
         }
 
-        public IGlassBlowingTool GetGlassBlowingTool(AssetLocation code)
+        public IGlassBlowingTool GetGlassBlowingTool(string code)
         {
-            if(tools.TryGetValue(code.ToShortString(), out var tool))
+            if(tools.TryGetValue(code, out var tool))
             {
                 return tool;
             }
