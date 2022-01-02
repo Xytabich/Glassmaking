@@ -17,7 +17,7 @@ namespace GlassMaking.Tools
             {
                 return new ToolStep() {
                     tool = tool,
-                    shape = shape == null ? null : (int[,])shape.Clone()
+                    shape = shape == null ? null : shape.Clone()
                 };
             }
 

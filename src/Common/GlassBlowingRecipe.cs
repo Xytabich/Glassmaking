@@ -6,7 +6,6 @@ using System.Text;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
-using Vintagestory.API.MathTools;
 
 namespace GlassMaking
 {
@@ -53,7 +52,7 @@ namespace GlassMaking
                 }
                 var step = tool.GetStepInstance();
                 step.tool = steps[i].tool;
-                step.shape = steps[i].GenRadii();
+                step.shape = steps[i].shape;
                 if(!step.Resolve(steps[i].attributes, world, sourceForErrorLogging))
                 {
                     return false;
@@ -202,80 +201,33 @@ namespace GlassMaking
     {
         public string tool;
 
-        public string[] shape;
+        public SmoothRoundedShape shape;
 
         [JsonProperty]
         [JsonConverter(typeof(JsonAttributesConverter))]
         public JsonObject attributes;
-
-        public int[,] GenRadii()
-        {
-            if(shape != null && shape.Length > 0)
-            {
-                var shapeRadii = new int[shape.Length, 2];
-                for(int i = 0; i < shape.Length; i++)
-                {
-                    string str = shape[i];
-                    int innerRadius = 0;
-                    int index = 0;
-                    for(; index < str.Length; index++)
-                    {
-                        if(str[index] == '_') innerRadius++;
-                        if(str[index] == '#') break;
-                    }
-                    innerRadius = GameMath.Clamp(innerRadius, 0, 15);
-                    int outerRadius = 0;
-                    for(; index < str.Length; index++)
-                    {
-                        if(str[index] != '#') break;
-                        outerRadius++;
-                    }
-                    outerRadius = GameMath.Clamp(innerRadius + outerRadius, innerRadius + 1, 16);
-                    shapeRadii[i, 0] = innerRadius;
-                    shapeRadii[i, 1] = outerRadius;
-                }
-                return shapeRadii;
-            }
-            else
-            {
-                return null;
-            }
-        }
     }
 
     public abstract class GlassBlowingToolStep
     {
         public string tool;
 
-        public int[,] shape;
-
-        public bool hasShape => shape != null && shape.GetLength(0) > 0;
+        public SmoothRoundedShape shape;
 
         public abstract bool Resolve(JsonObject attributes, IWorldAccessor world, string sourceForErrorLogging);
 
         public virtual void ToBytes(BinaryWriter writer)
         {
-            if(shape == null) writer.Write(0);
-            else
-            {
-                int length = shape.GetLength(0);
-                writer.Write(length);
-                for(int i = 0; i < length; i++)
-                {
-                    writer.Write((byte)((shape[i, 0] & 15) | ((shape[i, 1] << 4) & 15)));
-                }
-            }
+            writer.Write(shape != null);
+            if(shape != null) shape.ToBytes(writer);
         }
 
         public virtual void FromBytes(BinaryReader reader, IWorldAccessor resolver)
         {
-            int length = reader.ReadInt32();
-            shape = new int[length, 2];
-            for(int i = 0; i < length; i++)
+            if(reader.ReadBoolean())
             {
-                var data = reader.ReadByte();
-                shape[i, 0] = data & 15;
-                shape[i, 1] = (data >> 4) & 15;
+                shape = new SmoothRoundedShape();
+                shape.FromBytes(reader);
             }
         }
 

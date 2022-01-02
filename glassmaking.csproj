@@ -65,6 +65,10 @@
       <HintPath>C:\Games\Vintagestory\Lib\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="OpenTK">
+      <HintPath>C:\Games\Vintagestory\Lib\OpenTK.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="modinfo.json" />
@@ -91,11 +95,13 @@
     <Compile Include="src\Blocks\GlassSmelteryInventory.cs" />
     <Compile Include="src\Blocks\Renderer\BlockRendererFirebox.cs" />
     <Compile Include="src\Blocks\Renderer\BlockRendererGlassSmeltery.cs" />
+    <Compile Include="src\Common\FastVec2f.cs" />
     <Compile Include="src\Common\GlassBlend.cs" />
     <Compile Include="src\Common\GlassBlowingRecipe.cs" />
     <Compile Include="src\Common\GlassMoldRecipe.cs" />
     <Compile Include="src\Common\IGlassBlowingTool.cs" />
     <Compile Include="src\Common\SimpleTextureSource.cs" />
+    <Compile Include="src\Common\SmoothRoundedShape.cs" />
     <Compile Include="src\GlassMakingMod.cs" />
     <Compile Include="src\Items\ItemGlassBlend.cs" />
     <Compile Include="src\Items\ItemGlassworkPipe.cs" />
