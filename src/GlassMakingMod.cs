@@ -52,6 +52,11 @@ namespace GlassMaking
             tools.Add(code, tool);
         }
 
+        public GlassBlowingRecipe GetGlassBlowingRecipe(string code)
+        {
+            return null;//TODO:
+        }
+
         public IGlassBlowingTool GetGlassBlowingTool(string code)
         {
             if(tools.TryGetValue(code, out var tool))

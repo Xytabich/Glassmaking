@@ -1,4 +1,5 @@
-﻿using Vintagestory.API.Common;
+﻿using Vintagestory.API.Client;
+using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
 
 namespace GlassMaking.Tools
@@ -18,6 +19,11 @@ namespace GlassMaking.Tools
                     tool = tool,
                     shape = shape == null ? null : (int[,])shape.Clone()
                 };
+            }
+
+            public override WorldInteraction[] GetHeldInteractionHelp(ITreeAttribute treeAttribute)
+            {
+                return new WorldInteraction[0];
             }
 
             public override bool Resolve(JsonObject attributes, IWorldAccessor world, string sourceForErrorLogging)

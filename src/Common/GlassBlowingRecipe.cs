@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
+using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
@@ -66,6 +68,20 @@ namespace GlassMaking
             return new Dictionary<string, string[]>();
         }
 
+        public void GetRecipeInfo(ITreeAttribute recipeAttribute, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
+        {
+            dsc.AppendLine("Recipe: " + recipeAttribute.GetString("code"));
+            int step = recipeAttribute.GetInt("step");
+            dsc.AppendLine("Step: " + (step + 1));
+            resolvedSteps[step].GetStepInfo(recipeAttribute.GetTreeAttribute("data"), dsc, world, withDebugInfo);
+        }
+
+        public WorldInteraction[] GetHeldInteractionHelp(ITreeAttribute recipeAttribute)
+        {
+            int step = recipeAttribute.GetInt("step");
+            return resolvedSteps[step].GetHeldInteractionHelp(recipeAttribute.GetTreeAttribute("data"));
+        }
+
         public void ToBytes(BinaryWriter writer)
         {
             writer.Write(code);
@@ -76,6 +92,74 @@ namespace GlassMaking
                 resolvedSteps[i].ToBytes(writer);
             }
             output.ToBytes(writer);
+        }
+
+        public void OnHeldInteractStart(ItemSlot slot, ref ITreeAttribute recipeAttribute, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling)
+        {
+            int step = recipeAttribute.GetInt("step");
+            var data = recipeAttribute.GetTreeAttribute("data");
+            var prevData = data;
+            resolvedSteps[step].OnHeldInteractStart(slot, ref data, byEntity, blockSel, entitySel, firstEvent, ref handling, out float progress);
+            if(progress >= 1f)
+            {
+                //TODO: изменить меш
+                step++;
+                if(step >= steps.Length)
+                {
+                    recipeAttribute = null;
+                    //TODO: give output
+                }
+                else
+                {
+                    if(prevData != null) recipeAttribute.RemoveAttribute("data");
+                    recipeAttribute.SetInt("step", step);
+                    slot.MarkDirty();
+                }
+            }
+            else
+            {
+                //TODO: изменить меш в соответствии с прогрессом
+                if(prevData != data)
+                {
+                    if(data == null) recipeAttribute.RemoveAttribute("data");
+                    else recipeAttribute["data"] = data;
+                }
+            }
+        }
+
+        public bool OnHeldInteractStep(float secondsUsed, ItemSlot slot, ref ITreeAttribute recipeAttribute, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel)
+        {
+            int step = recipeAttribute.GetInt("step");
+            var data = recipeAttribute.GetTreeAttribute("data");
+            var prevData = data;
+            bool result = resolvedSteps[step].OnHeldInteractStep(secondsUsed, slot, ref data, byEntity, blockSel, entitySel, out float progress);
+            if(progress >= 1f)
+            {
+                //TODO: изменить меш
+                step++;
+                if(step >= steps.Length)
+                {
+                    recipeAttribute = null;
+                    //TODO: give output
+                }
+                else
+                {
+                    if(prevData != null) recipeAttribute.RemoveAttribute("data");
+                    recipeAttribute.SetInt("step", step);
+                    slot.MarkDirty();
+                }
+                return false;
+            }
+            else
+            {
+                //TODO: изменить меш в соответствии с прогрессом
+                if(prevData != data)
+                {
+                    if(data == null) recipeAttribute.RemoveAttribute("data");
+                    else recipeAttribute["data"] = data;
+                }
+            }
+            return result;
         }
 
         public void FromBytes(BinaryReader reader, IWorldAccessor resolver)
@@ -196,5 +280,20 @@ namespace GlassMaking
         }
 
         public abstract GlassBlowingToolStep Clone();
+
+        public virtual void GetStepInfo(ITreeAttribute treeAttribute, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo) { }
+
+        public abstract WorldInteraction[] GetHeldInteractionHelp(ITreeAttribute treeAttribute);
+
+        public void OnHeldInteractStart(ItemSlot slot, ref ITreeAttribute data, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling, out float progress)
+        {
+            progress = 1;
+        }
+
+        public bool OnHeldInteractStep(float secondsUsed, ItemSlot slot, ref ITreeAttribute data, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, out float progress)
+        {
+            progress = 1;
+            return true;
+        }
     }
 }

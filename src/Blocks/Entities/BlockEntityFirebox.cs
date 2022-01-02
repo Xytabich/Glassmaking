@@ -19,7 +19,9 @@ namespace GlassMaking.Blocks
         protected virtual float fuelDurationModifier => 0.8f;
         protected virtual int maxFuelCount => 16;
 
-        private ItemStack contents = null;
+        private ItemStack contents => inventory[0].Itemstack;
+        private ItemSlot contentsSlot => inventory[0];
+        private InventoryGeneric inventory = new InventoryGeneric(1, "firebox-1", null);
 
         private BlockRendererFirebox renderer = null;
 
@@ -40,11 +42,8 @@ namespace GlassMaking.Blocks
         public override void Initialize(ICoreAPI api)
         {
             base.Initialize(api);
-            if(contents != null)
-            {
-                contents.ResolveBlockOrItem(Api.World);
-                ApplyFuelParameters();
-            }
+            inventory.LateInitialize("firebox-1", api);
+            if(contents != null) ApplyFuelParameters();
             SetReceiver(api.World.BlockAccessor.GetBlockEntity(Pos.UpCopy()) as ITimeBasedHeatReceiver);
             if(api.Side == EnumAppSide.Client)
             {
@@ -96,23 +95,19 @@ namespace GlassMaking.Blocks
         public override void FromTreeAttributes(ITreeAttribute tree, IWorldAccessor worldAccessForResolve)
         {
             base.FromTreeAttributes(tree, worldAccessForResolve);
-            contents = tree.GetItemstack("fuelStack");
+            inventory.FromTreeAttributes(tree);
             fuelLevel = tree.GetFloat("fuelLevel");
             temperature = tree.GetFloat("temperature", 20);
             burning = tree.GetBool("burning");
             lastTickTime = tree.GetDouble("lastTickTotalHours");
-            if(contents != null && Api?.World != null)
-            {
-                contents.ResolveBlockOrItem(Api.World);
-                ApplyFuelParameters();
-            }
+            if(contents != null && Api?.World != null) ApplyFuelParameters();
             UpdateRendererFull();
         }
 
         public override void ToTreeAttributes(ITreeAttribute tree)
         {
             base.ToTreeAttributes(tree);
-            tree.SetItemstack("fuelStack", contents);
+            inventory.ToTreeAttributes(tree);
             tree.SetFloat("fuelLevel", fuelLevel);
             tree.SetFloat("temperature", temperature);
             tree.SetBool("burning", burning);
@@ -131,7 +126,7 @@ namespace GlassMaking.Blocks
 
         public ItemStack[] GetDropItems()
         {
-            if(contents == null || contents.StackSize < 1) return null;
+            if(contentsSlot.StackSize < 1) return null;
             return new ItemStack[] { contents.Clone() };
         }
 
@@ -139,50 +134,27 @@ namespace GlassMaking.Blocks
         {
             var combustibleProps = slot.Itemstack.Collectible.CombustibleProps;
             if(combustibleProps == null || combustibleProps.BurnTemperature < 100) return false;
-            if(burning)
-            {
-                if(contents == null) return false;
-                if(!contents.Satisfies(slot.Itemstack)) return false;
-            }
-            else
-            {
-                if(contents != null && !contents.Satisfies(slot.Itemstack)) return false;
-            }
 
             int consume = Math.Min(maxFuelCount - GetFuelCount(), Math.Min(slot.Itemstack.StackSize, count));
             if(consume > 0)
             {
-                if(Api.Side == EnumAppSide.Server)
+                if(slot.TryPutInto(byPlayer.Entity.World, contentsSlot, consume) > 0)
                 {
-                    if(contents == null)
+                    if(Api.Side == EnumAppSide.Server)
                     {
-                        contents = slot.Itemstack.GetEmptyClone();
-                        contents.StackSize = consume;
                         if(!burning && temperature >= 300)
                         {
                             burning = true;
                             ApplyFuelParameters();
                             fuelLevel = fuelBurnDuration;
-                            contents.StackSize--;
+                            contentsSlot.TakeOut(1);
                         }
-                        UpdateRendererFull();
+                        slot.MarkDirty();
+                        MarkDirty(true);
                     }
-                    else
-                    {
-                        contents.StackSize += consume;
-                    }
-                    if(slot.Itemstack.StackSize > consume)
-                    {
-                        slot.Itemstack.StackSize -= consume;
-                    }
-                    else
-                    {
-                        slot.Itemstack = null;
-                    }
-                    slot.MarkDirty();
-                    MarkDirty(true);
+                    UpdateRendererFull();
+                    return true;
                 }
-                return true;
             }
             return false;
         }
@@ -199,7 +171,7 @@ namespace GlassMaking.Blocks
                 burning = true;
                 ApplyFuelParameters();
                 fuelLevel = fuelBurnDuration;
-                if(contents.StackSize > 0) contents.StackSize--;
+                if(contentsSlot.StackSize > 0) contentsSlot.TakeOut(1);
                 lastTickTime = Api.World.Calendar.TotalHours;
                 UpdateRendererFull();
                 MarkDirty(true);
@@ -325,11 +297,11 @@ namespace GlassMaking.Blocks
                     fuelLevel = (float)(burnTime % fuelBurnDuration);
                     if(usedFuelCount > 0 && Api.Side == EnumAppSide.Server)
                     {
-                        contents.StackSize -= usedFuelCount;
-                        if(contents.StackSize <= 0)
+                        contentsSlot.TakeOut(usedFuelCount);
+                        if(contentsSlot.StackSize <= 0)
                         {
                             burning = fuelLevel > 0;
-                            if(!burning) contents = null;
+                            if(!burning) contentsSlot.TakeOutWhole();
                         }
                         MarkDirty(true);
                     }
@@ -340,7 +312,7 @@ namespace GlassMaking.Blocks
                     burning = fuelLevel > 0;
                     if(!burning && Api.Side == EnumAppSide.Server)
                     {
-                        contents = null;
+                        contentsSlot.TakeOutWhole();
                         MarkDirty(true);
                     }
                 }
@@ -361,8 +333,7 @@ namespace GlassMaking.Blocks
 
         private int GetFuelCount()
         {
-            if(contents == null) return 0;
-            return contents.StackSize;
+            return contentsSlot.StackSize;
         }
 
         private void ApplyFuelParameters()

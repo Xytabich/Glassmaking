@@ -27,7 +27,7 @@ namespace GlassMaking.Blocks
         {
             this.pos = pos;
             this.api = api;
-            this.unlitTexture = api.Render.GetOrLoadTexture(new AssetLocation("game", "block/coal/orecoalmix.png"));
+            this.unlitTexture = api.Render.GetOrLoadTexture(new AssetLocation("game", "block/coal/orecoalmix.png"));//TODO: atlas texture
             this.litTexture = api.Render.GetOrLoadTexture(new AssetLocation("game", "block/coal/ember.png"));
         }
 
