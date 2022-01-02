@@ -16,6 +16,8 @@ namespace GlassMaking.Items
         private const int RADIAL_SECTION_INDICES = (RADIAL_SECTIONS_VERTICES + 1) * 2;
         private const int CAP_SECTION_INDICES = RADIAL_SECTIONS_VERTICES + 2;
 
+        private const int MAX_RADIUS = 16;
+
         private static readonly int[] radialSectionTriangles = {
             0, 9,  1, 1, 9,  10,
             1, 10, 2, 2, 10, 11,
@@ -82,8 +84,6 @@ namespace GlassMaking.Items
             7, 9, 8
         };
 
-        private const int MAX_RADIUS = 16;
-
         private static int nextMeshRefId = 0;
 
         private Item shardsItem;
@@ -139,72 +139,7 @@ namespace GlassMaking.Items
             var itemstack = slot.Itemstack;
             if(firstEvent)
             {
-                if((blockSel == null || byEntity.World.BlockAccessor.GetBlock(blockSel.Position).Id == 0))
-                {
-                    //var bytes = itemstack.Attributes.GetBytes("radii");
-                    //int minCost = int.MaxValue;
-                    //int minIndex = -1;
-                    //int baseIndex = bytes.Length - 1;
-                    //for(int i = 0; i < bytes.Length - 1; i++)
-                    //{
-                    //    if(TryGetExpansionCost(bytes, i, out int cost))
-                    //    {
-                    //        if(cost + i < minCost)
-                    //        {
-                    //            minCost = cost + i;
-                    //            minIndex = i;
-                    //        }
-                    //    }
-                    //    if((bytes[i] & 15) == 0)
-                    //    {
-                    //        baseIndex = i;
-                    //        break;
-                    //    }
-                    //}
-
-                    //int length = 0;
-                    //bool displaceBase = true;
-                    //int lastHeight = (bytes[baseIndex] >> 4) & 15;
-                    //for(int i = baseIndex; i < bytes.Length; i++)
-                    //{
-                    //    int height = (bytes[i] >> 4) & 15;
-                    //    if((bytes[i] & 15) != 0 || height > lastHeight)
-                    //    {
-                    //        displaceBase = false;
-                    //        break;
-                    //    }
-                    //    length++;
-                    //    lastHeight = height;
-                    //}
-                    //if(displaceBase && (length + baseIndex) < minCost && lastHeight > 0)
-                    //{
-                    //    int height = lastHeight - 1;
-                    //    int index = baseIndex;
-                    //    for(int i = baseIndex - 1; i >= 0; i--)
-                    //    {
-                    //        if((bytes[i] & 15) > height)
-                    //        {
-                    //            break;
-                    //        }
-                    //        index--;
-                    //    }
-                    //    for(int i = index; i < bytes.Length; i++)
-                    //    {
-                    //        bytes[i] = (byte)((bytes[i] & 240) | (height + 1));
-                    //    }
-                    //    Array.Resize(ref bytes, bytes.Length + 1);
-                    //    bytes[bytes.Length - 1] = (byte)(height << 4);
-                    //}
-                    //else if(minIndex >= 0)
-                    //{
-                    //    bytes[minIndex] = (byte)(((bytes[minIndex] & 15) + 2) | ((((bytes[minIndex] >> 4) & 15) + 1) << 4));
-                    //}
-                    //itemstack.Attributes.SetBytes("radii", bytes);
-                    //slot.MarkDirty();
-                    //handling = EnumHandHandling.PreventDefault;
-                    //return;
-                }
-                else
+                if(blockSel != null || byEntity.World.BlockAccessor.GetBlock(blockSel.Position).Id != 0)
                 {
                     if(itemstack.Attributes.HasAttribute("radii") && itemstack.Attributes.HasAttribute("glasscode"))
                     {
@@ -600,73 +535,11 @@ namespace GlassMaking.Items
             }
         }
 
-        private void GenerateSegment(int radius, out int[] minCoords, out int[] maxCoords)
-        {
-            if(radius == 0)
-            {
-                minCoords = new int[1] { 0 };
-                maxCoords = new int[1] { 0 };
-                return;
-            }
-            if(radius == 1)
-            {
-                minCoords = new int[2] { 1, 0 };
-                maxCoords = new int[2] { 1, 0 };
-                return;
-            }
-
-            minCoords = new int[radius + 1];
-            maxCoords = new int[radius + 1];
-
-            int x = 0;
-            int y = radius;
-            int delta = 1 - 2 * radius;
-            int error;
-            while(y >= x)
-            {
-                maxCoords[y] = x;
-                minCoords[x] = y;
-                maxCoords[x] = Math.Max(maxCoords[x], y);
-                minCoords[y] = Math.Min(minCoords[y], x);
-
-                error = 2 * (delta + y) - 1;
-                if(delta < 0 && error <= 0)
-                {
-                    x++;
-                    delta += 2 * x + 1;
-                    continue;
-                }
-                error = 2 * (delta + y) - 1;
-                if((delta < 0) && (error <= 0))
-                {
-                    x++;
-                    delta += 2 * x + 1;
-                    continue;
-                }
-                if((delta > 0) && (error > 0))
-                {
-                    y--;
-                    delta -= 2 * y + 1;
-                    continue;
-                }
-                x++;
-                delta += 2 * (x - y);
-                y--;
-            }
-        }
-
         private class CachedWorkItem
         {
             public MeshRef meshref;
-            public int TextureId;
             public byte[] radii;
             public bool isDirty = false;
-        }
-
-        private class SegmentInfo
-        {
-            public int[] minCoords;
-            public int[] maxCoords;
         }
     }
 }
