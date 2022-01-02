@@ -10,7 +10,7 @@ namespace GlassMaking.Blocks
 
         public int RenderRange => 24;
 
-        private int mixTexture, meltTexture;
+        private TextureAtlasPosition mixTexture, meltTexture;
         private Matrixf ModelMat = new Matrixf();
 
         private BlockPos pos;
@@ -32,8 +32,8 @@ namespace GlassMaking.Blocks
             this.api = api;
             this.bathMesh = bathMesh;
             this.bathTextureId = bathTextureId;
-            this.mixTexture = api.Render.GetOrLoadTexture(new AssetLocation("game", "block/coal/orecoalmix.png"));
-            this.meltTexture = api.Render.GetOrLoadTexture(new AssetLocation("game", "block/coal/ember.png"));
+            this.mixTexture = api.ItemTextureAtlas[new AssetLocation("game", "item/resource/ungraded/borax")];
+            this.meltTexture = api.ItemTextureAtlas[new AssetLocation("game", "item/resource/ungraded/clearquartz")];
         }
 
         public void SetHeight(float percent)
@@ -44,8 +44,9 @@ namespace GlassMaking.Blocks
                 meshRef?.Dispose();
                 if(this.height != 0)
                 {
-                    MeshData cube = CubeMeshUtil.GetCubeFace(BlockFacing.UP, 0.3125f, 0.3125f, new Vec3f(0f, -2f / 32f - 0.3125f, 0f));//TODO: texture atlas
+                    MeshData cube = CubeMeshUtil.GetCubeFace(BlockFacing.UP, 0.3125f, 0.3125f, new Vec3f(0f, -2f / 32f - 0.3125f, 0f));
                     cube.Flags = new int[24];
+                    cube.SetTexPos(isMix ? mixTexture : meltTexture);
                     meshRef = api.Render.UploadMesh(cube);
                 }
             }
@@ -53,6 +54,13 @@ namespace GlassMaking.Blocks
 
         public void SetParameters(bool isMix, int glowLevel)
         {
+            if(this.isMix != isMix && meshRef != null)
+            {
+                MeshData cube = CubeMeshUtil.GetCubeFace(BlockFacing.UP, 0.3125f, 0.3125f, new Vec3f(0f, -2f / 32f - 0.3125f, 0f));
+                cube.Flags = new int[24];
+                cube.SetTexPos(isMix ? mixTexture : meltTexture);
+                api.Render.UpdateMesh(meshRef, cube);
+            }
             this.isMix = isMix;
             this.glowLevel = glowLevel;
         }
@@ -71,7 +79,7 @@ namespace GlassMaking.Blocks
             if(height != 0)
             {
                 standardShaderProgram.ModelMatrix = ModelMat.Identity().Translate((0.5f + pos.X) - cameraPos.X, pos.Y - cameraPos.Y + height / 16f, (0.5f + pos.Z) - cameraPos.Z).Values;
-                render.BindTexture2d(isMix ? mixTexture : meltTexture);
+                render.BindTexture2d(isMix ? mixTexture.atlasTextureId : meltTexture.atlasTextureId);
                 render.RenderMesh(meshRef);
             }
             standardShaderProgram.Stop();

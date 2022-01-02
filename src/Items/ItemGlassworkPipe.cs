@@ -241,6 +241,7 @@ namespace GlassMaking.Items
                     if(source != null)
                     {
                         int amount = source.GetGlassAmount();
+                        if(api.Side == EnumAppSide.Server) System.Diagnostics.Debug.WriteLine(amount);
                         if(amount > 0 && CanAddGlass(byEntity, slot, amount, source.GetGlassCode(), (!byEntity.Controls.Sneak) ? 1 : 5))
                         {
                             if(byEntity.World.Side == EnumAppSide.Server)
@@ -343,7 +344,7 @@ namespace GlassMaking.Items
             if(source != null)
             {
                 int amount = source.GetGlassAmount();
-                if(CanAddGlass(byEntity, slot, amount, source.GetGlassCode(), (!byEntity.Controls.Sneak) ? 1 : 5))
+                if(amount > 0 && CanAddGlass(byEntity, slot, amount, source.GetGlassCode(), (!byEntity.Controls.Sneak) ? 1 : 5))
                 {
                     float speed = 1.5f;
                     if(api.Side == EnumAppSide.Client)
