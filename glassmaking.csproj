@@ -101,11 +101,11 @@
     <Compile Include="src\Common\GlassMoldRecipe.cs" />
     <Compile Include="src\Common\IGlassBlowingTool.cs" />
     <Compile Include="src\Common\SimpleTextureSource.cs" />
-    <Compile Include="src\Common\SmoothRoundedShape.cs" />
+    <Compile Include="src\Common\SmoothRadialShape.cs" />
     <Compile Include="src\GlassMakingMod.cs" />
     <Compile Include="src\Items\ItemGlassBlend.cs" />
     <Compile Include="src\Items\ItemGlassworkPipe.cs" />
-    <Compile Include="src\Items\ItemGlassworkPipeRenderer.cs" />
+    <Compile Include="src\Items\GlasspipeRenderUtil.cs" />
     <Compile Include="src\Tools\GlasspipeBlowingTool.cs" />
     <Compile Include="src\Utils.cs" />
   </ItemGroup>

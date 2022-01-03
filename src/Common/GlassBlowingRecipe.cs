@@ -201,7 +201,7 @@ namespace GlassMaking
     {
         public string tool;
 
-        public SmoothRoundedShape shape;
+        public SmoothRadialShape shape;
 
         [JsonProperty]
         [JsonConverter(typeof(JsonAttributesConverter))]
@@ -212,7 +212,7 @@ namespace GlassMaking
     {
         public string tool;
 
-        public SmoothRoundedShape shape;
+        public SmoothRadialShape shape;
 
         public abstract bool Resolve(JsonObject attributes, IWorldAccessor world, string sourceForErrorLogging);
 
@@ -226,7 +226,7 @@ namespace GlassMaking
         {
             if(reader.ReadBoolean())
             {
-                shape = new SmoothRoundedShape();
+                shape = new SmoothRadialShape();
                 shape.FromBytes(reader);
             }
         }

@@ -8,7 +8,7 @@ using Vintagestory.API.MathTools;
 
 namespace GlassMaking
 {
-    public class SmoothRoundedShape
+    public class SmoothRadialShape
     {
         [JsonProperty(Required = Required.Always)]
         public int segments;
@@ -61,16 +61,16 @@ namespace GlassMaking
             }
         }
 
-        public SmoothRoundedShape Clone()
+        public SmoothRadialShape Clone()
         {
-            return new SmoothRoundedShape() {
+            return new SmoothRadialShape() {
                 segments = segments,
                 outer = Array.ConvertAll(outer, x => x.Clone()),
                 inner = inner == null ? null : Array.ConvertAll(inner, x => x.Clone())
             };
         }
 
-        public static void BuildMesh(MeshData mesh, SmoothRoundedShape shape, Func<MeshData, FastVec2f, bool, int> vecCallback, Action<MeshData, int, int, bool> triCallback)
+        public static void BuildMesh(MeshData mesh, SmoothRadialShape shape, Func<MeshData, FastVec2f, bool, int> vecCallback, Action<MeshData, int, int, bool> triCallback)
         {
             var tmpList = new FastList<FastVec2f>();
 
@@ -102,7 +102,7 @@ namespace GlassMaking
             }
         }
 
-        public static void BuildLerpedMesh(MeshData mesh, SmoothRoundedShape from, SmoothRoundedShape to, float t, Func<MeshData, FastVec2f, bool, int> vecCallback, Action<MeshData, int, int, bool> triCallback)
+        public static void BuildLerpedMesh(MeshData mesh, SmoothRadialShape from, SmoothRadialShape to, float t, Func<MeshData, FastVec2f, bool, int> vecCallback, Action<MeshData, int, int, bool> triCallback)
         {
             var tmpList = new FastList<FastVec2f>();
 
@@ -132,7 +132,7 @@ namespace GlassMaking
             }
         }
 
-        private static int AddLerpedVertex(MeshData mesh, FastList<FastVec2f> tmpList, Func<MeshData, FastVec2f, bool, int> vecCallback, bool isOuter, SmoothRoundedShape from, SmoothRoundedShape to, float at, float bt, float t)
+        private static int AddLerpedVertex(MeshData mesh, FastList<FastVec2f> tmpList, Func<MeshData, FastVec2f, bool, int> vecCallback, bool isOuter, SmoothRadialShape from, SmoothRadialShape to, float at, float bt, float t)
         {
             var a = LerpParts(isOuter ? from.outer : from.inner, tmpList, from.segments, at);
             var b = LerpParts(isOuter ? to.outer : to.inner, tmpList, to.segments, bt);

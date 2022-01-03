@@ -21,7 +21,7 @@ namespace GlassMaking.Blocks
 
         private static SimpleParticleProperties smokeParticles;
 
-        protected virtual int maxGlassAmount => 200;
+        protected virtual int maxGlassAmount => 1000;
 
         IInventory IBlockEntityContainer.Inventory => inventory;
         string IBlockEntityContainer.InventoryClassName => inventory.ClassName;

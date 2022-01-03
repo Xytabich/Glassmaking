@@ -8,6 +8,9 @@
         "items": [ "*" ],
         "tools": [ "*" ]
     },
+    "textures": {
+        "glass": { "base": "game:item/resource/ungraded/clearquartz" }
+    },
     "attributes": {
         "maxglass": 100
     },
