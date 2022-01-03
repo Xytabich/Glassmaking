@@ -70,43 +70,78 @@ namespace GlassMaking
             };
         }
 
-        public static void BuildLerped(MeshData mesh, SmoothRoundedShape from, SmoothRoundedShape to, float t)
+        public static void BuildMesh(MeshData mesh, SmoothRoundedShape shape, Func<MeshData, FastVec2f, bool, int> vecCallback, Action<MeshData, int, int, bool> triCallback)
         {
-            int segments = (int)Math.Ceiling(GameMath.Lerp(from.segments, to.segments, t));
-
             var tmpList = new FastList<FastVec2f>();
 
-            float fromStep = (float)from.segments / segments;
-            float toStep = (float)to.segments / segments;
-            for(int i = 0; i < segments; i++)
+            FastVec2f vec;
+            int count, prevCount = 0;
+            for(int i = 0; i < shape.segments; i++)
             {
-                AddLerpedVertex(mesh, tmpList, from, to, i * fromStep, i * toStep, t);
+                vec = LerpParts(shape.outer, tmpList, shape.segments, i);
+                count = vecCallback.Invoke(mesh, vec, true);
+                if(i != 0) triCallback.Invoke(mesh, prevCount, count, true);
+                prevCount = count;
             }
-            AddLerpedVertex(mesh, tmpList, from, to, from.segments, to.segments, t);
+            vec = LerpParts(shape.outer, tmpList, shape.segments, shape.segments);
+            count = vecCallback.Invoke(mesh, vec, true);
+            triCallback.Invoke(mesh, prevCount, count, true);
+
+            if(shape.inner != null)
+            {
+                for(int i = 0; i < shape.segments; i++)
+                {
+                    vec = LerpParts(shape.inner, tmpList, shape.segments, i);
+                    count = vecCallback.Invoke(mesh, vec, false);
+                    if(i != 0) triCallback.Invoke(mesh, prevCount, count, false);
+                    prevCount = count;
+                }
+                vec = LerpParts(shape.inner, tmpList, shape.segments, shape.segments);
+                count = vecCallback.Invoke(mesh, vec, false);
+                triCallback.Invoke(mesh, prevCount, count, false);
+            }
         }
 
-        private static void AddLerpedVertex(MeshData mesh, FastList<FastVec2f> tmpList, SmoothRoundedShape from, SmoothRoundedShape to, float at, float bt, float t)
+        public static void BuildLerpedMesh(MeshData mesh, SmoothRoundedShape from, SmoothRoundedShape to, float t, Func<MeshData, FastVec2f, bool, int> vecCallback, Action<MeshData, int, int, bool> triCallback)
         {
-            var a = LerpParts(from.outer, tmpList, from.segments, at);
-            var b = LerpParts(to.outer, tmpList, to.segments, bt);
-            var c = FastVec2f.Lerp(a, b, t);
-            if(c.Y == 0f)
+            var tmpList = new FastList<FastVec2f>();
+
+            int segments = (int)Math.Ceiling(GameMath.Lerp(from.segments, to.segments, t));
+            float fromStep = (float)from.segments / segments;
+            float toStep = (float)to.segments / segments;
+            int count, prevCount = 0;
+            for(int i = 0; i < segments; i++)
             {
-                mesh.AddVertex(0, 0, c.X);
+                count = AddLerpedVertex(mesh, tmpList, vecCallback, true, from, to, i * fromStep, i * toStep, t);
+                if(i != 0) triCallback.Invoke(mesh, prevCount, count, true);
+                prevCount = count;
             }
-            else
+            count = AddLerpedVertex(mesh, tmpList, vecCallback, true, from, to, from.segments, to.segments, t);
+            triCallback.Invoke(mesh, prevCount, count, true);
+
+            if(from.inner != null && to.inner != null)
             {
-                float step = GameMath.TWOPI / 8;
-                for(int i = 0; i <= 8; i++)
+                for(int i = 0; i < segments; i++)
                 {
-                    float angle = step * i;
-                    mesh.AddVertex(GameMath.FastSin(angle) * c.Y, GameMath.FastCos(angle) * c.Y, c.X);
+                    count = AddLerpedVertex(mesh, tmpList, vecCallback, false, from, to, i * fromStep, i * toStep, t);
+                    if(i != 0) triCallback.Invoke(mesh, prevCount, count, false);
+                    prevCount = count;
                 }
+                count = AddLerpedVertex(mesh, tmpList, vecCallback, false, from, to, from.segments, to.segments, t);
+                triCallback.Invoke(mesh, prevCount, count, false);
             }
+        }
+
+        private static int AddLerpedVertex(MeshData mesh, FastList<FastVec2f> tmpList, Func<MeshData, FastVec2f, bool, int> vecCallback, bool isOuter, SmoothRoundedShape from, SmoothRoundedShape to, float at, float bt, float t)
+        {
+            var a = LerpParts(isOuter ? from.outer : from.inner, tmpList, from.segments, at);
+            var b = LerpParts(isOuter ? to.outer : to.inner, tmpList, to.segments, bt);
+            return vecCallback.Invoke(mesh, FastVec2f.Lerp(a, b, t), isOuter);
         }
 
         private static FastVec2f LerpParts(ShapePart[] parts, FastList<FastVec2f> tmpList, float full, float t)
         {
+            if(parts == null || parts.Length == 0) return new FastVec2f(0, 0);
             tmpList.Clear();
             if(parts.Length == 1)
             {
@@ -141,19 +176,13 @@ namespace GlassMaking
 
             public void Interpolate(FastList<FastVec2f> tmpList, float t)
             {
+                if(vertices.Length == 0) tmpList.Add(new FastVec2f(0, 0));
+                if(vertices.Length == 1) tmpList.Add(new FastVec2f(vertices[0]));
                 for(int i = 0; i < vertices.Length; i++)
                 {
                     tmpList.Add(new FastVec2f(vertices[i]));
                 }
-                while(tmpList.Count > 1)
-                {
-                    int count = tmpList.Count - 1;
-                    for(int i = 0; i < count; i++)
-                    {
-                        tmpList[i] = FastVec2f.Lerp(tmpList[i], tmpList[i + 1], t);
-                    }
-                    tmpList.RemoveAt(count);
-                }
+                Utils.InterpolateBezier(tmpList, t);
             }
 
             public void ToBytes(BinaryWriter writer)

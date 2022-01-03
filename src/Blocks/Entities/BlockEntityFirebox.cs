@@ -298,11 +298,7 @@ namespace GlassMaking.Blocks
                     if(usedFuelCount > 0 && Api.Side == EnumAppSide.Server)
                     {
                         contentsSlot.TakeOut(usedFuelCount);
-                        if(contentsSlot.StackSize <= 0)
-                        {
-                            burning = fuelLevel > 0;
-                            if(!burning) contentsSlot.TakeOutWhole();
-                        }
+                        if(contentsSlot.StackSize <= 0) burning = fuelLevel > 0;
                         MarkDirty(true);
                     }
                 }
@@ -310,11 +306,7 @@ namespace GlassMaking.Blocks
                 {
                     fuelLevel = (float)burnTime;
                     burning = fuelLevel > 0;
-                    if(!burning && Api.Side == EnumAppSide.Server)
-                    {
-                        contentsSlot.TakeOutWhole();
-                        MarkDirty(true);
-                    }
+                    if(!burning && Api.Side == EnumAppSide.Server) MarkDirty(true);
                 }
             }
             if(!burning && temperature > 20)

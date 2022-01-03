@@ -178,7 +178,7 @@ namespace GlassMaking.Blocks
                         state = SmelteryState.ContainsMix;
                     }
                     glassAmount += blend.amount * consume;
-                    UpdateRendererFull();
+                    slot.MarkDirty();
                     MarkDirty(true);
                 }
                 return true;
@@ -221,8 +221,8 @@ namespace GlassMaking.Blocks
             if(glassAmount <= 0 && Api.Side == EnumAppSide.Server)
             {
                 state = SmelteryState.Empty;
-                MarkDirty(true);
             }
+            MarkDirty(true);
         }
 
         public void SpawnGlassUseParticles(IWorldAccessor world, BlockSelection blockSel, IPlayer byPlayer)
