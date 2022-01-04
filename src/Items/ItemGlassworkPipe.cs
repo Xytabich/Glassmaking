@@ -305,8 +305,17 @@ namespace GlassMaking.Items
 
         public bool TryGetRecipeOutputs(out KeyValuePair<IAttribute, ItemStack>[] recipeOutputs)
         {
-            recipeOutputs = null;
-            return false;
+            var recipes = mod.GetGlassBlowingRecipes();
+            recipeOutputs = default;
+            if(recipes.Count == 0) return false;
+
+            recipeOutputs = new KeyValuePair<IAttribute, ItemStack>[recipes.Count];
+            int index = 0;
+            foreach(var pair in recipes)
+            {
+                recipeOutputs[index++] = new KeyValuePair<IAttribute, ItemStack>(new StringAttribute(pair.Key), pair.Value.output.ResolvedItemstack);
+            }
+            return index > 0;
         }
 
         public bool GenericHeldItemAction(IPlayer player, string action, ITreeAttribute attributes)

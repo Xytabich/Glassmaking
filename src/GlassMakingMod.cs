@@ -1,6 +1,5 @@
 ﻿using GlassMaking.Blocks;
 using GlassMaking.Common;
-using GlassMaking.GenericItemAction;
 using GlassMaking.Items;
 using GlassMaking.Tools;
 using System.Collections.Generic;
@@ -79,6 +78,11 @@ namespace GlassMaking
                 return recipe;
             }
             return null;
+        }
+
+        public IReadOnlyDictionary<string, GlassBlowingRecipe> GetGlassBlowingRecipes()
+        {
+            return glassblowingRecipes.Pairs;
         }
 
         public IGlassBlowingTool GetGlassBlowingTool(string code)
