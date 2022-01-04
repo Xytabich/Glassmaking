@@ -93,23 +93,27 @@ namespace GlassMaking
             output.ToBytes(writer);
         }
 
-        public void OnHeldInteractStart(ItemSlot slot, ref ITreeAttribute recipeAttribute, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling)
+        public void OnHeldInteractStart(ItemSlot slot, ref ITreeAttribute recipeAttribute, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling, out float progress)
         {
             int step = recipeAttribute.GetInt("step");
             var data = recipeAttribute.GetTreeAttribute("data");
             var prevData = data;
-            resolvedSteps[step].OnHeldInteractStart(slot, ref data, byEntity, blockSel, entitySel, firstEvent, ref handling, out float progress);
+            resolvedSteps[step].OnHeldInteractStart(slot, ref data, byEntity, blockSel, entitySel, firstEvent, ref handling, out progress);
             if(progress >= 1f)
             {
-                //TODO: изменить меш
                 step++;
                 if(step >= steps.Length)
                 {
                     recipeAttribute = null;
-                    //TODO: give output
+                    var item = output.ResolvedItemstack.Clone();
+                    if(!byEntity.TryGiveItemStack(item))
+                    {
+                        byEntity.World.SpawnItemEntity(item, byEntity.Pos.XYZ.Add(0.0, 0.5, 0.0));
+                    }
                 }
                 else
                 {
+                    progress = 0f;
                     if(prevData != null) recipeAttribute.RemoveAttribute("data");
                     recipeAttribute.SetInt("step", step);
                     slot.MarkDirty();
@@ -117,7 +121,6 @@ namespace GlassMaking
             }
             else
             {
-                //TODO: изменить меш в соответствии с прогрессом
                 if(prevData != data)
                 {
                     if(data == null) recipeAttribute.RemoveAttribute("data");
@@ -126,23 +129,27 @@ namespace GlassMaking
             }
         }
 
-        public bool OnHeldInteractStep(float secondsUsed, ItemSlot slot, ref ITreeAttribute recipeAttribute, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel)
+        public bool OnHeldInteractStep(float secondsUsed, ItemSlot slot, ref ITreeAttribute recipeAttribute, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, out float progress)
         {
             int step = recipeAttribute.GetInt("step");
             var data = recipeAttribute.GetTreeAttribute("data");
             var prevData = data;
-            bool result = resolvedSteps[step].OnHeldInteractStep(secondsUsed, slot, ref data, byEntity, blockSel, entitySel, out float progress);
+            bool result = resolvedSteps[step].OnHeldInteractStep(secondsUsed, slot, ref data, byEntity, blockSel, entitySel, out progress);
             if(progress >= 1f)
             {
-                //TODO: изменить меш
                 step++;
                 if(step >= steps.Length)
                 {
                     recipeAttribute = null;
-                    //TODO: give output
+                    var item = output.ResolvedItemstack.Clone();
+                    if(!byEntity.TryGiveItemStack(item))
+                    {
+                        byEntity.World.SpawnItemEntity(item, byEntity.Pos.XYZ.Add(0.0, 0.5, 0.0));
+                    }
                 }
                 else
                 {
+                    progress = 0f;
                     if(prevData != null) recipeAttribute.RemoveAttribute("data");
                     recipeAttribute.SetInt("step", step);
                     slot.MarkDirty();
@@ -151,7 +158,6 @@ namespace GlassMaking
             }
             else
             {
-                //TODO: изменить меш в соответствии с прогрессом
                 if(prevData != data)
                 {
                     if(data == null) recipeAttribute.RemoveAttribute("data");

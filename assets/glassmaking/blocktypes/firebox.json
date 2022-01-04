@@ -14,6 +14,10 @@
         "general": [ "*-north" ],
         "construction": [ "*-north" ]
     },
+    "textures": {
+        "lit": { "base": "game:block/coal/ember" },
+        "unlit": { "base": "game:block/coal/orecoalmix" }
+    },
     "replaceable": 400,
     "resistance": 3.5,
     "maxStackSize": 1,

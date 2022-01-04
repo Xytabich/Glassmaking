@@ -54,7 +54,7 @@ namespace GlassMaking.Blocks
                     capi.Tesselator.TesselateShape("glassmaking:glass-smeltery-shape", asset.ToObject<Shape>(), out var bath, bathSource, new Vec3f(0f, GetRotation(), 0f));
                     return capi.Render.UploadMesh(bath);
                 });
-                renderer = new BlockRendererGlassSmeltery(Pos, capi, bathMesh, bathSource["inside"].atlasTextureId);
+                renderer = new BlockRendererGlassSmeltery(Pos, capi.Tesselator.GetTexSource(Block), capi, bathMesh, bathSource["inside"].atlasTextureId);
                 capi.Event.RegisterRenderer(renderer, EnumRenderStage.Opaque, "glassmaking:firebox");
                 UpdateRendererFull();
             }
@@ -403,7 +403,7 @@ namespace GlassMaking.Blocks
         {
             Empty,
             ContainsMix,
-            Melting,//TODO: при переходе на этот процесс, т.е. когда считается количество стекла которое было помещено, нужно проверять на макс. кол-во, и выкидывать лишние предметы..? либо надо как-то сделать функцию, типа canputitem или что-то вроде того
+            Melting,
             Bubbling,
             ContainsGlass
         }

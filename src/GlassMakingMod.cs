@@ -73,7 +73,7 @@ namespace GlassMaking
 
         private void RegisterGlassblowingRecipe(GlassBlowingRecipe r)
         {
-            r.recipeId = glassblowingRecipes.Count;//TODO: resolve
+            r.recipeId = glassblowingRecipes.Count;
             glassblowingRecipes.Add(r);
         }
     }

@@ -95,13 +95,22 @@ namespace GlassMaking.Items
                     var recipe = mod.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
                     if(recipe != null)
                     {
-                        //TODO: передать renderer в котором можно будет изменить внешний вид
-                        recipe.OnHeldInteractStart(slot, ref recipeAttribute, byEntity, blockSel, entitySel, firstEvent, ref handling);
+                        recipe.OnHeldInteractStart(slot, ref recipeAttribute, byEntity, blockSel, entitySel, firstEvent, ref handling, out float progress);
                         if(recipeAttribute == null)
                         {
                             handling = EnumHandHandling.PreventDefault;
+                            if(api.Side == EnumAppSide.Client)
+                            {
+                                MeshContainer.Remove(api, itemstack);
+                            }
                             itemstack.Attributes.RemoveAttribute("recipe");
                             slot.MarkDirty();
+                        }
+                        else if(api.Side == EnumAppSide.Client)
+                        {
+                            var container = MeshContainer.Get(api, itemstack);
+                            container.data = progress;
+                            container.isDirty = true;
                         }
                         return;
                     }
@@ -146,13 +155,22 @@ namespace GlassMaking.Items
                 var recipe = mod.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
                 if(recipe != null)
                 {
-                    //TODO: передать renderer в котором можно будет изменить внешний вид
-                    bool result = recipe.OnHeldInteractStep(secondsUsed, slot, ref recipeAttribute, byEntity, blockSel, entitySel);
+                    bool result = recipe.OnHeldInteractStep(secondsUsed, slot, ref recipeAttribute, byEntity, blockSel, entitySel, out float progress);
                     if(recipeAttribute == null)
                     {
+                        if(api.Side == EnumAppSide.Client)
+                        {
+                            MeshContainer.Remove(api, itemstack);
+                        }
                         itemstack.Attributes.RemoveAttribute("recipe");
                         slot.MarkDirty();
                         return false;
+                    }
+                    else if(api.Side == EnumAppSide.Client)
+                    {
+                        var container = MeshContainer.Get(api, itemstack);
+                        container.data = progress;
+                        container.isDirty = true;
                     }
                     return result;
                 }
@@ -234,9 +252,13 @@ namespace GlassMaking.Items
             base.OnModifiedInInventorySlot(world, slot, extractedStack);
             if(api.Side == EnumAppSide.Client)
             {
-                if(slot.Itemstack.Attributes.HasAttribute("glasslayers"))
+                if(slot.Itemstack.Attributes.HasAttribute("glasslayers") || slot.Itemstack.Attributes.HasAttribute("recipe"))
                 {
                     SetMeshDirty(slot.Itemstack);
+                }
+                else
+                {
+                    MeshContainer.Remove(api, slot.Itemstack);
                 }
             }
         }
@@ -259,7 +281,23 @@ namespace GlassMaking.Items
             }
             else
             {
-                //TODO: if has no render attributes - remove & dispose container
+                var recipeAttribute = itemstack.Attributes.GetTreeAttribute("recipe");
+                if(recipeAttribute == null)
+                {
+                    var container = MeshContainer.Get(capi, itemstack);
+                    if(container.isDirty || !container.hasMesh)
+                    {
+                        UpdateRecipeMesh(itemstack, recipeAttribute);
+                    }
+
+                    container.UpdateMeshRef(capi, Shape, capi.Tesselator.GetTextureSource(this));
+                    renderinfo.ModelRef = container.meshRef;
+                    renderinfo.CullFaces = true;
+                }
+                else
+                {
+                    MeshContainer.Remove(capi, itemstack);
+                }
             }
             base.OnBeforeRender(capi, itemstack, target, ref renderinfo);
         }
@@ -355,6 +393,11 @@ namespace GlassMaking.Items
             }
         }
 
+        private void UpdateRecipeMesh(ItemStack item, ITreeAttribute recipe)
+        {
+            throw new NotImplementedException();
+        }
+
         private class MeshContainer
         {
             private static int counter = 0;
@@ -433,6 +476,7 @@ namespace GlassMaking.Items
                     item.TempAttributes.RemoveAttribute("tmpMeshId");
                     if(GlasspipeMeshCache.TryGet(api, out var cache) && cache.containers.TryGetValue(id.Value, out var container))
                     {
+                        cache.containers.Remove(id.Value);
                         container.Dispose();
                     }
                 }
@@ -504,6 +548,7 @@ namespace GlassMaking.Items
             {
                 if(TryGet(api, out var cache))
                 {
+                    ObjectCacheUtil.Delete(api, KEY);
                     foreach(var pair in cache.containers)
                     {
                         pair.Value.Dispose();

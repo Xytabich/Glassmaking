@@ -18,6 +18,10 @@
 		"general": [ "*-north" ],
 		"construction": [ "*-north" ]
 	},
+	"textures": {
+		"mix": { "base": "game:item/resource/ungraded/borax" },
+		"melt": { "base": "game:item/resource/ungraded/clearquartz" }
+	},
 	"replaceable": 400,
 	"resistance": 3.5,
 	"maxStackSize": 1,

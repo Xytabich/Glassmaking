@@ -40,9 +40,17 @@ namespace GlassMaking.Blocks
 
         public void AddItem(ItemStack itemStack)
         {
-            slots.Add(NewSlot(slots.Count));
-            slots[slots.Count - 1].Itemstack = itemStack;
-            //TODO: merge or add
+            var dummy = new DummySlot(itemStack);
+            ItemStackMoveOperation op = new ItemStackMoveOperation(Api.World, EnumMouseButton.Left, 0, EnumMergePriority.AutoMerge, itemStack.StackSize);
+            for(int i = 0; i < slots.Count; i++)
+            {
+                dummy.TryPutInto(slots[i], ref op);
+            }
+            if(dummy.StackSize > 0)
+            {
+                slots.Add(NewSlot(slots.Count));
+                slots[slots.Count - 1].Itemstack = dummy.Itemstack.Clone();
+            }
         }
 
         public void Clear()

@@ -1,5 +1,4 @@
 ﻿using Vintagestory.API.Client;
-using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Blocks
@@ -10,7 +9,7 @@ namespace GlassMaking.Blocks
 
         public int RenderRange => 24;
 
-        private int unlitTexture, litTexture;
+        private TextureAtlasPosition unlitTexture, litTexture;
         private Matrixf ModelMat = new Matrixf();
 
         private BlockPos pos;
@@ -23,12 +22,12 @@ namespace GlassMaking.Blocks
         private bool isBurning = false;
         private int glowLevel = 0;
 
-        public BlockRendererFirebox(BlockPos pos, ICoreClientAPI api)
+        public BlockRendererFirebox(BlockPos pos, ITexPositionSource tex, ICoreClientAPI api)
         {
             this.pos = pos;
             this.api = api;
-            this.unlitTexture = api.Render.GetOrLoadTexture(new AssetLocation("game", "block/coal/orecoalmix.png"));//TODO: atlas texture
-            this.litTexture = api.Render.GetOrLoadTexture(new AssetLocation("game", "block/coal/ember.png"));
+            this.unlitTexture = tex["unlit"];
+            this.litTexture = tex["lit"];
         }
 
         public void SetHeight(int contentHeight)
@@ -37,17 +36,20 @@ namespace GlassMaking.Blocks
             {
                 this.contentHeight = contentHeight;
                 meshRef?.Dispose();
+                meshRef = null;
                 if(contentHeight != 0)
                 {
-                    MeshData cube = CubeMeshUtil.GetCube(0.3125f, contentHeight / 48f, new Vec3f(0f, 1f / 32f, 0f));
-                    cube.Flags = new int[24];
-                    meshRef = api.Render.UploadMesh(cube);
+                    meshRef = api.Render.UploadMesh(GenerateMesh());
                 }
             }
         }
 
         public void SetParameters(bool isBurning, int glowLevel)
         {
+            if(this.isBurning != isBurning && meshRef != null)
+            {
+                api.Render.UpdateMesh(meshRef, GenerateMesh());
+            }
             this.isBurning = isBurning;
             this.glowLevel = glowLevel;
         }
@@ -60,7 +62,7 @@ namespace GlassMaking.Blocks
                 standardShaderProgram.ExtraGlow = glowLevel;
                 IRenderAPI render = api.Render;
                 Vec3d cameraPos = api.World.Player.Entity.CameraPos;
-                render.BindTexture2d(isBurning ? litTexture : unlitTexture);
+                render.BindTexture2d(isBurning ? litTexture.atlasTextureId : unlitTexture.atlasTextureId);
                 standardShaderProgram.ModelMatrix = ModelMat.Identity().Translate((0.5f + pos.X) - cameraPos.X, pos.Y - cameraPos.Y + contentHeight / 48f, (0.5f + pos.Z) - cameraPos.Z).Values;
                 standardShaderProgram.ViewMatrix = render.CameraMatrixOriginf;
                 standardShaderProgram.ProjectionMatrix = render.CurrentProjectionMatrix;
@@ -73,6 +75,14 @@ namespace GlassMaking.Blocks
         {
             api.Event.UnregisterRenderer(this, EnumRenderStage.Opaque);
             meshRef?.Dispose();
+        }
+
+        private MeshData GenerateMesh()
+        {
+            MeshData mesh = CubeMeshUtil.GetCube(0.3125f, contentHeight / 48f, new Vec3f(0f, 1f / 32f, 0f));
+            mesh.Flags = new int[24];
+            mesh.SetTexPos(isBurning ? litTexture : unlitTexture);
+            return mesh;
         }
     }
 }

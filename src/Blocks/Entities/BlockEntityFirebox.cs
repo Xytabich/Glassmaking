@@ -47,9 +47,9 @@ namespace GlassMaking.Blocks
             SetReceiver(api.World.BlockAccessor.GetBlockEntity(Pos.UpCopy()) as ITimeBasedHeatReceiver);
             if(api.Side == EnumAppSide.Client)
             {
-                ICoreClientAPI coreClientAPI = (ICoreClientAPI)api;
-                renderer = new BlockRendererFirebox(Pos, coreClientAPI);
-                coreClientAPI.Event.RegisterRenderer(renderer, EnumRenderStage.Opaque, "glassmaking:firebox");
+                ICoreClientAPI capi = (ICoreClientAPI)api;
+                renderer = new BlockRendererFirebox(Pos, capi.Tesselator.GetTexSource(Block), capi);
+                capi.Event.RegisterRenderer(renderer, EnumRenderStage.Opaque, "glassmaking:firebox");
                 UpdateRendererFull();
             }
             RegisterGameTickListener(OnCommonTick, 200);
