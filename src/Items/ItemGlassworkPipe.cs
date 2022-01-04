@@ -42,7 +42,7 @@ namespace GlassMaking.Items
                 var recipe = mod.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
                 if(recipe != null)
                 {
-                    recipe.GetRecipeInfo(recipeAttribute, dsc, world, withDebugInfo);
+                    recipe.GetRecipeInfo(itemstack, recipeAttribute, dsc, world, withDebugInfo);
                 }
             }
             var glasslayers = itemstack.Attributes.GetTreeAttribute("glasslayers");
@@ -79,7 +79,7 @@ namespace GlassMaking.Items
                 var recipe = mod.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
                 if(recipe != null)
                 {
-                    return recipe.GetHeldInteractionHelp(recipeAttribute);
+                    return recipe.GetHeldInteractionHelp(itemstack, recipeAttribute);
                 }
             }
             return base.GetHeldInteractionHelp(inSlot);
@@ -87,36 +87,30 @@ namespace GlassMaking.Items
 
         public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling)
         {
-            if(firstEvent)
+            var itemstack = slot.Itemstack;
+            var recipeAttribute = itemstack.Attributes.GetTreeAttribute("recipe");
+            if(recipeAttribute != null)
             {
-                var itemstack = slot.Itemstack;
-                var recipeAttribute = itemstack.Attributes.GetTreeAttribute("recipe");
-                if(recipeAttribute != null)
+                var recipe = mod.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
+                if(recipe != null)
                 {
-                    var recipe = mod.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
-                    if(recipe != null)
+                    recipe.OnHeldInteractStart(slot, ref recipeAttribute, byEntity, blockSel, entitySel, firstEvent, ref handling);
+                    if(recipeAttribute == null)
                     {
-                        recipe.OnHeldInteractStart(slot, ref recipeAttribute, byEntity, blockSel, entitySel, firstEvent, ref handling, out float progress);
-                        if(recipeAttribute == null)
-                        {
-                            handling = EnumHandHandling.PreventDefault;
-                            if(api.Side == EnumAppSide.Client)
-                            {
-                                MeshContainer.Remove(api, itemstack);
-                            }
-                            itemstack.Attributes.RemoveAttribute("recipe");
-                            slot.MarkDirty();
-                        }
-                        else if(api.Side == EnumAppSide.Client)
-                        {
-                            var container = MeshContainer.Get(api, itemstack);
-                            container.data = progress;
-                            container.isDirty = true;
-                        }
-                        return;
+                        handling = EnumHandHandling.PreventDefault;
+                        itemstack.Attributes.RemoveAttribute("recipe");
+                        slot.MarkDirty();
                     }
+                    else if(api.Side == EnumAppSide.Client)
+                    {
+                        SetMeshDirty(itemstack);
+                    }
+                    return;
                 }
-                else
+            }
+            else
+            {
+                if(firstEvent)
                 {
                     var be = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position);
                     if(be != null)
@@ -148,7 +142,6 @@ namespace GlassMaking.Items
 
         public override bool OnHeldInteractStep(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel)
         {
-            if(blockSel == null) return false;
             var itemstack = slot.Itemstack;
             var recipeAttribute = itemstack.Attributes.GetTreeAttribute("recipe");
             if(recipeAttribute != null)
@@ -156,28 +149,23 @@ namespace GlassMaking.Items
                 var recipe = mod.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
                 if(recipe != null)
                 {
-                    bool result = recipe.OnHeldInteractStep(secondsUsed, slot, ref recipeAttribute, byEntity, blockSel, entitySel, out float progress);
+                    bool result = recipe.OnHeldInteractStep(secondsUsed, slot, ref recipeAttribute, byEntity, blockSel, entitySel);
                     if(recipeAttribute == null)
                     {
-                        if(api.Side == EnumAppSide.Client)
-                        {
-                            MeshContainer.Remove(api, itemstack);
-                        }
                         itemstack.Attributes.RemoveAttribute("recipe");
                         slot.MarkDirty();
                         return false;
                     }
                     else if(api.Side == EnumAppSide.Client)
                     {
-                        var container = MeshContainer.Get(api, itemstack);
-                        container.data = progress;
-                        container.isDirty = true;
+                        SetMeshDirty(itemstack);
                     }
                     return result;
                 }
             }
             else
             {
+                if(blockSel == null) return false;
                 var be = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position);
                 if(be != null)
                 {
@@ -239,13 +227,53 @@ namespace GlassMaking.Items
         public override void OnHeldInteractStop(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel)
         {
             base.OnHeldInteractStop(secondsUsed, slot, byEntity, blockSel, entitySel);
+            var itemstack = slot.Itemstack;
+            var recipeAttribute = itemstack.Attributes.GetTreeAttribute("recipe");
+            if(recipeAttribute != null)
+            {
+                var recipe = mod.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
+                if(recipe != null)
+                {
+                    recipe.OnHeldInteractStop(secondsUsed, slot, ref recipeAttribute, byEntity, blockSel, entitySel);
+                    if(recipeAttribute == null)
+                    {
+                        itemstack.Attributes.RemoveAttribute("recipe");
+                        slot.MarkDirty();
+                    }
+                    else if(api.Side == EnumAppSide.Client)
+                    {
+                        SetMeshDirty(itemstack);
+                    }
+                }
+            }
             slot.Itemstack.TempAttributes.RemoveAttribute("lastAddGlassTime");
         }
 
-        public override bool OnHeldAttackCancel(float secondsPassed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSelection, EntitySelection entitySel, EnumItemUseCancelReason cancelReason)
+        public override bool OnHeldInteractCancel(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, EnumItemUseCancelReason cancelReason)
         {
+            var itemstack = slot.Itemstack;
+            var recipeAttribute = itemstack.Attributes.GetTreeAttribute("recipe");
+            if(recipeAttribute != null)
+            {
+                var recipe = mod.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
+                if(recipe != null)
+                {
+                    var result = recipe.OnHeldInteractCancel(secondsUsed, slot, ref recipeAttribute, byEntity, blockSel, entitySel, cancelReason);
+                    if(recipeAttribute == null)
+                    {
+                        itemstack.Attributes.RemoveAttribute("recipe");
+                        slot.MarkDirty();
+                        return true;
+                    }
+                    else if(api.Side == EnumAppSide.Client)
+                    {
+                        SetMeshDirty(itemstack);
+                    }
+                    return result;
+                }
+            }
             slot.Itemstack.TempAttributes.RemoveAttribute("lastAddGlassTime");
-            return base.OnHeldAttackCancel(secondsPassed, slot, byEntity, blockSelection, entitySel, cancelReason);
+            return base.OnHeldInteractCancel(secondsUsed, slot, byEntity, blockSel, entitySel, cancelReason);
         }
 
         public override void OnModifiedInInventorySlot(IWorldAccessor world, ItemSlot slot, ItemStack extractedStack = null)
@@ -429,9 +457,16 @@ namespace GlassMaking.Items
             }
         }
 
-        private void UpdateRecipeMesh(ItemStack item, ITreeAttribute recipe)
+        private void UpdateRecipeMesh(ItemStack item, ITreeAttribute recipeAttribute)
         {
-            throw new NotImplementedException();
+            var recipe = mod.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
+            if(recipe != null)
+            {
+                var container = MeshContainer.Get(api, item);
+                container.BeginMeshChange();
+                recipe.UpdateMesh(item, container.mesh, recipeAttribute);
+                container.EndMeshChange();
+            }
         }
 
         private class MeshContainer

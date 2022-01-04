@@ -10,6 +10,8 @@ namespace GlassMaking
 {
     public class SmoothRadialShape
     {
+        public static readonly SmoothRadialShape Empty = new SmoothRadialShape();
+
         [JsonProperty(Required = Required.Always)]
         public int segments;
         [JsonProperty, JsonConverter(typeof(ShapePartConverter))]
@@ -72,6 +74,8 @@ namespace GlassMaking
 
         public static void BuildMesh(MeshData mesh, SmoothRadialShape shape, Func<MeshData, FastVec2f, bool, int> vecCallback, Action<MeshData, int, int, bool> triCallback)
         {
+            if(shape.segments <= 0) return;
+
             var tmpList = new FastList<FastVec2f>();
 
             FastVec2f vec;
@@ -104,9 +108,10 @@ namespace GlassMaking
 
         public static void BuildLerpedMesh(MeshData mesh, SmoothRadialShape from, SmoothRadialShape to, float t, Func<MeshData, FastVec2f, bool, int> vecCallback, Action<MeshData, int, int, bool> triCallback)
         {
-            var tmpList = new FastList<FastVec2f>();
-
             int segments = (int)Math.Ceiling(GameMath.Lerp(from.segments, to.segments, t));
+            if(segments <= 0) return;
+
+            var tmpList = new FastList<FastVec2f>();
             float fromStep = (float)from.segments / segments;
             float toStep = (float)to.segments / segments;
             int count, prevCount = 0;
