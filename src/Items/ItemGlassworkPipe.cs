@@ -1,5 +1,6 @@
 ﻿using GlassMaking.Blocks;
 using GlassMaking.Common;
+using GlassMaking.GenericItemAction;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,7 +12,7 @@ using Vintagestory.API.Util;
 
 namespace GlassMaking.Items
 {
-    public class ItemGlassworkPipe : Item
+    public class ItemGlassworkPipe : Item, IRecipeSourceItem, IGenericHeldItemAction
     {
         private int MAX_GLASS_AMOUNT = 1000;
 
@@ -282,7 +283,7 @@ namespace GlassMaking.Items
             else
             {
                 var recipeAttribute = itemstack.Attributes.GetTreeAttribute("recipe");
-                if(recipeAttribute == null)
+                if(recipeAttribute != null)
                 {
                     var container = MeshContainer.Get(capi, itemstack);
                     if(container.isDirty || !container.hasMesh)
@@ -300,6 +301,32 @@ namespace GlassMaking.Items
                 }
             }
             base.OnBeforeRender(capi, itemstack, target, ref renderinfo);
+        }
+
+        public bool TryGetRecipeOutputs(out KeyValuePair<IAttribute, ItemStack>[] recipeOutputs)
+        {
+            recipeOutputs = null;
+            return false;
+        }
+
+        public bool GenericHeldItemAction(IPlayer player, string action, ITreeAttribute attributes)
+        {
+            if(action == "recipe")
+            {
+                var code = attributes.GetString("key");
+                if(!string.IsNullOrEmpty(code))
+                {
+                    var recipe = mod.GetGlassBlowingRecipe(code);
+                    if(recipe != null)
+                    {
+                        var slot = player.Entity.RightHandItemSlot;
+                        slot.Itemstack.Attributes.SetString("recipe", code);
+                        slot.MarkDirty();
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         private bool CanAddGlass(EntityAgent byEntity, ItemSlot slot, int amount, AssetLocation code, int multiplier)
