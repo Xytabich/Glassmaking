@@ -69,6 +69,10 @@
       <HintPath>C:\Games\Vintagestory\Lib\OpenTK.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="protobuf-net">
+      <HintPath>C:\Games\Vintagestory\Lib\protobuf-net.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="modinfo.json" />
@@ -99,10 +103,16 @@
     <Compile Include="src\Common\GlassBlend.cs" />
     <Compile Include="src\Common\GlassBlowingRecipe.cs" />
     <Compile Include="src\Common\GlassMoldRecipe.cs" />
+    <Compile Include="src\Common\GuiDialogItemRecipeSelector.cs" />
     <Compile Include="src\Common\IGlassBlowingTool.cs" />
+    <Compile Include="src\Common\IRecipeSourceItem.cs" />
     <Compile Include="src\Common\RecipeRegistryDictionary.cs" />
     <Compile Include="src\Common\SimpleTextureSource.cs" />
     <Compile Include="src\Common\SmoothRadialShape.cs" />
+    <Compile Include="src\GenericItemAction\GenericItemActionSystem.cs" />
+    <Compile Include="src\GenericItemAction\GuiHeldItemActionDialog.cs" />
+    <Compile Include="src\GenericItemAction\HeldItemActionMessage.cs" />
+    <Compile Include="src\GenericItemAction\IGenericHeldItemAction.cs" />
     <Compile Include="src\GlassMakingMod.cs" />
     <Compile Include="src\Items\ItemGlassBlend.cs" />
     <Compile Include="src\Items\ItemGlassworkPipe.cs" />

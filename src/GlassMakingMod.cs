@@ -1,9 +1,12 @@
 ﻿using GlassMaking.Blocks;
 using GlassMaking.Common;
+using GlassMaking.GenericItemAction;
 using GlassMaking.Items;
 using GlassMaking.Tools;
 using System.Collections.Generic;
+using Vintagestory.API.Client;
 using Vintagestory.API.Common;
+using Vintagestory.API.Config;
 using Vintagestory.API.Server;
 using Vintagestory.ServerMods;
 
@@ -46,6 +49,13 @@ namespace GlassMaking
             base.StartServerSide(api);
 
             api.Event.SaveGameLoaded += OnSaveGameLoaded;
+        }
+
+        public override void StartClientSide(ICoreClientAPI api)
+        {
+            base.StartClientSide(api);
+            api.Input.RegisterHotKey("itemrecipeselect", Lang.Get("Select Item Recipe"), GlKeys.F, HotkeyType.GUIOrOtherControls);
+            api.Gui.RegisterDialog(new GuiDialogItemRecipeSelector(api));
         }
 
         public void RegisterGlassBlowingTool(string code, IGlassBlowingTool tool)
