@@ -341,8 +341,8 @@ namespace GlassMaking.Blocks
         {
             if(Api != null && Api.Side == EnumAppSide.Client && renderer != null)
             {
-                renderer.SetHeight(GetFuelHeight());
                 UpdateRendererParameters();
+                renderer.SetHeight(GetFuelHeight());
             }
         }
 

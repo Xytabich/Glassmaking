@@ -12,7 +12,7 @@ using Vintagestory.API.Util;
 
 namespace GlassMaking.Items
 {
-    public class ItemGlassworkPipe : Item, IRecipeSourceItem, IGenericHeldItemAction
+    public class ItemGlassworkPipe : Item, IItemCrafter, IGenericHeldItemAction
     {
         private int MAX_GLASS_AMOUNT = 1000;
 
@@ -110,7 +110,7 @@ namespace GlassMaking.Items
             }
             else
             {
-                if(firstEvent)
+                if(firstEvent && blockSel != null)
                 {
                     var be = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position);
                     if(be != null)
@@ -124,7 +124,7 @@ namespace GlassMaking.Items
                         if(source != null)
                         {
                             int amount = source.GetGlassAmount();
-                            if(amount > 0 && CanAddGlass(byEntity, slot, amount, source.GetGlassCode(), (!byEntity.Controls.Sneak) ? 1 : 5))
+                            if(amount > 0 && CanAddGlass(byEntity, slot, amount, source.GetGlassCode(), byEntity.Controls.Sneak ? 5 : 1))
                             {
                                 if(byEntity.World.Side == EnumAppSide.Server)
                                 {
@@ -178,7 +178,7 @@ namespace GlassMaking.Items
                     if(source != null)
                     {
                         int amount = source.GetGlassAmount();
-                        if(amount > 0 && CanAddGlass(byEntity, slot, amount, source.GetGlassCode(), (!byEntity.Controls.Sneak) ? 1 : 5))
+                        if(amount > 0 && CanAddGlass(byEntity, slot, amount, source.GetGlassCode(), byEntity.Controls.Sneak ? 5 : 1))
                         {
                             float speed = 1.5f;
                             if(api.Side == EnumAppSide.Client)
@@ -198,7 +198,7 @@ namespace GlassMaking.Items
                                 if(slot.Itemstack.TempAttributes.GetFloat("lastAddGlassTime") + useTime <= secondsUsed)
                                 {
                                     slot.Itemstack.TempAttributes.SetFloat("lastAddGlassTime", (float)Math.Floor(secondsUsed));
-                                    if(amount > 0 && AddGlass(byEntity, slot, amount, source.GetGlassCode(), (!byEntity.Controls.Sneak) ? 1 : 5, out int consumed))
+                                    if(amount > 0 && AddGlass(byEntity, slot, amount, source.GetGlassCode(), byEntity.Controls.Sneak ? 5 : 1, out int consumed))
                                     {
                                         source.RemoveGlass(consumed);
                                         slot.MarkDirty();
@@ -331,7 +331,12 @@ namespace GlassMaking.Items
             base.OnBeforeRender(capi, itemstack, target, ref renderinfo);
         }
 
-        public bool TryGetRecipeOutputs(out KeyValuePair<IAttribute, ItemStack>[] recipeOutputs)
+        public bool PreventRecipeAssignment(IClientPlayer player, ItemStack item)
+        {
+            return item.Attributes.HasAttribute("recipe") || item.Attributes.HasAttribute("glasslayers");
+        }
+
+        public bool TryGetRecipeOutputs(IClientPlayer player, ItemStack item, out KeyValuePair<IAttribute, ItemStack>[] recipeOutputs)
         {
             var recipes = mod.GetGlassBlowingRecipes();
             recipeOutputs = default;
@@ -357,13 +362,20 @@ namespace GlassMaking.Items
                     if(recipe != null)
                     {
                         var slot = player.Entity.RightHandItemSlot;
-                        slot.Itemstack.Attributes.SetString("recipe", code);
+                        slot.Itemstack.Attributes.GetOrAddTreeAttribute("recipe").SetString("code", code);
                         slot.MarkDirty();
                         return true;
                     }
                 }
             }
             return false;
+        }
+
+        public void AddGlassmelt(ItemStack item, AssetLocation code, int amount)
+        {
+            string glassCode = code.ToShortString();
+            var glassmelt = item.Attributes.GetOrAddTreeAttribute("glassmelt");
+            glassmelt.SetInt(glassCode, glassmelt.GetInt(glassCode) + amount);
         }
 
         private bool CanAddGlass(EntityAgent byEntity, ItemSlot slot, int amount, AssetLocation code, int multiplier)
@@ -383,11 +395,11 @@ namespace GlassMaking.Items
 
         private bool AddGlass(EntityAgent byEntity, ItemSlot slot, int amount, AssetLocation code, int multiplier, out int consumed)
         {
-            int maxAmount = MAX_GLASS_AMOUNT;
+            int currentAmount = 0;
             var glassmelt = slot.Itemstack.Attributes.GetOrAddTreeAttribute("glassmelt");
             foreach(var pair in glassmelt)
             {
-                maxAmount -= (pair.Value as IntAttribute).value;
+                currentAmount += (pair.Value as IntAttribute).value;
             }
 
             var glasslayers = slot.Itemstack.Attributes.GetOrAddTreeAttribute("glasslayers");
@@ -402,7 +414,7 @@ namespace GlassMaking.Items
             }
 
             string glassCode = code.ToShortString();
-            consumed = Math.Min(maxAmount, Math.Min(amount, multiplier * 5));
+            consumed = Math.Min(MAX_GLASS_AMOUNT - currentAmount, Math.Min(amount, multiplier * (5 + (int)(currentAmount * 0.01f))));
             if(codesAttrib.value.Length > 0 && codesAttrib.value[codesAttrib.value.Length - 1] == glassCode)
             {
                 amountsAttrib.value[amountsAttrib.value.Length - 1] += consumed;
@@ -415,7 +427,7 @@ namespace GlassMaking.Items
                 amountsAttrib.value[amountsAttrib.value.Length - 1] = consumed;
             }
 
-            glassmelt.SetInt(glassCode, glassmelt.GetInt(glassCode) + consumed);
+            AddGlassmelt(slot.Itemstack, code, consumed);
 
             return true;
         }
@@ -437,12 +449,13 @@ namespace GlassMaking.Items
             {
                 const double invPI = 1.0 / Math.PI;
                 container.data = count;
+
                 var root = Math.Pow(count * invPI, 1.0 / 3.0);
-                int length = GameMath.Max(1, (int)Math.Floor(root));
-                float radius = (float)Math.Sqrt(count * invPI - length) * 0.5f * 1.5f;
-                length *= 2;
                 var shape = new SmoothRadialShape();
-                shape.segments = length + 3;
+                shape.segments = GameMath.Max(1, (int)Math.Floor(root)) * 2 + 3;
+
+                float radius = (float)Math.Sqrt(count * invPI / root);
+                float length = (float)(root * 1.5);
                 shape.outer = new SmoothRadialShape.ShapePart[] { new SmoothRadialShape.ShapePart() {
                     vertices = new float[][] {
                        new float[] { -3, 0 },

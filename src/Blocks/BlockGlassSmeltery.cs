@@ -16,7 +16,7 @@ namespace GlassMaking.Blocks
                 var be = world.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityGlassSmeltery;
                 if(be != null)
                 {
-                    if(be.TryAdd(byPlayer, slot, (!byPlayer.Entity.Controls.Sneak) ? 1 : 5) && world.Side == EnumAppSide.Client)
+                    if(be.TryAdd(byPlayer, slot, byPlayer.Entity.Controls.Sneak ? (byPlayer.Entity.Controls.Sprint ? 20 : 5) : 1) && world.Side == EnumAppSide.Client)
                     {
                         (byPlayer as IClientPlayer).TriggerFpAnimation(EnumHandInteract.HeldItemInteract);
                     }

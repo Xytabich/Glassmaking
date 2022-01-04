@@ -75,36 +75,35 @@ namespace GlassMaking
         public void GetRecipeInfo(ItemStack item, ITreeAttribute recipeAttribute, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
         {
             dsc.AppendLine("Recipe: " + recipeAttribute.GetString("code"));
-            int step = recipeAttribute.GetInt("step");
+            int step = recipeAttribute.GetInt("step", 0);
             dsc.AppendLine("Step: " + (step + 1));
-            resolvedSteps[step].GetStepInfo(item, recipeAttribute.GetTreeAttribute("data"), dsc, world, withDebugInfo);
+            resolvedSteps[step].GetStepInfo(item, recipeAttribute["data"], dsc, world, withDebugInfo);
         }
 
         public WorldInteraction[] GetHeldInteractionHelp(ItemStack item, ITreeAttribute recipeAttribute)
         {
-            int step = recipeAttribute.GetInt("step");
-            return resolvedSteps[step].GetHeldInteractionHelp(item, recipeAttribute.GetTreeAttribute("data"));
+            int step = recipeAttribute.GetInt("step", 0);
+            return resolvedSteps[step].GetHeldInteractionHelp(item, recipeAttribute["data"]);
         }
 
         public void OnHeldInteractStart(ItemSlot slot, ref ITreeAttribute recipeAttribute, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling)
         {
-            int step = recipeAttribute.GetInt("step");
-            var data = recipeAttribute.GetTreeAttribute("data");
+            int step = recipeAttribute.GetInt("step", 0);
+            var data = recipeAttribute["data"];
             var prevData = data;
             resolvedSteps[step].OnHeldInteractStart(slot, ref data, byEntity, blockSel, entitySel, firstEvent, ref handling, out bool isComplete);
-            if(ApplyStepProperties(ref recipeAttribute, byEntity, step, prevData, data, isComplete))
-            {
-                slot.MarkDirty();
-            }
+            ApplyStepProperties(ref recipeAttribute, byEntity, step, prevData, data, isComplete);
+            if(isComplete) slot.MarkDirty();
         }
 
         public bool OnHeldInteractStep(float secondsUsed, ItemSlot slot, ref ITreeAttribute recipeAttribute, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel)
         {
-            int step = recipeAttribute.GetInt("step");
-            var data = recipeAttribute.GetTreeAttribute("data");
+            int step = recipeAttribute.GetInt("step", 0);
+            var data = recipeAttribute["data"];
             var prevData = data;
             bool result = resolvedSteps[step].OnHeldInteractStep(secondsUsed, slot, ref data, byEntity, blockSel, entitySel, out bool isComplete);
-            if(ApplyStepProperties(ref recipeAttribute, byEntity, step, prevData, data, isComplete))
+            ApplyStepProperties(ref recipeAttribute, byEntity, step, prevData, data, isComplete);
+            if(isComplete)
             {
                 slot.MarkDirty();
                 return false;
@@ -114,34 +113,27 @@ namespace GlassMaking
 
         public void OnHeldInteractStop(float secondsUsed, ItemSlot slot, ref ITreeAttribute recipeAttribute, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel)
         {
-            int step = recipeAttribute.GetInt("step");
-            var data = recipeAttribute.GetTreeAttribute("data");
+            int step = recipeAttribute.GetInt("step", 0);
+            var data = recipeAttribute["data"];
             var prevData = data;
-            resolvedSteps[step].OnHeldInteractStop(secondsUsed, slot, ref data, byEntity, blockSel, entitySel, out bool isComplete);
-            if(ApplyStepProperties(ref recipeAttribute, byEntity, step, prevData, data, isComplete))
-            {
-                slot.MarkDirty();
-            }
+            resolvedSteps[step].OnHeldInteractStop(secondsUsed, slot, ref data, byEntity, blockSel, entitySel);
+            ApplyStepProperties(ref recipeAttribute, byEntity, step, prevData, data, false);
         }
 
         public bool OnHeldInteractCancel(float secondsUsed, ItemSlot slot, ref ITreeAttribute recipeAttribute, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, EnumItemUseCancelReason cancelReason)
         {
-            int step = recipeAttribute.GetInt("step");
-            var data = recipeAttribute.GetTreeAttribute("data");
+            int step = recipeAttribute.GetInt("step", 0);
+            var data = recipeAttribute["data"];
             var prevData = data;
-            bool result = resolvedSteps[step].OnHeldInteractCancel(secondsUsed, slot, ref data, byEntity, blockSel, entitySel, cancelReason, out bool isComplete);
-            if(ApplyStepProperties(ref recipeAttribute, byEntity, step, prevData, data, isComplete))
-            {
-                slot.MarkDirty();
-                return true;
-            }
+            bool result = resolvedSteps[step].OnHeldInteractCancel(secondsUsed, slot, ref data, byEntity, blockSel, entitySel, cancelReason);
+            ApplyStepProperties(ref recipeAttribute, byEntity, step, prevData, data, false);
             return result;
         }
 
         public void UpdateMesh(ItemStack item, MeshData mesh, ITreeAttribute recipeAttribute)
         {
-            int step = recipeAttribute.GetInt("step");
-            float progress = resolvedSteps[step].GetStepProgress(item, recipeAttribute.GetTreeAttribute("data"));
+            int step = recipeAttribute.GetInt("step", 0);
+            float progress = resolvedSteps[step].GetStepProgress(item, recipeAttribute["data"]);
             SmoothRadialShape prevShape = null;
             for(int i = 0; i < step; i++)
             {
@@ -156,8 +148,14 @@ namespace GlassMaking
                 if(prevShape == null) return;
                 SmoothRadialShape.BuildMesh(mesh, prevShape, GlasspipeRenderUtil.GenerateRadialVertices, GlasspipeRenderUtil.GenerateRadialFaces);
             }
-            if(prevShape == null) prevShape = SmoothRadialShape.Empty;
-            SmoothRadialShape.BuildLerpedMesh(mesh, prevShape, resolvedSteps[step].shape, GameMath.Clamp(progress, 0, 1), GlasspipeRenderUtil.GenerateRadialVertices, GlasspipeRenderUtil.GenerateRadialFaces);
+
+            progress = GameMath.Clamp(progress, 0, 1);
+            if(prevShape == null)
+            {
+                if(progress < 0.2f) return;
+                prevShape = SmoothRadialShape.Empty;
+            }
+            SmoothRadialShape.BuildLerpedMesh(mesh, prevShape, resolvedSteps[step].shape, progress, GlasspipeRenderUtil.GenerateRadialVertices, GlasspipeRenderUtil.GenerateRadialFaces);
         }
 
         public void ToBytes(BinaryWriter writer)
@@ -202,10 +200,9 @@ namespace GlassMaking
             };
         }
 
-        private bool ApplyStepProperties(ref ITreeAttribute recipeAttribute, EntityAgent byEntity, int step, ITreeAttribute prevData, ITreeAttribute data, bool isComplete)
+        private void ApplyStepProperties(ref ITreeAttribute recipeAttribute, EntityAgent byEntity, int step, IAttribute prevData, IAttribute data, bool isComplete)
         {
-            if(byEntity.Api.Side == EnumAppSide.Client) return false;
-            if(isComplete)
+            if(isComplete && byEntity.Api.Side == EnumAppSide.Server)
             {
                 step++;
                 if(step >= steps.Length)
@@ -222,7 +219,6 @@ namespace GlassMaking
                     if(prevData != null) recipeAttribute.RemoveAttribute("data");
                     recipeAttribute.SetInt("step", step);
                 }
-                return true;
             }
             else
             {
@@ -231,7 +227,6 @@ namespace GlassMaking
                     if(data == null) recipeAttribute.RemoveAttribute("data");
                     else recipeAttribute["data"] = data;
                 }
-                return false;
             }
         }
 
@@ -277,34 +272,33 @@ namespace GlassMaking
 
         public abstract GlassBlowingToolStep Clone();
 
-        public virtual void GetStepInfo(ItemStack item, ITreeAttribute treeAttribute, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo) { }
+        public virtual void GetStepInfo(ItemStack item, IAttribute data, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo) { }
 
-        public abstract WorldInteraction[] GetHeldInteractionHelp(ItemStack item, ITreeAttribute treeAttribute);
+        public virtual WorldInteraction[] GetHeldInteractionHelp(ItemStack item, IAttribute data) { return new WorldInteraction[0]; }
 
-        public virtual float GetStepProgress(ItemStack item, ITreeAttribute treeAttribute)
+        public virtual float GetStepProgress(ItemStack item, IAttribute data)
         {
             return 0f;
         }
 
-        public virtual void OnHeldInteractStart(ItemSlot slot, ref ITreeAttribute data, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling, out bool isComplete)
+        public virtual void OnHeldInteractStart(ItemSlot slot, ref IAttribute data, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling, out bool isComplete)
         {
             isComplete = true;
         }
 
-        public virtual bool OnHeldInteractStep(float secondsUsed, ItemSlot slot, ref ITreeAttribute data, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, out bool isComplete)
+        public virtual bool OnHeldInteractStep(float secondsUsed, ItemSlot slot, ref IAttribute data, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, out bool isComplete)
         {
             isComplete = true;
             return true;
         }
 
-        public virtual void OnHeldInteractStop(float secondsUsed, ItemSlot slot, ref ITreeAttribute data, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, out bool isComplete)
+        public virtual void OnHeldInteractStop(float secondsUsed, ItemSlot slot, ref IAttribute data, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel)
         {
-            isComplete = false;
+
         }
 
-        public virtual bool OnHeldInteractCancel(float secondsUsed, ItemSlot slot, ref ITreeAttribute data, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, EnumItemUseCancelReason cancelReason, out bool isComplete)
+        public virtual bool OnHeldInteractCancel(float secondsUsed, ItemSlot slot, ref IAttribute data, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, EnumItemUseCancelReason cancelReason)
         {
-            isComplete = false;
             return true;
         }
     }

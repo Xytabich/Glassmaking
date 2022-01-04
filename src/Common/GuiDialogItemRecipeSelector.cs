@@ -36,25 +36,29 @@ namespace GlassMaking
 
         private bool OnKeyCombination(KeyCombination viaKeyComb)
         {
-            item = capi.World.Player?.InventoryManager?.ActiveHotbarSlot?.Itemstack?.Collectible;
-            if(item == null) return false;
+            var player = capi.World.Player;
+            var itemstack = player?.InventoryManager?.ActiveHotbarSlot?.Itemstack;
+            if(itemstack == null) return false;
+            this.item = itemstack.Collectible;
 
             bool sourceSelected = false;
-            IRecipeSourceItem source;
-            if((source = item as IRecipeSourceItem) != null)
+            IItemCrafter source;
+            if((source = itemstack.Collectible as IItemCrafter) != null)
             {
-                if(source.TryGetRecipeOutputs(out recipeOutputs))
+                if(source.PreventRecipeAssignment(player, itemstack)) return false;
+                if(source.TryGetRecipeOutputs(player, itemstack, out recipeOutputs))
                 {
                     sourceSelected = true;
                 }
             }
             if(!sourceSelected)
             {
-                foreach(var behavior in item.CollectibleBehaviors)
+                foreach(var behavior in itemstack.Collectible.CollectibleBehaviors)
                 {
-                    if((source = behavior as IRecipeSourceItem) != null)
+                    if((source = behavior as IItemCrafter) != null)
                     {
-                        if(source.TryGetRecipeOutputs(out recipeOutputs))
+                        if(source.PreventRecipeAssignment(player, itemstack)) return false;
+                        if(source.TryGetRecipeOutputs(player, itemstack, out recipeOutputs))
                         {
                             sourceSelected = true;
                             break;
@@ -94,6 +98,8 @@ namespace GlassMaking
                     }
                 });
             }
+
+            prevSlotOver = -1;
 
             int cnt = Math.Max(1, skillItems.Count);
 

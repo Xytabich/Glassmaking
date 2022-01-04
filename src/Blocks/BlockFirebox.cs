@@ -29,7 +29,7 @@ namespace GlassMaking.Blocks
                             return true;
                         }
                     }
-                    if(be.TryAdd(byPlayer, slot, (!byPlayer.Entity.Controls.Sneak) ? 1 : 5))
+                    if(be.TryAdd(byPlayer, slot, byPlayer.Entity.Controls.Sprint ? 5 : 1))
                     {
                         if(world.Side == EnumAppSide.Client)
                         {
