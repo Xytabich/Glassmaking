@@ -1,4 +1,5 @@
 ﻿using GlassMaking.Blocks;
+using GlassMaking.Common;
 using GlassMaking.Items;
 using GlassMaking.Tools;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace GlassMaking
     public class GlassMakingMod : ModSystem
     {
         private ICoreServerAPI sapi;
-        private List<GlassBlowingRecipe> glassblowingRecipes;
+        private RecipeRegistryDictionary<GlassBlowingRecipe> glassblowingRecipes;
         private Dictionary<string, IGlassBlowingTool> tools = new Dictionary<string, IGlassBlowingTool>();
 
         public override void Start(ICoreAPI api)
@@ -36,7 +37,7 @@ namespace GlassMaking
 
             RegisterGlassBlowingTool("glasspipe", new GlasspipeBlowingTool());
 
-            glassblowingRecipes = api.RegisterRecipeRegistry<RecipeRegistryGeneric<GlassBlowingRecipe>>("glassblowing").Recipes;
+            glassblowingRecipes = api.RegisterRecipeRegistry<RecipeRegistryDictionary<GlassBlowingRecipe>>("glassblowing");
         }
 
         public override void StartServerSide(ICoreServerAPI api)
@@ -54,7 +55,20 @@ namespace GlassMaking
 
         public GlassBlowingRecipe GetGlassBlowingRecipe(string code)
         {
-            return null;//TODO:
+            if(glassblowingRecipes.Pairs.TryGetValue(code, out var recipe))
+            {
+                return recipe;
+            }
+            return null;
+        }
+
+        public GlassBlowingRecipe GetGlassBlowingRecipe(AssetLocation code)
+        {
+            if(glassblowingRecipes.Pairs.TryGetValue(code.ToShortString(), out var recipe))
+            {
+                return recipe;
+            }
+            return null;
         }
 
         public IGlassBlowingTool GetGlassBlowingTool(string code)
@@ -73,8 +87,8 @@ namespace GlassMaking
 
         private void RegisterGlassblowingRecipe(GlassBlowingRecipe r)
         {
-            r.recipeId = glassblowingRecipes.Count;
-            glassblowingRecipes.Add(r);
+            r.recipeId = glassblowingRecipes.Recipes.Count;
+            glassblowingRecipes.AddRecipe(r);
         }
     }
 }

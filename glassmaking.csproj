@@ -100,6 +100,7 @@
     <Compile Include="src\Common\GlassBlowingRecipe.cs" />
     <Compile Include="src\Common\GlassMoldRecipe.cs" />
     <Compile Include="src\Common\IGlassBlowingTool.cs" />
+    <Compile Include="src\Common\RecipeRegistryDictionary.cs" />
     <Compile Include="src\Common\SimpleTextureSource.cs" />
     <Compile Include="src\Common\SmoothRadialShape.cs" />
     <Compile Include="src\GlassMakingMod.cs" />

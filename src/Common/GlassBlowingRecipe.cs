@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using GlassMaking.Common;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,7 +10,7 @@ using Vintagestory.API.Datastructures;
 
 namespace GlassMaking
 {
-    public class GlassBlowingRecipe : IByteSerializable, IRecipeBase<GlassBlowingRecipe>
+    public class GlassBlowingRecipe : IRecipeBase, IByteSerializable, IRecipeBase<GlassBlowingRecipe>
     {
         public int recipeId;
 
@@ -28,6 +29,8 @@ namespace GlassMaking
         public IRecipeIngredient[] Ingredients { get; } = new IRecipeIngredient[0];
 
         public IRecipeOutput Output => output;
+
+        AssetLocation IRecipeBase.code => code;
 
         public bool Resolve(IWorldAccessor world, string sourceForErrorLogging)
         {
