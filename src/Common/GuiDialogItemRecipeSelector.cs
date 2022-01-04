@@ -14,6 +14,8 @@ namespace GlassMaking
 
         private const double floatyDialogAlign = 0.75;
 
+        public override string ToggleKeyCombinationCode => null;
+
         public override bool PrefersUngrabbedMouse => false;
 
         private int prevSlotOver = -1;
@@ -24,7 +26,7 @@ namespace GlassMaking
 
         private BlockSelection blockPos;
 
-        public GuiDialogItemRecipeSelector(ICoreClientAPI capi) : base(null, capi) { }
+        public GuiDialogItemRecipeSelector(ICoreClientAPI capi) : base(capi) { }
 
         public override void OnBlockTexturesLoaded()
         {
@@ -41,7 +43,7 @@ namespace GlassMaking
             IRecipeSourceItem source;
             if((source = item as IRecipeSourceItem) != null)
             {
-                if(source.TryGetDialogParameters(out DialogTitle, out recipeOutputs))
+                if(source.TryGetRecipeOutputs(out recipeOutputs))
                 {
                     sourceSelected = true;
                 }
@@ -52,7 +54,7 @@ namespace GlassMaking
                 {
                     if((source = behavior as IRecipeSourceItem) != null)
                     {
-                        if(source.TryGetDialogParameters(out DialogTitle, out recipeOutputs))
+                        if(source.TryGetRecipeOutputs(out recipeOutputs))
                         {
                             sourceSelected = true;
                             break;

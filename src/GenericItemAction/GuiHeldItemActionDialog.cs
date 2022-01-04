@@ -5,11 +5,11 @@ using Vintagestory.API.Datastructures;
 
 namespace GlassMaking.GenericItemAction
 {
-    public abstract class GuiHeldItemActionDialog : GuiDialogGeneric
+    public abstract class GuiHeldItemActionDialog : GuiDialog
     {
         private GenericItemActionSystem system;
 
-        public GuiHeldItemActionDialog(string DialogTitle, ICoreClientAPI capi) : base(DialogTitle, capi)
+        public GuiHeldItemActionDialog(ICoreClientAPI capi) : base(capi)
         {
             system = capi.ModLoader.GetModSystem<GenericItemActionSystem>();
         }
