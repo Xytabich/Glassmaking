@@ -24,7 +24,7 @@
         },
         {
             "code": "outtype",
-            "states": [ "sphere-small", "sphere-medium", "sphere-large", "glassshape" ]
+            "states": [ "sphere-small", "sphere-medium", "sphere-large" ]
         }
     ],
     "attributes": {
@@ -62,20 +62,6 @@
                     {
                         "code": "game:plain",
                         "amount": 218
-                    }
-                ]
-            }
-        },
-        "*-glassshape": {
-            "glassmold": {
-                "output": {
-                    "type": "block",
-                    "code": "testmod:glassshape"
-                },
-                "recipe": [
-                    {
-                        "code": "game:plain",
-                        "amount": 128
                     }
                 ]
             }
@@ -118,14 +104,6 @@
         "walk": "walk/stone"
     },
     "collisionSelectionBoxByType": {
-        "*-glassshape": {
-            "x1": 0.2,
-            "y1": 0,
-            "z1": 0.2,
-            "x2": 0.8,
-            "y2": 0.875,
-            "z2": 0.8
-        },
         "*": {
             "x1": 0,
             "y1": 0,

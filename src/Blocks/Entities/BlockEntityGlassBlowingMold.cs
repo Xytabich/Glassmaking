@@ -7,8 +7,32 @@ namespace GlassMaking.Blocks
     {
         private GlassMoldRecipe recipe = null;
 
+        private bool splittable = false;
+
+        public override void Initialize(ICoreAPI api)
+        {
+            base.Initialize(api);
+            splittable = Block.Variant.ContainsKey("state");
+        }
+
+        public bool OnInteract(IWorldAccessor world, IPlayer byPlayer)
+        {
+            if(splittable && byPlayer.InventoryManager.ActiveHotbarSlot.Itemstack == null)
+            {
+                world.BlockAccessor.ExchangeBlock(world.BlockAccessor.GetBlock(Block.CodeWithVariant("state", Block.Variant["state"] == "opened" ? "closed" : "opened")).Id, Pos);
+                return true;
+            }
+            return false;
+        }
+
         public bool CanReceiveGlass(string[] layersCode, int[] layersAmount, out float fillTime)
         {
+            if(splittable && Block.Variant["state"] == "opened")
+            {
+                fillTime = 0;
+                return false;
+            }
+
             var layers = GetRecipe().recipe;
             if(layersCode.Length < layers.Length)
             {
