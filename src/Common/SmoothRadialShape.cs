@@ -10,8 +10,6 @@ namespace GlassMaking
 {
     public class SmoothRadialShape
     {
-        public static readonly SmoothRadialShape Empty = new SmoothRadialShape();
-
         [JsonProperty(Required = Required.Always)]
         public int segments;
         [JsonProperty, JsonConverter(typeof(ShapePartConverter))]

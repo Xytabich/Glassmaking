@@ -14,6 +14,8 @@ namespace GlassMaking
 {
     public class GlassBlowingRecipe : IRecipeBase, IByteSerializable, IRecipeBase<GlassBlowingRecipe>
     {
+        private static SmoothRadialShape EmptyShape = new SmoothRadialShape() { segments = 1, outer = new SmoothRadialShape.ShapePart[] { new SmoothRadialShape.ShapePart() { vertices = new float[][] { new float[] { -1.5f, 0 } } } } };
+
         public int recipeId;
 
         public AssetLocation code;
@@ -89,6 +91,8 @@ namespace GlassMaking
         public void OnHeldInteractStart(ItemSlot slot, ITreeAttribute recipeAttribute, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling, out bool isRecipeComplete)
         {
             int step = recipeAttribute.GetInt("step", 0);
+            slot.Itemstack.TempAttributes.SetInt("glassblowingRecipeStep", step);
+
             var data = recipeAttribute["data"];
             var prevData = data;
             resolvedSteps[step].OnHeldInteractStart(slot, ref data, byEntity, blockSel, entitySel, firstEvent, ref handling, out bool isComplete);
@@ -100,6 +104,12 @@ namespace GlassMaking
         public bool OnHeldInteractStep(float secondsUsed, ItemSlot slot, ITreeAttribute recipeAttribute, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, out bool isRecipeComplete)
         {
             int step = recipeAttribute.GetInt("step", 0);
+            if(slot.Itemstack.TempAttributes.GetInt("glassblowingRecipeStep", -1) != step)
+            {
+                isRecipeComplete = false;
+                return false;
+            }
+
             var data = recipeAttribute["data"];
             var prevData = data;
             bool result = resolvedSteps[step].OnHeldInteractStep(secondsUsed, slot, ref data, byEntity, blockSel, entitySel, out bool isComplete);
@@ -115,6 +125,7 @@ namespace GlassMaking
 
         public void OnHeldInteractStop(float secondsUsed, ItemSlot slot, ITreeAttribute recipeAttribute, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel)
         {
+            slot.Itemstack.TempAttributes.RemoveAttribute("glassblowingRecipeStep");
             int step = recipeAttribute.GetInt("step", 0);
             var data = recipeAttribute["data"];
             var prevData = data;
@@ -124,6 +135,7 @@ namespace GlassMaking
 
         public bool OnHeldInteractCancel(float secondsUsed, ItemSlot slot, ITreeAttribute recipeAttribute, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, EnumItemUseCancelReason cancelReason)
         {
+            slot.Itemstack.TempAttributes.RemoveAttribute("glassblowingRecipeStep");
             int step = recipeAttribute.GetInt("step", 0);
             var data = recipeAttribute["data"];
             var prevData = data;
@@ -152,11 +164,7 @@ namespace GlassMaking
             }
 
             progress = GameMath.Clamp(progress, 0, 1);
-            if(prevShape == null)
-            {
-                if(progress < 0.2f) return;
-                prevShape = SmoothRadialShape.Empty;
-            }
+            if(prevShape == null) prevShape = EmptyShape;
             SmoothRadialShape.BuildLerpedMesh(mesh, prevShape, resolvedSteps[step].shape, progress, GlasspipeRenderUtil.GenerateRadialVertices, GlasspipeRenderUtil.GenerateRadialFaces);
         }
 

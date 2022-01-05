@@ -200,13 +200,13 @@ namespace GlassMaking.Items
                             var amountsAttrib = glasslayers["amount"] as IntArrayAttribute;
                             if(mold.CanReceiveGlass(codesAttrib.value, amountsAttrib.value, out float fillTime))
                             {
-                                float speed = 1.5f;
+                                const float speed = 1.5f;
                                 if(api.Side == EnumAppSide.Client)
                                 {
                                     ModelTransform modelTransform = new ModelTransform();
                                     modelTransform.EnsureDefaultValues();
                                     modelTransform.Origin.Set(0.5f, 0.2f, 0.5f);
-                                    modelTransform.Translation.Set(-Math.Min(0.3f, speed * secondsUsed), -Math.Min(0.75f, speed * secondsUsed), Math.Min(0.75f, speed * secondsUsed));
+                                    modelTransform.Translation.Set(-Math.Min(0.5f, speed * secondsUsed), -Math.Min(0.15f, speed * secondsUsed * 1.5f), Math.Min(1f, speed * secondsUsed * 1.5f));
                                     modelTransform.Scale = 1f + Math.Min(0.25f, speed * secondsUsed / 4f);
                                     modelTransform.Rotation.X = Math.Max(-50f, -secondsUsed * 180f * speed);
                                     byEntity.Controls.UsingHeldItemTransformBefore = modelTransform;
@@ -281,7 +281,7 @@ namespace GlassMaking.Items
                         int amount = source.GetGlassAmount();
                         if(amount > 0 && CanAddGlass(byEntity, slot, amount, source.GetGlassCode(), byEntity.Controls.Sneak ? 5 : 1))
                         {
-                            float speed = 1.5f;
+                            const float speed = 1.5f;
                             if(api.Side == EnumAppSide.Client)
                             {
                                 ModelTransform modelTransform = new ModelTransform();
@@ -293,7 +293,7 @@ namespace GlassMaking.Items
                                 modelTransform.Rotation.Z = GameMath.FastCos(secondsUsed * 3f) * 5f;
                                 byEntity.Controls.UsingHeldItemTransformBefore = modelTransform;
                             }
-                            float useTime = 2f;
+                            const float useTime = 2f;
                             if(api.Side == EnumAppSide.Server && secondsUsed >= useTime)
                             {
                                 if(slot.Itemstack.TempAttributes.GetFloat("lastAddGlassTime") + useTime <= secondsUsed)

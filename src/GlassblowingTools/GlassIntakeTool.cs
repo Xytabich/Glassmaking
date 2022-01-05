@@ -4,13 +4,12 @@ using GlassMaking.Items;
 using System;
 using System.IO;
 using System.Text;
-using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 
-namespace GlassMaking.Tools
+namespace GlassMaking.GlassblowingTools
 {
     public class GlassIntakeTool : IGlassBlowingTool
     {
@@ -64,7 +63,9 @@ namespace GlassMaking.Tools
             {
                 return new ToolStep() {
                     tool = tool,
-                    shape = shape == null ? null : shape.Clone()
+                    shape = shape == null ? null : shape.Clone(),
+                    code = code.Clone(),
+                    amount = amount
                 };
             }
 
@@ -93,8 +94,8 @@ namespace GlassMaking.Tools
                         var source = be as BlockEntityGlassSmeltery;
                         if(source != null)
                         {
-                            int amount = source.GetGlassAmount();
-                            if(amount > 0 && ((data as IntAttribute)?.value ?? 0) < amount)
+                            int sourceAmount = source.GetGlassAmount();
+                            if(sourceAmount > 0 && ((data as IntAttribute)?.value ?? 0) < amount)
                             {
                                 if(byEntity.World.Side == EnumAppSide.Server)
                                 {

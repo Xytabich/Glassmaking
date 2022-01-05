@@ -1,7 +1,7 @@
 ﻿using GlassMaking.Blocks;
 using GlassMaking.Common;
+using GlassMaking.GlassblowingTools;
 using GlassMaking.Items;
-using GlassMaking.Tools;
 using System.Collections.Generic;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
@@ -38,6 +38,7 @@ namespace GlassMaking
             api.RegisterBlockBehaviorClass("Horizontal2BMultiblock", typeof(BlockBehaviorHorizontal2BMultiblock));
 
             RegisterGlassBlowingTool("glassintake", new GlassIntakeTool());
+            RegisterGlassBlowingTool("blowing", new BlowingTool());
 
             glassblowingRecipes = api.RegisterRecipeRegistry<RecipeRegistryDictionary<GlassBlowingRecipe>>("glassblowing");
         }
