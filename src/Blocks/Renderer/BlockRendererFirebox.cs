@@ -46,11 +46,11 @@ namespace GlassMaking.Blocks
 
         public void SetParameters(bool isBurning, int glowLevel)
         {
-            if(this.isBurning != isBurning && meshRef != null)
+            if(this.isBurning != isBurning)
             {
-                api.Render.UpdateMesh(meshRef, GenerateMesh());
+                this.isBurning = isBurning;
+                if(meshRef != null) api.Render.UpdateMesh(meshRef, GenerateMesh());
             }
-            this.isBurning = isBurning;
             this.glowLevel = glowLevel;
         }
 
