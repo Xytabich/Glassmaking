@@ -1,7 +1,6 @@
 ﻿using GlassMaking.Items;
 using System;
 using System.IO;
-using System.Text;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
 
@@ -52,7 +51,7 @@ namespace GlassMaking.GlassblowingTools
 
             public override float GetStepProgress(ItemStack item, IAttribute data)
             {
-                return item.TempAttributes.GetFloat("blowingTime", 0f) / time;
+                return item.TempAttributes.GetFloat("toolUseTime", 0f) / time;
             }
 
             public override void OnHeldInteractStart(ItemSlot slot, ref IAttribute data, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling, out bool isComplete)
@@ -60,7 +59,10 @@ namespace GlassMaking.GlassblowingTools
                 isComplete = false;
                 if(firstEvent && slot.Itemstack.Item is ItemGlassworkPipe)
                 {
-                    slot.Itemstack.TempAttributes.SetFloat("blowingTime", 0f);
+                    if(byEntity.Api.Side == EnumAppSide.Client)
+                    {
+                        slot.Itemstack.TempAttributes.SetFloat("toolUseTime", 0f);
+                    }
                     handling = EnumHandHandling.PreventDefault;
                 }
             }
@@ -78,7 +80,7 @@ namespace GlassMaking.GlassblowingTools
                     modelTransform.Rotation.X = Math.Max(-50f, -secondsUsed * 180f * speed);
                     byEntity.Controls.UsingHeldItemTransformBefore = modelTransform;
 
-                    slot.Itemstack.TempAttributes.SetFloat("blowingTime", Math.Max(secondsUsed - 1f, 0f));
+                    slot.Itemstack.TempAttributes.SetFloat("toolUseTime", Math.Max(secondsUsed - 1f, 0f));
                 }
                 if(secondsUsed >= time)
                 {
@@ -94,12 +96,18 @@ namespace GlassMaking.GlassblowingTools
 
             public override void OnHeldInteractStop(float secondsUsed, ItemSlot slot, ref IAttribute data, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel)
             {
-                slot.Itemstack.TempAttributes.RemoveAttribute("blowingTime");
+                if(byEntity.Api.Side == EnumAppSide.Client)
+                {
+                    slot.Itemstack.TempAttributes.RemoveAttribute("toolUseTime");
+                }
             }
 
             public override bool OnHeldInteractCancel(float secondsUsed, ItemSlot slot, ref IAttribute data, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, EnumItemUseCancelReason cancelReason)
             {
-                slot.Itemstack.TempAttributes.RemoveAttribute("blowingTime");
+                if(byEntity.Api.Side == EnumAppSide.Client)
+                {
+                    slot.Itemstack.TempAttributes.RemoveAttribute("toolUseTime");
+                }
                 return true;
             }
         }
