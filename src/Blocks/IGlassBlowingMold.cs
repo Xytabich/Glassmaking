@@ -4,10 +4,8 @@ namespace GlassMaking.Blocks
 {
     public interface IGlassBlowingMold
     {
-        bool CanReceiveGlass(int count, AssetLocation code);
+        bool CanReceiveGlass(string[] layersCode, int[] layersAmount, out float fillTime);
 
-        int GetRequiredAmount();
-
-        ItemStack GetOutputItem();
+        void TakeGlass(EntityAgent byEntity, string[] layersCode, int[] layersAmount);
     }
 }

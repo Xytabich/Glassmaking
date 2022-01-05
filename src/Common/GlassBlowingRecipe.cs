@@ -86,23 +86,25 @@ namespace GlassMaking
             return resolvedSteps[step].GetHeldInteractionHelp(item, recipeAttribute["data"]);
         }
 
-        public void OnHeldInteractStart(ItemSlot slot, ref ITreeAttribute recipeAttribute, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling)
+        public void OnHeldInteractStart(ItemSlot slot, ITreeAttribute recipeAttribute, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling, out bool isRecipeComplete)
         {
             int step = recipeAttribute.GetInt("step", 0);
             var data = recipeAttribute["data"];
             var prevData = data;
             resolvedSteps[step].OnHeldInteractStart(slot, ref data, byEntity, blockSel, entitySel, firstEvent, ref handling, out bool isComplete);
             ApplyStepProperties(ref recipeAttribute, byEntity, step, prevData, data, isComplete);
+            isRecipeComplete = recipeAttribute == null;
             if(isComplete) slot.MarkDirty();
         }
 
-        public bool OnHeldInteractStep(float secondsUsed, ItemSlot slot, ref ITreeAttribute recipeAttribute, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel)
+        public bool OnHeldInteractStep(float secondsUsed, ItemSlot slot, ITreeAttribute recipeAttribute, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, out bool isRecipeComplete)
         {
             int step = recipeAttribute.GetInt("step", 0);
             var data = recipeAttribute["data"];
             var prevData = data;
             bool result = resolvedSteps[step].OnHeldInteractStep(secondsUsed, slot, ref data, byEntity, blockSel, entitySel, out bool isComplete);
             ApplyStepProperties(ref recipeAttribute, byEntity, step, prevData, data, isComplete);
+            isRecipeComplete = recipeAttribute == null;
             if(isComplete)
             {
                 slot.MarkDirty();
@@ -111,7 +113,7 @@ namespace GlassMaking
             return result;
         }
 
-        public void OnHeldInteractStop(float secondsUsed, ItemSlot slot, ref ITreeAttribute recipeAttribute, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel)
+        public void OnHeldInteractStop(float secondsUsed, ItemSlot slot, ITreeAttribute recipeAttribute, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel)
         {
             int step = recipeAttribute.GetInt("step", 0);
             var data = recipeAttribute["data"];
@@ -120,7 +122,7 @@ namespace GlassMaking
             ApplyStepProperties(ref recipeAttribute, byEntity, step, prevData, data, false);
         }
 
-        public bool OnHeldInteractCancel(float secondsUsed, ItemSlot slot, ref ITreeAttribute recipeAttribute, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, EnumItemUseCancelReason cancelReason)
+        public bool OnHeldInteractCancel(float secondsUsed, ItemSlot slot, ITreeAttribute recipeAttribute, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, EnumItemUseCancelReason cancelReason)
         {
             int step = recipeAttribute.GetInt("step", 0);
             var data = recipeAttribute["data"];

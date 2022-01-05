@@ -1,0 +1,14 @@
+[
+    {
+        "file": "game:blocktypes/plant/ferntree",
+        "op": "add",
+        "path": "/attributes/glassBubblingReducer",
+        "value": {
+            "amount": 0.5,
+            "replacement": {
+                "type": "item",
+                "code": "game:firewood"
+            }
+        }
+    }
+]

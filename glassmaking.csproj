@@ -105,7 +105,7 @@
     <Compile Include="src\Common\GlassMoldRecipe.cs" />
     <Compile Include="src\Common\GuiDialogItemRecipeSelector.cs" />
     <Compile Include="src\Common\IGlassBlowingTool.cs" />
-    <Compile Include="src\Common\IRecipeSourceItem.cs" />
+    <Compile Include="src\Common\IItemCrafter.cs" />
     <Compile Include="src\Common\RecipeRegistryDictionary.cs" />
     <Compile Include="src\Common\SimpleTextureSource.cs" />
     <Compile Include="src\Common\SmoothRadialShape.cs" />

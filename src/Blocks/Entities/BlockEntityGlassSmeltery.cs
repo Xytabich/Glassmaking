@@ -1,4 +1,5 @@
 ﻿using GlassMaking.Common;
+using Newtonsoft.Json;
 using System;
 using System.Text;
 using Vintagestory.API.Client;
@@ -149,8 +150,38 @@ namespace GlassMaking.Blocks
 
         public bool TryAdd(IPlayer byPlayer, ItemSlot slot, int count)
         {
-            if(glassAmount >= maxGlassAmount || heatSource == null) return false;
+            if(heatSource == null) return false;
+            if(state == SmelteryState.Bubbling)
+            {
+                var reducer = slot.Itemstack.ItemAttributes?["glassBubblingReducer"].AsObject<GlassBubblingReducer>();
+                if(reducer != null)
+                {
+                    if(Api.Side == EnumAppSide.Server)
+                    {
+                        var collectible = slot.Itemstack.Collectible;
+                        slot.TakeOut(1);
+                        processProgress = Math.Min(processProgress + reducer.amount, glassAmount * PROCESS_HOURS_PER_UNIT * BUBBLING_PROCESS_MULTIPLIER);
+                        slot.MarkDirty();
+                        MarkDirty(true);
+                        if(reducer.replacement != null)
+                        {
+                            if(reducer.replacement.Resolve(Api.World, "glassBubblingReducer.replacement from " + collectible.Code))
+                            {
+                                var item = reducer.replacement.ResolvedItemstack;
+                                if(!byPlayer.Entity.TryGiveItemStack(item))
+                                {
+                                    byPlayer.Entity.World.SpawnItemEntity(item, byPlayer.Entity.Pos.XYZ.Add(0.0, 0.5, 0.0));
+                                }
+                            }
+                        }
+                    }
+                    byPlayer.Entity.World.PlaySoundAt(new AssetLocation("sounds/sizzle"), byPlayer, byPlayer);
+                    SpawnGlassUseParticles(byPlayer.Entity.World, null, byPlayer, 10);
+                    return true;
+                }
+            }
 
+            if(glassAmount >= maxGlassAmount) return false;
             GlassBlend blend = slot.Itemstack.ItemAttributes?[GlassBlend.PROPERTY_NAME]?.AsObject<GlassBlend>(null, slot.Itemstack.Collectible.Code.Domain);
             if(blend == null) blend = GlassBlend.FromTreeAttributes(slot.Itemstack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
             if(blend != null && blend.amount > 0 && (glassCode == null || glassCode.Equals(blend.code)) && (blend.amount + glassAmount) <= maxGlassAmount)
@@ -225,12 +256,12 @@ namespace GlassMaking.Blocks
             MarkDirty(true);
         }
 
-        public void SpawnGlassUseParticles(IWorldAccessor world, BlockSelection blockSel, IPlayer byPlayer)
+        public void SpawnGlassUseParticles(IWorldAccessor world, BlockSelection blockSel, IPlayer byPlayer, float quantity = 1f)
         {
             // Smoke on the mold
-            Vec3d blockpos = blockSel.Position.ToVec3d().Add(0.5, 0, 0.5);
+            Vec3d blockpos = Pos.ToVec3d().Add(0.5, 0, 0.5);
             world.SpawnParticles(
-                1,
+                quantity,
                 ColorUtil.ToRgba(50, 220, 220, 220),
                 blockpos.AddCopy(-0.25, -0.1, -0.25),
                 blockpos.Add(0.25, 0.1, 0.25),
@@ -407,5 +438,14 @@ namespace GlassMaking.Blocks
             Bubbling,
             ContainsGlass
         }
+    }
+
+    [JsonObject]
+    internal class GlassBubblingReducer
+    {
+        [JsonProperty]
+        public JsonItemStack replacement = null;
+        [JsonProperty(Required = Required.Always)]
+        public double amount;
     }
 }

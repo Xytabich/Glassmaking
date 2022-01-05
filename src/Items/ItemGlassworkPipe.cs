@@ -16,14 +16,12 @@ namespace GlassMaking.Items
     {
         private int MAX_GLASS_AMOUNT = 1000;
 
-        private Item shardsItem;
         private GlassMakingMod mod;
 
         public override void OnLoaded(ICoreAPI api)
         {
             base.OnLoaded(api);
             mod = api.ModLoader.GetModSystem<GlassMakingMod>();
-            shardsItem = api.World.GetItem(new AssetLocation("glassmaking", "glassshards"));
         }
 
         public override void OnUnloaded(ICoreAPI api)
@@ -94,11 +92,12 @@ namespace GlassMaking.Items
                 var recipe = mod.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
                 if(recipe != null)
                 {
-                    recipe.OnHeldInteractStart(slot, ref recipeAttribute, byEntity, blockSel, entitySel, firstEvent, ref handling);
-                    if(recipeAttribute == null)
+                    recipe.OnHeldInteractStart(slot, recipeAttribute, byEntity, blockSel, entitySel, firstEvent, ref handling, out bool isComplete);
+                    if(isComplete)
                     {
                         handling = EnumHandHandling.PreventDefault;
                         itemstack.Attributes.RemoveAttribute("recipe");
+                        itemstack.Attributes.RemoveAttribute("glassmelt");
                         slot.MarkDirty();
                     }
                     else if(api.Side == EnumAppSide.Client)
@@ -115,10 +114,31 @@ namespace GlassMaking.Items
                     var be = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position);
                     if(be != null)
                     {
-                        var mold = be as BlockEntityGlassBlowingMold;
+                        var mold = be as IGlassBlowingMold;
                         if(mold != null)
                         {
-
+                            var glasslayers = itemstack.Attributes.GetTreeAttribute("glasslayers");
+                            if(glasslayers != null)
+                            {
+                                var codesAttrib = glasslayers["code"] as StringArrayAttribute;
+                                var amountsAttrib = glasslayers["amount"] as IntArrayAttribute;
+                                if(mold.CanReceiveGlass(codesAttrib.value, amountsAttrib.value, out _))
+                                {
+                                    byEntity.World.RegisterCallback(delegate (IWorldAccessor world, BlockPos pos, float dt) {
+                                        if(byEntity.Controls.HandUse == EnumHandInteract.HeldItemInteract)
+                                        {
+                                            IPlayer dualCallByPlayer = null;
+                                            if(byEntity is EntityPlayer)
+                                            {
+                                                dualCallByPlayer = byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID);
+                                            }
+                                            world.PlaySoundAt(new AssetLocation("sounds/sizzle"), byEntity, dualCallByPlayer);
+                                        }
+                                    }, blockSel.Position, 666);
+                                    handling = EnumHandHandling.PreventDefault;
+                                    return;
+                                }
+                            }
                         }
                         var source = be as BlockEntityGlassSmeltery;
                         if(source != null)
@@ -149,10 +169,11 @@ namespace GlassMaking.Items
                 var recipe = mod.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
                 if(recipe != null)
                 {
-                    bool result = recipe.OnHeldInteractStep(secondsUsed, slot, ref recipeAttribute, byEntity, blockSel, entitySel);
-                    if(recipeAttribute == null)
+                    bool result = recipe.OnHeldInteractStep(secondsUsed, slot, recipeAttribute, byEntity, blockSel, entitySel, out bool isComplete);
+                    if(isComplete)
                     {
                         itemstack.Attributes.RemoveAttribute("recipe");
+                        itemstack.Attributes.RemoveAttribute("glassmelt");
                         slot.MarkDirty();
                         return false;
                     }
@@ -169,10 +190,90 @@ namespace GlassMaking.Items
                 var be = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position);
                 if(be != null)
                 {
-                    var mold = be as BlockEntityGlassBlowingMold;
+                    var mold = be as IGlassBlowingMold;
                     if(mold != null)
                     {
+                        var glasslayers = itemstack.Attributes.GetTreeAttribute("glasslayers");
+                        if(glasslayers != null)
+                        {
+                            var codesAttrib = glasslayers["code"] as StringArrayAttribute;
+                            var amountsAttrib = glasslayers["amount"] as IntArrayAttribute;
+                            if(mold.CanReceiveGlass(codesAttrib.value, amountsAttrib.value, out float fillTime))
+                            {
+                                float speed = 1.5f;
+                                if(api.Side == EnumAppSide.Client)
+                                {
+                                    ModelTransform modelTransform = new ModelTransform();
+                                    modelTransform.EnsureDefaultValues();
+                                    modelTransform.Origin.Set(0.5f, 0.2f, 0.5f);
+                                    modelTransform.Translation.Set(-Math.Min(0.3f, speed * secondsUsed), -Math.Min(0.75f, speed * secondsUsed), Math.Min(0.75f, speed * secondsUsed));
+                                    modelTransform.Scale = 1f + Math.Min(0.25f, speed * secondsUsed / 4f);
+                                    modelTransform.Rotation.X = Math.Max(-50f, -secondsUsed * 180f * speed);
+                                    byEntity.Controls.UsingHeldItemTransformBefore = modelTransform;
+                                }
+                                if(api.Side == EnumAppSide.Server && secondsUsed >= 1f + fillTime)
+                                {
+                                    mold.TakeGlass(byEntity, codesAttrib.value, amountsAttrib.value);
+                                    Dictionary<string, int> shards = new Dictionary<string, int>();
+                                    for(int i = 0; i < codesAttrib.value.Length; i++)
+                                    {
+                                        if(amountsAttrib.value[i] > 0)
+                                        {
+                                            int count;
+                                            if(!shards.TryGetValue(codesAttrib.value[i], out count)) count = 0;
+                                            shards[codesAttrib.value[i]] = count + amountsAttrib.value[i];
+                                        }
+                                    }
+                                    itemstack.Attributes.RemoveAttribute("glassmelt");
+                                    itemstack.Attributes.RemoveAttribute("glasslayers");
+                                    slot.MarkDirty();
 
+                                    foreach(var pair in shards)
+                                    {
+                                        var shardsItem = api.World.GetItem(new AssetLocation("glassmaking", "glassshards"));
+                                        int quantity = pair.Value / 5;
+                                        if(quantity > 0)
+                                        {
+                                            var item = new ItemStack(shardsItem, quantity);
+                                            new GlassBlend(new AssetLocation(pair.Key), 5).ToTreeAttributes(item.Attributes.GetOrAddTreeAttribute(GlassBlend.PROPERTY_NAME));
+                                            if(!byEntity.TryGiveItemStack(item))
+                                            {
+                                                byEntity.World.SpawnItemEntity(item, byEntity.Pos.XYZ.Add(0.0, 0.5, 0.0));
+                                            }
+                                        }
+                                    }
+                                    return false;
+                                }
+                                if(secondsUsed > 1f / speed)
+                                {
+                                    IPlayer byPlayer = null;
+                                    if(byEntity is EntityPlayer) byPlayer = byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID);
+                                    // Smoke on the mold
+                                    Vec3d blockpos = blockSel.Position.ToVec3d().Add(0.5, 0.2, 0.5);
+                                    float y2 = 0;
+                                    Block block = byEntity.World.BlockAccessor.GetBlock(blockSel.Position);
+                                    Cuboidf[] collboxs = block.GetCollisionBoxes(byEntity.World.BlockAccessor, blockSel.Position);
+                                    for(int i = 0; collboxs != null && i < collboxs.Length; i++)
+                                    {
+                                        y2 = Math.Max(y2, collboxs[i].Y2);
+                                    }
+                                    byEntity.World.SpawnParticles(
+                                        Math.Max(1, 12 - (secondsUsed - 1) * 6),
+                                        ColorUtil.ToRgba(50, 220, 220, 220),
+                                        blockpos.AddCopy(-0.5, y2 - 2 / 16f, -0.5),
+                                        blockpos.Add(0.5, y2 - 2 / 16f + 0.15, 0.5),
+                                        new Vec3f(-0.5f, 0f, -0.5f),
+                                        new Vec3f(0.5f, 0f, 0.5f),
+                                        1.5f,
+                                        -0.05f,
+                                        0.75f,
+                                        EnumParticleModel.Quad,
+                                        byPlayer
+                                    );
+                                }
+                                return true;
+                            }
+                        }
                     }
                     var source = be as BlockEntityGlassSmeltery;
                     if(source != null)
@@ -234,13 +335,8 @@ namespace GlassMaking.Items
                 var recipe = mod.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
                 if(recipe != null)
                 {
-                    recipe.OnHeldInteractStop(secondsUsed, slot, ref recipeAttribute, byEntity, blockSel, entitySel);
-                    if(recipeAttribute == null)
-                    {
-                        itemstack.Attributes.RemoveAttribute("recipe");
-                        slot.MarkDirty();
-                    }
-                    else if(api.Side == EnumAppSide.Client)
+                    recipe.OnHeldInteractStop(secondsUsed, slot, recipeAttribute, byEntity, blockSel, entitySel);
+                    if(api.Side == EnumAppSide.Client)
                     {
                         SetMeshDirty(itemstack);
                     }
@@ -258,14 +354,8 @@ namespace GlassMaking.Items
                 var recipe = mod.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
                 if(recipe != null)
                 {
-                    var result = recipe.OnHeldInteractCancel(secondsUsed, slot, ref recipeAttribute, byEntity, blockSel, entitySel, cancelReason);
-                    if(recipeAttribute == null)
-                    {
-                        itemstack.Attributes.RemoveAttribute("recipe");
-                        slot.MarkDirty();
-                        return true;
-                    }
-                    else if(api.Side == EnumAppSide.Client)
+                    var result = recipe.OnHeldInteractCancel(secondsUsed, slot, recipeAttribute, byEntity, blockSel, entitySel, cancelReason);
+                    if(api.Side == EnumAppSide.Client)
                     {
                         SetMeshDirty(itemstack);
                     }
