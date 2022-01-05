@@ -36,6 +36,18 @@ namespace GlassMaking
 
         AssetLocation IRecipeBase.code => code;
 
+        public Dictionary<string, string[]> GetNameToCodeMapping(IWorldAccessor world)
+        {
+            return new Dictionary<string, string[]>();
+        }
+
+        public GlassBlowingToolStep GetStep(ITreeAttribute recipeAttribute)
+        {
+            int step = recipeAttribute.GetInt("step", 0);
+            if(step < 0 || step >= resolvedSteps.Length) return null;
+            return resolvedSteps[step];
+        }
+
         public bool Resolve(IWorldAccessor world, string sourceForErrorLogging)
         {
             if(steps == null || steps.Length == 0 || output == null)
@@ -69,11 +81,6 @@ namespace GlassMaking
             return true;
         }
 
-        public Dictionary<string, string[]> GetNameToCodeMapping(IWorldAccessor world)
-        {
-            return new Dictionary<string, string[]>();
-        }
-
         public void GetRecipeInfo(ItemStack item, ITreeAttribute recipeAttribute, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
         {
             dsc.AppendLine("Recipe: " + recipeAttribute.GetString("code"));
@@ -84,8 +91,7 @@ namespace GlassMaking
 
         public WorldInteraction[] GetHeldInteractionHelp(ItemStack item, ITreeAttribute recipeAttribute)
         {
-            int step = recipeAttribute.GetInt("step", 0);
-            return resolvedSteps[step].GetHeldInteractionHelp(item, recipeAttribute["data"]);
+            return GetStep(recipeAttribute).GetHeldInteractionHelp(item, recipeAttribute["data"]);
         }
 
         public void OnHeldInteractStart(ItemSlot slot, ITreeAttribute recipeAttribute, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling, out bool isRecipeComplete)

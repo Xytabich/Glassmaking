@@ -421,6 +421,20 @@ namespace GlassMaking.Items
             base.OnBeforeRender(capi, itemstack, target, ref renderinfo);
         }
 
+        public void OnRecipeUpdated(ItemSlot slot, bool isComplete)
+        {
+            if(isComplete)
+            {
+                slot.Itemstack.Attributes.RemoveAttribute("recipe");
+                slot.Itemstack.Attributes.RemoveAttribute("glassmelt");
+                slot.MarkDirty();
+            }
+            else if(api.Side == EnumAppSide.Client)
+            {
+                SetMeshDirty(slot.Itemstack);
+            }
+        }
+
         public bool PreventRecipeAssignment(IClientPlayer player, ItemStack item)
         {
             return item.Attributes.HasAttribute("recipe") || item.Attributes.HasAttribute("glasslayers");
@@ -511,10 +525,8 @@ namespace GlassMaking.Items
             }
             else
             {
-                Array.Resize(ref codesAttrib.value, codesAttrib.value.Length + 1);
-                Array.Resize(ref amountsAttrib.value, amountsAttrib.value.Length + 1);
-                codesAttrib.value[codesAttrib.value.Length - 1] = glassCode;
-                amountsAttrib.value[amountsAttrib.value.Length - 1] = consumed;
+                codesAttrib.value.Append(glassCode);
+                amountsAttrib.value.Append(consumed);
             }
 
             AddGlassmelt(slot.Itemstack, code, consumed);

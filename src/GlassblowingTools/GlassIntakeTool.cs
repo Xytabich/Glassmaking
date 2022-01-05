@@ -86,7 +86,7 @@ namespace GlassMaking.GlassblowingTools
             public override void OnHeldInteractStart(ItemSlot slot, ref IAttribute data, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling, out bool isComplete)
             {
                 isComplete = false;
-                if(firstEvent && blockSel != null && slot.Itemstack.Item is ItemGlassworkPipe)
+                if(firstEvent && blockSel != null)
                 {
                     var be = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position);
                     if(be != null)

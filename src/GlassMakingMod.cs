@@ -37,8 +37,11 @@ namespace GlassMaking
 
             api.RegisterBlockBehaviorClass("Horizontal2BMultiblock", typeof(BlockBehaviorHorizontal2BMultiblock));
 
+            api.RegisterCollectibleBehaviorClass("glassmaking:supplglassworktool", typeof(SupplementalGlassworkTool));
+
             RegisterGlassBlowingTool("glassintake", new GlassIntakeTool());
             RegisterGlassBlowingTool("blowing", new BlowingTool());
+            RegisterGlassBlowingTool("shears", new ShearsTool());
 
             glassblowingRecipes = api.RegisterRecipeRegistry<RecipeRegistryDictionary<GlassBlowingRecipe>>("glassblowing");
         }

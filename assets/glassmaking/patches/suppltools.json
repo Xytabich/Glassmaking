@@ -1,0 +1,19 @@
+[
+    {
+        "file": "game:itemtypes/tool/shears",
+        "op": "add",
+        "path": "/behaviors",
+        "value": []
+    },
+    {
+        "file": "game:itemtypes/tool/shears",
+        "op": "add",
+        "path": "/behaviors/-",
+        "value": {
+            "name": "glassmaking:supplglassworktool",
+            "properties": {
+                "tool": "shears"
+            }
+        }
+    }
+]

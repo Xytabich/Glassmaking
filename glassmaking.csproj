@@ -113,12 +113,14 @@
     <Compile Include="src\GenericItemAction\GuiHeldItemActionDialog.cs" />
     <Compile Include="src\GenericItemAction\HeldItemActionMessage.cs" />
     <Compile Include="src\GenericItemAction\IGenericHeldItemAction.cs" />
+    <Compile Include="src\GlassblowingTools\ShearsTool.cs" />
     <Compile Include="src\GlassMakingMod.cs" />
     <Compile Include="src\Items\ItemGlassBlend.cs" />
     <Compile Include="src\Items\ItemGlassworkPipe.cs" />
     <Compile Include="src\Items\GlasspipeRenderUtil.cs" />
     <Compile Include="src\GlassblowingTools\BlowingTool.cs" />
     <Compile Include="src\GlassblowingTools\GlassIntakeTool.cs" />
+    <Compile Include="src\Items\SupplementalGlassworkTool.cs" />
     <Compile Include="src\Utils.cs" />
   </ItemGroup>
   <ItemGroup />
