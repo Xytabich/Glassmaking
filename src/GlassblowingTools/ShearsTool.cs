@@ -2,6 +2,8 @@
 using System.IO;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
+using Vintagestory.API.MathTools;
+using Vintagestory.GameContent;
 
 namespace GlassMaking.GlassblowingTools
 {
@@ -41,7 +43,7 @@ namespace GlassMaking.GlassblowingTools
                         if(attributes.KeyExists("damage"))
                         {
                             damage = attributes["damage"].AsInt(0);
-                            if(damage > 0) return true;
+                            if(damage >= 0) return true;
                         }
                         else return true;
                     }
@@ -68,7 +70,7 @@ namespace GlassMaking.GlassblowingTools
             public override void OnHeldInteractStart(ItemSlot slot, ref IAttribute data, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling, out bool isComplete)
             {
                 isComplete = false;
-                if(firstEvent)
+                if(firstEvent && byEntity.RightHandItemSlot?.Itemstack?.Item is ItemShears)
                 {
                     if(byEntity.Api.Side == EnumAppSide.Client)
                     {
@@ -80,16 +82,29 @@ namespace GlassMaking.GlassblowingTools
 
             public override bool OnHeldInteractStep(float secondsUsed, ItemSlot slot, ref IAttribute data, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, out bool isComplete)
             {
-                const float speed = 1.5f;
                 if(byEntity.Api.Side == EnumAppSide.Client)
                 {
-                    ModelTransform modelTransform = new ModelTransform();
-                    modelTransform.EnsureDefaultValues();
-                    modelTransform.Origin.Set(0.5f, 0.2f, 0.5f);
-                    modelTransform.Translation.Set(-Math.Min(0.5f, speed * secondsUsed), -Math.Min(0.15f, speed * secondsUsed * 1.5f), Math.Min(1f, speed * secondsUsed * 1.5f));
-                    modelTransform.Scale = 1f + Math.Min(0.25f, speed * secondsUsed / 4f);
-                    modelTransform.Rotation.X = Math.Max(-50f, -secondsUsed * 180f * speed);
-                    byEntity.Controls.LeftUsingHeldItemTransformBefore = modelTransform;
+                    const float speed = 2f;
+                    ModelTransform leftTransform = new ModelTransform();
+                    leftTransform.EnsureDefaultValues();
+                    leftTransform.Origin.Set(0f, 0f, 0f);
+                    leftTransform.Scale = 1f + Math.Min(0.25f, speed * secondsUsed / 3f);
+                    leftTransform.Rotation.Y = Math.Min(25f, secondsUsed * 45f * speed);
+                    leftTransform.Rotation.X = GameMath.Lerp(0f, 0.5f * GameMath.Clamp(byEntity.Pos.Pitch - (float)Math.PI, -0.2f, 1.0995574f) * GameMath.RAD2DEG, Math.Min(1, secondsUsed * speed * 4f));
+                    leftTransform.Rotation.Z = secondsUsed * 90f % 360f;
+                    System.Diagnostics.Debug.WriteLine(leftTransform.Rotation.X);
+                    byEntity.Controls.LeftUsingHeldItemTransformBefore = leftTransform;
+
+                    const float speed2 = 1.5f;
+                    ModelTransform rightTransform = new ModelTransform();
+                    rightTransform.EnsureDefaultValues();
+                    rightTransform.Origin.Set(-0.5f, -0.5f, -0.5f);
+                    rightTransform.Translation.Set(0.24f, 0.1f, -0.5f);
+                    rightTransform.Rotation.Y = Math.Min(25f, secondsUsed * 45f * speed) + GameMath.FastSin(secondsUsed * 4f * speed2) * 3f;
+                    rightTransform.Rotation.Z = Math.Min(25f, secondsUsed * 45f * speed);
+                    byEntity.Controls.UsingHeldItemTransformBefore = rightTransform;
+
+                    byEntity.Controls.HandUse = EnumHandInteract.None;
 
                     slot.Itemstack.TempAttributes.SetFloat("toolUseTime", Math.Max(secondsUsed - 1f, 0f));
                 }
@@ -98,7 +113,7 @@ namespace GlassMaking.GlassblowingTools
                     if(byEntity.Api.Side == EnumAppSide.Server)
                     {
                         var toolSlot = byEntity.RightHandItemSlot;
-                        toolSlot.Itemstack.Item.DamageItem(byEntity.World, byEntity, toolSlot, damage);
+                        if(damage > 0) toolSlot.Itemstack.Item.DamageItem(byEntity.World, byEntity, toolSlot, damage);
                         isComplete = true;
                         return false;
                     }

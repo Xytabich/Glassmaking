@@ -207,10 +207,10 @@ namespace GlassMaking.Items
                                 {
                                     ModelTransform modelTransform = new ModelTransform();
                                     modelTransform.EnsureDefaultValues();
-                                    modelTransform.Origin.Set(0.5f, 0.2f, 0.5f);
-                                    modelTransform.Translation.Set(-Math.Min(0.5f, speed * secondsUsed), -Math.Min(0.15f, speed * secondsUsed * 1.5f), Math.Min(1f, speed * secondsUsed * 1.5f));
+                                    modelTransform.Origin.Z = 0;
+                                    modelTransform.Translation.Set(-Math.Min(1.275f, speed * secondsUsed * 1.5f), -Math.Min(0.5f, speed * secondsUsed), -Math.Min(0.25f, speed * Math.Max(0, secondsUsed - 0.5f) * 0.5f));
                                     modelTransform.Scale = 1f + Math.Min(0.25f, speed * secondsUsed / 4f);
-                                    modelTransform.Rotation.X = Math.Max(-50f, -secondsUsed * 180f * speed);
+                                    modelTransform.Rotation.X = -Math.Min(25f, secondsUsed * 45f * speed);
                                     byEntity.Controls.UsingHeldItemTransformBefore = modelTransform;
                                 }
                                 if(api.Side == EnumAppSide.Server && secondsUsed >= 1f + fillTime)
@@ -288,11 +288,12 @@ namespace GlassMaking.Items
                             {
                                 ModelTransform modelTransform = new ModelTransform();
                                 modelTransform.EnsureDefaultValues();
-                                modelTransform.Origin.Set(0.5f, 0.2f, 0.5f);
+                                modelTransform.Origin.Set(0f, 0f, 0f);
                                 modelTransform.Translation.Set(-Math.Min(0.5f, speed * secondsUsed), -Math.Min(0.5f, speed * secondsUsed), Math.Min(0.5f, speed * secondsUsed));
                                 modelTransform.Scale = 1f - Math.Min(0.1f, speed * secondsUsed / 4f);
-                                modelTransform.Rotation.X = -Math.Min(30f, secondsUsed * 180f * speed) + GameMath.FastSin(secondsUsed * 3f) * 5f;
-                                modelTransform.Rotation.Z = GameMath.FastCos(secondsUsed * 3f) * 5f;
+                                modelTransform.Rotation.X = -Math.Min(10f, secondsUsed * 45f * speed);
+                                modelTransform.Rotation.Y = -Math.Min(15f, secondsUsed * 45f * speed) + GameMath.FastSin(secondsUsed * 1.5f);
+                                modelTransform.Rotation.Z = secondsUsed * 90f % 360f;
                                 byEntity.Controls.UsingHeldItemTransformBefore = modelTransform;
                             }
                             const float useTime = 2f;
@@ -527,8 +528,8 @@ namespace GlassMaking.Items
             }
             else
             {
-                codesAttrib.value.Append(glassCode);
-                amountsAttrib.value.Append(consumed);
+                codesAttrib.value = codesAttrib.value.Append(glassCode);
+                amountsAttrib.value = amountsAttrib.value.Append(consumed);
             }
 
             AddGlassmelt(slot.Itemstack, code, consumed);

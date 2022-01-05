@@ -155,7 +155,7 @@ namespace GlassMaking
             int step = recipeAttribute.GetInt("step", 0);
             float progress = resolvedSteps[step].GetStepProgress(item, recipeAttribute["data"]);
             SmoothRadialShape prevShape = null;
-            for(int i = 0; i < step; i++)
+            for(int i = step - 1; i >= 0; i--)
             {
                 if(resolvedSteps[i].shape != null)
                 {
@@ -167,6 +167,7 @@ namespace GlassMaking
             {
                 if(prevShape == null) return;
                 SmoothRadialShape.BuildMesh(mesh, prevShape, GlasspipeRenderUtil.GenerateRadialVertices, GlasspipeRenderUtil.GenerateRadialFaces);
+                return;
             }
 
             progress = GameMath.Clamp(progress, 0, 1);

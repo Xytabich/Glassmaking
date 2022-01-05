@@ -129,11 +129,12 @@ namespace GlassMaking.GlassblowingTools
                         {
                             ModelTransform modelTransform = new ModelTransform();
                             modelTransform.EnsureDefaultValues();
-                            modelTransform.Origin.Set(0.5f, 0.2f, 0.5f);
+                            modelTransform.Origin.Set(0f, 0f, 0f);
                             modelTransform.Translation.Set(-Math.Min(0.5f, speed * secondsUsed), -Math.Min(0.5f, speed * secondsUsed), Math.Min(0.5f, speed * secondsUsed));
                             modelTransform.Scale = 1f - Math.Min(0.1f, speed * secondsUsed / 4f);
-                            modelTransform.Rotation.X = -Math.Min(30f, secondsUsed * 180f * speed) + GameMath.FastSin(secondsUsed * 3f) * 5f;
-                            modelTransform.Rotation.Z = GameMath.FastCos(secondsUsed * 3f) * 5f;
+                            modelTransform.Rotation.X = -Math.Min(10f, secondsUsed * 45f * speed);
+                            modelTransform.Rotation.Y = -Math.Min(15f, secondsUsed * 45f * speed) + GameMath.FastSin(secondsUsed * 1.5f);
+                            modelTransform.Rotation.Z = secondsUsed * 90f % 360f;
                             byEntity.Controls.UsingHeldItemTransformBefore = modelTransform;
                         }
                         float useTime = 2f;
@@ -143,6 +144,7 @@ namespace GlassMaking.GlassblowingTools
                             {
                                 slot.Itemstack.TempAttributes.SetFloat("lastAddGlassTime", (float)Math.Floor(secondsUsed));
                                 int consumed = Math.Min(Math.Min(amount - amountAttribute.value, sourceAmount), (byEntity.Controls.Sneak ? 5 : 1) * (5 + (int)(amountAttribute.value * 0.01f)));
+                                (slot.Itemstack.Item as ItemGlassworkPipe).AddGlassmelt(slot.Itemstack, code, consumed);
                                 amountAttribute.value += consumed;
                                 source.RemoveGlass(consumed);
                                 slot.MarkDirty();

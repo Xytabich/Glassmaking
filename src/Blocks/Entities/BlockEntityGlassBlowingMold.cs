@@ -9,13 +9,19 @@ namespace GlassMaking.Blocks
 
         public bool CanReceiveGlass(string[] layersCode, int[] layersAmount, out float fillTime)
         {
-            fillTime = GetRecipe().fillTime;
-            var recipe = GetRecipe().recipe;
-            int layerIndex = layersCode.Length - 1;
-            for(int i = recipe.Length - 1; i >= 0; i--)
+            var layers = GetRecipe().recipe;
+            if(layersCode.Length < layers.Length)
             {
-                if(recipe[i].code.ToShortString() != layersCode[layerIndex]) return false;
-                if(!recipe[i].IsSuitable(layersAmount[layerIndex])) return false;
+                fillTime = 0;
+                return false;
+            }
+
+            fillTime = GetRecipe().fillTime;
+            int layerIndex = layersCode.Length - 1;
+            for(int i = layers.Length - 1; i >= 0; i--)
+            {
+                if(layers[i].code.ToShortString() != layersCode[layerIndex]) return false;
+                if(!layers[i].IsSuitable(layersAmount[layerIndex])) return false;
                 layerIndex--;
             }
             return true;

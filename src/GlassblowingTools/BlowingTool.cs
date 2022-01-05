@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
+using Vintagestory.API.MathTools;
 
 namespace GlassMaking.GlassblowingTools
 {
@@ -74,10 +75,8 @@ namespace GlassMaking.GlassblowingTools
                 {
                     ModelTransform modelTransform = new ModelTransform();
                     modelTransform.EnsureDefaultValues();
-                    modelTransform.Origin.Set(0.5f, 0.2f, 0.5f);
-                    modelTransform.Translation.Set(-Math.Min(0.5f, speed * secondsUsed), -Math.Min(0.15f, speed * secondsUsed * 1.5f), Math.Min(1f, speed * secondsUsed * 1.5f));
+                    modelTransform.Translation.Set(-Math.Min(1.275f, speed * secondsUsed * 1.5f), -Math.Min(0.5f, speed * secondsUsed), -Math.Min(0.25f, speed * Math.Max(0, secondsUsed - 0.5f) * 0.5f));
                     modelTransform.Scale = 1f + Math.Min(0.25f, speed * secondsUsed / 4f);
-                    modelTransform.Rotation.X = Math.Max(-50f, -secondsUsed * 180f * speed);
                     byEntity.Controls.UsingHeldItemTransformBefore = modelTransform;
 
                     slot.Itemstack.TempAttributes.SetFloat("toolUseTime", Math.Max(secondsUsed - 1f, 0f));
