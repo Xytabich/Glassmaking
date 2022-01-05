@@ -14,14 +14,16 @@ namespace GlassMaking.Items
 {
     public class ItemGlassworkPipe : Item, IItemCrafter, IGenericHeldItemAction
     {
-        private int MAX_GLASS_AMOUNT = 1000;
-
         private GlassMakingMod mod;
+        private int maxGlassAmount;
+        private ModelTransform glassTransform;
 
         public override void OnLoaded(ICoreAPI api)
         {
             base.OnLoaded(api);
             mod = api.ModLoader.GetModSystem<GlassMakingMod>();
+            maxGlassAmount = Attributes["maxGlass"].AsInt();
+            glassTransform = Attributes["glassTransform"].AsObject<ModelTransform>();
         }
 
         public override void OnUnloaded(ICoreAPI api)
@@ -393,7 +395,7 @@ namespace GlassMaking.Items
                     if(glassmelt != null) UpdateGlassmeltMesh(itemstack, glassmelt);
                 }
 
-                container.UpdateMeshRef(capi, Shape, capi.Tesselator.GetTextureSource(this));
+                container.UpdateMeshRef(capi, Shape, capi.Tesselator.GetTextureSource(this), glassTransform);
                 renderinfo.ModelRef = container.meshRef;
                 renderinfo.CullFaces = true;
                 return;
@@ -409,7 +411,7 @@ namespace GlassMaking.Items
                         UpdateRecipeMesh(itemstack, recipeAttribute);
                     }
 
-                    container.UpdateMeshRef(capi, Shape, capi.Tesselator.GetTextureSource(this));
+                    container.UpdateMeshRef(capi, Shape, capi.Tesselator.GetTextureSource(this), glassTransform);
                     renderinfo.ModelRef = container.meshRef;
                     renderinfo.CullFaces = true;
                 }
@@ -492,7 +494,7 @@ namespace GlassMaking.Items
                 {
                     count += (pair.Value as IntAttribute).value;
                 }
-                if(count >= MAX_GLASS_AMOUNT) return false;
+                if(count >= maxGlassAmount) return false;
             }
             return true;
         }
@@ -518,7 +520,7 @@ namespace GlassMaking.Items
             }
 
             string glassCode = code.ToShortString();
-            consumed = Math.Min(MAX_GLASS_AMOUNT - currentAmount, Math.Min(amount, multiplier * (5 + (int)(currentAmount * 0.01f))));
+            consumed = Math.Min(maxGlassAmount - currentAmount, Math.Min(amount, multiplier * (5 + (int)(currentAmount * 0.01f))));
             if(codesAttrib.value.Length > 0 && codesAttrib.value[codesAttrib.value.Length - 1] == glassCode)
             {
                 amountsAttrib.value[amountsAttrib.value.Length - 1] += consumed;
@@ -677,7 +679,7 @@ namespace GlassMaking.Items
                 }
             }
 
-            public void UpdateMeshRef(ICoreClientAPI capi, CompositeShape shape, ITexPositionSource tex)
+            public void UpdateMeshRef(ICoreClientAPI capi, CompositeShape shape, ITexPositionSource tex, ModelTransform meshTransform)
             {
                 if(updateMesh.HasValue)
                 {
@@ -686,6 +688,7 @@ namespace GlassMaking.Items
                     var baseMesh = cache.GetMesh(capi, shape, tex);
                     var toUpload = new MeshData(baseMesh.VerticesCount + mesh.VerticesCount, baseMesh.IndicesCount + mesh.IndicesCount, false, true, true, true);
                     toUpload.AddMeshData(baseMesh);
+                    mesh.ModelTransform(meshTransform);
                     toUpload.AddMeshData(mesh);
                     if(updateMesh.Value)
                     {
