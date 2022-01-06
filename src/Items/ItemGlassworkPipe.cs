@@ -85,6 +85,42 @@ namespace GlassMaking.Items
             return base.GetHeldInteractionHelp(inSlot);
         }
 
+        public override void OnConsumedByCrafting(ItemSlot[] allInputSlots, ItemSlot stackInSlot, GridRecipe gridRecipe, CraftingRecipeIngredient fromIngredient, IPlayer byPlayer, int quantity)
+        {
+            if(gridRecipe.Output.ResolvedItemstack?.Item is ItemGlassworkPipe && gridRecipe.Attributes?.IsTrue("breakglass") == true)
+            {
+                var glassmelt = stackInSlot.Itemstack.Attributes.GetTreeAttribute("glassmelt");
+                if(glassmelt != null)
+                {
+                    var shardsItem = api.World.GetItem(new AssetLocation("glassmaking", "glassshards"));
+                    foreach(var pair in glassmelt)
+                    {
+                        int count = ((IntAttribute)pair.Value).value * quantity / 5;
+                        if(count > 0)
+                        {
+                            var item = new ItemStack(shardsItem, count);
+                            new GlassBlend(new AssetLocation(pair.Key), 5).ToTreeAttributes(item.Attributes.GetOrAddTreeAttribute(GlassBlend.PROPERTY_NAME));
+                            if(!byPlayer.Entity.TryGiveItemStack(item))
+                            {
+                                byPlayer.Entity.World.SpawnItemEntity(item, byPlayer.Entity.Pos.XYZ.Add(0.0, 0.5, 0.0));
+                            }
+                        }
+                    }
+                }
+            }
+            base.OnConsumedByCrafting(allInputSlots, stackInSlot, gridRecipe, fromIngredient, byPlayer, quantity);
+        }
+
+        public override bool MatchesForCrafting(ItemStack inputStack, GridRecipe gridRecipe, CraftingRecipeIngredient ingredient)
+        {
+            if(gridRecipe.Output.ResolvedItemstack?.Item is ItemGlassworkPipe && ingredient.ResolvedItemstack?.Item is ItemGlassworkPipe &&
+                gridRecipe.Attributes?.IsTrue("breakglass") == true)
+            {
+                return inputStack.Attributes.HasAttribute("glassmelt");
+            }
+            return base.MatchesForCrafting(inputStack, gridRecipe, ingredient);
+        }
+
         public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling)
         {
             var itemstack = slot.Itemstack;
@@ -230,9 +266,9 @@ namespace GlassMaking.Items
                                     itemstack.Attributes.RemoveAttribute("glasslayers");
                                     slot.MarkDirty();
 
+                                    var shardsItem = api.World.GetItem(new AssetLocation("glassmaking", "glassshards"));
                                     foreach(var pair in shards)
                                     {
-                                        var shardsItem = api.World.GetItem(new AssetLocation("glassmaking", "glassshards"));
                                         int quantity = pair.Value / 5;
                                         if(quantity > 0)
                                         {
