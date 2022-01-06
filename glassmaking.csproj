@@ -80,20 +80,14 @@
   <ItemGroup>
     <Content Include="assets\glassmaking\blocktypes\firebox.json" />
     <Content Include="assets\glassmaking\blocktypes\glass-smeltery.json" />
-    <Content Include="assets\glassmaking\blocktypes\glassmold.json" />
     <Content Include="assets\glassmaking\blocktypes\glassworktable-s.json" />
     <Content Include="assets\glassmaking\blocktypes\glassworktable.json" />
     <Content Include="assets\glassmaking\blocktypes\glassworktable\mercurypump.json" />
     <Content Include="assets\glassmaking\itemtypes\glassshards.json" />
     <Content Include="assets\glassmaking\itemtypes\glassworkpipe.json" />
-    <Content Include="assets\glassmaking\itemtypes\resource\glasspart.json" />
     <Content Include="assets\glassmaking\lang\en.json" />
     <Content Include="assets\glassmaking\patches\glassBubblingReducer.json" />
     <Content Include="assets\glassmaking\patches\suppltools.json" />
-    <Content Include="assets\glassmaking\shapes\block\clay\glassmold\glassshape.json" />
-    <Content Include="assets\glassmaking\shapes\block\clay\glassmold\sphere-large.json" />
-    <Content Include="assets\glassmaking\shapes\block\clay\glassmold\sphere-medium.json" />
-    <Content Include="assets\glassmaking\shapes\block\clay\glassmold\sphere-small.json" />
     <Content Include="assets\glassmaking\shapes\block\firebox.json" />
     <Content Include="assets\glassmaking\shapes\block\glass-smeltery\bath.json" />
     <Content Include="assets\glassmaking\shapes\block\glass-smeltery\cover.json" />
@@ -103,9 +97,6 @@
     <Content Include="assets\glassmaking\shapes\block\tempering-oven.json" />
     <Content Include="assets\glassmaking\shapes\item\glassworkpipe.json" />
     <Content Include="assets\glassmaking\shapes\item\resource\crushed\glassshards.json" />
-    <Content Include="assets\glassmaking\shapes\item\resource\glass\sphere-large.json" />
-    <Content Include="assets\glassmaking\shapes\item\resource\glass\sphere-medium.json" />
-    <Content Include="assets\glassmaking\shapes\item\resource\glass\sphere-small.json" />
     <Content Include="assets\glassmaking\textures\item\resource\crushed\glassshards.png" />
   </ItemGroup>
   <ItemGroup>

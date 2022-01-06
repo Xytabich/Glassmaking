@@ -51,12 +51,12 @@ namespace GlassMaking.Blocks
 
         public void SetParameters(bool isMix, int glowLevel)
         {
-            if(this.isMix != isMix && meshRef != null)
-            {
-                api.Render.UpdateMesh(meshRef, GenerateMesh());
-            }
-            this.isMix = isMix;
             this.glowLevel = glowLevel;
+            if(this.isMix != isMix)
+            {
+                this.isMix = isMix;
+                if(meshRef != null) api.Render.UpdateMesh(meshRef, GenerateMesh());
+            }
         }
 
         public void OnRenderFrame(float deltaTime, EnumRenderStage stage)
