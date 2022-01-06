@@ -4,10 +4,11 @@ using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
+using Vintagestory.GameContent;
 
 namespace GlassMaking.Blocks
 {
-    public class BlockEntityFirebox : BlockEntity, ITimeBasedHeatSource
+    public class BlockEntityFirebox : BlockEntity, ITimeBasedHeatSource, IHeatSource
     {
         private const float TEMP_INCREASE_PER_HOUR = 1500;
         private const float TEMP_DECREASE_PER_HOUR = 2000;
@@ -106,6 +107,11 @@ namespace GlassMaking.Blocks
             tree.SetFloat("temperature", temperature);
             tree.SetBool("burning", burning);
             tree.SetDouble("lastTickTotalHours", lastTickTime);
+        }
+
+        public float GetHeatStrength(IWorldAccessor world, BlockPos heatSourcePos, BlockPos heatReceiverPos)
+        {
+            return fuelTemperature > 20f ? Math.Max((temperature - 20f) / (fuelTemperature - 20f) * 8f, 0f) : 0f;
         }
 
         public void SetReceiver(ITimeBasedHeatReceiver receiver)
