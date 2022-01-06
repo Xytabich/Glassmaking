@@ -188,6 +188,12 @@ namespace GlassMaking.Blocks
             }
         }
 
+        public ItemStack[] GetDropItems()
+        {
+            if(contents != null) return new ItemStack[] { contents.Clone() };
+            return null;
+        }
+
         public override bool OnTesselation(ITerrainMeshPool mesher, ITesselatorAPI tessThreadTesselator)
         {
             if(hasContentsTransform && Block.Variant["state"] == "opened" && contentsMesh != null)

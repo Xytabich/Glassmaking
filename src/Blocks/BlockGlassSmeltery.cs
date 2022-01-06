@@ -14,7 +14,7 @@ namespace GlassMaking.Blocks
             if(itemstack != null)
             {
                 var be = world.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityGlassSmeltery;
-                if(be != null)
+                if(be != null && be.CanInteract(byPlayer.Entity, blockSel))
                 {
                     if(be.TryAdd(byPlayer, slot, byPlayer.Entity.Controls.Sneak ? (byPlayer.Entity.Controls.Sprint ? 20 : 5) : 1))
                     {

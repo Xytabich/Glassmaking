@@ -97,7 +97,7 @@ namespace GlassMaking.GlassblowingTools
                     if(be != null)
                     {
                         var source = be as BlockEntityGlassSmeltery;
-                        if(source != null)
+                        if(source != null && source.CanInteract(byEntity, blockSel))
                         {
                             int sourceAmount = source.GetGlassAmount();
                             if(sourceAmount > 0 && ((data as IntAttribute)?.value ?? 0) < amount)
@@ -118,7 +118,7 @@ namespace GlassMaking.GlassblowingTools
                 isComplete = false;
                 if(blockSel == null) return false;
                 var source = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityGlassSmeltery;
-                if(source != null)
+                if(source != null && source.CanInteract(byEntity, blockSel))
                 {
                     IntAttribute amountAttribute = data as IntAttribute;
                     if(amountAttribute == null)

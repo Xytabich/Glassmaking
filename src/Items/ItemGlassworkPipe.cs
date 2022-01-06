@@ -143,7 +143,7 @@ namespace GlassMaking.Items
                             }
                         }
                         var source = be as BlockEntityGlassSmeltery;
-                        if(source != null)
+                        if(source != null && source.CanInteract(byEntity, blockSel))
                         {
                             int amount = source.GetGlassAmount();
                             if(amount > 0 && CanAddGlass(byEntity, slot, amount, source.GetGlassCode(), byEntity.Controls.Sneak ? 5 : 1))
@@ -278,7 +278,7 @@ namespace GlassMaking.Items
                         }
                     }
                     var source = be as BlockEntityGlassSmeltery;
-                    if(source != null)
+                    if(source != null && source.CanInteract(byEntity, blockSel))
                     {
                         int amount = source.GetGlassAmount();
                         if(amount > 0 && CanAddGlass(byEntity, slot, amount, source.GetGlassCode(), byEntity.Controls.Sneak ? 5 : 1))

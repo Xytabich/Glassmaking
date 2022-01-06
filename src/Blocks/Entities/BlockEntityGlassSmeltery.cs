@@ -229,6 +229,11 @@ namespace GlassMaking.Blocks
             return items.ToArray();
         }
 
+        public bool CanInteract(EntityAgent byEntity, BlockSelection blockSel)
+        {
+            return blockSel.Face.Opposite.Code.ToLower() == Block.Variant["side"].ToLower();
+        }
+
         public int GetGlassAmount()
         {
             if(heatSource != null)
