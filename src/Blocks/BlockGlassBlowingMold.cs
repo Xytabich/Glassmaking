@@ -13,7 +13,7 @@ namespace GlassMaking.Blocks
                 {
                     if(be.OnInteract(world, byPlayer))
                     {
-                        return false;
+                        return true;
                     }
                 }
             }

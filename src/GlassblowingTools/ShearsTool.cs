@@ -92,7 +92,6 @@ namespace GlassMaking.GlassblowingTools
                     leftTransform.Rotation.Y = Math.Min(25f, secondsUsed * 45f * speed);
                     leftTransform.Rotation.X = GameMath.Lerp(0f, 0.5f * GameMath.Clamp(byEntity.Pos.Pitch - (float)Math.PI, -0.2f, 1.0995574f) * GameMath.RAD2DEG, Math.Min(1, secondsUsed * speed * 4f));
                     leftTransform.Rotation.Z = secondsUsed * 90f % 360f;
-                    System.Diagnostics.Debug.WriteLine(leftTransform.Rotation.X);
                     byEntity.Controls.LeftUsingHeldItemTransformBefore = leftTransform;
 
                     const float speed2 = 1.5f;
