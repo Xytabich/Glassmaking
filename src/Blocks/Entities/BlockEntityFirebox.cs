@@ -15,8 +15,6 @@ namespace GlassMaking.Blocks
         private static SimpleParticleProperties smokeParticles;
         private static AdvancedParticleProperties fireParticles;
 
-        protected virtual float fuelTemperatureModifier => 1.1f;
-        protected virtual float fuelDurationModifier => 0.8f;
         protected virtual int maxFuelCount => 16;
 
         private ItemStack contents => inventory[0].Itemstack;
@@ -68,10 +66,6 @@ namespace GlassMaking.Blocks
                 {
                     dsc.AppendLine("Fuel: " + contents.GetName());
                 }
-            }
-            if(temperature > 25)
-            {
-                dsc.AppendLine("Temperature: " + temperature.ToString("#"));
             }
             if(burning)
             {
@@ -331,9 +325,9 @@ namespace GlassMaking.Blocks
         private void ApplyFuelParameters()
         {
             var combustibleProps = contents.Collectible.CombustibleProps;//TODO: smoke level?
-            fuelTemperature = combustibleProps.BurnTemperature * fuelTemperatureModifier;
+            fuelTemperature = combustibleProps.BurnTemperature;
             var calendar = Api.World.Calendar;
-            fuelBurnDuration = combustibleProps.BurnDuration * fuelDurationModifier * calendar.SpeedOfTime * calendar.CalendarSpeedMul;
+            fuelBurnDuration = combustibleProps.BurnDuration * calendar.SpeedOfTime * calendar.CalendarSpeedMul;
             fuelBurnDuration *= 1f / 3600f;
         }
 
