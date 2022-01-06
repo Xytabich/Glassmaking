@@ -50,7 +50,7 @@ namespace GlassMaking.GlassblowingTools
                 };
             }
 
-            public override float GetStepProgress(ItemStack item, IAttribute data)
+            public override float GetMeshTransitionValue(ItemStack item, IAttribute data)
             {
                 return item.TempAttributes.GetFloat("toolUseTime", 0f) / time;
             }

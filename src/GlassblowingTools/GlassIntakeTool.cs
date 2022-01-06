@@ -76,10 +76,15 @@ namespace GlassMaking.GlassblowingTools
                 dsc.AppendLine("  Remaining amount: " + (amount - (amountAttribute == null ? 0 : amountAttribute.value)));
             }
 
-            public override float GetStepProgress(ItemStack item, IAttribute data)
+            public override float GetMeshTransitionValue(ItemStack item, IAttribute data)
             {
                 IntAttribute amountAttribute = data as IntAttribute;
-                if(amountAttribute != null) return (float)amountAttribute.value / amount;
+                if(amountAttribute != null)
+                {
+                    float t = 1f - (float)amountAttribute.value / amount;
+                    t = 1f - t * t;
+                    return t;
+                }
                 return 0f;
             }
 

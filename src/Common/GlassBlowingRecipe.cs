@@ -12,16 +12,20 @@ using Vintagestory.API.MathTools;
 
 namespace GlassMaking
 {
+    [JsonObject(MemberSerialization.OptIn)]
     public class GlassBlowingRecipe : IRecipeBase, IByteSerializable, IRecipeBase<GlassBlowingRecipe>
     {
         private static SmoothRadialShape EmptyShape = new SmoothRadialShape() { segments = 1, outer = new SmoothRadialShape.ShapePart[] { new SmoothRadialShape.ShapePart() { vertices = new float[][] { new float[] { -1.5f, 0 } } } } };
 
         public int recipeId;
 
+        [JsonProperty]
         public AssetLocation code;
 
+        [JsonProperty]
         public JsonItemStack output;
 
+        [JsonProperty]
         public JsonGlassBlowingToolStep[] steps;
 
         public GlassBlowingToolStep[] resolvedSteps;
@@ -153,7 +157,7 @@ namespace GlassMaking
         public void UpdateMesh(ItemStack item, MeshData mesh, ITreeAttribute recipeAttribute)
         {
             int step = recipeAttribute.GetInt("step", 0);
-            float progress = resolvedSteps[step].GetStepProgress(item, recipeAttribute["data"]);
+            float t = resolvedSteps[step].GetMeshTransitionValue(item, recipeAttribute["data"]);
             SmoothRadialShape prevShape = null;
             for(int i = step - 1; i >= 0; i--)
             {
@@ -170,9 +174,9 @@ namespace GlassMaking
                 return;
             }
 
-            progress = GameMath.Clamp(progress, 0, 1);
+            t = GameMath.Clamp(t, 0, 1);
             if(prevShape == null) prevShape = EmptyShape;
-            SmoothRadialShape.BuildLerpedMesh(mesh, prevShape, resolvedSteps[step].shape, progress, GlasspipeRenderUtil.GenerateRadialVertices, GlasspipeRenderUtil.GenerateRadialFaces);
+            SmoothRadialShape.BuildLerpedMesh(mesh, prevShape, resolvedSteps[step].shape, t, GlasspipeRenderUtil.GenerateRadialVertices, GlasspipeRenderUtil.GenerateRadialFaces);
         }
 
         public void ToBytes(BinaryWriter writer)
@@ -253,10 +257,13 @@ namespace GlassMaking
         }
     }
 
+    [JsonObject]
     public sealed class JsonGlassBlowingToolStep
     {
+        [JsonProperty]
         public string tool;
 
+        [JsonProperty]
         public SmoothRadialShape shape;
 
         [JsonProperty]
@@ -293,7 +300,7 @@ namespace GlassMaking
 
         public virtual WorldInteraction[] GetHeldInteractionHelp(ItemStack item, IAttribute data) { return new WorldInteraction[0]; }
 
-        public virtual float GetStepProgress(ItemStack item, IAttribute data)
+        public virtual float GetMeshTransitionValue(ItemStack item, IAttribute data)
         {
             return 0f;
         }
