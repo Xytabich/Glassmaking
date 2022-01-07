@@ -29,21 +29,23 @@ namespace GlassMaking.Items
             {
                 interactions = ObjectCacheUtil.GetOrCreate(api, "glassmaking:heldhelp-glasspipe", delegate {
                     List<ItemStack> list = new List<ItemStack>();
+                    var capi = api as ICoreClientAPI;
                     foreach(Block block in api.World.Blocks)
                     {
-                        if(block is BlockGlassSmeltery && (!block.Variant.TryGetValue("side", out var side) || side == "north"))
+                        if(block is BlockGlassSmeltery)
                         {
-                            list.Add(new ItemStack(block));
+                            List<ItemStack> stacks = block.GetHandBookStacks(capi);
+                            if(stacks != null) list.AddRange(stacks);
                         }
                     }
                     return new WorldInteraction[] {
                         new WorldInteraction() {
-                            ActionLangCode = "glassmaking:heldhelp-glasspipe",
+                            ActionLangCode = "glassmaking:heldhelp-glasspipe-intake",
                             MouseButton = EnumMouseButton.Right,
                             Itemstacks = list.ToArray()
                         },
                         new WorldInteraction() {
-                            ActionLangCode = "glassmaking:heldhelp-glasspipe",
+                            ActionLangCode = "glassmaking:heldhelp-glasspipe-intake",
                             MouseButton = EnumMouseButton.Right,
                             HotKeyCode = "sneak",
                             Itemstacks = list.ToArray()

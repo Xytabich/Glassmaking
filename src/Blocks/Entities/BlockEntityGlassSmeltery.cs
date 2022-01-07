@@ -44,7 +44,7 @@ namespace GlassMaking.Blocks
         public override void Initialize(ICoreAPI api)
         {
             base.Initialize(api);
-            inventory.LateInitialize("glasswork:glasssmeltery-" + Pos.X + "/" + Pos.Y + "/" + Pos.Z, api);
+            inventory.LateInitialize("glassmaking:glasssmeltery-" + Pos.X + "/" + Pos.Y + "/" + Pos.Z, api);
             if(api.Side == EnumAppSide.Client)
             {
                 ICoreClientAPI capi = (ICoreClientAPI)api;
@@ -149,12 +149,12 @@ namespace GlassMaking.Blocks
             base.OnBlockRemoved();
         }
 
-        public bool TryAdd(IPlayer byPlayer, ItemSlot slot, int count)
+        public bool TryAdd(IPlayer byPlayer, ItemSlot slot, int multiplier)
         {
             if(heatSource == null) return false;
             if(state == SmelteryState.Bubbling)
             {
-                var reducer = slot.Itemstack.ItemAttributes?["glassBubblingReducer"].AsObject<GlassBubblingReducer>();
+                var reducer = slot.Itemstack.ItemAttributes?["glassmaking:glassBubblingReducer"].AsObject<GlassBubblingReducer>();
                 if(reducer != null)
                 {
                     if(Api.Side == EnumAppSide.Server)
@@ -202,7 +202,7 @@ namespace GlassMaking.Blocks
                             state = SmelteryState.ContainsMix;
                         }
                     }
-                    int consume = Math.Min(Math.Min(count, slot.Itemstack.StackSize), (maxGlassAmount - glassAmount) / blend.amount);
+                    int consume = Math.Min(Math.Min(multiplier, slot.Itemstack.StackSize), (maxGlassAmount - glassAmount) / blend.amount);
                     var item = slot.TakeOut(consume);
                     if(state == SmelteryState.Empty || state == SmelteryState.ContainsMix)
                     {

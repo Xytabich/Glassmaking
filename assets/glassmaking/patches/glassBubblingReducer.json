@@ -2,7 +2,7 @@
     {
         "file": "game:blocktypes/plant/ferntree",
         "op": "add",
-        "path": "/attributes/glassBubblingReducer",
+        "path": "/attributes/glassmaking:glassBubblingReducer",
         "value": {
             "amount": 0.5,
             "replacement": {

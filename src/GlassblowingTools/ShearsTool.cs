@@ -28,7 +28,8 @@ namespace GlassMaking.GlassblowingTools
             {
                 if(item is ItemShears tool && tool.ToolTier >= 4)
                 {
-                    list.Add(new ItemStack(tool));
+                    List<ItemStack> stacks = item.GetHandBookStacks(api);
+                    if(stacks != null) list.AddRange(stacks);
                 }
             }
             interactions = new WorldInteraction[1] {

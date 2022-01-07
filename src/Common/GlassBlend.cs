@@ -7,7 +7,7 @@ namespace GlassMaking.Common
     [JsonObject]
     public class GlassBlend
     {
-        public const string PROPERTY_NAME = "glassblend";
+        public const string PROPERTY_NAME = "glassmaking:glassblend";
 
         [JsonProperty(Required = Required.DisallowNull)]
         public AssetLocation code;

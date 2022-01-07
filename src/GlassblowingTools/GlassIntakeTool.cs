@@ -30,9 +30,10 @@ namespace GlassMaking.GlassblowingTools
             List<ItemStack> list = new List<ItemStack>();
             foreach(Block block in api.World.Blocks)
             {
-                if(block is BlockGlassSmeltery && (!block.Variant.TryGetValue("side", out var side) || side == "north"))
+                if(block is BlockGlassSmeltery)
                 {
-                    list.Add(new ItemStack(block));
+                    List<ItemStack> stacks = block.GetHandBookStacks(api);
+                    if(stacks != null) list.AddRange(stacks);
                 }
             }
             interactions = new WorldInteraction[] {

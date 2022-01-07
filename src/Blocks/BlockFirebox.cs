@@ -1,12 +1,67 @@
-﻿using Vintagestory.API.Client;
+﻿using System.Collections.Generic;
+using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Util;
+using Vintagestory.GameContent;
 
 namespace GlassMaking.Blocks
 {
     public class BlockFirebox : Block
     {
+        private WorldInteraction[] interactions;
+
+        public override void OnLoaded(ICoreAPI api)
+        {
+            base.OnLoaded(api);
+
+            if(api.Side != EnumAppSide.Client) return;
+            ICoreClientAPI capi = api as ICoreClientAPI;
+
+            interactions = ObjectCacheUtil.GetOrCreate(api, "glassmaking:blockhelp-firebox", () => {
+                List<ItemStack> fuelStacklist = new List<ItemStack>();
+                List<ItemStack> canIgniteStacks = new List<ItemStack>();
+
+                foreach(CollectibleObject obj in api.World.Collectibles)
+                {
+                    if(obj.CombustibleProps?.BurnTemperature >= 100)
+                    {
+                        List<ItemStack> stacks = obj.GetHandBookStacks(capi);
+                        if(stacks != null) fuelStacklist.AddRange(stacks);
+                    }
+                    if(obj is Block && (obj as Block).HasBehavior<BlockBehaviorCanIgnite>())
+                    {
+                        List<ItemStack> stacks = obj.GetHandBookStacks(capi);
+                        if(stacks != null) canIgniteStacks.AddRange(stacks);
+                    }
+                }
+                //TODO: check amount & filter by current content
+                return new WorldInteraction[] {
+                    new WorldInteraction()
+                    {
+                        ActionLangCode = "glassmaking:blockhelp-firebox-fuel",
+                        HotKeyCode = null,
+                        MouseButton = EnumMouseButton.Right,
+                        Itemstacks = fuelStacklist.ToArray()
+                    },
+                    new WorldInteraction()
+                    {
+                        ActionLangCode = "glassmaking:blockhelp-firebox-fuelx5",
+                        HotKeyCode = "sprint",
+                        MouseButton = EnumMouseButton.Right,
+                        Itemstacks = fuelStacklist.ToArray()
+                    },
+                    new WorldInteraction()
+                    {
+                        ActionLangCode = "glassmaking:blockhelp-firebox-ignite",
+                        HotKeyCode = "sneak",
+                        MouseButton = EnumMouseButton.Right,
+                        Itemstacks = canIgniteStacks.ToArray()
+                    }
+                };
+            });
+        }
+
         public override bool OnBlockInteractStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)
         {
             var slot = byPlayer.InventoryManager.ActiveHotbarSlot;
@@ -88,6 +143,11 @@ namespace GlassMaking.Blocks
                     be.SetReceiver(world.BlockAccessor.GetBlockEntity(neibpos) as ITimeBasedHeatReceiver);
                 }
             }
+        }
+
+        public override WorldInteraction[] GetPlacedBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer)
+        {
+            return interactions.Append(base.GetPlacedBlockInteractionHelp(world, selection, forPlayer));
         }
     }
 }

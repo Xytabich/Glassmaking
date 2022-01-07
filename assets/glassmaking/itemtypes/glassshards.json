@@ -4,7 +4,7 @@
     "heldTpIdleAnimation": "holdbothhands",
     "shape": { "base": "item/resource/crushed/glassshards" },
     "attributes": {
-        "glassblend": {
+        "glassmaking:glassblend": {
             "code": "game:plain",
             "amount": 5
         },
