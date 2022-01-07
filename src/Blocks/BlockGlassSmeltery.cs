@@ -1,5 +1,6 @@
 ﻿using GlassMaking.Common;
 using GlassMaking.Items;
+using System;
 using System.Collections.Generic;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
@@ -22,36 +23,38 @@ namespace GlassMaking.Blocks
             interactions = ObjectCacheUtil.GetOrCreate(api, "glassmaking:blockhelp-glasssmeltery", () => {
                 List<ItemStack> blends = new List<ItemStack>();
 
-                foreach(CollectibleObject obj in api.World.Collectibles)
+                foreach(Item item in api.World.Items)
                 {
-                    if(obj is ItemGlassBlend || obj.Attributes?.KeyExists(GlassBlend.PROPERTY_NAME) == true)
+                    if(item is ItemGlassBlend && item.Attributes?.KeyExists(GlassBlend.PROPERTY_NAME) == true)
                     {
-                        List<ItemStack> stacks = obj.GetHandBookStacks(capi);
+                        List<ItemStack> stacks = item.GetHandBookStacks(capi);
                         if(stacks != null) blends.AddRange(stacks);
                     }
                 }
-                //TODO: check amount & bubbling reducer & filter by current content
                 return new WorldInteraction[] {
                     new WorldInteraction()
                     {
                         ActionLangCode = "glassmaking:blockhelp-glasssmeltery-add",
                         HotKeyCode = null,
                         MouseButton = EnumMouseButton.Right,
-                        Itemstacks = blends.ToArray()
+                        Itemstacks = blends.ToArray(),
+                        GetMatchingStacks = GetMatchingBlends
                     },
                     new WorldInteraction()
                     {
                         ActionLangCode = "glassmaking:blockhelp-glasssmeltery-add",
                         HotKeyCode = "sneak",
                         MouseButton = EnumMouseButton.Right,
-                        Itemstacks = blends.ToArray()
+                        Itemstacks = blends.ConvertAll(s => { s = s.Clone(); s.StackSize = 5; return s; }).ToArray(),
+                        GetMatchingStacks = GetMatchingBlends
                     },
                     new WorldInteraction()
                     {
                         ActionLangCode = "glassmaking:blockhelp-glasssmeltery-add",
                         HotKeyCodes = new string[] { "sneak", "sprint" },
                         MouseButton = EnumMouseButton.Right,
-                        Itemstacks = blends.ToArray()
+                        Itemstacks = blends.ConvertAll(s => { s = s.Clone(); s.StackSize = 20; return s; }).ToArray(),
+                        GetMatchingStacks = GetMatchingBlends
                     }
                 };
             });
@@ -105,6 +108,26 @@ namespace GlassMaking.Blocks
         public override WorldInteraction[] GetPlacedBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer)
         {
             return interactions.Append(base.GetPlacedBlockInteractionHelp(world, selection, forPlayer));
+        }
+
+        private ItemStack[] GetMatchingBlends(WorldInteraction wi, BlockSelection blockSelection, EntitySelection entitySelection)
+        {
+            if(wi.Itemstacks.Length == 0) return null;
+            var be = api.World.BlockAccessor.GetBlockEntity(blockSelection.Position) as BlockEntityGlassSmeltery;
+            if(be == null) return null;
+            be.GetGlassFillState(out var canAddAmount, out var code);
+            if(code == null) return wi.Itemstacks;
+            if(canAddAmount <= 0) return null;
+            List<ItemStack> list = new List<ItemStack>();
+            foreach(var stack in wi.Itemstacks)
+            {
+                var blend = GlassBlend.FromJson(stack);
+                if(blend.code.Equals(code) && blend.amount * stack.StackSize <= canAddAmount)
+                {
+                    list.Add(stack);
+                }
+            }
+            return list.ToArray();
         }
     }
 }

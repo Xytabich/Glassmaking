@@ -149,6 +149,17 @@ namespace GlassMaking.Blocks
             base.OnBlockRemoved();
         }
 
+        public void GetGlassFillState(out int canAddAmount, out AssetLocation code)
+        {
+            code = null;
+            canAddAmount = maxGlassAmount;
+            if(glassCode != null)
+            {
+                code = glassCode;
+                canAddAmount = maxGlassAmount - glassAmount;
+            }
+        }
+
         public bool TryAdd(IPlayer byPlayer, ItemSlot slot, int multiplier)
         {
             if(heatSource == null) return false;
@@ -183,7 +194,7 @@ namespace GlassMaking.Blocks
             }
 
             if(glassAmount >= maxGlassAmount) return false;
-            GlassBlend blend = slot.Itemstack.ItemAttributes?[GlassBlend.PROPERTY_NAME]?.AsObject<GlassBlend>(null, slot.Itemstack.Collectible.Code.Domain);
+            GlassBlend blend = GlassBlend.FromJson(slot.Itemstack);
             if(blend == null) blend = GlassBlend.FromTreeAttributes(slot.Itemstack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
             if(blend != null && blend.amount > 0 && (glassCode == null || glassCode.Equals(blend.code)) && (blend.amount + glassAmount) <= maxGlassAmount)
             {
@@ -258,6 +269,7 @@ namespace GlassMaking.Blocks
             if(glassAmount <= 0 && Api.Side == EnumAppSide.Server)
             {
                 state = SmelteryState.Empty;
+                glassCode = null;
             }
             MarkDirty(true);
         }

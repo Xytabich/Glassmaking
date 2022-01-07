@@ -35,28 +35,31 @@ namespace GlassMaking.Blocks
                         if(stacks != null) canIgniteStacks.AddRange(stacks);
                     }
                 }
-                //TODO: check amount & filter by current content
+
                 return new WorldInteraction[] {
                     new WorldInteraction()
                     {
                         ActionLangCode = "glassmaking:blockhelp-firebox-fuel",
                         HotKeyCode = null,
                         MouseButton = EnumMouseButton.Right,
-                        Itemstacks = fuelStacklist.ToArray()
+                        Itemstacks = fuelStacklist.ToArray(),
+                        GetMatchingStacks = GetMatchingFuel
                     },
                     new WorldInteraction()
                     {
-                        ActionLangCode = "glassmaking:blockhelp-firebox-fuelx5",
+                        ActionLangCode = "glassmaking:blockhelp-firebox-fuel",
                         HotKeyCode = "sprint",
                         MouseButton = EnumMouseButton.Right,
-                        Itemstacks = fuelStacklist.ToArray()
+                        Itemstacks = fuelStacklist.ConvertAll(s => { s = s.Clone(); s.StackSize = 5; return s; }).ToArray(),
+                        GetMatchingStacks = GetMatchingFuel
                     },
                     new WorldInteraction()
                     {
                         ActionLangCode = "glassmaking:blockhelp-firebox-ignite",
                         HotKeyCode = "sneak",
                         MouseButton = EnumMouseButton.Right,
-                        Itemstacks = canIgniteStacks.ToArray()
+                        Itemstacks = canIgniteStacks.ToArray(),
+                        GetMatchingStacks = GetMatchingIgnitor
                     }
                 };
             });
@@ -148,6 +151,28 @@ namespace GlassMaking.Blocks
         public override WorldInteraction[] GetPlacedBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer)
         {
             return interactions.Append(base.GetPlacedBlockInteractionHelp(world, selection, forPlayer));
+        }
+
+        private ItemStack[] GetMatchingFuel(WorldInteraction wi, BlockSelection blockSelection, EntitySelection entitySelection)
+        {
+            if(wi.Itemstacks.Length == 0) return null;
+            var be = api.World.BlockAccessor.GetBlockEntity(blockSelection.Position) as BlockEntityFirebox;
+            if(be == null) return null;
+            be.GetFuelStackState(out var canAddAmount, out var stack);
+            if(stack == null) return wi.Itemstacks;
+            if(canAddAmount < wi.Itemstacks[0].StackSize) return null;
+            stack = stack.GetEmptyClone();
+            stack.StackSize = wi.Itemstacks[0].StackSize;
+            return new ItemStack[] { stack };
+        }
+
+        private ItemStack[] GetMatchingIgnitor(WorldInteraction wi, BlockSelection blockSelection, EntitySelection entitySelection)
+        {
+            if(wi.Itemstacks.Length == 0) return null;
+            var be = api.World.BlockAccessor.GetBlockEntity(blockSelection.Position) as BlockEntityFirebox;
+            if(be == null) return null;
+            if(be.IsBurning()) return null;
+            return wi.Itemstacks;
         }
     }
 }

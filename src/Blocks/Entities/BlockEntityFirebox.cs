@@ -130,6 +130,17 @@ namespace GlassMaking.Blocks
             return new ItemStack[] { contents.Clone() };
         }
 
+        public void GetFuelStackState(out int canAddAmount, out ItemStack stack)
+        {
+            stack = null;
+            canAddAmount = maxFuelCount;
+            if(contents != null)
+            {
+                canAddAmount = maxFuelCount - GetFuelCount();
+                stack = contents;
+            }
+        }
+
         public bool TryAdd(IPlayer byPlayer, ItemSlot slot, int count)
         {
             var combustibleProps = slot.Itemstack.Collectible.CombustibleProps;

@@ -40,5 +40,16 @@ namespace GlassMaking.Common
             if(tree == null) return null;
             return new GlassBlend(new AssetLocation(tree.GetString("code")), tree.GetInt("amount"));
         }
+
+        public static GlassBlend FromJson(CollectibleObject collectible)
+        {
+            if(collectible.Attributes == null) return null;
+            return collectible.Attributes[PROPERTY_NAME].AsObject<GlassBlend>(null, collectible.Code.Domain);
+        }
+
+        public static GlassBlend FromJson(ItemStack stack)
+        {
+            return FromJson(stack.Collectible);
+        }
     }
 }

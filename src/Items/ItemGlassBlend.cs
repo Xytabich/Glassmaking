@@ -10,7 +10,7 @@ namespace GlassMaking.Items
         public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
         {
             base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
-            GlassBlend blend = inSlot.Itemstack.ItemAttributes?[GlassBlend.PROPERTY_NAME]?.AsObject<GlassBlend>(null, inSlot.Itemstack.Collectible.Code.Domain);
+            GlassBlend blend = GlassBlend.FromJson(inSlot.Itemstack);
             if(blend == null) blend = GlassBlend.FromTreeAttributes(inSlot.Itemstack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
             if(blend != null && blend.amount > 0)
             {
