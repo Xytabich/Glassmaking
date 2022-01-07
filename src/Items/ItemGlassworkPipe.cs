@@ -17,6 +17,7 @@ namespace GlassMaking.Items
         private GlassMakingMod mod;
         private int maxGlassAmount;
         private ModelTransform glassTransform;
+        private WorldInteraction[] interactions;
 
         public override void OnLoaded(ICoreAPI api)
         {
@@ -24,6 +25,32 @@ namespace GlassMaking.Items
             mod = api.ModLoader.GetModSystem<GlassMakingMod>();
             maxGlassAmount = Attributes["maxGlass"].AsInt();
             glassTransform = Attributes["glassTransform"].AsObject<ModelTransform>();
+            if(api.Side == EnumAppSide.Client)
+            {
+                interactions = ObjectCacheUtil.GetOrCreate(api, "glassmaking:heldhelp-glasspipe", delegate {
+                    List<ItemStack> list = new List<ItemStack>();
+                    foreach(Block block in api.World.Blocks)
+                    {
+                        if(block is BlockGlassSmeltery && (!block.Variant.TryGetValue("side", out var side) || side == "north"))
+                        {
+                            list.Add(new ItemStack(block));
+                        }
+                    }
+                    return new WorldInteraction[] {
+                        new WorldInteraction() {
+                            ActionLangCode = "glassmaking:heldhelp-glasspipe",
+                            MouseButton = EnumMouseButton.Right,
+                            Itemstacks = list.ToArray()
+                        },
+                        new WorldInteraction() {
+                            ActionLangCode = "glassmaking:heldhelp-glasspipe",
+                            MouseButton = EnumMouseButton.Right,
+                            HotKeyCode = "sneak",
+                            Itemstacks = list.ToArray()
+                        }
+                    };
+                });
+            }
         }
 
         public override void OnUnloaded(ICoreAPI api)
@@ -82,7 +109,18 @@ namespace GlassMaking.Items
                     return recipe.GetHeldInteractionHelp(itemstack, recipeAttribute);
                 }
             }
-            return base.GetHeldInteractionHelp(inSlot);
+            var list = interactions.Append(base.GetHeldInteractionHelp(inSlot));
+            if(!itemstack.Attributes.HasAttribute("glasslayers"))
+            {
+                list = new WorldInteraction[] {
+                    new WorldInteraction() {
+                        ActionLangCode = "glassmaking:heldhelp-glasspipe-recipe",
+                        HotKeyCode = "itemrecipeselect",
+                        MouseButton = EnumMouseButton.None
+                    }
+                }.Append(list);
+            }
+            return list;
         }
 
         public override void OnConsumedByCrafting(ItemSlot[] allInputSlots, ItemSlot stackInSlot, GridRecipe gridRecipe, CraftingRecipeIngredient fromIngredient, IPlayer byPlayer, int quantity)

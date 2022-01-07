@@ -15,5 +15,21 @@
                 "tool": "shears"
             }
         }
+    },
+    {
+        "file": "game:itemtypes/tool/shears",
+        "op": "add",
+        "path": "/tooltierbytype",
+        "value": {
+            "*-copper": 2,
+            "*-gold": 2,
+            "*-silver": 2,
+            "*-bismuthbronze": 3,
+            "*-tinbronze": 3,
+            "*-blackbronze": 3,
+            "*-iron": 4,
+            "*-meteoriciron": 4,
+            "*-steel": 5
+        }
     }
 ]

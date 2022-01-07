@@ -2,8 +2,10 @@
 using GlassMaking.Common;
 using GlassMaking.Items;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
@@ -13,9 +15,39 @@ namespace GlassMaking.GlassblowingTools
 {
     public class GlassIntakeTool : IGlassBlowingTool
     {
+        private bool initComplete = false;
+        private WorldInteraction[] interactions;
+
         public GlassBlowingToolStep GetStepInstance()
         {
-            return new ToolStep();
+            return new ToolStep(this);
+        }
+
+        private void OnInitClient(ICoreClientAPI api)
+        {
+            if(initComplete) return;
+            initComplete = true;
+            List<ItemStack> list = new List<ItemStack>();
+            foreach(Block block in api.World.Blocks)
+            {
+                if(block is BlockGlassSmeltery && (!block.Variant.TryGetValue("side", out var side) || side == "north"))
+                {
+                    list.Add(new ItemStack(block));
+                }
+            }
+            interactions = new WorldInteraction[] {
+                new WorldInteraction() {
+                    ActionLangCode = "glassmaking:heldhelp-gbtool-intake",
+                    MouseButton = EnumMouseButton.Right,
+                    Itemstacks = list.ToArray()
+                },
+                new WorldInteraction() {
+                    ActionLangCode = "glassmaking:heldhelp-gbtool-intake",
+                    MouseButton = EnumMouseButton.Right,
+                    HotKeyCode = "sneak",
+                    Itemstacks = list.ToArray()
+                }
+            };
         }
 
         private class ToolStep : GlassBlowingToolStep
@@ -23,11 +55,22 @@ namespace GlassMaking.GlassblowingTools
             private AssetLocation code;
             private int amount;
 
+            private GlassIntakeTool toolInstance;
+
+            public ToolStep(GlassIntakeTool toolInstance)
+            {
+                this.toolInstance = toolInstance;
+            }
+
             public override void FromBytes(BinaryReader reader, IWorldAccessor resolver)
             {
                 base.FromBytes(reader, resolver);
                 code = new AssetLocation(reader.ReadString());
                 amount = reader.ReadInt32();
+                if(resolver.Api.Side == EnumAppSide.Client)
+                {
+                    toolInstance.OnInitClient(resolver.Api as ICoreClientAPI);
+                }
             }
 
             public override void ToBytes(BinaryWriter writer)
@@ -61,12 +104,17 @@ namespace GlassMaking.GlassblowingTools
 
             public override GlassBlowingToolStep Clone()
             {
-                return new ToolStep() {
+                return new ToolStep(toolInstance) {
                     tool = tool,
                     shape = shape == null ? null : shape.Clone(),
                     code = code.Clone(),
                     amount = amount
                 };
+            }
+
+            public override WorldInteraction[] GetHeldInteractionHelp(ItemStack item, IAttribute data)
+            {
+                return toolInstance.interactions;
             }
 
             public override void GetStepInfo(ItemStack item, IAttribute data, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)

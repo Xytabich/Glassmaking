@@ -1,27 +1,52 @@
-﻿using GlassMaking.Items;
-using System;
+﻿using System;
 using System.IO;
+using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
-using Vintagestory.API.MathTools;
 
 namespace GlassMaking.GlassblowingTools
 {
     public class BlowingTool : IGlassBlowingTool
     {
+        private bool initComplete = false;
+        private WorldInteraction[] interactions;
+
         public GlassBlowingToolStep GetStepInstance()
         {
-            return new ToolStep();
+            return new ToolStep(this);
+        }
+
+        private void OnInitClient(ICoreClientAPI api)
+        {
+            if(initComplete) return;
+            initComplete = true;
+            interactions = new WorldInteraction[1] {
+                new WorldInteraction() {
+                    ActionLangCode = "glassmaking:heldhelp-gbtool-blowing",
+                    MouseButton = EnumMouseButton.Right
+                }
+            };
         }
 
         private class ToolStep : GlassBlowingToolStep
         {
             private float time;
 
+            private BlowingTool toolInstance;
+
+            public ToolStep(BlowingTool toolInstance)
+            {
+                this.toolInstance = toolInstance;
+            }
+
             public override void FromBytes(BinaryReader reader, IWorldAccessor resolver)
             {
                 base.FromBytes(reader, resolver);
                 time = reader.ReadSingle();
+                if(resolver.Api.Side == EnumAppSide.Client)
+                {
+                    toolInstance.OnInitClient(resolver.Api as ICoreClientAPI);
+                }
             }
 
             public override void ToBytes(BinaryWriter writer)
@@ -43,11 +68,16 @@ namespace GlassMaking.GlassblowingTools
 
             public override GlassBlowingToolStep Clone()
             {
-                return new ToolStep() {
+                return new ToolStep(toolInstance) {
                     tool = tool,
                     shape = shape == null ? null : shape.Clone(),
                     time = time
                 };
+            }
+
+            public override WorldInteraction[] GetHeldInteractionHelp(ItemStack item, IAttribute data)
+            {
+                return toolInstance.interactions;
             }
 
             public override float GetMeshTransitionValue(ItemStack item, IAttribute data)
