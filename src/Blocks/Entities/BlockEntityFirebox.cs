@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GlassMaking.Common;
+using System;
 using System.Text;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
@@ -210,41 +211,57 @@ namespace GlassMaking.Blocks
             return lastTickTime > totalHours ? totalHours : lastTickTime;
         }
 
-        public double CalcTempElapsedTime(double startTime, float temperature)
+        public HeatGraph CalcHeatGraph(double totalHours = 0)
         {
-            if(fuelTemperature < temperature) return 0;
+            HeatGraph graph = default;
 
-            double time = 0;
-            float temp = this.temperature;
-            double hours = Api.World.Calendar.TotalHours - lastTickTime;
+            float temp = temperature;
+            graph.startTemperature = temp;
+            graph.workingTemperature = temp;
+
+            if(totalHours <= 0) totalHours = Api.World.Calendar.TotalHours;
+            double hours = totalHours - lastTickTime;
+            graph.totalTime = Math.Max(hours, 0);
+
             if(burning && hours > 0)
             {
                 double burnTime = fuelLevel + fuelBurnDuration * GetFuelCount();
-                if(temp < temperature)
+                if(temp < fuelTemperature)
                 {
-                    double t = Math.Min((temperature - temp) / TEMP_INCREASE_PER_HOUR, Math.Min(hours, burnTime));
-                    temp += (float)(t * TEMP_INCREASE_PER_HOUR);
-                    hours -= t;
-                    burnTime -= t;
-                    startTime -= t;
+                    double time = Math.Min((fuelTemperature - temp) / TEMP_INCREASE_PER_HOUR, Math.Min(hours, burnTime));
+                    temp -= (float)(time * TEMP_INCREASE_PER_HOUR);
+                    hours -= time;
+                    burnTime -= time;
+                    graph.transitionTime = time;
+                    graph.workingTemperature = temp;
+                }
+                else if(temp > fuelTemperature)
+                {
+                    graph.transitionTime = Math.Min((temp - fuelTemperature) / TEMP_DECREASE_PER_HOUR, hours);
+                    temp -= (float)(graph.transitionTime * TEMP_DECREASE_PER_HOUR);
+                    graph.workingTemperature = temp;
                 }
                 if(hours > 0)
                 {
-                    time = Math.Min(burnTime, hours);
-                    hours -= time;
+                    graph.holdTime = Math.Min(burnTime, hours);
+                    hours -= graph.holdTime;
                 }
             }
             if(hours > 0)
             {
-                time += Math.Min((temp - temperature) / TEMP_DECREASE_PER_HOUR, hours) * TEMP_DECREASE_PER_HOUR;
+                graph.coolingTime = Math.Min((temp - 20) / TEMP_DECREASE_PER_HOUR, hours);
+                temp -= (float)(graph.coolingTime * TEMP_DECREASE_PER_HOUR);
             }
-            return Math.Max(time - Math.Max(startTime, 0), 0);
+            graph.endTemperature = temp;
+
+            return graph;
         }
 
-        public float CalcCurrentTemperature()
+        public float CalcCurrentTemperature(double totalHours = 0)
         {
             float temp = temperature;
-            double hours = Api.World.Calendar.TotalHours - lastTickTime;
+            if(totalHours <= 0) totalHours = Api.World.Calendar.TotalHours;
+            double hours = totalHours - lastTickTime;
             if(burning && hours > 0)
             {
                 double burnTime = fuelLevel + fuelBurnDuration * GetFuelCount();
@@ -255,12 +272,9 @@ namespace GlassMaking.Blocks
                     hours -= time;
                     burnTime -= time;
                 }
-                if(temp < fuelTemperature)
+                else if(temp > fuelTemperature)
                 {
-                    double time = Math.Min((fuelTemperature - temp) / TEMP_INCREASE_PER_HOUR, Math.Min(hours, burnTime));
-                    temp += (float)(time * TEMP_INCREASE_PER_HOUR);
-                    hours -= time;
-                    burnTime -= time;
+                    temp = Math.Max(fuelTemperature, temp - (float)(hours * TEMP_DECREASE_PER_HOUR));
                 }
                 if(hours > 0)
                 {

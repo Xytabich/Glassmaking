@@ -305,7 +305,7 @@ namespace GlassMaking.Blocks
                 double timeOffset = 0;
                 if(state == SmelteryState.ContainsMix)
                 {
-                    if(Api.Side == EnumAppSide.Server && heatSource.CalcTempElapsedTime(timeOffset, MELTING_TEMPERATURE) > 0)
+                    if(Api.Side == EnumAppSide.Server && heatSource.CalcHeatGraph().CalcTemperatureHoldTime(timeOffset, MELTING_TEMPERATURE) > 0)
                     {
                         state = SmelteryState.Melting;
                         processProgress = 0;
@@ -317,7 +317,7 @@ namespace GlassMaking.Blocks
                 if(state == SmelteryState.Melting)
                 {
                     double timeLeft = glassAmount * PROCESS_HOURS_PER_UNIT - processProgress;
-                    double time = heatSource.CalcTempElapsedTime(timeOffset, MELTING_TEMPERATURE);
+                    double time = heatSource.CalcHeatGraph().CalcTemperatureHoldTime(timeOffset, MELTING_TEMPERATURE);
                     if(time >= timeLeft)
                     {
                         timeOffset += timeLeft;
@@ -336,7 +336,7 @@ namespace GlassMaking.Blocks
                 if(state == SmelteryState.Bubbling)
                 {
                     double timeLeft = glassAmount * PROCESS_HOURS_PER_UNIT * BUBBLING_PROCESS_MULTIPLIER - processProgress;
-                    double time = heatSource.CalcTempElapsedTime(timeOffset, BUBBLING_TEMPERATURE);
+                    double time = heatSource.CalcHeatGraph().CalcTemperatureHoldTime(timeOffset, BUBBLING_TEMPERATURE);
                     if(time >= timeLeft)
                     {
                         if(Api.Side == EnumAppSide.Server)

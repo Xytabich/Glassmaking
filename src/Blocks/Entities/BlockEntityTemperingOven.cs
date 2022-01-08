@@ -1,6 +1,7 @@
 ﻿using System;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
+using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.GameContent;
 
@@ -15,6 +16,7 @@ namespace GlassMaking.Blocks
         protected virtual int itemCapacity => 9;
 
         private InventoryGeneric inventory;
+        private ItemStack lastRemoved = null;
 
         private ITimeBasedHeatSource heatSource = null;
         private ItemProcessInfo[] processes;
@@ -44,6 +46,76 @@ namespace GlassMaking.Blocks
             updateMeshes();
         }
 
+        public bool TryInteract(IPlayer byPlayer, ItemSlot slot)
+        {
+            if(slot.Empty || slot.Itemstack.Equals(Api.World, lastRemoved, GlobalConstants.IgnoredStackAttributes))
+            {
+                for(int i = 0; i < processes.Length; i++)
+                {
+                    if(!inventory[i].Empty && (processes[i] == null || byPlayer.Entity.Controls.Sneak))
+                    {
+                        slot.Itemstack = inventory[i].TakeOut(1);
+                        lastRemoved = slot.Itemstack.Clone();
+                        updateMeshes();
+                        MarkDirty(true);
+                        return true;
+                    }
+                }
+                lastRemoved = null;
+            }
+            else
+            {
+                var properties = slot.Itemstack.Collectible.Attributes?["tempering"];
+                if(properties != null && properties.Exists)
+                {
+                    if(gridSize > 0)
+                    {
+                        float size = slot.Itemstack.Collectible.Attributes?["temperingOvenSize"].AsFloat() ?? 1f;
+                        if(size > gridCellSize) return false;
+
+                        int len = gridSize * gridSize;
+                        for(int i = 0; i < len; i++)
+                        {
+                            if(inventory[i].Empty)
+                            {
+                                inventory[i].Itemstack = slot.TakeOut(1);
+                                lastRemoved = null;
+                                updateMeshes();
+                                MarkDirty(true);
+                                return true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        float size = slot.Itemstack.Collectible.Attributes?["temperingOvenSize"].AsFloat() ?? 1f;
+                        if(size > 1) return false;
+                        if(size <= 1f / 3f)
+                        {
+                            gridCellSize = 1f / 3f;
+                            gridSize = 3;
+                        }
+                        else if(size <= 0.5f)
+                        {
+                            gridCellSize = 0.5f;
+                            gridSize = 2;
+                        }
+                        else
+                        {
+                            gridCellSize = 1f;
+                            gridSize = 1;
+                        }
+                        inventory[0].Itemstack = slot.TakeOut(1);
+                        lastRemoved = null;
+                        updateMeshes();
+                        MarkDirty(true);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         void ITimeBasedHeatReceiver.SetHeatSource(ITimeBasedHeatSource heatSource)
         {
             this.heatSource = heatSource;
@@ -61,16 +133,21 @@ namespace GlassMaking.Blocks
                     double timeOffset = 0;
                     if(!process.isHeated)
                     {
-                        var time = heatSource.CalcTempElapsedTime(0, process.temperingTemperature);
-                        if(time > 0)
-                        {
-                            process.isHeated = true;
-                            timeOffset = time;
-                        }
+                        //var temp = heatSource.CalcCurrentTemperature();
+                        ////TODO: lerp temperature to current
+                        //if(temp > 0)
+                        //{
+                        //    slot.Itemstack.Collectible.SetTemperature(0);
+                        //    if(process.temperature >= process.temperingTemperature)
+                        //    {
+                        //        process.isHeated = true;
+                        //        timeOffset = temp;
+                        //    }
+                        //}
                     }
                     if(process.isHeated)
                     {
-                        process.time += (totalHours - heatSource.GetLastTickTime()) - timeOffset - heatSource.CalcTempElapsedTime(timeOffset, process.temperingTemperature);
+                        process.time += (totalHours - heatSource.GetLastTickTime()) - timeOffset - heatSource.CalcHeatGraph().CalcTemperatureHoldTime(timeOffset, process.temperingTemperature);
                         if(process.time >= process.temperingTime)
                         {
                             processes[i] = null;
@@ -141,15 +218,17 @@ namespace GlassMaking.Blocks
 
         private void ResolveProcessInfo(int index)
         {
-            var properties = inventory[index].Itemstack.Collectible.Attributes?["tempering"];
+            var stack = inventory[index].Itemstack;
+            var properties = stack.Collectible.Attributes?["tempering"];
             if(properties != null && properties.Exists)
             {
-                var stack = properties["output"].AsObject<JsonItemStack>();
-                if(stack.Resolve(Api.World, "tempering oven"))
+                var output = properties["output"].AsObject<JsonItemStack>();
+                if(output.Resolve(Api.World, "tempering oven"))
                 {
                     processes[index].temperingTemperature = properties["temperature"].AsFloat();
                     processes[index].temperingTime = properties["time"].AsInt() / 3600.0;
-                    processes[index].output = stack.ResolvedItemstack;
+                    processes[index].output = output.ResolvedItemstack;
+                    processes[index].temperature = stack.Collectible.GetTemperature(Api.World, stack);
                     return;
                 }
             }
@@ -166,7 +245,7 @@ namespace GlassMaking.Blocks
                 if(!slot.Empty)
                 {
                     itemsCount++;
-                    maxSize = Math.Max(maxSize, slot.Itemstack.ItemAttributes?["temperingOvenSize"].AsFloat() ?? 0f);
+                    maxSize = Math.Max(maxSize, slot.Itemstack.ItemAttributes?["temperingOvenSize"].AsFloat() ?? 1f);
                 }
             }
             if(itemsCount > 0 && gridSize == 0)
@@ -198,6 +277,7 @@ namespace GlassMaking.Blocks
             public ItemStack output;
             public bool isHeated;
             public double time;
+            public float temperature;
         }
     }
 }

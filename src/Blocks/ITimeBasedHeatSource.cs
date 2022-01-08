@@ -1,4 +1,6 @@
-﻿namespace GlassMaking.Blocks
+﻿using GlassMaking.Common;
+
+namespace GlassMaking.Blocks
 {
     public interface ITimeBasedHeatSource
     {
@@ -23,13 +25,13 @@
         float GetTemperature();
 
         /// <summary>
-        /// Calculates the temperature for the current World.Calendar.TotalHours
+        /// Calculates the temperature for the calendarTotalHours (uses World.Calendar.TotalHours if the value is 0)
         /// </summary>
-        float CalcCurrentTemperature();
+        float CalcCurrentTemperature(double calendarTotalHours = 0);
 
         /// <summary>
-        /// Returns the time during which the specified temperature was kept from the previous tick to the current World.Calendar.TotalHours value
+        /// Calculates the graph of temperature changes for the interval between the previous tick and the calendarTotalHours (uses World.Calendar.TotalHours if the value is 0)
         /// </summary>
-        double CalcTempElapsedTime(double startTime, float temperature);
+        HeatGraph CalcHeatGraph(double calendarTotalHours = 0);
     }
 }

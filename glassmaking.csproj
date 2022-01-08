@@ -106,6 +106,7 @@
     <Compile Include="src\Common\GlassBlowingRecipe.cs" />
     <Compile Include="src\Common\GlassMoldRecipe.cs" />
     <Compile Include="src\Common\GuiDialogItemRecipeSelector.cs" />
+    <Compile Include="src\Common\HeatGraph.cs" />
     <Compile Include="src\Common\IGlassBlowingTool.cs" />
     <Compile Include="src\Common\IItemCrafter.cs" />
     <Compile Include="src\Common\RecipeRegistryDictionary.cs" />
