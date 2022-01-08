@@ -1,6 +1,5 @@
 ﻿using GlassMaking.Common;
 using GlassMaking.Items;
-using System;
 using System.Collections.Generic;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;

@@ -82,6 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\Blocks\BlockGlassBlowingMold.cs" />
+    <Compile Include="src\Blocks\Entities\BlockEntityTemperingOven.cs" />
     <Compile Include="src\Blocks\Glassworktable\BlockEntityGlassworktable.cs" />
     <Compile Include="src\Blocks\Glassworktable\BlockGlassworktable.cs" />
     <Compile Include="src\Blocks\ITimeBasedHeatReceiver.cs" />
