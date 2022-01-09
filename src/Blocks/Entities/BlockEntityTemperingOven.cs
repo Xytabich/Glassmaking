@@ -128,33 +128,37 @@ namespace GlassMaking.Blocks
             {
                 var slot = inventory[i];
                 var process = processes[i];
-                if(!slot.Empty && process != null)
+                if(!slot.Empty)
                 {
-                    double timeOffset = 0;
-                    if(!process.isHeated)
+                    if(process != null)
                     {
-                        //var temp = heatSource.CalcCurrentTemperature();
-                        ////TODO: lerp temperature to current
-                        //if(temp > 0)
-                        //{
-                        //    slot.Itemstack.Collectible.SetTemperature(0);
-                        //    if(process.temperature >= process.temperingTemperature)
-                        //    {
-                        //        process.isHeated = true;
-                        //        timeOffset = temp;
-                        //    }
-                        //}
-                    }
-                    if(process.isHeated)
-                    {
-                        process.time += (totalHours - heatSource.GetLastTickTime()) - timeOffset - heatSource.CalcHeatGraph().CalcTemperatureHoldTime(timeOffset, process.temperingTemperature);
-                        if(process.time >= process.temperingTime)
+                        double timeOffset = 0;
+                        if(!process.isHeated)
                         {
-                            processes[i] = null;
-                            slot.Itemstack = process.output.Clone();
-                            MarkDirty(true);
+                            //var temp = heatSource.CalcCurrentTemperature();
+                            ////TODO: lerp temperature to current
+                            //if(temp > 0)
+                            //{
+                            //    slot.Itemstack.Collectible.SetTemperature(0);
+                            //    if(process.temperature >= process.temperingTemperature)
+                            //    {
+                            //        process.isHeated = true;
+                            //        timeOffset = temp;
+                            //    }
+                            //}
+                        }
+                        if(process.isHeated)
+                        {
+                            process.time += (totalHours - heatSource.GetLastTickTime()) - timeOffset - heatSource.CalcHeatGraph().CalcTemperatureHoldTime(timeOffset, process.temperingTemperature);
+                            if(process.time >= process.temperingTime)
+                            {
+                                processes[i] = null;
+                                slot.Itemstack = process.output.Clone();
+                                MarkDirty(true);
+                            }
                         }
                     }
+                    //TODO: update item temperature
                 }
             }
         }
