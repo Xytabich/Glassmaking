@@ -6,10 +6,9 @@ namespace GlassMaking.Blocks
     {
         public virtual bool TryPlaceBlock(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, ItemStack itemstack, string side)
         {
-            if(world.BlockAccessor.GetBlock(blockSel.Position.UpCopy()).IsReplacableBy(itemstack.Block))
+            if(world.BlockAccessor.GetBlock(blockSel.Position).IsReplacableBy(this))
             {
-                world.GetBlock(CodeWithVariant("side", side)).DoPlaceBlock(world, byPlayer, blockSel, itemstack);
-                return true;
+                return world.GetBlock(CodeWithVariant("side", side)).DoPlaceBlock(world, byPlayer, blockSel, itemstack);
             }
             return false;
         }

@@ -58,11 +58,13 @@ namespace GlassMaking.Common
             return endTemperature;
         }
 
-        public double CalcHeatingTime(float startTemperature, float tempPerHour, float targetTemperature)
+        public double? CalcHeatingTime(float startTemperature, float tempPerHour, float targetTemperature)
         {
-            if(workingTemperature < targetTemperature || this.startTemperature < targetTemperature) return 0;
+            if(startTemperature >= targetTemperature) return 0;
+            if(workingTemperature < targetTemperature || this.startTemperature < targetTemperature) return null;
             var t = (targetTemperature - startTemperature) / tempPerHour;
-            if(GetTemperature(t) < targetTemperature) return 0;
+            if(t > totalTime) return null;
+            if(GetTemperature(t) < targetTemperature) return null;
             return t;
         }
 
@@ -71,7 +73,7 @@ namespace GlassMaking.Common
             if(transitionTime > 0)
             {
                 double delta = (workingTemperature - startTemperature) / transitionTime;
-                double change = startTemperature > currentTemperature ? -decreasePerHour : increasePerHour;
+                double change = startTemperature > currentTemperature ? increasePerHour : -decreasePerHour;
                 double t = (startTemperature - currentTemperature) / (change - delta);
                 if(t > transitionTime) t = transitionTime;
                 currentTemperature += (float)(change * t);
@@ -121,6 +123,14 @@ namespace GlassMaking.Common
                     {
                         currentTemperature += (float)((coolingTime - t) * -decreasePerHour);
                     }
+                }
+            }
+            if(currentTemperature > endTemperature)
+            {
+                var coldTime = totalTime - transitionTime - holdTime - coolingTime;
+                if(coldTime > 0)
+                {
+                    currentTemperature = (float)Math.Max(endTemperature, currentTemperature - coldTime * decreasePerHour);
                 }
             }
             return currentTemperature;

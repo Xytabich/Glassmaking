@@ -318,36 +318,24 @@ namespace GlassMaking.Blocks
                 {
                     double timeLeft = glassAmount * PROCESS_HOURS_PER_UNIT - processProgress;
                     double time = heatSource.CalcHeatGraph().CalcTemperatureHoldTime(timeOffset, MELTING_TEMPERATURE);
-                    if(time >= timeLeft)
+                    processProgress += Math.Min(time, timeLeft);
+                    if(Api.Side == EnumAppSide.Server && time >= timeLeft)
                     {
                         timeOffset += timeLeft;
-                        if(Api.Side == EnumAppSide.Server)
-                        {
-                            processProgress = 0;
-                            state = SmelteryState.Bubbling;
-                            MarkDirty(true);
-                        }
-                    }
-                    else
-                    {
-                        processProgress += time;
+                        processProgress = 0;
+                        state = SmelteryState.Bubbling;
+                        MarkDirty(true);
                     }
                 }
                 if(state == SmelteryState.Bubbling)
                 {
                     double timeLeft = glassAmount * PROCESS_HOURS_PER_UNIT * BUBBLING_PROCESS_MULTIPLIER - processProgress;
                     double time = heatSource.CalcHeatGraph().CalcTemperatureHoldTime(timeOffset, BUBBLING_TEMPERATURE);
-                    if(time >= timeLeft)
+                    processProgress += Math.Min(time, timeLeft);
+                    if(Api.Side == EnumAppSide.Server && time >= timeLeft)
                     {
-                        if(Api.Side == EnumAppSide.Server)
-                        {
-                            state = SmelteryState.ContainsGlass;
-                            MarkDirty(true);
-                        }
-                    }
-                    else
-                    {
-                        processProgress += time;
+                        state = SmelteryState.ContainsGlass;
+                        MarkDirty(true);
                     }
                 }
             }

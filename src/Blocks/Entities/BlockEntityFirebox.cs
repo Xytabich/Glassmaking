@@ -159,7 +159,7 @@ namespace GlassMaking.Blocks
                             burning = true;
                             ApplyFuelParameters();
                             fuelLevel = fuelBurnDuration;
-                            contentsSlot.TakeOut(1);
+                            contents.StackSize--;
                         }
                         slot.MarkDirty();
                         MarkDirty(true);
@@ -183,7 +183,7 @@ namespace GlassMaking.Blocks
                 burning = true;
                 ApplyFuelParameters();
                 fuelLevel = fuelBurnDuration;
-                if(contentsSlot.StackSize > 0) contentsSlot.TakeOut(1);
+                if(contentsSlot.StackSize > 0) contents.StackSize--;
                 lastTickTime = Api.World.Calendar.TotalHours;
                 UpdateRendererFull();
                 MarkDirty(true);
@@ -322,8 +322,15 @@ namespace GlassMaking.Blocks
                     fuelLevel = (float)(burnTime % fuelBurnDuration);
                     if(usedFuelCount > 0 && Api.Side == EnumAppSide.Server)
                     {
-                        contentsSlot.TakeOut(usedFuelCount);
-                        if(contentsSlot.StackSize <= 0) burning = fuelLevel > 0;
+                        contents.StackSize -= usedFuelCount;
+                        if(contentsSlot.StackSize <= 0)
+                        {
+                            burning = fuelLevel > 0;
+                            if(!burning)
+                            {
+                                contentsSlot.Itemstack = null;
+                            }
+                        }
                         MarkDirty(true);
                     }
                 }
@@ -331,7 +338,11 @@ namespace GlassMaking.Blocks
                 {
                     fuelLevel = (float)burnTime;
                     burning = fuelLevel > 0;
-                    if(!burning && Api.Side == EnumAppSide.Server) MarkDirty(true);
+                    if(!burning && Api.Side == EnumAppSide.Server)
+                    {
+                        contentsSlot.Itemstack = null;
+                        MarkDirty(true);
+                    }
                 }
             }
             if(!burning && temperature > 20)

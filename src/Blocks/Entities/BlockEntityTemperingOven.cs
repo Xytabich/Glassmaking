@@ -1,4 +1,6 @@
-﻿using System;
+﻿using GlassMaking.Common;
+using System;
+using System.Text;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
@@ -26,11 +28,12 @@ namespace GlassMaking.Blocks
 
         private bool preventMeshUpdate = false;
 
-        public BlockEntityTemperingOven()
+        public BlockEntityTemperingOven() : base()
         {
             gridSize = itemCapacity;
             inventory = new InventoryGeneric(itemCapacity, InventoryClassName + "-" + Pos, null);
             processes = new ItemProcessInfo[itemCapacity];
+            meshes = new MeshData[itemCapacity];
         }
 
         public override void Initialize(ICoreAPI api)
@@ -43,25 +46,60 @@ namespace GlassMaking.Blocks
                 if(processes[i] != null) ResolveProcessInfo(i);
             }
             UpdateGrid();
-            updateMeshes();
+            if(Api.Side == EnumAppSide.Client) updateMeshes();
+        }
+
+        public override void GetBlockInfo(IPlayer forPlayer, StringBuilder dsc)
+        {
+            if(!inventory.Empty)
+            {
+                dsc.AppendLine("Contents:");
+                for(int i = 0; i < itemCapacity; i++)
+                {
+                    if(!inventory[i].Empty)
+                    {
+                        dsc.Append(inventory[i].GetStackName());
+                        float temperature = (inventory[i].Itemstack.Attributes["temperature"] as ITreeAttribute)?.GetFloat("temperature", 20f) ?? 20f;
+                        dsc.Append(" Temperature: " + temperature.ToString("0"));
+                        if(processes[i] != null && processes[i].isHeated)
+                        {
+                            dsc.Append(" Tempering: " + (Math.Min(processes[i].time / processes[i].temperingTime, 1) * 100).ToString("0") + "%");
+                        }
+                        dsc.AppendLine();
+                    }
+                }
+            }
         }
 
         public bool TryInteract(IPlayer byPlayer, ItemSlot slot)
         {
             if(slot.Empty || slot.Itemstack.Equals(Api.World, lastRemoved, GlobalConstants.IgnoredStackAttributes))
             {
+                bool removed = false;
                 for(int i = 0; i < processes.Length; i++)
                 {
                     if(!inventory[i].Empty && (processes[i] == null || byPlayer.Entity.Controls.Sneak))
                     {
                         slot.Itemstack = inventory[i].TakeOut(1);
                         lastRemoved = slot.Itemstack.Clone();
-                        updateMeshes();
-                        MarkDirty(true);
-                        return true;
+                        processes[i] = null;
+                        removed = true;
+                        break;
                     }
                 }
+                if(removed)
+                {
+                    if(inventory.Empty)
+                    {
+                        gridSize = 0;
+                        lastRemoved = null;
+                    }
+                    if(Api.Side == EnumAppSide.Client) updateMeshes();
+                    MarkDirty(true);
+                    return true;
+                }
                 lastRemoved = null;
+                return false;
             }
             else
             {
@@ -80,7 +118,9 @@ namespace GlassMaking.Blocks
                             {
                                 inventory[i].Itemstack = slot.TakeOut(1);
                                 lastRemoved = null;
-                                updateMeshes();
+                                processes[i] = new ItemProcessInfo() { isHeated = false, time = 0 };
+                                ResolveProcessInfo(i);
+                                if(Api.Side == EnumAppSide.Client) updateMeshes();
                                 MarkDirty(true);
                                 return true;
                             }
@@ -107,7 +147,9 @@ namespace GlassMaking.Blocks
                         }
                         inventory[0].Itemstack = slot.TakeOut(1);
                         lastRemoved = null;
-                        updateMeshes();
+                        processes[0] = new ItemProcessInfo() { isHeated = false, time = 0 };
+                        ResolveProcessInfo(0);
+                        if(Api.Side == EnumAppSide.Client) updateMeshes();
                         MarkDirty(true);
                         return true;
                     }
@@ -123,42 +165,47 @@ namespace GlassMaking.Blocks
 
         void ITimeBasedHeatReceiver.OnHeatSourceTick(float dt)
         {
-            double totalHours = Api.World.Calendar.TotalHours;
-            for(int i = 0; i < itemCapacity; i++)
+            if(gridSize != 0)
             {
-                var slot = inventory[i];
-                var process = processes[i];
-                if(!slot.Empty)
+                var totalHours = Api.World.Calendar.TotalHours;
+                var graph = heatSource.CalcHeatGraph();
+                for(int i = 0; i < itemCapacity; i++)
                 {
-                    if(process != null)
+                    var slot = inventory[i];
+                    if(!slot.Empty)
                     {
-                        double timeOffset = 0;
-                        if(!process.isHeated)
+                        float temperature = (slot.Itemstack.Attributes["temperature"] as ITreeAttribute)?.GetFloat("temperature", 20f) ?? 20f;
+                        var process = processes[i];
+                        if(process != null)
                         {
-                            //var temp = heatSource.CalcCurrentTemperature();
-                            ////TODO: lerp temperature to current
-                            //if(temp > 0)
-                            //{
-                            //    slot.Itemstack.Collectible.SetTemperature(0);
-                            //    if(process.temperature >= process.temperingTemperature)
-                            //    {
-                            //        process.isHeated = true;
-                            //        timeOffset = temp;
-                            //    }
-                            //}
-                        }
-                        if(process.isHeated)
-                        {
-                            process.time += (totalHours - heatSource.GetLastTickTime()) - timeOffset - heatSource.CalcHeatGraph().CalcTemperatureHoldTime(timeOffset, process.temperingTemperature);
-                            if(process.time >= process.temperingTime)
+                            double timeOffset = 0;
+                            if(!process.isHeated)
                             {
-                                processes[i] = null;
-                                slot.Itemstack = process.output.Clone();
-                                MarkDirty(true);
+                                if(Api.Side == EnumAppSide.Server)
+                                {
+                                    var time = graph.CalcHeatingTime(temperature, 1000f, process.temperingTemperature.max);
+                                    if(time.HasValue)
+                                    {
+                                        process.isHeated = true;
+                                        timeOffset = time.Value;
+                                        MarkDirty(true);
+                                    }
+                                }
+                            }
+                            if(process.isHeated)
+                            {
+                                process.time += Math.Max(0, Math.Min((temperature - process.temperingTemperature.min) / 90f, totalHours - heatSource.GetLastTickTime()) - timeOffset);
+                                if(process.time >= process.temperingTime && Api.Side == EnumAppSide.Server)
+                                {
+                                    processes[i] = null;
+                                    slot.Itemstack = process.output.Clone();
+                                    MarkDirty(true);
+                                }
                             }
                         }
+                        temperature = graph.CalcFinalTemperature(temperature, 1000f, 90f);
+                        slot.Itemstack.Collectible.SetTemperature(Api.World, slot.Itemstack, temperature);
                     }
-                    //TODO: update item temperature
                 }
             }
         }
@@ -205,7 +252,7 @@ namespace GlassMaking.Blocks
                     if(processes[i] != null) ResolveProcessInfo(i);
                 }
                 UpdateGrid();
-                updateMeshes();
+                if(Api.Side == EnumAppSide.Client) updateMeshes();
             }
         }
 
@@ -226,13 +273,12 @@ namespace GlassMaking.Blocks
             var properties = stack.Collectible.Attributes?["tempering"];
             if(properties != null && properties.Exists)
             {
-                var output = properties["output"].AsObject<JsonItemStack>();
+                var output = properties["output"].AsObject<JsonItemStack>(null, stack.Collectible.Code.Domain);
                 if(output.Resolve(Api.World, "tempering oven"))
                 {
-                    processes[index].temperingTemperature = properties["temperature"].AsFloat();
+                    processes[index].temperingTemperature = properties["temperature"].AsObject<MinMaxFloat>();
                     processes[index].temperingTime = properties["time"].AsInt() / 3600.0;
                     processes[index].output = output.ResolvedItemstack;
-                    processes[index].temperature = stack.Collectible.GetTemperature(Api.World, stack);
                     return;
                 }
             }
@@ -276,12 +322,11 @@ namespace GlassMaking.Blocks
 
         private class ItemProcessInfo
         {
-            public float temperingTemperature;
+            public MinMaxFloat temperingTemperature;
             public double temperingTime;
             public ItemStack output;
             public bool isHeated;
             public double time;
-            public float temperature;
         }
     }
 }

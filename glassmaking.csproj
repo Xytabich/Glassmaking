@@ -82,6 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\Blocks\BlockGlassBlowingMold.cs" />
+    <Compile Include="src\Blocks\BlockTemperingOven.cs" />
     <Compile Include="src\Blocks\Entities\BlockEntityTemperingOven.cs" />
     <Compile Include="src\Blocks\Glassworktable\BlockEntityGlassworktable.cs" />
     <Compile Include="src\Blocks\Glassworktable\BlockGlassworktable.cs" />
@@ -109,6 +110,7 @@
     <Compile Include="src\Common\HeatGraph.cs" />
     <Compile Include="src\Common\IGlassBlowingTool.cs" />
     <Compile Include="src\Common\IItemCrafter.cs" />
+    <Compile Include="src\Common\MinMaxFloat.cs" />
     <Compile Include="src\Common\RecipeRegistryDictionary.cs" />
     <Compile Include="src\Common\SimpleTextureSource.cs" />
     <Compile Include="src\Common\SmoothRadialShape.cs" />

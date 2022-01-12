@@ -1,0 +1,153 @@
+{
+    "code": "temperingoven",
+    "class": "glassmaking:temperingoven",
+    "entityclass": "glassmaking:temperingoven",
+    "blockmaterial": "Ceramic",
+    "behaviors": [
+        { "name": "HorizontalOrientable" },
+        { "name": "UnstableFalling" },
+        { "name": "Unplaceable" }
+    ],
+    "variantgroups": [
+        {
+            "code": "side",
+            "loadFromProperties": "abstract/horizontalorientation"
+        }
+    ],
+    "creativeinventory": {
+        "general": [ "*-north" ],
+        "construction": [ "*-north" ]
+    },
+    "replaceable": 400,
+    "resistance": 3.5,
+    "maxStackSize": 1,
+    "lightAbsorption": 3,
+    "shapeByType": {
+        "*-north": {
+            "base": "block/tempering-oven",
+            "rotateY": 0
+        },
+        "*-east": {
+            "base": "block/tempering-oven",
+            "rotateY": 270
+        },
+        "*-south": {
+            "base": "block/tempering-oven",
+            "rotateY": 180
+        },
+        "*-west": {
+            "base": "block/tempering-oven",
+            "rotateY": 90
+        }
+    },
+    "sounds": {
+        "walk": "game:walk/stone",
+        "place": "game:block/ceramicplace",
+        "byTool": {
+            "Pickaxe": {
+                "hit": "game:block/rock-hit-pickaxe",
+                "break": "game:block/rock-break-pickaxe"
+            }
+        }
+    },
+    "collisionboxes": [
+        {
+            "x1": 0,
+            "y1": 0.25,
+            "z1": 0,
+            "x2": 1,
+            "y2": 1,
+            "z2": 1
+        },
+        {
+            "x1": 0,
+            "y1": 0,
+            "z1": 0.25,
+            "x2": 1,
+            "y2": 0.25,
+            "z2": 1,
+            "rotateYByType": {
+                "*-north": 180,
+                "*-east": 90,
+                "*-west": 270
+            }
+        },
+        {
+            "x1": 0,
+            "y1": 0,
+            "z1": 0,
+            "x2": 0.375,
+            "y2": 0.25,
+            "z2": 0.25,
+            "rotateYByType": {
+                "*-north": 180,
+                "*-east": 90,
+                "*-west": 270
+            }
+        },
+        {
+            "x1": 0.625,
+            "y1": 0,
+            "z1": 0,
+            "x2": 1,
+            "y2": 0.25,
+            "z2": 0.25,
+            "rotateYByType": {
+                "*-north": 180,
+                "*-east": 90,
+                "*-west": 270
+            }
+        }
+    ],
+    "selectionbox": {
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1,
+        "y2": 1,
+        "z2": 1
+    },
+    "sideopaqueByType": {
+        "*-north": {
+            "all": false,
+            "north": true
+        },
+        "*-east": {
+            "all": false,
+            "east": true
+        },
+        "*-south": {
+            "all": false,
+            "south": true
+        },
+        "*-west": {
+            "all": false,
+            "west": true
+        }
+    },
+    "sidesolidByType": {
+        "*-north": {
+            "all": false,
+            "north": true
+        },
+        "*-east": {
+            "all": false,
+            "east": true
+        },
+        "*-south": {
+            "all": false,
+            "south": true
+        },
+        "*-west": {
+            "all": false,
+            "west": true
+        }
+    },
+    "guiTransform": {
+        "rotation": {
+            "x": -22.6,
+            "y": 135,
+            "z": 0
+        }
+    }
+}
