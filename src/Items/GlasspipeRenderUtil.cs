@@ -84,7 +84,7 @@ namespace GlassMaking.Items
             }
             else
             {
-                float step = GameMath.TWOPI / RADIAL_SECTIONS_COUNT;
+                const float step = GameMath.TWOPI / RADIAL_SECTIONS_COUNT;
                 for(int i = 0; i <= RADIAL_SECTIONS_COUNT; i++)
                 {
                     float angle = step * i;

@@ -87,9 +87,9 @@ namespace GlassMaking
 
         public void GetRecipeInfo(ItemStack item, ITreeAttribute recipeAttribute, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
         {
-            dsc.AppendLine("Recipe: " + recipeAttribute.GetString("code"));
+            dsc.Append("Recipe: ").AppendLine(recipeAttribute.GetString("code"));
             int step = recipeAttribute.GetInt("step", 0);
-            dsc.AppendLine("Step: " + (step + 1));
+            dsc.Append("Step: ").Append(step + 1).AppendLine();
             resolvedSteps[step].GetStepInfo(item, recipeAttribute["data"], dsc, world, withDebugInfo);
         }
 

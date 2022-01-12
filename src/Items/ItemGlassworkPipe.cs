@@ -78,11 +78,11 @@ namespace GlassMaking.Items
             if(glasslayers != null)
             {
                 dsc.AppendLine("Layers:");
-                var codes = (glasslayers["code"] as StringArrayAttribute).value;
-                var amounts = (glasslayers["amount"] as IntArrayAttribute).value;
+                var codes = ((StringArrayAttribute)glasslayers["code"]).value;
+                var amounts = ((IntArrayAttribute)glasslayers["amount"]).value;
                 for(int i = 0; i < codes.Length; i++)
                 {
-                    dsc.AppendLine("  " + amounts[i] + "x " + GlassBlend.GetBlendNameCode(new AssetLocation(codes[i])));
+                    dsc.Append("  ").Append(amounts[i]).Append("x ").AppendLine(GlassBlend.GetBlendNameCode(new AssetLocation(codes[i])));
                 }
             }
 
@@ -93,8 +93,8 @@ namespace GlassMaking.Items
                 dsc.AppendLine("Break down to receive:");
                 foreach(var pair in glassmelt)
                 {
-                    int amount = (pair.Value as IntAttribute).value * 5 / 5;
-                    if(amount > 0) dsc.AppendLine("  " + amount + "x " + GlassBlend.GetBlendNameCode(new AssetLocation(pair.Key)));
+                    int amount = ((IntAttribute)pair.Value).value * 5 / 5;
+                    if(amount > 0) dsc.Append("  ").Append(amount).Append("x ").AppendLine(GlassBlend.GetBlendNameCode(new AssetLocation(pair.Key)));
                 }
             }
         }
@@ -569,7 +569,7 @@ namespace GlassMaking.Items
                 int count = 0;
                 foreach(var pair in glassmelt)
                 {
-                    count += (pair.Value as IntAttribute).value;
+                    count += ((IntAttribute)pair.Value).value;
                 }
                 if(count >= maxGlassAmount) return false;
             }
@@ -582,7 +582,7 @@ namespace GlassMaking.Items
             var glassmelt = slot.Itemstack.Attributes.GetOrAddTreeAttribute("glassmelt");
             foreach(var pair in glassmelt)
             {
-                currentAmount += (pair.Value as IntAttribute).value;
+                currentAmount += ((IntAttribute)pair.Value).value;
             }
 
             var glasslayers = slot.Itemstack.Attributes.GetOrAddTreeAttribute("glasslayers");
@@ -623,7 +623,7 @@ namespace GlassMaking.Items
             int count = 0;
             foreach(var pair in glassmelt)
             {
-                count += (pair.Value as IntAttribute).value;
+                count += ((IntAttribute)pair.Value).value;
             }
             var container = MeshContainer.Get(api, item);
             if(container.data == null || (int)container.data != count)

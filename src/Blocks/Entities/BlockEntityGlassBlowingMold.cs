@@ -34,7 +34,7 @@ namespace GlassMaking.Blocks
         {
             get
             {
-                Dictionary<string, CompositeTexture> textures = nowTesselatingObj is Item item ? item.Textures : (nowTesselatingObj as Block).Textures;
+                Dictionary<string, CompositeTexture> textures = nowTesselatingObj is Item item ? item.Textures : ((Block)nowTesselatingObj).Textures;
                 AssetLocation texturePath = null;
                 CompositeTexture tex;
 
@@ -94,7 +94,7 @@ namespace GlassMaking.Blocks
             base.GetBlockInfo(forPlayer, dsc);
             if(contents != null)
             {
-                dsc.AppendLine("Contents: " + contents.StackSize + "x " + contents.GetName());
+                dsc.Append("Contents: ").Append(contents.StackSize).Append("x ").AppendLine(contents.GetName());
             }
         }
 

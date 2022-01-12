@@ -49,7 +49,7 @@ namespace GlassMaking.Items
 
         public override void OnHeldInteractStop(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, ref EnumHandling handling)
         {
-            if(byEntity.RightHandItemSlot == slot && TryGetRecipe(byEntity, out var recipe, out var recipeAttribute, out var pipeItem))
+            if(byEntity.RightHandItemSlot == slot && TryGetRecipe(byEntity, out var recipe, out var recipeAttribute, out _))
             {
                 recipe.OnHeldInteractStop(secondsUsed, byEntity.LeftHandItemSlot, recipeAttribute, byEntity, blockSel, entitySel);
                 handling = EnumHandling.PreventSubsequent;

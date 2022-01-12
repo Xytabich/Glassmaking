@@ -70,22 +70,22 @@ namespace GlassMaking.Blocks
                 switch(state)
                 {
                     case SmelteryState.ContainsMix:
-                        dsc.AppendLine("Contains: " + glassAmount + "x " + Lang.Get(GlassBlend.GetBlendNameCode(glassCode)));
-                        if(heatSource.IsHeatedUp()) dsc.AppendLine("Temperature: " + (heatSource.CalcCurrentTemperature() * TEMPERATURE_MODIFIER).ToString("0"));
+                        dsc.Append("Contains: ").Append(glassAmount).Append("x ").AppendLine(Lang.Get(GlassBlend.GetBlendNameCode(glassCode)));
+                        if(heatSource.IsHeatedUp()) dsc.Append("Temperature: ").AppendLine((heatSource.CalcCurrentTemperature() * TEMPERATURE_MODIFIER).ToString("0"));
                         break;
                     case SmelteryState.Melting:
-                        dsc.AppendLine("Contains: " + glassAmount + "x " + Lang.Get(GlassBlend.GetBlendNameCode(glassCode)));
-                        dsc.AppendLine("Melting progress: " + (processProgress / (glassAmount * PROCESS_HOURS_PER_UNIT) * 100).ToString("0") + "%");
-                        dsc.AppendLine("Temperature: " + (heatSource.CalcCurrentTemperature() * TEMPERATURE_MODIFIER).ToString("0"));
+                        dsc.Append("Contains: ").Append(glassAmount).Append("x ").AppendLine(Lang.Get(GlassBlend.GetBlendNameCode(glassCode)));
+                        dsc.Append("Melting progress: ").Append((processProgress / (glassAmount * PROCESS_HOURS_PER_UNIT) * 100).ToString("0")).AppendLine("%");
+                        dsc.Append("Temperature: ").AppendLine((heatSource.CalcCurrentTemperature() * TEMPERATURE_MODIFIER).ToString("0"));
                         break;
                     case SmelteryState.Bubbling:
-                        dsc.AppendLine("Contains: " + glassAmount + "x " + Lang.Get(GlassBlend.GetBlendNameCode(glassCode)));
-                        dsc.AppendLine("Bubbling progress: " + (processProgress / (glassAmount * PROCESS_HOURS_PER_UNIT * BUBBLING_PROCESS_MULTIPLIER) * 100).ToString("0") + "%");
-                        dsc.AppendLine("Temperature: " + (heatSource.CalcCurrentTemperature() * TEMPERATURE_MODIFIER).ToString("0"));
+                        dsc.Append("Contains: ").Append(glassAmount).Append("x ").AppendLine(Lang.Get(GlassBlend.GetBlendNameCode(glassCode)));
+                        dsc.Append("Bubbling progress: ").Append((processProgress / (glassAmount * PROCESS_HOURS_PER_UNIT * BUBBLING_PROCESS_MULTIPLIER) * 100).ToString("0")).AppendLine("%");
+                        dsc.Append("Temperature: ").AppendLine((heatSource.CalcCurrentTemperature() * TEMPERATURE_MODIFIER).ToString("0"));
                         break;
                     case SmelteryState.ContainsGlass:
-                        dsc.AppendLine("Contains melt: " + glassAmount + "x " + Lang.Get(GlassBlend.GetBlendNameCode(glassCode)));
-                        dsc.AppendLine("Temperature: " + (heatSource.CalcCurrentTemperature() * TEMPERATURE_MODIFIER).ToString("0"));
+                        dsc.Append("Contains melt: ").Append(glassAmount).Append("x ").AppendLine(Lang.Get(GlassBlend.GetBlendNameCode(glassCode)));
+                        dsc.Append("Temperature: ").AppendLine((heatSource.CalcCurrentTemperature() * TEMPERATURE_MODIFIER).ToString("0"));
                         break;
                 }
             }
@@ -374,23 +374,14 @@ namespace GlassMaking.Blocks
 
         private int GetRotation()
         {
-            int result = 0;
             switch(Block.Variant["side"])
             {
-                case "north":
-                    result = 0;
-                    break;
-                case "east":
-                    result = 270;
-                    break;
-                case "south":
-                    result = 180;
-                    break;
-                case "west":
-                    result = 90;
-                    break;
+                case "north": return 0;
+                case "west": return 90;
+                case "south": return 180;
+                case "east": return 270;
             }
-            return result;
+            return 0;
         }
 
         private void GetSmokeParameters(out double x, out double z, out double wx, out double wz)

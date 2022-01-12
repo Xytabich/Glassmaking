@@ -60,10 +60,10 @@ namespace GlassMaking.Blocks
                     {
                         dsc.Append(inventory[i].GetStackName());
                         float temperature = (inventory[i].Itemstack.Attributes["temperature"] as ITreeAttribute)?.GetFloat("temperature", 20f) ?? 20f;
-                        dsc.Append(" Temperature: " + temperature.ToString("0"));
+                        dsc.Append(" Temperature: ").Append(temperature.ToString("0"));
                         if(processes[i] != null && processes[i].isHeated)
                         {
-                            dsc.Append(" Tempering: " + (Math.Min(processes[i].time / processes[i].temperingTime, 1) * 100).ToString("0") + "%");
+                            dsc.Append(" Tempering: ").Append((Math.Min(processes[i].time / processes[i].temperingTime, 1) * 100).ToString("0")).Append('%');
                         }
                         dsc.AppendLine();
                     }
@@ -259,6 +259,7 @@ namespace GlassMaking.Blocks
         public override void TranslateMesh(MeshData mesh, int index)
         {
             base.TranslateMesh(mesh, index);
+            //TODO:
         }
 
         public override void updateMeshes()

@@ -121,8 +121,8 @@ namespace GlassMaking.GlassblowingTools
             public override void GetStepInfo(ItemStack item, IAttribute data, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
             {
                 IntAttribute amountAttribute = data as IntAttribute;
-                dsc.AppendLine("  Required: " + Lang.Get(GlassBlend.GetBlendNameCode(code)));
-                dsc.AppendLine("  Remaining amount: " + (amount - (amountAttribute == null ? 0 : amountAttribute.value)));
+                dsc.Append("  Required: ").AppendLine(Lang.Get(GlassBlend.GetBlendNameCode(code)));
+                dsc.Append("  Remaining amount: ").Append(amount - (amountAttribute == null ? 0 : amountAttribute.value)).AppendLine();
             }
 
             public override float GetMeshTransitionValue(ItemStack item, IAttribute data)
@@ -131,8 +131,7 @@ namespace GlassMaking.GlassblowingTools
                 if(amountAttribute != null)
                 {
                     float t = 1f - (float)amountAttribute.value / amount;
-                    t = 1f - t * t;
-                    return t;
+                    return 1f - t * t;
                 }
                 return 0f;
             }
@@ -178,7 +177,7 @@ namespace GlassMaking.GlassblowingTools
                     int sourceAmount = source.GetGlassAmount();
                     if(sourceAmount > 0 && amountAttribute.value < amount)
                     {
-                        float speed = 1.5f;
+                        const float speed = 1.5f;
                         if(byEntity.Api.Side == EnumAppSide.Client)
                         {
                             ModelTransform modelTransform = new ModelTransform();
@@ -191,14 +190,14 @@ namespace GlassMaking.GlassblowingTools
                             modelTransform.Rotation.Z = secondsUsed * 90f % 360f;
                             byEntity.Controls.UsingHeldItemTransformBefore = modelTransform;
                         }
-                        float useTime = 2f;
+                        const float useTime = 2f;
                         if(byEntity.Api.Side == EnumAppSide.Server && secondsUsed >= useTime)
                         {
                             if(slot.Itemstack.TempAttributes.GetFloat("lastAddGlassTime") + useTime <= secondsUsed)
                             {
                                 slot.Itemstack.TempAttributes.SetFloat("lastAddGlassTime", (float)Math.Floor(secondsUsed));
                                 int consumed = Math.Min(Math.Min(amount - amountAttribute.value, sourceAmount), (byEntity.Controls.Sneak ? 5 : 1) * (5 + (int)(amountAttribute.value * 0.01f)));
-                                (slot.Itemstack.Item as ItemGlassworkPipe).AddGlassmelt(slot.Itemstack, code, consumed);
+                                ((ItemGlassworkPipe)slot.Itemstack.Item).AddGlassmelt(slot.Itemstack, code, consumed);
                                 amountAttribute.value += consumed;
                                 source.RemoveGlass(consumed);
                                 slot.MarkDirty();
