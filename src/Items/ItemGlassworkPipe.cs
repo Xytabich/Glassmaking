@@ -202,7 +202,7 @@ namespace GlassMaking.Items
                                 var amountsAttrib = glasslayers["amount"] as IntArrayAttribute;
                                 if(mold.CanReceiveGlass(codesAttrib.value, amountsAttrib.value, out _))
                                 {
-                                    byEntity.World.RegisterCallback(delegate (IWorldAccessor world, BlockPos pos, float dt) {
+                                    byEntity.World.RegisterCallback((world, pos, dt) => {
                                         if(byEntity.Controls.HandUse == EnumHandInteract.HeldItemInteract)
                                         {
                                             IPlayer dualCallByPlayer = null;

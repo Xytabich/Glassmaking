@@ -1,4 +1,5 @@
 ﻿using GlassMaking.Common;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Vintagestory.API.Client;
@@ -149,7 +150,7 @@ namespace GlassMaking.Blocks
             int layerIndex = layersCode.Length - 1;
             for(int i = layers.Length - 1; i >= 0; i--)
             {
-                if(layers[i].code.ToShortString() != layersCode[layerIndex]) return false;
+                if(!string.Equals(layers[i].code.ToShortString(), layersCode[layerIndex], StringComparison.InvariantCulture)) return false;
                 if(!layers[i].IsSuitable(layersAmount[layerIndex])) return false;
                 layerIndex--;
             }

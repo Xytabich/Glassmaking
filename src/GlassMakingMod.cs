@@ -66,12 +66,12 @@ namespace GlassMaking
 
         public void RegisterGlassBlowingTool(string code, IGlassBlowingTool tool)
         {
-            tools.Add(code, tool);
+            tools.Add(code.ToLowerInvariant(), tool);
         }
 
         public GlassBlowingRecipe GetGlassBlowingRecipe(string code)
         {
-            if(glassblowingRecipes.Pairs.TryGetValue(code, out var recipe))
+            if(glassblowingRecipes.Pairs.TryGetValue(code.ToLowerInvariant(), out var recipe))
             {
                 return recipe;
             }
@@ -94,7 +94,7 @@ namespace GlassMaking
 
         public IGlassBlowingTool GetGlassBlowingTool(string code)
         {
-            if(tools.TryGetValue(code, out var tool))
+            if(tools.TryGetValue(code.ToLowerInvariant(), out var tool))
             {
                 return tool;
             }

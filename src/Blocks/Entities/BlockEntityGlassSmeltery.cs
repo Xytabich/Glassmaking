@@ -243,7 +243,7 @@ namespace GlassMaking.Blocks
 
         public bool CanInteract(EntityAgent byEntity, BlockSelection blockSel)
         {
-            return blockSel.Face.Opposite.Code.ToLower() == Block.Variant["side"].ToLower();
+            return string.Equals(blockSel.Face.Opposite.Code, Block.Variant["side"], StringComparison.OrdinalIgnoreCase);
         }
 
         public int GetGlassAmount()
@@ -452,6 +452,6 @@ namespace GlassMaking.Blocks
         [JsonProperty]
         public JsonItemStack replacement = null;
         [JsonProperty(Required = Required.Always)]
-        public double amount;
+        public double amount = 1;
     }
 }
