@@ -108,7 +108,7 @@ namespace GlassMaking.Blocks
                 {
                     if(gridSize > 0)
                     {
-                        float size = slot.Itemstack.Collectible.Attributes?["temperingOvenSize"].AsFloat() ?? 1f;
+                        float size = slot.Itemstack.Collectible.Attributes?["temperingOvenSize"].AsFloat(1f) ?? 1f;
                         if(size > gridCellSize) return false;
 
                         int len = gridSize * gridSize;
@@ -128,7 +128,7 @@ namespace GlassMaking.Blocks
                     }
                     else
                     {
-                        float size = slot.Itemstack.Collectible.Attributes?["temperingOvenSize"].AsFloat() ?? 1f;
+                        float size = slot.Itemstack.Collectible.Attributes?["temperingOvenSize"].AsFloat(1f) ?? 1f;
                         if(size > 1) return false;
                         if(size <= 1f / 3f)
                         {
@@ -295,7 +295,7 @@ namespace GlassMaking.Blocks
                 if(!slot.Empty)
                 {
                     itemsCount++;
-                    maxSize = Math.Max(maxSize, slot.Itemstack.ItemAttributes?["temperingOvenSize"].AsFloat() ?? 1f);
+                    maxSize = Math.Max(maxSize, slot.Itemstack.ItemAttributes?["temperingOvenSize"].AsFloat(1f) ?? 1f);
                 }
             }
             if(itemsCount > 0 && gridSize == 0)
