@@ -71,21 +71,21 @@ namespace GlassMaking.Blocks
                 {
                     case SmelteryState.ContainsMix:
                         dsc.AppendLine("Contains: " + glassAmount + "x " + Lang.Get(GlassBlend.GetBlendNameCode(glassCode)));
-                        if(heatSource.IsHeatedUp()) dsc.AppendLine("Temperature: " + heatSource.CalcCurrentTemperature().ToString("0"));
+                        if(heatSource.IsHeatedUp()) dsc.AppendLine("Temperature: " + (heatSource.CalcCurrentTemperature() * TEMPERATURE_MODIFIER).ToString("0"));
                         break;
                     case SmelteryState.Melting:
                         dsc.AppendLine("Contains: " + glassAmount + "x " + Lang.Get(GlassBlend.GetBlendNameCode(glassCode)));
                         dsc.AppendLine("Melting progress: " + (processProgress / (glassAmount * PROCESS_HOURS_PER_UNIT) * 100).ToString("0") + "%");
-                        dsc.AppendLine("Temperature: " + heatSource.CalcCurrentTemperature().ToString("0"));
+                        dsc.AppendLine("Temperature: " + (heatSource.CalcCurrentTemperature() * TEMPERATURE_MODIFIER).ToString("0"));
                         break;
                     case SmelteryState.Bubbling:
                         dsc.AppendLine("Contains: " + glassAmount + "x " + Lang.Get(GlassBlend.GetBlendNameCode(glassCode)));
                         dsc.AppendLine("Bubbling progress: " + (processProgress / (glassAmount * PROCESS_HOURS_PER_UNIT * BUBBLING_PROCESS_MULTIPLIER) * 100).ToString("0") + "%");
-                        dsc.AppendLine("Temperature: " + heatSource.CalcCurrentTemperature().ToString("0"));
+                        dsc.AppendLine("Temperature: " + (heatSource.CalcCurrentTemperature() * TEMPERATURE_MODIFIER).ToString("0"));
                         break;
                     case SmelteryState.ContainsGlass:
                         dsc.AppendLine("Contains melt: " + glassAmount + "x " + Lang.Get(GlassBlend.GetBlendNameCode(glassCode)));
-                        dsc.AppendLine("Temperature: " + heatSource.CalcCurrentTemperature().ToString("0"));
+                        dsc.AppendLine("Temperature: " + (heatSource.CalcCurrentTemperature() * TEMPERATURE_MODIFIER).ToString("0"));
                         break;
                 }
             }

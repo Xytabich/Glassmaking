@@ -23,22 +23,56 @@ namespace GlassMaking.Common
         public float workingTemperature;
         public float endTemperature;
 
-        public double CalcTemperatureHoldTime(double timeOffset, float temperature)//TODO: time offset
+        public double CalcTemperatureHoldTime(double timeOffset, float temperature)
         {
-            if(startTemperature < temperature || workingTemperature < temperature) return 0;
+            if(timeOffset >= totalTime) return 0;
+            if(startTemperature < temperature && workingTemperature < temperature) return 0;
+            if(startTemperature > temperature && endTemperature > temperature) return totalTime;
+
+            double time = 0;
             if(workingTemperature < temperature)
             {
-                return transitionTime * (1f - (temperature - workingTemperature) / (startTemperature - workingTemperature));
+                if(transitionTime <= timeOffset) return 0;
+                time += Math.Max(0, transitionTime * (startTemperature - temperature) / (startTemperature - workingTemperature) - timeOffset);
             }
             else
             {
-                if(endTemperature >= temperature) return totalTime;
-                if(startTemperature < temperature)
+                if(transitionTime > timeOffset)
                 {
-                    return coolingTime * (1f - (temperature - endTemperature) / (workingTemperature - endTemperature)) + holdTime + transitionTime * (1f - (temperature - startTemperature) / (workingTemperature - startTemperature));
+                    if(startTemperature >= temperature)
+                    {
+                        time += (transitionTime - timeOffset);
+                    }
+                    else
+                    {
+                        time = transitionTime * (workingTemperature - temperature) / (workingTemperature - startTemperature);
+                        time = Math.Min(transitionTime - timeOffset, time);
+                    }
                 }
-                return coolingTime * (1f - (temperature - endTemperature) / (workingTemperature - endTemperature)) + holdTime + transitionTime;
+                timeOffset = Math.Max(0, timeOffset - transitionTime);
+                if(holdTime > timeOffset)
+                {
+                    time += (holdTime - timeOffset);
+                }
+                timeOffset = Math.Max(0, timeOffset - holdTime);
+                if(coolingTime > timeOffset)
+                {
+                    if(endTemperature >= temperature)
+                    {
+                        time += (coolingTime - timeOffset);
+                    }
+                    else
+                    {
+                        time += Math.Max(0, coolingTime * (workingTemperature - temperature) / (workingTemperature - endTemperature) - timeOffset);
+                    }
+                }
+                if(endTemperature >= temperature)
+                {
+                    timeOffset = Math.Max(0, timeOffset - coolingTime);
+                    time += totalTime - transitionTime - holdTime - coolingTime - timeOffset;
+                }
             }
+            return time;
         }
 
         public float GetTemperature(double timeOffset)
