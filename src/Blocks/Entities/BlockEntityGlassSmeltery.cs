@@ -16,7 +16,7 @@ namespace GlassMaking.Blocks
         private const float TEMPERATURE_MODIFIER = 1.1f;
         private const float BUBBLING_TEMPERATURE = 1450 / TEMPERATURE_MODIFIER;
         private const float MELTING_TEMPERATURE = 1300 / TEMPERATURE_MODIFIER;
-        private const float WORKING_TEMPERATURE = 1100 / TEMPERATURE_MODIFIER;
+        private const float MOLTEN_TEMPERATURE = 1200 / TEMPERATURE_MODIFIER;
 
         private const double PROCESS_HOURS_PER_UNIT = 0.001;
         private const double BUBBLING_PROCESS_MULTIPLIER = 3;
@@ -246,11 +246,16 @@ namespace GlassMaking.Blocks
             return string.Equals(blockSel.Face.Opposite.Code, Block.Variant["side"], StringComparison.OrdinalIgnoreCase);
         }
 
+        public float GetTemperature()
+        {
+            return heatSource.CalcCurrentTemperature() * TEMPERATURE_MODIFIER;
+        }
+
         public int GetGlassAmount()
         {
             if(heatSource != null)
             {
-                if(state == SmelteryState.ContainsGlass && heatSource.CalcCurrentTemperature() >= WORKING_TEMPERATURE)
+                if(state == SmelteryState.ContainsGlass && heatSource.CalcCurrentTemperature() >= MOLTEN_TEMPERATURE)
                 {
                     return glassAmount;
                 }

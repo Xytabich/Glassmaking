@@ -197,7 +197,7 @@ namespace GlassMaking.GlassblowingTools
                             {
                                 slot.Itemstack.TempAttributes.SetFloat("lastAddGlassTime", (float)Math.Floor(secondsUsed));
                                 int consumed = Math.Min(Math.Min(amount - amountAttribute.value, sourceAmount), (byEntity.Controls.Sneak ? 5 : 1) * (5 + (int)(amountAttribute.value * 0.01f)));
-                                ((ItemGlassworkPipe)slot.Itemstack.Item).AddGlassmelt(slot.Itemstack, code, consumed);
+                                ((ItemGlassworkPipe)slot.Itemstack.Item).AddGlassmelt(byEntity.World, slot.Itemstack, code, consumed, source.GetTemperature());
                                 amountAttribute.value += consumed;
                                 source.RemoveGlass(consumed);
                                 slot.MarkDirty();
