@@ -466,10 +466,12 @@ namespace GlassMaking.Items
             if(itemstack.Attributes.HasAttribute("glasslayers"))
             {
                 var container = MeshContainer.Get(capi, itemstack);
-                if(container.isDirty || !container.hasMesh)
+                var temperature = MeshContainer.TemperatureToState(itemstack.Attributes.GetFloat("glassTemperature", 20));
+                if(container.isDirty || !container.hasMesh || container.temperature != temperature)
                 {
+                    container.temperature = temperature;
                     var glassmelt = itemstack.Attributes.GetTreeAttribute("glassmelt");
-                    if(glassmelt != null) UpdateGlassmeltMesh(itemstack, glassmelt);
+                    if(glassmelt != null) UpdateGlassmeltMesh(itemstack, glassmelt, MeshContainer.StateToGlow(temperature));
                 }
 
                 container.UpdateMeshRef(capi, Shape, capi.Tesselator.GetTextureSource(this), glassTransform);
@@ -483,14 +485,17 @@ namespace GlassMaking.Items
                 if(recipeAttribute != null)
                 {
                     var container = MeshContainer.Get(capi, itemstack);
-                    if(container.isDirty || !container.hasMesh)
+                    var temperature = MeshContainer.TemperatureToState(itemstack.Attributes.GetFloat("glassTemperature", 20));
+                    if(container.isDirty || !container.hasMesh || container.temperature != temperature)
                     {
-                        UpdateRecipeMesh(itemstack, recipeAttribute);
+                        container.temperature = temperature;
+                        UpdateRecipeMesh(itemstack, recipeAttribute, MeshContainer.StateToGlow(temperature));
                     }
 
                     container.UpdateMeshRef(capi, Shape, capi.Tesselator.GetTextureSource(this), glassTransform);
                     renderinfo.ModelRef = container.meshRef;
                     renderinfo.CullFaces = true;
+                    return;
                 }
                 else
                 {
@@ -618,7 +623,7 @@ namespace GlassMaking.Items
             MeshContainer.Get(api, item).isDirty = true;
         }
 
-        private void UpdateGlassmeltMesh(ItemStack item, ITreeAttribute glassmelt)
+        private void UpdateGlassmeltMesh(ItemStack item, ITreeAttribute glassmelt, int glow)
         {
             int count = 0;
             foreach(var pair in glassmelt)
@@ -626,10 +631,10 @@ namespace GlassMaking.Items
                 count += ((IntAttribute)pair.Value).value;
             }
             var container = MeshContainer.Get(api, item);
-            if(container.data == null || (int)container.data != count)
+            if(container._data == null || (int)container._data != count)
             {
                 const double invPI = 1.0 / Math.PI;
-                container.data = count;
+                container._data = count;
 
                 var root = Math.Pow(count * invPI, 1.0 / 3.0);
                 var shape = new SmoothRadialShape();
@@ -646,34 +651,35 @@ namespace GlassMaking.Items
                     }
                 } };
                 container.BeginMeshChange();
-                SmoothRadialShape.BuildMesh(container.mesh, shape, GlasspipeRenderUtil.GenerateRadialVertices, GlasspipeRenderUtil.GenerateRadialFaces);
+                SmoothRadialShape.BuildMesh(container._mesh, shape, (m, i, o) => GlasspipeRenderUtil.GenerateRadialVertices(m, i, o, glow), GlasspipeRenderUtil.GenerateRadialFaces);
                 container.EndMeshChange();
             }
         }
 
-        private void UpdateRecipeMesh(ItemStack item, ITreeAttribute recipeAttribute)
+        private void UpdateRecipeMesh(ItemStack item, ITreeAttribute recipeAttribute, int glow)
         {
             var recipe = mod.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
             if(recipe != null)
             {
-                var container = MeshContainer.Get(api, item);
-                container.BeginMeshChange();
-                recipe.UpdateMesh(item, container.mesh, recipeAttribute);
-                container.EndMeshChange();
+                recipe.UpdateMesh(item, MeshContainer.Get(api, item), glow, recipeAttribute);
             }
         }
 
-        private class MeshContainer
+        private class MeshContainer : IMeshContainer
         {
             private static int counter = 0;
 
-            public MeshData mesh;
+            public object _data;
+            public MeshData _mesh;
             public MeshRef meshRef = null;
-            public object data;
 
             public bool isDirty = false;
+            public TemperatureState temperature;
 
             public bool hasMesh => meshRef != null || updateMesh.HasValue;
+
+            object IMeshContainer.data { get { return _data; } set { _data = value; } }
+            MeshData IMeshContainer.mesh { get { return _mesh; } }
 
             private bool? updateMesh = null;
             private int prevVertices, prevIndices;
@@ -682,16 +688,16 @@ namespace GlassMaking.Items
 
             public void BeginMeshChange()
             {
-                mesh.Clear();
+                _mesh.Clear();
             }
 
             public void EndMeshChange()
             {
                 isDirty = false;
-                if(meshRef == null || mesh.VerticesCount != prevVertices || mesh.IndicesCount != prevIndices)
+                if(meshRef == null || _mesh.VerticesCount != prevVertices || _mesh.IndicesCount != prevIndices)
                 {
-                    prevVertices = mesh.VerticesCount;
-                    prevIndices = mesh.IndicesCount;
+                    prevVertices = _mesh.VerticesCount;
+                    prevIndices = _mesh.IndicesCount;
                     updateMesh = true;
                 }
                 else
@@ -711,7 +717,7 @@ namespace GlassMaking.Items
                 else
                 {
                     container = new MeshContainer();
-                    container.mesh = new MeshData(16, 16, true, true, true, true).WithColorMaps();
+                    container._mesh = new MeshData(16, 16, true, true, true, true).WithColorMaps();
                     item.TempAttributes.SetInt("tmpMeshId", counter);
                     cache.containers[counter] = container;
                     counter++;
@@ -760,13 +766,13 @@ namespace GlassMaking.Items
             {
                 if(updateMesh.HasValue)
                 {
-                    mesh.SetTexPos(tex["glass"]);
+                    _mesh.SetTexPos(tex["glass"]);
                     GlasspipeMeshCache.TryGet(capi, out var cache);
                     var baseMesh = cache.GetMesh(capi, shape, tex);
-                    var toUpload = new MeshData(baseMesh.VerticesCount + mesh.VerticesCount, baseMesh.IndicesCount + mesh.IndicesCount, false, true, true, true);
+                    var toUpload = new MeshData(baseMesh.VerticesCount + _mesh.VerticesCount, baseMesh.IndicesCount + _mesh.IndicesCount, false, true, true, true);
                     toUpload.AddMeshData(baseMesh);
-                    mesh.ModelTransform(meshTransform);
-                    toUpload.AddMeshData(mesh);
+                    _mesh.ModelTransform(meshTransform);
+                    toUpload.AddMeshData(_mesh);
                     if(updateMesh.Value)
                     {
                         if(meshRef != null) meshRef.Dispose();
@@ -777,6 +783,23 @@ namespace GlassMaking.Items
                         capi.Render.UpdateMesh(meshRef, toUpload);
                     }
                     updateMesh = null;
+                }
+            }
+
+            public static TemperatureState TemperatureToState(float temperature)
+            {
+                if(temperature < 500) return TemperatureState.Cold;
+                if(temperature < 1100) return TemperatureState.Heated;
+                return TemperatureState.Working;
+            }
+
+            public static int StateToGlow(TemperatureState state)
+            {
+                switch(state)
+                {
+                    case TemperatureState.Heated: return 127;
+                    case TemperatureState.Working:return 255;
+                    default: return 0;
                 }
             }
         }
@@ -821,6 +844,23 @@ namespace GlassMaking.Items
                     }
                 }
             }
+        }
+
+        private enum TemperatureState
+        {
+            Cold,
+            Heated,
+            Working
+        }
+
+        public interface IMeshContainer
+        {
+            object data { get; set; }
+            MeshData mesh { get; }
+
+            void BeginMeshChange();
+
+            void EndMeshChange();
         }
     }
 }

@@ -154,10 +154,26 @@ namespace GlassMaking
             return result;
         }
 
-        public void UpdateMesh(ItemStack item, MeshData mesh, ITreeAttribute recipeAttribute)
+        public void UpdateMesh(ItemStack item, ItemGlassworkPipe.IMeshContainer container, int glow, ITreeAttribute recipeAttribute)
         {
+            string code = recipeAttribute.GetString("code");
             int step = recipeAttribute.GetInt("step", 0);
             float t = resolvedSteps[step].GetMeshTransitionValue(item, recipeAttribute["data"]);
+            t = GameMath.Clamp(t, 0, 1);
+
+            if(container.data == null || !(container.data is MeshInfo data))
+            {
+                container.data = new MeshInfo(code, step, t);
+            }
+            else if(!data.Equals(code, step, t))
+            {
+                data.Set(code, step, t);
+            }
+            else
+            {
+                return;
+            }
+
             SmoothRadialShape prevShape = null;
             for(int i = step - 1; i >= 0; i--)
             {
@@ -169,14 +185,20 @@ namespace GlassMaking
             }
             if(resolvedSteps[step].shape == null)
             {
-                if(prevShape == null) return;
-                SmoothRadialShape.BuildMesh(mesh, prevShape, GlasspipeRenderUtil.GenerateRadialVertices, GlasspipeRenderUtil.GenerateRadialFaces);
+                container.BeginMeshChange();
+                if(prevShape != null)
+                {
+                    SmoothRadialShape.BuildMesh(container.mesh, prevShape, (m, i, o) => GlasspipeRenderUtil.GenerateRadialVertices(m, i, o, glow), GlasspipeRenderUtil.GenerateRadialFaces);
+                }
+                container.EndMeshChange();
                 return;
             }
 
-            t = GameMath.Clamp(t, 0, 1);
             if(prevShape == null) prevShape = EmptyShape;
-            SmoothRadialShape.BuildLerpedMesh(mesh, prevShape, resolvedSteps[step].shape, t, GlasspipeRenderUtil.GenerateRadialVertices, GlasspipeRenderUtil.GenerateRadialFaces);
+            container.BeginMeshChange();
+            SmoothRadialShape.BuildLerpedMesh(container.mesh, prevShape, resolvedSteps[step].shape, t,
+                (m, i, o) => GlasspipeRenderUtil.GenerateRadialVertices(m, i, o, glow), GlasspipeRenderUtil.GenerateRadialFaces);
+            container.EndMeshChange();
         }
 
         public void ToBytes(BinaryWriter writer)
@@ -254,6 +276,32 @@ namespace GlassMaking
         private static GlassBlowingToolStep CloneStep(GlassBlowingToolStep other)
         {
             return other.Clone();
+        }
+
+        private class MeshInfo
+        {
+            public string code;
+            public int step;
+            public float progress;
+
+            public MeshInfo(string code, int step, float progress)
+            {
+                this.code = code;
+                this.step = step;
+                this.progress = progress;
+            }
+
+            public void Set(string code, int step, float progress)
+            {
+                this.code = code;
+                this.step = step;
+                this.progress = progress;
+            }
+
+            public bool Equals(string code, int step, float progress)
+            {
+                return this.code == code && this.step == step && this.progress == progress;
+            }
         }
     }
 
