@@ -26,21 +26,22 @@
 	"resistance": 3.5,
 	"maxStackSize": 1,
 	"lightAbsorption": 3,
+	"shapeInventory": { "base": "block/glass-smeltery/item" },
 	"shapeByType": {
 		"*-north": {
-			"base": "block/glass-smeltery/item",
+			"base": "block/glass-smeltery/cover",
 			"rotateY": 0
 		},
 		"*-east": {
-			"base": "block/glass-smeltery/item",
+			"base": "block/glass-smeltery/cover",
 			"rotateY": 270
 		},
 		"*-south": {
-			"base": "block/glass-smeltery/item",
+			"base": "block/glass-smeltery/cover",
 			"rotateY": 180
 		},
 		"*-west": {
-			"base": "block/glass-smeltery/item",
+			"base": "block/glass-smeltery/cover",
 			"rotateY": 90
 		}
 	},

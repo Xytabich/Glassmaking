@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
+using Vintagestory.API.Util;
 
 namespace GlassMaking.Blocks
 {
-    public class BlockEntityGlassworktable : BlockEntity
+    public class BlockEntityWorkbench : BlockEntity
     {
         private object modulesLocker = new object();
         private List<ModuleInfo> modules = new List<ModuleInfo>();
@@ -17,10 +18,10 @@ namespace GlassMaking.Blocks
         {
             if(slot.Itemstack.Class != EnumItemClass.Block) return false;
 
-            var attribs = slot.Itemstack.ItemAttributes;
-            if(attribs == null || !attribs.KeyExists("glassworktable")) return false;
+            var attribs = slot.Itemstack.ItemAttributes;//TODO: if(stack.collectible is workbenchtool)
+            if(attribs == null || !attribs.KeyExists("workbenchTool")) return false;
 
-            var tableModule = attribs["glassworktable"];
+            var tableModule = attribs["workbenchTool"];
             var tools = tableModule["tools"].Token as JObject;
             foreach(var tool in tools)
             {
@@ -63,11 +64,6 @@ namespace GlassMaking.Blocks
         public override bool OnTesselation(ITerrainMeshPool mesher, ITesselatorAPI tessThreadTesselator)
         {
             if(modules.Count == 0) return false;
-            var capi = Api as ICoreClientAPI;
-            Shape shape = capi.Assets.TryGet(new AssetLocation("glassmaking", "shapes/block/glasstable.json")).ToObject<Shape>();
-            MeshData modeldata;
-            capi.Tesselator.TesselateShape(capi.World.BlockAccessor.GetBlock(Pos), shape, out modeldata, new Vec3f(0f, GetRotation(), 0f));
-            mesher.AddMeshData(modeldata);
             lock(modulesLocker)
             {
                 foreach(var module in modules)
@@ -77,28 +73,42 @@ namespace GlassMaking.Blocks
             }
             return true;
         }
-
         private int GetRotation()
         {
             Block block = Api.World.BlockAccessor.GetBlock(Pos);
-            int result = 0;
             switch(block.LastCodePart())
             {
-                case "north":
-                    result = 0;
-                    break;
-                case "east":
-                    result = 270;
-                    break;
-                case "south":
-                    result = 180;
-                    break;
-                case "west":
-                    result = 90;
-                    break;
+                case "north": return 0;
+                case "east": return 270;
+                case "south": return 180;
+                case "west": return 90;
             }
-            return result;
+            return 0;
         }
+
+        //private void GetOffsetAndRotation(out int rotation, out Vec3f offset)
+        //{
+        //    Block block = Api.World.BlockAccessor.GetBlock(Pos);
+        //    switch(block.LastCodePart())
+        //    {
+        //        case "east":
+        //            rotation = 270;
+        //            offset = new Vec3f(0, 0, -1);
+        //            break;
+        //        case "south":
+        //            rotation = 180;
+        //            offset = new Vec3f(1, 0, 0);
+        //            break;
+        //        case "west":
+        //            rotation = 90;
+        //            offset = new Vec3f(0, 0, 1);
+        //            break;
+        //        default:
+        //            rotation = 0;
+        //            offset = new Vec3f(-1, 0, 0);
+        //            break;
+        //    }
+        //}
 
         private struct ModuleInfo
         {

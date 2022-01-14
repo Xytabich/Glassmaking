@@ -32,8 +32,6 @@ namespace GlassMaking.Blocks
 
         private ITimeBasedHeatSource heatSource = null;
 
-        private MeshData coverMesh;
-
         private SmelteryState state;
         private int glassAmount;
         private AssetLocation glassCode;
@@ -48,11 +46,9 @@ namespace GlassMaking.Blocks
             if(api.Side == EnumAppSide.Client)
             {
                 ICoreClientAPI capi = (ICoreClientAPI)api;
-                var asset = capi.Assets.TryGet(new AssetLocation(Block.Code.Domain, "shapes/block/glass-smeltery/cover.json"));
-                capi.Tesselator.TesselateShape(Block, asset.ToObject<Shape>(), out coverMesh, new Vec3f(0f, GetRotation(), 0f));
                 var bathSource = capi.Tesselator.GetTexSource(Block);
                 var bathMesh = ObjectCacheUtil.GetOrCreate(capi, "glassmaking:glass-smeltery-" + Block.Variant["side"], () => {
-                    asset = capi.Assets.TryGet(new AssetLocation(Block.Code.Domain, "shapes/block/glass-smeltery/bath.json"));
+                    var asset = capi.Assets.TryGet(new AssetLocation(Block.Code.Domain, "shapes/block/glass-smeltery/bath.json"));
                     capi.Tesselator.TesselateShape("glassmaking:glass-smeltery-shape", asset.ToObject<Shape>(), out var bath, bathSource, new Vec3f(0f, GetRotation(), 0f));
                     return capi.Render.UploadMesh(bath);
                 });
@@ -128,13 +124,6 @@ namespace GlassMaking.Blocks
                 }
             }
             UpdateRendererFull();
-        }
-
-        public override bool OnTesselation(ITerrainMeshPool mesher, ITesselatorAPI tessThreadTesselator)
-        {
-            mesher.AddMeshData(coverMesh);
-            base.OnTesselation(mesher, tessThreadTesselator);
-            return true;
         }
 
         public override void OnBlockUnloaded()

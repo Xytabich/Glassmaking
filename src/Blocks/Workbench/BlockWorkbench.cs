@@ -3,7 +3,7 @@ using Vintagestory.API.Common;
 
 namespace GlassMaking.Blocks
 {
-    public class BlockGlassworktable : BlockHorizontal2BMultiblockMain
+    public class BlockWorkbench : BlockHorizontal2BMultiblockMain
     {
         public override bool OnBlockInteractStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)
         {
@@ -11,7 +11,7 @@ namespace GlassMaking.Blocks
             ItemStack itemstack = slot.Itemstack;
             if(itemstack != null)
             {
-                var be = world.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityGlassworktable;
+                var be = world.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityWorkbench;
                 if(be != null)
                 {
                     if(be.OnUseItem(byPlayer, slot))

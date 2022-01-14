@@ -1,13 +1,14 @@
 {
     "code": "mercurypump",
+    //"class": "glassmaking:workbenchtool",
     "heldTpIdleAnimation": "holdbothhands",
-    "shape": { "base": "block/glassworktable/mercurypump" },
+    "shape": { "base": "block/workbench/tools/mercurypump" },
     "behaviors": [
         { "name": "Unplaceable" }
     ],
     "attributes": {
-        "glassworktable": {
-            "tools": { "vacuumpump": 1000000 },
+        "workbenchTool": {
+            "tools": { "vacuumpump": 1000000 },//TODO: categories: {"vacuumpump": 1000000}
             "transform": {
                 "translation": {
                     "x": 0.25,
