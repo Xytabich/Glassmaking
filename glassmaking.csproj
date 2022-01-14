@@ -91,9 +91,9 @@
     <Content Include="assets\glassmaking\patches\suppltools.json" />
     <Content Include="assets\glassmaking\recipes\grid\breakglass.json" />
     <Content Include="assets\glassmaking\shapes\block\firebox.json" />
-    <Content Include="assets\glassmaking\shapes\block\glass-smeltery\bath.json" />
-    <Content Include="assets\glassmaking\shapes\block\glass-smeltery\cover.json" />
-    <Content Include="assets\glassmaking\shapes\block\glass-smeltery\item.json" />
+    <Content Include="assets\glassmaking\shapes\block\smeltery\bath.json" />
+    <Content Include="assets\glassmaking\shapes\block\smeltery\cover.json" />
+    <Content Include="assets\glassmaking\shapes\block\smeltery\item.json" />
     <Content Include="assets\glassmaking\shapes\block\tempering-oven.json" />
     <Content Include="assets\glassmaking\shapes\block\workbench\item.json" />
     <Content Include="assets\glassmaking\shapes\block\workbench\left.json" />
@@ -107,8 +107,8 @@
     <Compile Include="src\Blocks\BlockGlassBlowingMold.cs" />
     <Compile Include="src\Blocks\BlockTemperingOven.cs" />
     <Compile Include="src\Blocks\Entities\BlockEntityTemperingOven.cs" />
-    <Compile Include="src\Blocks\Workbench\BlockEntityWorkbench.cs" />
-    <Compile Include="src\Blocks\Workbench\BlockWorkbench.cs" />
+    <Compile Include="src\Blocks\Entities\BlockEntityWorkbench.cs" />
+    <Compile Include="src\Blocks\BlockWorkbench.cs" />
     <Compile Include="src\Blocks\ITimeBasedHeatReceiver.cs" />
     <Compile Include="src\Blocks\ITimeBasedHeatSource.cs" />
     <Compile Include="src\Blocks\Multiblock\BlockHorizontal2BMultiblockMain.cs" />

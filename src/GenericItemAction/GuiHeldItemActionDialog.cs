@@ -21,7 +21,7 @@ namespace GlassMaking.GenericItemAction
             {
                 if(heldAction.GenericHeldItemAction(player, action, attributes))
                 {
-                    system.SendActionMessage(item.Id, action, attributes);
+                    system.SendActionMessage(item, action, attributes);
                     return;
                 }
             }
@@ -31,7 +31,7 @@ namespace GlassMaking.GenericItemAction
                 {
                     if(heldAction.GenericHeldItemAction(player, action, attributes))
                     {
-                        system.SendActionMessage(item.Id, action, attributes);
+                        system.SendActionMessage(item, action, attributes);
                         return;
                     }
                 }

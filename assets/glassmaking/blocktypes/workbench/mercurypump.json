@@ -8,18 +8,18 @@
     ],
     "attributes": {
         "workbenchTool": {
-            "tools": { "vacuumpump": 1000000 },//TODO: categories: {"vacuumpump": 1000000}
-            "transform": {
-                "translation": {
-                    "x": 0.25,
-                    "y": 1,
-                    "z": -0.25
-                },
-                "rotation": {
-                    "x": 0,
-                    "y": -25,
-                    "z": 0
-                }
+            "tools": { "vacuumpump": 1000000 } //TODO: categories: {"vacuumpump": 1000000}
+        },
+        "workbenchTransform": {
+            "translation": {
+                "x": 0.25,
+                "y": 1,
+                "z": -0.25
+            },
+            "rotation": {
+                "x": 0,
+                "y": -25,
+                "z": 0
             }
         }
     },

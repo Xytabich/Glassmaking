@@ -42,14 +42,14 @@ namespace GlassMaking.Blocks
         public override void Initialize(ICoreAPI api)
         {
             base.Initialize(api);
-            inventory.LateInitialize("glassmaking:glasssmeltery-" + Pos.X + "/" + Pos.Y + "/" + Pos.Z, api);
+            inventory.LateInitialize("glassmaking:smeltery-" + Pos.X + "/" + Pos.Y + "/" + Pos.Z, api);
             if(api.Side == EnumAppSide.Client)
             {
                 ICoreClientAPI capi = (ICoreClientAPI)api;
                 var bathSource = capi.Tesselator.GetTexSource(Block);
-                var bathMesh = ObjectCacheUtil.GetOrCreate(capi, "glassmaking:glass-smeltery-" + Block.Variant["side"], () => {
-                    var asset = capi.Assets.TryGet(new AssetLocation(Block.Code.Domain, "shapes/block/glass-smeltery/bath.json"));
-                    capi.Tesselator.TesselateShape("glassmaking:glass-smeltery-shape", asset.ToObject<Shape>(), out var bath, bathSource, new Vec3f(0f, GetRotation(), 0f));
+                var bathMesh = ObjectCacheUtil.GetOrCreate(capi, "glassmaking:smeltery-shape-" + Block.Variant["side"], () => {
+                    var asset = capi.Assets.TryGet(new AssetLocation(Block.Code.Domain, "shapes/block/smeltery/bath.json"));
+                    capi.Tesselator.TesselateShape("glassmaking:smeltery-shape", asset.ToObject<Shape>(), out var bath, bathSource, new Vec3f(0f, GetRotation(), 0f));
                     return capi.Render.UploadMesh(bath);
                 });
                 renderer = new BlockRendererGlassSmeltery(Pos, capi.Tesselator.GetTexSource(Block), capi, bathMesh, bathSource["inside"].atlasTextureId);

@@ -19,7 +19,7 @@ namespace GlassMaking.Blocks
             if(api.Side != EnumAppSide.Client) return;
             ICoreClientAPI capi = api as ICoreClientAPI;
 
-            interactions = ObjectCacheUtil.GetOrCreate(api, "glassmaking:blockhelp-glasssmeltery", () => {
+            interactions = ObjectCacheUtil.GetOrCreate(api, "glassmaking:blockhelp-smeltery", () => {
                 List<ItemStack> blends = new List<ItemStack>();
 
                 foreach(Item item in api.World.Items)
@@ -33,7 +33,7 @@ namespace GlassMaking.Blocks
                 return new WorldInteraction[] {
                     new WorldInteraction()
                     {
-                        ActionLangCode = "glassmaking:blockhelp-glasssmeltery-add",
+                        ActionLangCode = "glassmaking:blockhelp-smeltery-add",
                         HotKeyCode = null,
                         MouseButton = EnumMouseButton.Right,
                         Itemstacks = blends.ToArray(),
@@ -41,7 +41,7 @@ namespace GlassMaking.Blocks
                     },
                     new WorldInteraction()
                     {
-                        ActionLangCode = "glassmaking:blockhelp-glasssmeltery-add",
+                        ActionLangCode = "glassmaking:blockhelp-smeltery-add",
                         HotKeyCode = "sneak",
                         MouseButton = EnumMouseButton.Right,
                         Itemstacks = blends.ConvertAll(s => { s = s.Clone(); s.StackSize = 5; return s; }).ToArray(),
@@ -49,7 +49,7 @@ namespace GlassMaking.Blocks
                     },
                     new WorldInteraction()
                     {
-                        ActionLangCode = "glassmaking:blockhelp-glasssmeltery-add",
+                        ActionLangCode = "glassmaking:blockhelp-smeltery-add",
                         HotKeyCodes = new string[] { "sneak", "sprint" },
                         MouseButton = EnumMouseButton.Right,
                         Itemstacks = blends.ConvertAll(s => { s = s.Clone(); s.StackSize = 20; return s; }).ToArray(),
@@ -95,11 +95,11 @@ namespace GlassMaking.Blocks
             base.OnUnloaded(api);
             if(api.Side == EnumAppSide.Client)
             {
-                var bathMesh = ObjectCacheUtil.TryGet<MeshRef>(api, "glassmaking:glass-smeltery-shape");
+                var bathMesh = ObjectCacheUtil.TryGet<MeshRef>(api, "glassmaking:smeltery-shape-" + Variant["side"]);
                 if(bathMesh != null)
                 {
                     bathMesh.Dispose();
-                    ObjectCacheUtil.Delete(api, "glassmaking:glass-smeltery-shape");
+                    ObjectCacheUtil.Delete(api, "glassmaking:smeltery-shape" + Variant["side"]);
                 }
             }
         }

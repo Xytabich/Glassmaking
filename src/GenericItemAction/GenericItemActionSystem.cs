@@ -29,10 +29,11 @@ namespace GlassMaking.GenericItemAction
             clientChannel = api.Network.GetChannel("genitemdlg:action");
         }
 
-        public void SendActionMessage(int itemId, string action, ITreeAttribute attributes)
+        public void SendActionMessage(CollectibleObject item, string action, ITreeAttribute attributes)
         {
             var msg = new HeldItemActionMessage();
-            msg.itemId = itemId;
+            msg.itemId = item.Id;
+            msg.itemClass = item.ItemClass;
             msg.action = action;
             msg.attributes = null;
             if(attributes != null)
@@ -50,7 +51,7 @@ namespace GlassMaking.GenericItemAction
         private void OnHeldAction(IServerPlayer fromPlayer, HeldItemActionMessage msg)
         {
             var itemstack = fromPlayer.Entity?.RightHandItemSlot?.Itemstack;
-            if(itemstack != null && itemstack.Id == msg.itemId)
+            if(itemstack != null && itemstack.Class == msg.itemClass && itemstack.Id == msg.itemId)
             {
                 ITreeAttribute attributes = null;
                 if(msg.attributes != null)

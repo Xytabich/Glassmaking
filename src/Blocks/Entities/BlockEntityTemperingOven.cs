@@ -28,7 +28,7 @@ namespace GlassMaking.Blocks
 
         private bool preventMeshUpdate = false;
 
-        public BlockEntityTemperingOven() : base()
+        public BlockEntityTemperingOven()
         {
             gridSize = itemCapacity;
             inventory = new InventoryGeneric(itemCapacity, InventoryClassName + "-" + Pos, null);
