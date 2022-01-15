@@ -44,6 +44,19 @@ namespace GlassMaking.Blocks
             return base.GetDrops(world, pos, byPlayer, dropQuantityMultiplier);
         }
 
+        public override string GetPlacedBlockInfo(IWorldAccessor world, BlockPos pos, IPlayer forPlayer)
+        {
+            if(isSurrogate)
+            {
+                var mainPos = GetMainBlockPosition(pos);
+                if(world.BlockAccessor.GetBlock(mainPos) is BlockHorizontal2BMultiblock mainBlock)
+                {
+                    return mainBlock.GetPlacedBlockInfo(world, mainPos, forPlayer);
+                }
+            }
+            return base.GetPlacedBlockInfo(world, pos, forPlayer);
+        }
+
         public override bool CanPlaceBlock(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, ref string failureCode)
         {
             if(!base.CanPlaceBlock(world, byPlayer, blockSel, ref failureCode))

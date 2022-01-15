@@ -58,13 +58,14 @@ namespace GlassMaking.Blocks
                     itemsInfo[i] = new ToolItemInfo() { boundingBoxes = boxes };
                     slot.MarkDirty();
 
+                    RebuildSelectionBoxes();
+
                     updateMesh(i);
                     MarkDirty(true);
                     return true;
                 }
             }
 
-            RebuildSelectionBoxes();
             return false;
         }
 
@@ -207,7 +208,7 @@ namespace GlassMaking.Blocks
             {
                 for(int j = b.Length - 1; j >= 0; j--)
                 {
-                    if(a[i].Intersects(b[j])) return true;
+                    if(a[i].Equals(b[i]) || a[i].Intersects(b[j])) return true;
                 }
             }
             return false;
