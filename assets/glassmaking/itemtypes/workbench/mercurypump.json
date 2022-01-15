@@ -5,7 +5,8 @@
     "shape": { "base": "block/workbench/tools/mercurypump" },
     "attributes": {
         "workbenchTool": {
-            //"tools": { "vacuumpump": 1000000 }
+            "code": "vacuumpump",
+            "attributes": { "value": 1000000 },
             "boundingBoxes": [
                 {
                     "x1": 0.65625,

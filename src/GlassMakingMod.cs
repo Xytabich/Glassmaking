@@ -23,7 +23,6 @@ namespace GlassMaking
 
             api.RegisterItemClass("glassmaking:glassworkpipe", typeof(ItemGlassworkPipe));
             api.RegisterItemClass("glassmaking:glassblend", typeof(ItemGlassBlend));
-            api.RegisterItemClass("glassmaking:workbenchtool", typeof(ItemWorkbenchTool));
 
             api.RegisterBlockClass("glassmaking:firebox", typeof(BlockFirebox));
             api.RegisterBlockClass("glassmaking:temperingoven", typeof(BlockTemperingOven));

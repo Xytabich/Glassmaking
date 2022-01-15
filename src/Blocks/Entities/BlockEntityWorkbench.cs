@@ -1,4 +1,6 @@
-﻿using System;
+﻿using GlassMaking.Workbench;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
@@ -21,7 +23,7 @@ namespace GlassMaking.Blocks
         private InventoryGeneric inventory;
 
         private Cuboidf[] selectionBoxes;
-        private Dictionary<string, WorkbenchToolInfo> tools = new Dictionary<string, WorkbenchToolInfo>();
+        private Dictionary<string, WorkbenchToolBehavior> tools = new Dictionary<string, WorkbenchToolBehavior>();
 
         public BlockEntityWorkbench()
         {
@@ -33,17 +35,17 @@ namespace GlassMaking.Blocks
         public override void Initialize(ICoreAPI api)
         {
             base.Initialize(api);
-            InitTools();
+            UpdateTools();
         }
 
         public bool OnUseItem(IPlayer byPlayer, ItemSlot slot)
         {
-            if(!(slot.Itemstack.Collectible is IWorkbenchToolContainer container)) return false;
+            if(!(slot.Itemstack.Collectible is IWorkbenchTool tool)) return false;
             var world = byPlayer.Entity.World;
-            var boxes = GetRotatedBoxes(container.GetContainerBoundingBoxes(world, slot.Itemstack), Block.Shape.rotateY);
+            var boxes = GetRotatedBoxes(tool.GetContainerBoundingBoxes(world, slot.Itemstack), Block.Shape.rotateY);
             for(int i = itemCapacity - 1; i >= 0; i--)
             {
-                if(itemsInfo[i] != null)
+                if(itemsInfo[i] != null && !itemsInfo[i].Empty)
                 {
                     if(HasIntersections(boxes, itemsInfo[i].boundingBoxes))
                     {
@@ -52,13 +54,10 @@ namespace GlassMaking.Blocks
                 }
             }
 
-            var tools = container.GetTools(world, slot.Itemstack);
-            for(int i = 0; i < tools.Length; i++)
+            var toolCode = tool.GetToolCode(world, slot.Itemstack).ToShortString();
+            if(tools.ContainsKey(toolCode))
             {
-                if(this.tools.ContainsKey(tools[i].code.ToShortString()))
-                {
-                    return false;
-                }
+                return false;
             }
 
             for(int i = 0; i < itemCapacity; i++)
@@ -67,11 +66,11 @@ namespace GlassMaking.Blocks
                 {
                     inventory[i].Itemstack = slot.TakeOut(1);
 
-                    for(int j = 0; j < tools.Length; j++)
-                    {
-                        this.tools.Add(tools[j].code.ToShortString(), tools[j]);
-                    }
-                    itemsInfo[i] = new ContainerInfo() { boundingBoxes = boxes, tools = tools };
+                    var behavior = tool.CreateToolBehavior(world, slot.Itemstack, this);
+                    var attribs = tool.GetToolAttributes(world, slot.Itemstack);
+                    itemsInfo[i] = new ContainerInfo() { boundingBoxes = boxes, tool = behavior, attributes = attribs };
+                    tools.Add(toolCode, behavior);
+                    behavior.OnLoaded(Api, attribs);
 
                     RebuildSelectionBoxes();
                     updateMesh(i);
@@ -93,7 +92,55 @@ namespace GlassMaking.Blocks
         public override void FromTreeAttributes(ITreeAttribute tree, IWorldAccessor worldForResolving)
         {
             base.FromTreeAttributes(tree, worldForResolving);
-            if(Api?.World != null) InitTools();
+            for(int i = 0; i < itemCapacity; i++)
+            {
+                var data = tree["tooldata" + i];
+                if(itemsInfo[i] == null)
+                {
+                    if(data != null)
+                    {
+                        itemsInfo[i] = new ContainerInfo() { data = data };
+                    }
+                }
+                else
+                {
+                    itemsInfo[i].data = data;
+                }
+            }
+            if(Api?.World != null) UpdateTools();
+        }
+
+        public override void ToTreeAttributes(ITreeAttribute tree)
+        {
+            base.ToTreeAttributes(tree);
+            for(int i = 0; i < itemCapacity; i++)
+            {
+                if(itemsInfo[i] != null)
+                {
+                    var attrib = itemsInfo[i].Empty ? itemsInfo[i].data : itemsInfo[i].tool.ToAttribute();
+                    if(attrib != null) tree["tooldata" + i] = attrib;
+                }
+            }
+        }
+
+        public override void OnBlockRemoved()
+        {
+            base.OnBlockRemoved();
+            foreach(var tool in tools)
+            {
+                tool.Value.OnBlockRemoved();
+            }
+            tools.Clear();
+        }
+
+        public override void OnBlockUnloaded()
+        {
+            base.OnBlockUnloaded();
+            foreach(var tool in tools)
+            {
+                tool.Value.OnBlockUnloaded();
+            }
+            tools.Clear();
         }
 
         protected override MeshData genMesh(ItemStack stack)
@@ -146,25 +193,40 @@ namespace GlassMaking.Blocks
             return mesh;
         }
 
-        private void InitTools()
+        private void UpdateTools()
         {
-            this.tools.Clear();
+            tools.Clear();
             for(int i = itemCapacity - 1; i >= 0; i--)
             {
                 var slot = inventory[i];
-                if(slot.Empty || !(slot.Itemstack.Collectible is IWorkbenchToolContainer container))
+                var info = itemsInfo[i];
+                if(slot.Empty || !(slot.Itemstack.Collectible is IWorkbenchTool tool))
                 {
+                    if(info != null && !itemsInfo[i].Empty) info.tool.OnUnloaded();
                     itemsInfo[i] = null;
                 }
                 else
                 {
-                    var tools = container.GetTools(Api.World, slot.Itemstack);
-                    for(int j = 0; j < tools.Length; j++)
+                    var attribs = tool.GetToolAttributes(Api.World, slot.Itemstack);
+                    var code = tool.GetToolCode(Api.World, slot.Itemstack).ToShortString();
+                    IAttribute data = info?.PickData();
+                    if(info != null && code == info.tool.code.ToShortString() && (attribs == null && info.attributes == null || JToken.DeepEquals(attribs?.Token, info.attributes?.Token)))
                     {
-                        this.tools[tools[j].code.ToShortString()] = tools[j];
+                        tools[code] = info.tool;
+                        info.tool.FromAttribute(data, Api.World);
+                        continue;
                     }
-                    var boxes = GetRotatedBoxes(container.GetContainerBoundingBoxes(Api.World, slot.Itemstack), Block.Shape.rotateY);
-                    itemsInfo[i] = new ContainerInfo() { boundingBoxes = boxes, tools = tools };
+                    else
+                    {
+                        if(info != null && !itemsInfo[i].Empty) info.tool.OnUnloaded();
+
+                        var behavior = tool.CreateToolBehavior(Api.World, slot.Itemstack, this);
+                        tools[code] = behavior;
+                        var boxes = GetRotatedBoxes(tool.GetContainerBoundingBoxes(Api.World, slot.Itemstack), Block.Shape.rotateY);
+                        itemsInfo[i] = new ContainerInfo() { boundingBoxes = boxes, tool = behavior, attributes = attribs };
+                        behavior.OnLoaded(Api, attribs);
+                        if(data != null) behavior.FromAttribute(data, Api.World);
+                    }
                 }
             }
             RebuildSelectionBoxes();
@@ -177,7 +239,7 @@ namespace GlassMaking.Blocks
             else boxes.Add(Block.DefaultCollisionBox);
             for(int i = itemCapacity - 1; i >= 0; i--)
             {
-                if(itemsInfo[i] != null)
+                if(itemsInfo[i] != null && !itemsInfo[i].Empty)
                 {
                     itemsInfo[i].selIndex = boxes.Count;
                     boxes.AddRange(itemsInfo[i].boundingBoxes);
@@ -240,7 +302,18 @@ namespace GlassMaking.Blocks
         {
             public int selIndex;
             public Cuboidf[] boundingBoxes;
-            public WorkbenchToolInfo[] tools;
+            public JsonObject attributes;
+            public WorkbenchToolBehavior tool = null;
+            public IAttribute data;
+
+            public bool Empty { get { return tool == null; } }
+
+            public IAttribute PickData()
+            {
+                var data = this.data;
+                this.data = null;
+                return data;
+            }
         }
     }
 }
