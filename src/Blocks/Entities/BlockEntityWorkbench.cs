@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
@@ -16,16 +17,17 @@ namespace GlassMaking.Blocks
 
         protected virtual int itemCapacity => 9;
 
-        private ToolItemInfo[] itemsInfo;
+        private ContainerInfo[] itemsInfo;
         private InventoryGeneric inventory;
 
         private Cuboidf[] selectionBoxes;
+        private Dictionary<string, WorkbenchToolInfo> tools = new Dictionary<string, WorkbenchToolInfo>();
 
         public BlockEntityWorkbench()
         {
             inventory = new InventoryGeneric(itemCapacity, InventoryClassName + "-" + Pos, null);
             meshes = new MeshData[itemCapacity];
-            itemsInfo = new ToolItemInfo[itemCapacity];
+            itemsInfo = new ContainerInfo[itemCapacity];
         }
 
         public override void Initialize(ICoreAPI api)
@@ -36,9 +38,9 @@ namespace GlassMaking.Blocks
 
         public bool OnUseItem(IPlayer byPlayer, ItemSlot slot)
         {
-            if(!(slot.Itemstack.Collectible is IWorkbenchTool tool)) return false;
+            if(!(slot.Itemstack.Collectible is IWorkbenchToolContainer container)) return false;
             var world = byPlayer.Entity.World;
-            var boxes = GetRotatedBoxes(tool.GetToolBoundingBoxes(world, slot.Itemstack), Block.Shape.rotateY);
+            var boxes = GetRotatedBoxes(container.GetContainerBoundingBoxes(world, slot.Itemstack), Block.Shape.rotateY);
             for(int i = itemCapacity - 1; i >= 0; i--)
             {
                 if(itemsInfo[i] != null)
@@ -50,17 +52,31 @@ namespace GlassMaking.Blocks
                 }
             }
 
+            var tools = container.GetTools(world, slot.Itemstack);
+            for(int i = 0; i < tools.Length; i++)
+            {
+                if(this.tools.ContainsKey(tools[i].code.ToShortString()))
+                {
+                    return false;
+                }
+            }
+
             for(int i = 0; i < itemCapacity; i++)
             {
                 if(inventory[i].Empty)
                 {
                     inventory[i].Itemstack = slot.TakeOut(1);
-                    itemsInfo[i] = new ToolItemInfo() { boundingBoxes = boxes };
-                    slot.MarkDirty();
+
+                    for(int j = 0; j < tools.Length; j++)
+                    {
+                        this.tools.Add(tools[j].code.ToShortString(), tools[j]);
+                    }
+                    itemsInfo[i] = new ContainerInfo() { boundingBoxes = boxes, tools = tools };
 
                     RebuildSelectionBoxes();
-
                     updateMesh(i);
+
+                    slot.MarkDirty();
                     MarkDirty(true);
                     return true;
                 }
@@ -132,17 +148,23 @@ namespace GlassMaking.Blocks
 
         private void InitTools()
         {
+            this.tools.Clear();
             for(int i = itemCapacity - 1; i >= 0; i--)
             {
                 var slot = inventory[i];
-                if(slot.Empty || !(slot.Itemstack.Collectible is IWorkbenchTool tool))
+                if(slot.Empty || !(slot.Itemstack.Collectible is IWorkbenchToolContainer container))
                 {
                     itemsInfo[i] = null;
                 }
                 else
                 {
-                    var boxes = GetRotatedBoxes(tool.GetToolBoundingBoxes(Api.World, slot.Itemstack), Block.Shape.rotateY);
-                    itemsInfo[i] = new ToolItemInfo() { boundingBoxes = boxes };
+                    var tools = container.GetTools(Api.World, slot.Itemstack);
+                    for(int j = 0; j < tools.Length; j++)
+                    {
+                        this.tools[tools[j].code.ToShortString()] = tools[j];
+                    }
+                    var boxes = GetRotatedBoxes(container.GetContainerBoundingBoxes(Api.World, slot.Itemstack), Block.Shape.rotateY);
+                    itemsInfo[i] = new ContainerInfo() { boundingBoxes = boxes, tools = tools };
                 }
             }
             RebuildSelectionBoxes();
@@ -194,12 +216,12 @@ namespace GlassMaking.Blocks
 
         private static void FillCuboid(float[] verts, Cuboidf target)
         {
-            target.X1 = verts[0];
-            target.Y1 = verts[1];
-            target.Z1 = verts[2];
-            target.X2 = verts[3];
-            target.Y2 = verts[4];
-            target.Z2 = verts[5];
+            target.X1 = Math.Min(verts[0], verts[3]);
+            target.Y1 = Math.Min(verts[1], verts[4]);
+            target.Z1 = Math.Min(verts[2], verts[5]);
+            target.X2 = Math.Max(verts[0], verts[3]);
+            target.Y2 = Math.Max(verts[1], verts[4]);
+            target.Z2 = Math.Max(verts[2], verts[5]);
         }
 
         private static bool HasIntersections(Cuboidf[] a, Cuboidf[] b)
@@ -208,16 +230,17 @@ namespace GlassMaking.Blocks
             {
                 for(int j = b.Length - 1; j >= 0; j--)
                 {
-                    if(a[i].Equals(b[i]) || a[i].Intersects(b[j])) return true;
+                    if(a[i].Intersects(b[j])) return true;
                 }
             }
             return false;
         }
 
-        private class ToolItemInfo
+        private class ContainerInfo
         {
             public int selIndex;
             public Cuboidf[] boundingBoxes;
+            public WorkbenchToolInfo[] tools;
         }
     }
 }

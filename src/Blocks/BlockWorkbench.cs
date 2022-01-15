@@ -35,7 +35,7 @@ namespace GlassMaking.Blocks
             var be = blockAccessor.GetBlockEntity(pos) as BlockEntityWorkbench;
             if(be != null)
             {
-                var boxes = (Cuboidf[])be.GetSelectionBoxes();
+                var boxes = be.GetSelectionBoxes();
                 if(isSurrogate)
                 {
                     boxes = (Cuboidf[])boxes.Clone();

@@ -132,11 +132,12 @@
     <Compile Include="src\Common\HeatGraph.cs" />
     <Compile Include="src\Common\IGlassBlowingTool.cs" />
     <Compile Include="src\Common\IItemCrafter.cs" />
-    <Compile Include="src\Common\IWorkbenchTool.cs" />
+    <Compile Include="src\Common\IWorkbenchToolContainer.cs" />
     <Compile Include="src\Common\MinMaxFloat.cs" />
     <Compile Include="src\Common\RecipeRegistryDictionary.cs" />
     <Compile Include="src\Common\SimpleTextureSource.cs" />
     <Compile Include="src\Common\SmoothRadialShape.cs" />
+    <Compile Include="src\Common\WorkbenchToolInfo.cs" />
     <Compile Include="src\GenericItemAction\GenericItemActionSystem.cs" />
     <Compile Include="src\GenericItemAction\GuiHeldItemActionDialog.cs" />
     <Compile Include="src\GenericItemAction\HeldItemActionMessage.cs" />

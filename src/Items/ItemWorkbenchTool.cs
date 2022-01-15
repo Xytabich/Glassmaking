@@ -5,7 +5,7 @@ using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Items
 {
-    public class ItemWorkbenchTool : Item, IWorkbenchTool
+    public class ItemWorkbenchTool : Item, IWorkbenchToolContainer
     {
         private ContainerInfo toolContainer;
 
@@ -16,9 +16,14 @@ namespace GlassMaking.Items
             if(toolContainer == null) api.World.Logger.Log(EnumLogType.Error, "The workbenchTool attribute was not found or is not in the correct format. Item: " + Code);
         }
 
-        public virtual Cuboidf[] GetToolBoundingBoxes(IWorldAccessor world, ItemStack itemStack)
+        public virtual Cuboidf[] GetContainerBoundingBoxes(IWorldAccessor world, ItemStack itemStack)
         {
             return toolContainer.boundingBoxes;
+        }
+
+        public virtual WorkbenchToolInfo[] GetTools(IWorldAccessor world, ItemStack itemStack)
+        {
+            return toolContainer.tools ?? new WorkbenchToolInfo[0];
         }
 
         [JsonObject]
@@ -26,14 +31,7 @@ namespace GlassMaking.Items
         {
             [JsonProperty(Required = Required.Always)]
             public Cuboidf[] boundingBoxes;
-            public ToolInfo[] tools;
-
-            [JsonObject]
-            public class ToolInfo
-            {
-                public AssetLocation code;
-                public JsonObject attributes;
-            }
+            public WorkbenchToolInfo[] tools;
         }
     }
 }
