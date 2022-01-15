@@ -23,14 +23,14 @@ namespace GlassMaking
 
             api.RegisterItemClass("glassmaking:glassworkpipe", typeof(ItemGlassworkPipe));
             api.RegisterItemClass("glassmaking:glassblend", typeof(ItemGlassBlend));
+            api.RegisterItemClass("glassmaking:workbenchtool", typeof(ItemWorkbenchTool));
 
             api.RegisterBlockClass("glassmaking:firebox", typeof(BlockFirebox));
             api.RegisterBlockClass("glassmaking:temperingoven", typeof(BlockTemperingOven));
             api.RegisterBlockClass("glassmaking:smeltery", typeof(BlockGlassSmeltery));
             api.RegisterBlockClass("glassmaking:glassmold", typeof(BlockGlassBlowingMold));
             api.RegisterBlockClass("glassmaking:workbench", typeof(BlockWorkbench));
-            api.RegisterBlockClass("Horizontal2BMultiblockSurrogate", typeof(BlockHorizontal2BMultiblockSurrogate));
-            api.RegisterBlockClass("Horizontal2BMultiblockMain", typeof(BlockHorizontal2BMultiblockMain));
+            api.RegisterBlockClass("Horizontal2BMultiblock", typeof(BlockHorizontal2BMultiblock));
 
             api.RegisterBlockEntityClass("glassmaking:firebox", typeof(BlockEntityFirebox));
             api.RegisterBlockEntityClass("glassmaking:temperingoven", typeof(BlockEntityTemperingOven));

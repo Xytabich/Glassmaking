@@ -1,14 +1,21 @@
 {
     "code": "mercurypump",
-    //"class": "glassmaking:workbenchtool",
+    "class": "glassmaking:workbenchtool",
     "heldTpIdleAnimation": "holdbothhands",
     "shape": { "base": "block/workbench/tools/mercurypump" },
-    "behaviors": [
-        { "name": "Unplaceable" }
-    ],
     "attributes": {
         "workbenchTool": {
-            "tools": { "vacuumpump": 1000000 } //TODO: categories: {"vacuumpump": 1000000}
+            //"tools": { "vacuumpump": 1000000 }
+            "boundingBoxes": [
+                {
+                    "x1": 0.65625,
+                    "x2": 0.84375,
+                    "y1": 1.0,
+                    "y2": 2.0,
+                    "z1": 0.15625,
+                    "z2": 0.34375
+                }
+            ]
         },
         "workbenchTransform": {
             "translation": {

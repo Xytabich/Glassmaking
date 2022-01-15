@@ -83,7 +83,7 @@
     <Content Include="assets\glassmaking\blocktypes\glass-smeltery.json" />
     <Content Include="assets\glassmaking\blocktypes\temperingoven.json" />
     <Content Include="assets\glassmaking\blocktypes\workbench.json" />
-    <Content Include="assets\glassmaking\blocktypes\workbench\mercurypump.json" />
+    <Content Include="assets\glassmaking\itemtypes\workbench\mercurypump.json" />
     <Content Include="assets\glassmaking\itemtypes\glassshards.json" />
     <Content Include="assets\glassmaking\itemtypes\glassworkpipe.json" />
     <Content Include="assets\glassmaking\lang\en.json" />
@@ -96,8 +96,8 @@
     <Content Include="assets\glassmaking\shapes\block\smeltery\item.json" />
     <Content Include="assets\glassmaking\shapes\block\tempering-oven.json" />
     <Content Include="assets\glassmaking\shapes\block\workbench\item.json" />
-    <Content Include="assets\glassmaking\shapes\block\workbench\left.json" />
-    <Content Include="assets\glassmaking\shapes\block\workbench\right.json" />
+    <Content Include="assets\glassmaking\shapes\block\workbench\other.json" />
+    <Content Include="assets\glassmaking\shapes\block\workbench\main.json" />
     <Content Include="assets\glassmaking\shapes\block\workbench\tools\mercurypump.json" />
     <Content Include="assets\glassmaking\shapes\item\glassworkpipe.json" />
     <Content Include="assets\glassmaking\shapes\item\resource\crushed\glassshards.json" />
@@ -111,8 +111,7 @@
     <Compile Include="src\Blocks\BlockWorkbench.cs" />
     <Compile Include="src\Blocks\ITimeBasedHeatReceiver.cs" />
     <Compile Include="src\Blocks\ITimeBasedHeatSource.cs" />
-    <Compile Include="src\Blocks\Multiblock\BlockHorizontal2BMultiblockMain.cs" />
-    <Compile Include="src\Blocks\Multiblock\BlockHorizontal2BMultiblockSurrogate.cs" />
+    <Compile Include="src\Blocks\Multiblock\BlockHorizontal2BMultiblock.cs" />
     <Compile Include="src\Blocks\Multiblock\BlockBehaviorHorizontal2BMultiblock.cs" />
     <Compile Include="src\Blocks\Entities\BlockEntityFirebox.cs" />
     <Compile Include="src\Blocks\Entities\BlockEntityGlassSmeltery.cs" />
@@ -133,6 +132,7 @@
     <Compile Include="src\Common\HeatGraph.cs" />
     <Compile Include="src\Common\IGlassBlowingTool.cs" />
     <Compile Include="src\Common\IItemCrafter.cs" />
+    <Compile Include="src\Common\IWorkbenchTool.cs" />
     <Compile Include="src\Common\MinMaxFloat.cs" />
     <Compile Include="src\Common\RecipeRegistryDictionary.cs" />
     <Compile Include="src\Common\SimpleTextureSource.cs" />
@@ -148,6 +148,7 @@
     <Compile Include="src\Items\GlasspipeRenderUtil.cs" />
     <Compile Include="src\GlassblowingTools\BlowingTool.cs" />
     <Compile Include="src\GlassblowingTools\GlassIntakeTool.cs" />
+    <Compile Include="src\Items\ItemWorkbenchTool.cs" />
     <Compile Include="src\Items\SupplementalGlassworkTool.cs" />
     <Compile Include="src\Utils.cs" />
   </ItemGroup>
