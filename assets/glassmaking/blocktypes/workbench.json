@@ -22,7 +22,7 @@
     ],
     "attributesByType": {
         "*-right-*": {
-            "surrogate": "glassmaking:workbench-left-{side}"
+            "surrogate": "workbench-left-{side}"
         }
     },
     "creativeinventory": {

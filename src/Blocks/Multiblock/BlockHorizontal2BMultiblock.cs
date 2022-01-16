@@ -5,12 +5,14 @@ namespace GlassMaking.Blocks
 {
     public class BlockHorizontal2BMultiblock : Block
     {
+        protected AssetLocation surrogate = null;
         protected bool isSurrogate;
         protected BlockFacing oppositeFace;
 
         public override void OnLoaded(ICoreAPI api)
         {
             isSurrogate = Attributes == null || !Attributes.KeyExists("surrogate");
+            if(!isSurrogate) surrogate = AssetLocation.Create(Attributes["surrogate"].AsString(), Code.Domain);
 
             string side;
             if(!Variant.TryGetValue("horizontalorientation", out side))
@@ -64,7 +66,7 @@ namespace GlassMaking.Blocks
                 return false;
             }
             if(isSurrogate) return true;
-            var surrogate = new AssetLocation(Attributes["surrogate"].AsString());
+
             blockSel = blockSel.Clone();
             blockSel.Position = blockSel.Position.AddCopy(oppositeFace);
             return world.GetBlock(surrogate).CanPlaceBlock(world, byPlayer, blockSel, ref failureCode);
@@ -78,7 +80,6 @@ namespace GlassMaking.Blocks
 
                 blockSel = blockSel.Clone();
                 blockSel.Position = blockSel.Position.AddCopy(oppositeFace);
-                var surrogate = new AssetLocation(Attributes["surrogate"].AsString());
                 world.GetBlock(surrogate).DoPlaceBlock(world, byPlayer, blockSel, byItemStack);
                 return true;
             }

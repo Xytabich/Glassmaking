@@ -10,7 +10,7 @@
         "op": "add",
         "path": "/behaviors/-",
         "value": {
-            "name": "glassmaking:supplglassworktool",
+            "name": "glassmaking:gbt-shears",
             "properties": {
                 "tool": "shears"
             }

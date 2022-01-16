@@ -1,144 +1,96 @@
 ﻿using System;
-using System.IO;
-using Vintagestory.API.Client;
 using Vintagestory.API.Common;
-using Vintagestory.API.Datastructures;
 
 namespace GlassMaking.GlassblowingTools
 {
-    public class BlowingTool : IGlassBlowingTool
+    public class BlowingTool : GlassblowingToolBehavior
     {
-        private bool initComplete = false;
-        private WorldInteraction[] interactions;
+        //private WorldInteraction[] interactions;
 
-        public GlassBlowingToolStep GetStepInstance()
+        public BlowingTool(CollectibleObject collObj) : base(collObj)
         {
-            return new ToolStep(this);
         }
 
-        private void OnInitClient(ICoreClientAPI api)
+        //public override void OnLoaded(ICoreAPI api)
+        //{
+        //    base.OnLoaded(api);
+        //    if(api.Side == EnumAppSide.Client)
+        //    {
+        //        interactions = new WorldInteraction[1] {
+        //            new WorldInteraction() {
+        //                ActionLangCode = "glassmaking:heldhelp-gbtool-blowing",
+        //                MouseButton = EnumMouseButton.Right
+        //            }
+        //        };
+        //    }
+        //}
+
+        public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling, ref EnumHandling handling)
         {
-            if(initComplete) return;
-            initComplete = true;
-            interactions = new WorldInteraction[1] {
-                new WorldInteraction() {
-                    ActionLangCode = "glassmaking:heldhelp-gbtool-blowing",
-                    MouseButton = EnumMouseButton.Right
+            if(firstEvent && TryGetRecipeStep(slot, byEntity, out var step))
+            {
+                if(step.BeginStep())
+                {
+                    if(api.Side == EnumAppSide.Client) step.SetProgress(0);
+                    handHandling = EnumHandHandling.PreventDefault;
+                    handling = EnumHandling.PreventSubsequent;
+                    return;
                 }
-            };
+            }
+            base.OnHeldInteractStart(slot, byEntity, blockSel, entitySel, firstEvent, ref handHandling, ref handling);
         }
 
-        private class ToolStep : GlassBlowingToolStep
+        public override bool OnHeldInteractStep(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, ref EnumHandling handling)
         {
-            private float time;
-
-            private BlowingTool toolInstance;
-
-            public ToolStep(BlowingTool toolInstance)
+            if(TryGetRecipeStep(slot, byEntity, out var step))
             {
-                this.toolInstance = toolInstance;
-            }
-
-            public override void FromBytes(BinaryReader reader, IWorldAccessor resolver)
-            {
-                base.FromBytes(reader, resolver);
-                time = reader.ReadSingle();
-                if(resolver.Api.Side == EnumAppSide.Client)
-                {
-                    toolInstance.OnInitClient(resolver.Api as ICoreClientAPI);
-                }
-            }
-
-            public override void ToBytes(BinaryWriter writer)
-            {
-                base.ToBytes(writer);
-                writer.Write(time);
-            }
-
-            public override bool Resolve(JsonObject attributes, IWorldAccessor world, string sourceForErrorLogging)
-            {
-                if(attributes.KeyExists("time"))
-                {
-                    time = attributes["time"].AsFloat(0);
-                    if(time > 0f) return true;
-                }
-                world.Logger.Error("Failed resolving a glassblowing tool with code {0} in {1}: Invalid time", nameof(BlowingTool), sourceForErrorLogging);
-                return false;
-            }
-
-            public override GlassBlowingToolStep Clone()
-            {
-                return new ToolStep(toolInstance) {
-                    tool = tool,
-                    shape = shape == null ? null : shape.Clone(),
-                    time = time
-                };
-            }
-
-            public override WorldInteraction[] GetHeldInteractionHelp(ItemStack item, IAttribute data)
-            {
-                return toolInstance.interactions;
-            }
-
-            public override float GetMeshTransitionValue(ItemStack item, IAttribute data)
-            {
-                return item.TempAttributes.GetFloat("toolUseTime", 0f) / time;
-            }
-
-            public override void OnHeldInteractStart(ItemSlot slot, ref IAttribute data, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling, out bool isComplete)
-            {
-                isComplete = false;
-                if(firstEvent)
+                if(step.ContinueStep())
                 {
                     if(byEntity.Api.Side == EnumAppSide.Client)
                     {
-                        slot.Itemstack.TempAttributes.SetFloat("toolUseTime", 0f);
+                        const float speed = 1.5f;
+                        ModelTransform modelTransform = new ModelTransform();
+                        modelTransform.EnsureDefaultValues();
+                        modelTransform.Translation.Set(-Math.Min(1.275f, speed * secondsUsed * 1.5f), -Math.Min(0.5f, speed * secondsUsed), -Math.Min(0.25f, speed * Math.Max(0, secondsUsed - 0.5f) * 0.5f));
+                        modelTransform.Scale = 1f + Math.Min(0.25f, speed * secondsUsed / 4f);
+                        byEntity.Controls.UsingHeldItemTransformBefore = modelTransform;
                     }
-                    handling = EnumHandHandling.PreventDefault;
-                }
-            }
 
-            public override bool OnHeldInteractStep(float secondsUsed, ItemSlot slot, ref IAttribute data, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, out bool isComplete)
-            {
-                const float speed = 1.5f;
-                if(byEntity.Api.Side == EnumAppSide.Client)
-                {
-                    ModelTransform modelTransform = new ModelTransform();
-                    modelTransform.EnsureDefaultValues();
-                    modelTransform.Translation.Set(-Math.Min(1.275f, speed * secondsUsed * 1.5f), -Math.Min(0.5f, speed * secondsUsed), -Math.Min(0.25f, speed * Math.Max(0, secondsUsed - 0.5f) * 0.5f));
-                    modelTransform.Scale = 1f + Math.Min(0.25f, speed * secondsUsed / 4f);
-                    byEntity.Controls.UsingHeldItemTransformBefore = modelTransform;
-
-                    slot.Itemstack.TempAttributes.SetFloat("toolUseTime", Math.Max(secondsUsed - 1f, 0f));
-                }
-                if(secondsUsed >= time)
-                {
-                    if(byEntity.Api.Side == EnumAppSide.Server)
+                    float time = step.stepAttributes["time"].AsFloat();
+                    if(api.Side == EnumAppSide.Client)
                     {
-                        isComplete = true;
-                        return false;
+                        step.SetProgress(Math.Max(secondsUsed - 1f, 0f) / time);
                     }
+                    if(byEntity.Api.Side == EnumAppSide.Server && secondsUsed >= time)
+                    {
+                        if(byEntity.Api.Side == EnumAppSide.Server)
+                        {
+                            step.CompleteStep(byEntity);
+                            handling = EnumHandling.PreventSubsequent;
+                            return false;
+                        }
+                    }
+                    handling = EnumHandling.PreventSubsequent;
+                    return true;
                 }
-                isComplete = false;
-                return true;
-            }
-
-            public override void OnHeldInteractStop(float secondsUsed, ItemSlot slot, ref IAttribute data, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel)
-            {
-                if(byEntity.Api.Side == EnumAppSide.Client)
+                else
                 {
-                    slot.Itemstack.TempAttributes.RemoveAttribute("toolUseTime");
+                    return false;
                 }
             }
+            return base.OnHeldInteractStep(secondsUsed, slot, byEntity, blockSel, entitySel, ref handling);
+        }
 
-            public override bool OnHeldInteractCancel(float secondsUsed, ItemSlot slot, ref IAttribute data, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, EnumItemUseCancelReason cancelReason)
+        public override void OnHeldInteractStop(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, ref EnumHandling handling)
+        {
+            if(api.Side == EnumAppSide.Client && TryGetRecipeStep(slot, byEntity, out var step))
             {
-                if(byEntity.Api.Side == EnumAppSide.Client)
+                if(step.ContinueStep())
                 {
-                    slot.Itemstack.TempAttributes.RemoveAttribute("toolUseTime");
+                    step.SetProgress(0);
                 }
-                return true;
             }
+            base.OnHeldInteractStop(secondsUsed, slot, byEntity, blockSel, entitySel, ref handling);
         }
     }
 }

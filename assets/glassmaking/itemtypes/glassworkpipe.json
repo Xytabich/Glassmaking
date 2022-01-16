@@ -1,6 +1,20 @@
 {
     "code": "glasswork_pipe",
     "class": "glassmaking:glassworkpipe",
+    "behaviors": [
+        {
+            "name": "glassmaking:gbt-blowing",
+            "properties": {
+                "tool": "blowing"
+            }
+        },
+        {
+            "name": "glassmaking:gbt-glassintake",
+            "properties": {
+                "tool": "glassintake"
+            }
+        }
+    ],
     "maxstacksize": 1,
     "shape": { "base": "item/glassworkpipe" },
     "creativeinventory": {

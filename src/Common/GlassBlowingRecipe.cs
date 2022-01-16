@@ -1,11 +1,11 @@
 ﻿using GlassMaking.Common;
 using GlassMaking.Items;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
@@ -28,8 +28,6 @@ namespace GlassMaking
         [JsonProperty]
         public JsonGlassBlowingToolStep[] steps;
 
-        public GlassBlowingToolStep[] resolvedSteps;
-
         public AssetLocation Name { get; set; }
 
         public bool Enabled { get; set; } = true;
@@ -45,11 +43,10 @@ namespace GlassMaking
             return new Dictionary<string, string[]>();
         }
 
-        public GlassBlowingToolStep GetStep(ITreeAttribute recipeAttribute)
+        public int GetStepIndex(ITreeAttribute recipeAttribute)
         {
             int step = recipeAttribute.GetInt("step", 0);
-            if(step < 0 || step >= resolvedSteps.Length) return null;
-            return resolvedSteps[step];
+            return step < 0 || step >= steps.Length ? -1 : step;
         }
 
         public bool Resolve(IWorldAccessor world, string sourceForErrorLogging)
@@ -63,103 +60,77 @@ namespace GlassMaking
             {
                 return false;
             }
-            var system = world.Api.ModLoader.GetModSystem<GlassMakingMod>();
-            resolvedSteps = new GlassBlowingToolStep[steps.Length];
-            for(int i = 0; i < steps.Length; i++)
-            {
-                var tool = system.GetGlassBlowingTool(steps[i].tool);
-                if(tool == null)
-                {
-                    world.Logger.Error("Failed resolving a glassblowing tool with code {0} in {1}", steps[i].tool, sourceForErrorLogging);
-                    return false;
-                }
-                var step = tool.GetStepInstance();
-                step.tool = steps[i].tool;
-                step.shape = steps[i].shape;
-                if(!step.Resolve(steps[i].attributes, world, sourceForErrorLogging))
-                {
-                    return false;
-                }
-                resolvedSteps[i] = step;
-            }
             return true;
         }
 
-        public void GetRecipeInfo(ItemStack item, ITreeAttribute recipeAttribute, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
+        public void GetRecipeInfo(ITreeAttribute recipeAttribute, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
         {
             dsc.Append("Recipe: ").AppendLine(recipeAttribute.GetString("code"));
             int step = recipeAttribute.GetInt("step", 0);
-            dsc.Append("Step: ").Append(step + 1).AppendLine();
-            resolvedSteps[step].GetStepInfo(item, recipeAttribute["data"], dsc, world, withDebugInfo);
+            dsc.Append("Step ").Append(step + 1).Append('/').Append(steps.Length).AppendLine();
+            dsc.Append("Tool: ").Append(steps[step].tool).AppendLine();
         }
 
-        public WorldInteraction[] GetHeldInteractionHelp(ItemStack item, ITreeAttribute recipeAttribute)
+        public bool TryBeginStep(ItemSlot slot, int index)
         {
-            return GetStep(recipeAttribute).GetHeldInteractionHelp(item, recipeAttribute["data"]);
-        }
-
-        public void OnHeldInteractStart(ItemSlot slot, ITreeAttribute recipeAttribute, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling, out bool isRecipeComplete)
-        {
-            int step = recipeAttribute.GetInt("step", 0);
-            slot.Itemstack.TempAttributes.SetInt("glassblowingRecipeStep", step);
-
-            var data = recipeAttribute["data"];
-            var prevData = data;
-            resolvedSteps[step].OnHeldInteractStart(slot, ref data, byEntity, blockSel, entitySel, firstEvent, ref handling, out bool isComplete);
-            ApplyStepProperties(ref recipeAttribute, byEntity, step, prevData, data, isComplete);
-            isRecipeComplete = recipeAttribute == null;
-            if(isComplete) slot.MarkDirty();
-        }
-
-        public bool OnHeldInteractStep(float secondsUsed, ItemSlot slot, ITreeAttribute recipeAttribute, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, out bool isRecipeComplete)
-        {
-            int step = recipeAttribute.GetInt("step", 0);
-            if(slot.Itemstack.TempAttributes.GetInt("glassblowingRecipeStep", -1) != step)
+            int current = slot.Itemstack.TempAttributes.GetInt("glassmaking:blowingStep", 0);
+            if(current <= index)
             {
-                isRecipeComplete = false;
-                return false;
+                if(current < index)
+                {
+                    slot.Itemstack.TempAttributes.SetInt("glassmaking:blowingStep", index);
+                    slot.MarkDirty();
+                }
+                return true;
             }
+            return false;
+        }
 
-            var data = recipeAttribute["data"];
-            var prevData = data;
-            bool result = resolvedSteps[step].OnHeldInteractStep(secondsUsed, slot, ref data, byEntity, blockSel, entitySel, out bool isComplete);
-            ApplyStepProperties(ref recipeAttribute, byEntity, step, prevData, data, isComplete);
-            isRecipeComplete = recipeAttribute == null;
-            if(isComplete)
+        public bool IsCurrentStep(ItemSlot slot, int index)
+        {
+            return slot.Itemstack.TempAttributes.GetInt("glassmaking:blowingStep", 0) == index;
+        }
+
+        public void OnStepProgress(ItemSlot slot, float progress)
+        {
+            if(((ItemGlassworkPipe)slot.Itemstack.Collectible).TryGetRecipeAttribute(slot.Itemstack, out var recipeAttribute))
             {
+                recipeAttribute.SetFloat("progress", GameMath.Clamp(progress, 0, 1));
+                ((ItemGlassworkPipe)slot.Itemstack.Collectible).OnRecipeUpdated(slot, false);
                 slot.MarkDirty();
-                return false;
             }
-            return result;
         }
 
-        public void OnHeldInteractStop(float secondsUsed, ItemSlot slot, ITreeAttribute recipeAttribute, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel)
+        public void OnStepComplete(ItemSlot slot, EntityAgent byEntity)
         {
-            slot.Itemstack.TempAttributes.RemoveAttribute("glassblowingRecipeStep");
-            int step = recipeAttribute.GetInt("step", 0);
-            var data = recipeAttribute["data"];
-            var prevData = data;
-            resolvedSteps[step].OnHeldInteractStop(secondsUsed, slot, ref data, byEntity, blockSel, entitySel);
-            ApplyStepProperties(ref recipeAttribute, byEntity, step, prevData, data, false);
+            if(byEntity.Api.Side != EnumAppSide.Server) return;
+            if(((ItemGlassworkPipe)slot.Itemstack.Collectible).TryGetRecipeAttribute(slot.Itemstack, out var recipeAttribute))
+            {
+                int step = recipeAttribute.GetInt("step", 0) + 1;
+                if(step >= steps.Length)
+                {
+                    var item = output.ResolvedItemstack.Clone();
+                    if(!byEntity.TryGiveItemStack(item))
+                    {
+                        byEntity.World.SpawnItemEntity(item, byEntity.Pos.XYZ.Add(0.0, 0.5, 0.0));
+                    }
+                    slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:blowingStep");
+                    ((ItemGlassworkPipe)slot.Itemstack.Collectible).OnRecipeUpdated(slot, true);
+                }
+                else
+                {
+                    recipeAttribute.SetInt("step", step);
+                    recipeAttribute.RemoveAttribute("progress");
+                }
+                slot.MarkDirty();
+            }
         }
 
-        public bool OnHeldInteractCancel(float secondsUsed, ItemSlot slot, ITreeAttribute recipeAttribute, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, EnumItemUseCancelReason cancelReason)
-        {
-            slot.Itemstack.TempAttributes.RemoveAttribute("glassblowingRecipeStep");
-            int step = recipeAttribute.GetInt("step", 0);
-            var data = recipeAttribute["data"];
-            var prevData = data;
-            bool result = resolvedSteps[step].OnHeldInteractCancel(secondsUsed, slot, ref data, byEntity, blockSel, entitySel, cancelReason);
-            ApplyStepProperties(ref recipeAttribute, byEntity, step, prevData, data, false);
-            return result;
-        }
-
-        public void UpdateMesh(ItemStack item, ItemGlassworkPipe.IMeshContainer container, int glow, ITreeAttribute recipeAttribute)
+        public void UpdateMesh(ITreeAttribute recipeAttribute, ItemGlassworkPipe.IMeshContainer container, int glow)
         {
             string code = recipeAttribute.GetString("code");
             int step = recipeAttribute.GetInt("step", 0);
-            float t = resolvedSteps[step].GetMeshTransitionValue(item, recipeAttribute["data"]);
-            t = GameMath.Clamp(t, 0, 1);
+            float t = GameMath.Clamp(recipeAttribute.GetFloat("progress", 0), 0, 1);
 
             if(container.data == null || !(container.data is MeshInfo data))
             {
@@ -177,13 +148,13 @@ namespace GlassMaking
             SmoothRadialShape prevShape = null;
             for(int i = step - 1; i >= 0; i--)
             {
-                if(resolvedSteps[i].shape != null)
+                if(steps[i].shape != null)
                 {
-                    prevShape = resolvedSteps[i].shape;
+                    prevShape = steps[i].shape;
                     break;
                 }
             }
-            if(resolvedSteps[step].shape == null)
+            if(steps[step].shape == null)
             {
                 container.BeginMeshChange();
                 if(prevShape != null)
@@ -196,7 +167,7 @@ namespace GlassMaking
 
             if(prevShape == null) prevShape = EmptyShape;
             container.BeginMeshChange();
-            SmoothRadialShape.BuildLerpedMesh(container.mesh, prevShape, resolvedSteps[step].shape, t,
+            SmoothRadialShape.BuildLerpedMesh(container.mesh, prevShape, steps[step].shape, t,
                 (m, i, o) => GlasspipeRenderUtil.GenerateRadialVertices(m, i, o, glow), GlasspipeRenderUtil.GenerateRadialFaces);
             container.EndMeshChange();
         }
@@ -204,11 +175,10 @@ namespace GlassMaking
         public void ToBytes(BinaryWriter writer)
         {
             writer.Write(code);
-            writer.Write(resolvedSteps.Length);
-            for(int i = 0; i < resolvedSteps.Length; i++)
+            writer.Write(steps.Length);
+            for(int i = 0; i < steps.Length; i++)
             {
-                writer.Write(resolvedSteps[i].tool);
-                resolvedSteps[i].ToBytes(writer);
+                steps[i].ToBytes(writer);
             }
             output.ToBytes(writer);
         }
@@ -216,15 +186,11 @@ namespace GlassMaking
         public void FromBytes(BinaryReader reader, IWorldAccessor resolver)
         {
             code = reader.ReadAssetLocation();
-            resolvedSteps = new GlassBlowingToolStep[reader.ReadInt32()];
-            var system = resolver.Api.ModLoader.GetModSystem<GlassMakingMod>();
-            for(int i = 0; i < resolvedSteps.Length; i++)
+            steps = new JsonGlassBlowingToolStep[reader.ReadInt32()];
+            for(int i = 0; i < steps.Length; i++)
             {
-                var code = reader.ReadString();
-                var tool = system.GetGlassBlowingTool(code);
-                resolvedSteps[i] = tool.GetStepInstance();
-                resolvedSteps[i].tool = code;
-                resolvedSteps[i].FromBytes(reader, resolver);
+                steps[i] = new JsonGlassBlowingToolStep();
+                steps[i].FromBytes(reader);
             }
             output = new JsonItemStack();
             output.FromBytes(reader, resolver.ClassRegistry);
@@ -237,43 +203,13 @@ namespace GlassMaking
                 recipeId = recipeId,
                 code = code.Clone(),
                 output = output.Clone(),
-                resolvedSteps = Array.ConvertAll(resolvedSteps, CloneStep),
+                steps = Array.ConvertAll(steps, CloneStep),
                 Name = Name.Clone(),
                 Enabled = Enabled
             };
         }
 
-        private void ApplyStepProperties(ref ITreeAttribute recipeAttribute, EntityAgent byEntity, int step, IAttribute prevData, IAttribute data, bool isComplete)
-        {
-            if(isComplete && byEntity.Api.Side == EnumAppSide.Server)
-            {
-                step++;
-                if(step >= steps.Length)
-                {
-                    recipeAttribute = null;
-                    var item = output.ResolvedItemstack.Clone();
-                    if(!byEntity.TryGiveItemStack(item))
-                    {
-                        byEntity.World.SpawnItemEntity(item, byEntity.Pos.XYZ.Add(0.0, 0.5, 0.0));
-                    }
-                }
-                else
-                {
-                    if(prevData != null) recipeAttribute.RemoveAttribute("data");
-                    recipeAttribute.SetInt("step", step);
-                }
-            }
-            else
-            {
-                if(prevData != data)
-                {
-                    if(data == null) recipeAttribute.RemoveAttribute("data");
-                    else recipeAttribute["data"] = data;
-                }
-            }
-        }
-
-        private static GlassBlowingToolStep CloneStep(GlassBlowingToolStep other)
+        private static JsonGlassBlowingToolStep CloneStep(JsonGlassBlowingToolStep other)
         {
             return other.Clone();
         }
@@ -317,61 +253,37 @@ namespace GlassMaking
         [JsonProperty]
         [JsonConverter(typeof(JsonAttributesConverter))]
         public JsonObject attributes;
-    }
 
-    public abstract class GlassBlowingToolStep
-    {
-        public string tool;
-
-        public SmoothRadialShape shape;
-
-        public abstract bool Resolve(JsonObject attributes, IWorldAccessor world, string sourceForErrorLogging);
-
-        public virtual void ToBytes(BinaryWriter writer)
+        public void ToBytes(BinaryWriter writer)
         {
+            writer.Write(tool);
             writer.Write(shape != null);
             if(shape != null) shape.ToBytes(writer);
+            writer.Write(attributes != null);
+            if(attributes != null) writer.Write(attributes.Token.ToString());
         }
 
-        public virtual void FromBytes(BinaryReader reader, IWorldAccessor resolver)
+        public void FromBytes(BinaryReader reader)
         {
+            tool = reader.ReadString();
             if(reader.ReadBoolean())
             {
                 shape = new SmoothRadialShape();
                 shape.FromBytes(reader);
             }
+            if(reader.ReadBoolean())
+            {
+                attributes = new JsonObject(JToken.Parse(reader.ReadString()));
+            }
         }
 
-        public abstract GlassBlowingToolStep Clone();
-
-        public virtual void GetStepInfo(ItemStack item, IAttribute data, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo) { }
-
-        public virtual WorldInteraction[] GetHeldInteractionHelp(ItemStack item, IAttribute data) { return new WorldInteraction[0]; }
-
-        public virtual float GetMeshTransitionValue(ItemStack item, IAttribute data)
+        public JsonGlassBlowingToolStep Clone()
         {
-            return 0f;
-        }
-
-        public virtual void OnHeldInteractStart(ItemSlot slot, ref IAttribute data, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling, out bool isComplete)
-        {
-            isComplete = true;
-        }
-
-        public virtual bool OnHeldInteractStep(float secondsUsed, ItemSlot slot, ref IAttribute data, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, out bool isComplete)
-        {
-            isComplete = true;
-            return true;
-        }
-
-        public virtual void OnHeldInteractStop(float secondsUsed, ItemSlot slot, ref IAttribute data, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel)
-        {
-
-        }
-
-        public virtual bool OnHeldInteractCancel(float secondsUsed, ItemSlot slot, ref IAttribute data, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, EnumItemUseCancelReason cancelReason)
-        {
-            return true;
+            return new JsonGlassBlowingToolStep() {
+                tool = tool,
+                shape = shape.Clone(),
+                attributes = attributes?.Clone()
+            };
         }
     }
 }

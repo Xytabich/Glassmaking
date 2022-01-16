@@ -15,7 +15,6 @@ namespace GlassMaking
     {
         private ICoreServerAPI sapi;
         private RecipeRegistryDictionary<GlassBlowingRecipe> glassblowingRecipes;
-        private Dictionary<string, IGlassBlowingTool> tools = new Dictionary<string, IGlassBlowingTool>();
 
         public override void Start(ICoreAPI api)
         {
@@ -39,11 +38,9 @@ namespace GlassMaking
 
             api.RegisterBlockBehaviorClass("Horizontal2BMultiblock", typeof(BlockBehaviorHorizontal2BMultiblock));
 
-            api.RegisterCollectibleBehaviorClass("glassmaking:supplglassworktool", typeof(SupplementalGlassworkTool));
-
-            RegisterGlassBlowingTool("glassintake", new GlassIntakeTool());
-            RegisterGlassBlowingTool("blowing", new BlowingTool());
-            RegisterGlassBlowingTool("shears", new ShearsTool());
+            api.RegisterCollectibleBehaviorClass("glassmaking:gbt-shears", typeof(ShearsTool));
+            api.RegisterCollectibleBehaviorClass("glassmaking:gbt-blowing", typeof(BlowingTool));
+            api.RegisterCollectibleBehaviorClass("glassmaking:gbt-glassintake", typeof(GlassIntakeTool));
 
             glassblowingRecipes = api.RegisterRecipeRegistry<RecipeRegistryDictionary<GlassBlowingRecipe>>("glassblowing");
         }
@@ -61,11 +58,6 @@ namespace GlassMaking
             base.StartClientSide(api);
             api.Input.RegisterHotKey("itemrecipeselect", Lang.Get("Select Item Recipe"), GlKeys.F, HotkeyType.GUIOrOtherControls);
             api.Gui.RegisterDialog(new GuiDialogItemRecipeSelector(api));
-        }
-
-        public void RegisterGlassBlowingTool(string code, IGlassBlowingTool tool)
-        {
-            tools.Add(code.ToLowerInvariant(), tool);
         }
 
         public GlassBlowingRecipe GetGlassBlowingRecipe(string code)
@@ -89,15 +81,6 @@ namespace GlassMaking
         public IReadOnlyDictionary<string, GlassBlowingRecipe> GetGlassBlowingRecipes()
         {
             return glassblowingRecipes.Pairs;
-        }
-
-        public IGlassBlowingTool GetGlassBlowingTool(string code)
-        {
-            if(tools.TryGetValue(code.ToLowerInvariant(), out var tool))
-            {
-                return tool;
-            }
-            return null;
         }
 
         private void OnSaveGameLoaded()

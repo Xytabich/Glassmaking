@@ -130,8 +130,8 @@
     <Compile Include="src\Common\GlassMoldRecipe.cs" />
     <Compile Include="src\Common\GuiDialogItemRecipeSelector.cs" />
     <Compile Include="src\Common\HeatGraph.cs" />
-    <Compile Include="src\Common\IGlassBlowingTool.cs" />
     <Compile Include="src\Common\IItemCrafter.cs" />
+    <Compile Include="src\GlassblowingTools\GlassblowingToolBehavior.cs" />
     <Compile Include="src\Workbench\IWorkbenchTool.cs" />
     <Compile Include="src\Common\MinMaxFloat.cs" />
     <Compile Include="src\Common\RecipeRegistryDictionary.cs" />
@@ -150,7 +150,6 @@
     <Compile Include="src\GlassblowingTools\BlowingTool.cs" />
     <Compile Include="src\GlassblowingTools\GlassIntakeTool.cs" />
     <Compile Include="src\Items\ItemWorkbenchTool.cs" />
-    <Compile Include="src\Items\SupplementalGlassworkTool.cs" />
     <Compile Include="src\Utils.cs" />
     <Compile Include="src\Workbench\WorkbenchToolBehavior.cs" />
   </ItemGroup>
