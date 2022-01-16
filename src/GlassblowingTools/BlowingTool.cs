@@ -56,7 +56,7 @@ namespace GlassMaking.GlassblowingTools
                         byEntity.Controls.UsingHeldItemTransformBefore = modelTransform;
                     }
 
-                    float time = step.stepAttributes["time"].AsFloat();
+                    float time = step.stepAttributes["time"].AsFloat(1);
                     if(api.Side == EnumAppSide.Client)
                     {
                         step.SetProgress(Math.Max(secondsUsed - 1f, 0f) / time);

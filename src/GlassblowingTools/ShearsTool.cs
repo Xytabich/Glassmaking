@@ -6,31 +6,9 @@ namespace GlassMaking.GlassblowingTools
 {
     public class ShearsTool : GlassblowingToolBehavior
     {
-        //private WorldInteraction[] interactions;
-
         public ShearsTool(CollectibleObject collObj) : base(collObj)
         {
         }
-
-        //public override void OnLoaded(ICoreAPI api)
-        //{
-        //    List<ItemStack> list = new List<ItemStack>();
-        //    foreach(Item item in api.World.Items)
-        //    {
-        //        if(item is ItemShears tool && tool.ToolTier >= 4)
-        //        {
-        //            List<ItemStack> stacks = item.GetHandBookStacks(api);
-        //            if(stacks != null) list.AddRange(stacks);
-        //        }
-        //    }
-        //    interactions = new WorldInteraction[1] {
-        //        new WorldInteraction() {
-        //            ActionLangCode = "glassmaking:heldhelp-gbtool-shears",
-        //            MouseButton = EnumMouseButton.Right,
-        //            Itemstacks = list.ToArray()
-        //        }
-        //    };
-        //}
 
         public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling, ref EnumHandling handling)
         {
@@ -77,7 +55,7 @@ namespace GlassMaking.GlassblowingTools
                         byEntity.Controls.HandUse = EnumHandInteract.None;
                     }
 
-                    float time = step.stepAttributes["time"].AsFloat();
+                    float time = step.stepAttributes["time"].AsFloat(1);
                     if(api.Side == EnumAppSide.Client)
                     {
                         step.SetProgress(Math.Max(secondsUsed - 1f, 0f) / time);
