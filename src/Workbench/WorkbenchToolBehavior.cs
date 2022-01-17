@@ -1,37 +1,39 @@
-﻿using System;
+﻿using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
+using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Workbench
 {
     public abstract class WorkbenchToolBehavior
     {
-        public AssetLocation code;
+        public string toolCode;
 
         /// <summary>
         /// The block for this behavior instance.
         /// </summary>
         public BlockEntity Blockentity;
 
-        /// <summary>
-        /// The properties of this block behavior.
-        /// </summary>
-        public JsonObject properties;
-
         public ICoreAPI Api;
 
-        public WorkbenchToolBehavior(BlockEntity blockentity)
+        public ItemSlot slot;
+
+        protected Cuboidf[] boundingBoxes;
+
+        public WorkbenchToolBehavior(string toolCode, BlockEntity blockentity, Cuboidf[] boundingBoxes)
         {
+            this.toolCode = toolCode;
             this.Blockentity = blockentity;
+            this.boundingBoxes = boundingBoxes;
         }
 
         /// <summary>
-        /// Called right after the block behavior was created
+        /// Called right after the tool behavior was created
         /// </summary>
-        /// <param name="properties"></param>
-        public virtual void OnLoaded(ICoreAPI api, JsonObject properties)
+        public virtual void OnLoaded(ICoreAPI api, ItemSlot slot)
         {
             this.Api = api;
+            this.slot = slot;
         }
 
         public virtual void OnUnloaded()
@@ -62,14 +64,24 @@ namespace GlassMaking.Workbench
             return false;
         }
 
-        public virtual void FromAttribute(IAttribute attribute, IWorldAccessor worldForResolving)
-        {
 
-        }
-
-        public virtual IAttribute ToAttribute()
+        public virtual WorldInteraction[] GetPlacedBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer)
         {
             return null;
+        }
+
+        public virtual ITreeAttribute ToAttribute()
+        {
+            return null;
+        }
+
+        public virtual void FromAttribute(IAttribute tree, IWorldAccessor worldAccessForResolve)
+        {
+        }
+
+        public virtual Cuboidf[] GetBoundingBoxes()
+        {
+            return boundingBoxes;
         }
 
         public virtual void OnBlockRemoved()
