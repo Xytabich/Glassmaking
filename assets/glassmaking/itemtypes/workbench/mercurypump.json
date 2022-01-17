@@ -6,19 +6,19 @@
     "attributes": {
         "workbenchTool": {
             "code": "vacuumpump",
-            "attributes": { "value": 1000000 },
-            "boundingBoxes": [
-                {
-                    "x1": 0.65625,
-                    "x2": 0.84375,
-                    "y1": 1.0,
-                    "y2": 2.0,
-                    "z1": 0.15625,
-                    "z2": 0.34375
-                }
-            ]
+            "attributes": { "value": 1000000 }
         },
-        "workbenchTransform": {
+        "workbenchToolBounds": [
+            {
+                "x1": 0.65625,
+                "x2": 0.84375,
+                "y1": 1.0,
+                "y2": 2.0,
+                "z1": 0.15625,
+                "z2": 0.34375
+            }
+        ],
+        "workbenchToolTransform": {
             "translation": {
                 "x": 0.25,
                 "y": 1,

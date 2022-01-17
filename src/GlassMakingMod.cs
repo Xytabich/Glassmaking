@@ -15,6 +15,7 @@ namespace GlassMaking
     {
         private ICoreServerAPI sapi;
         private RecipeRegistryDictionary<GlassBlowingRecipe> glassblowingRecipes;
+        private RecipeRegistryDictionary<WorkbenchRecipe> workbenchRecipes;
 
         public override void Start(ICoreAPI api)
         {
@@ -43,6 +44,7 @@ namespace GlassMaking
             api.RegisterCollectibleBehaviorClass("glassmaking:gbt-glassintake", typeof(GlassIntakeTool));
 
             glassblowingRecipes = api.RegisterRecipeRegistry<RecipeRegistryDictionary<GlassBlowingRecipe>>("glassblowing");
+            workbenchRecipes = api.RegisterRecipeRegistry<RecipeRegistryDictionary<WorkbenchRecipe>>("glassworkbench");
         }
 
         public override void StartServerSide(ICoreServerAPI api)
@@ -78,6 +80,24 @@ namespace GlassMaking
             return null;
         }
 
+        public WorkbenchRecipe GetWorkbenchRecipe(string code)
+        {
+            if(workbenchRecipes.Pairs.TryGetValue(code, out var recipe))
+            {
+                return recipe;
+            }
+            return null;
+        }
+
+        public WorkbenchRecipe GetWorkbenchRecipe(AssetLocation code)
+        {
+            if(workbenchRecipes.Pairs.TryGetValue(code.ToShortString(), out var recipe))
+            {
+                return recipe;
+            }
+            return null;
+        }
+
         public IReadOnlyDictionary<string, GlassBlowingRecipe> GetGlassBlowingRecipes()
         {
             return glassblowingRecipes.Pairs;
@@ -86,12 +106,19 @@ namespace GlassMaking
         private void OnSaveGameLoaded()
         {
             sapi.ModLoader.GetModSystem<RecipeLoader>().LoadRecipes<GlassBlowingRecipe>("glassblowing recipe", "recipes/glassblowing", RegisterGlassblowingRecipe);
+            sapi.ModLoader.GetModSystem<RecipeLoader>().LoadRecipes<WorkbenchRecipe>("glassworkbench recipe", "recipes/glassworkbench", RegisterWorkbenchRecipe);
         }
 
         private void RegisterGlassblowingRecipe(GlassBlowingRecipe r)
         {
             r.recipeId = glassblowingRecipes.Recipes.Count;
             glassblowingRecipes.AddRecipe(r);
+        }
+
+        private void RegisterWorkbenchRecipe(WorkbenchRecipe r)
+        {
+            r.recipeId = workbenchRecipes.Recipes.Count;
+            workbenchRecipes.AddRecipe(r);
         }
     }
 }

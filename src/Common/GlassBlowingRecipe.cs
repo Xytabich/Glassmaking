@@ -26,7 +26,7 @@ namespace GlassMaking
         public JsonItemStack output;
 
         [JsonProperty]
-        public JsonGlassBlowingToolStep[] steps;
+        public GlassBlowingRecipeStep[] steps;
 
         public AssetLocation Name { get; set; }
 
@@ -186,10 +186,10 @@ namespace GlassMaking
         public void FromBytes(BinaryReader reader, IWorldAccessor resolver)
         {
             code = reader.ReadAssetLocation();
-            steps = new JsonGlassBlowingToolStep[reader.ReadInt32()];
+            steps = new GlassBlowingRecipeStep[reader.ReadInt32()];
             for(int i = 0; i < steps.Length; i++)
             {
-                steps[i] = new JsonGlassBlowingToolStep();
+                steps[i] = new GlassBlowingRecipeStep();
                 steps[i].FromBytes(reader);
             }
             output = new JsonItemStack();
@@ -209,7 +209,7 @@ namespace GlassMaking
             };
         }
 
-        private static JsonGlassBlowingToolStep CloneStep(JsonGlassBlowingToolStep other)
+        private static GlassBlowingRecipeStep CloneStep(GlassBlowingRecipeStep other)
         {
             return other.Clone();
         }
@@ -242,9 +242,9 @@ namespace GlassMaking
     }
 
     [JsonObject]
-    public sealed class JsonGlassBlowingToolStep
+    public sealed class GlassBlowingRecipeStep
     {
-        [JsonProperty]
+        [JsonProperty(Required = Required.Always)]
         public string tool;
 
         [JsonProperty]
@@ -277,9 +277,9 @@ namespace GlassMaking
             }
         }
 
-        public JsonGlassBlowingToolStep Clone()
+        public GlassBlowingRecipeStep Clone()
         {
-            return new JsonGlassBlowingToolStep() {
+            return new GlassBlowingRecipeStep() {
                 tool = tool,
                 shape = shape.Clone(),
                 attributes = attributes?.Clone()

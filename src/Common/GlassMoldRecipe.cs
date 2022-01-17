@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Vintagestory.API.Common;
 
-namespace GlassMaking.Common
+namespace GlassMaking
 {
     [JsonObject]
     public class GlassMoldRecipe

@@ -14,12 +14,21 @@ namespace GlassMaking.Blocks
     {
         public override InventoryBase Inventory => inventory;
         public override string InventoryClassName => "glassmaking:workbench";
-        public override string AttributeTransformCode => "workbenchTransform";
+        public override string AttributeTransformCode => "workbenchToolTransform";
 
         protected virtual int itemCapacity => 9;
 
+        private GlassMakingMod mod;
+
+        private WorkbenchRecipe recipe = null;
+        private int recipeStep = 0;
+        private int startedStep = -1;
+
+        private int blockBoxesCount = 0;
         private SelectionInfo[] toolsSelection;
         private WorkbenchToolsInventory inventory;
+
+        private ItemStack ingredient = null;
 
         private Cuboidf[] selectionBoxes;
         private Dictionary<string, WorkbenchToolBehavior> tools = new Dictionary<string, WorkbenchToolBehavior>();
@@ -33,6 +42,7 @@ namespace GlassMaking.Blocks
 
         public override void Initialize(ICoreAPI api)
         {
+            mod = api.ModLoader.GetModSystem<GlassMakingMod>();
             base.Initialize(api);
             for(int i = itemCapacity - 1; i >= 0; i--)
             {
@@ -46,7 +56,205 @@ namespace GlassMaking.Blocks
             RebuildSelectionBoxes();
         }
 
-        public bool OnUseItem(IPlayer byPlayer, ItemSlot slot)
+        public WorldInteraction[] GetBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer)
+        {
+            if(selection.SelectionBoxIndex < blockBoxesCount)
+            {
+                //TODO: if recipe - show recipe help
+            }
+            else
+            {
+                for(int i = 0; i < toolsSelection.Length; i++)
+                {
+                    if(toolsSelection[i] != null && toolsSelection[i].index >= selection.SelectionBoxIndex &&
+                        selection.SelectionBoxIndex < (toolsSelection[i].index + toolsSelection[i].boxes.Length))
+                    {
+                        selection = selection.Clone();
+                        selection.SelectionBoxIndex -= toolsSelection[i].index;
+                        return inventory.GetBehavior(i).GetBlockInteractionHelp(world, selection, forPlayer);
+                    }
+                }
+            }
+            return null;
+        }
+
+        public bool OnBlockInteractStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection selection, ref EnumHandling handling)
+        {
+            handling = EnumHandling.PassThrough;
+            ItemSlot slot = byPlayer.InventoryManager.ActiveHotbarSlot;
+            if(selection.SelectionBoxIndex < blockBoxesCount)
+            {
+                if(byPlayer.Entity.Controls.Sneak)
+                {
+                    if(slot.Itemstack == null && ingredient != null)
+                    {
+                        slot.Itemstack = ingredient.Clone();
+                        ingredient = null;
+                        recipe = null;
+                        MarkDirty(true);
+                        handling = EnumHandling.PreventSubsequent;
+                        return false;
+                    }
+                }
+                else if(recipe != null)
+                {
+                    startedStep = recipeStep;
+                    if(tools.TryGetValue(recipe.steps[recipeStep].tool, out var tool))
+                    {
+                        selection = selection.Clone();
+                        selection.SelectionBoxIndex = -1;
+                        var behResult = tool.OnBlockInteractStart(world, byPlayer, selection, ref handling);
+                        if(handling != EnumHandling.PassThrough) return behResult;
+                    }
+                    handling = EnumHandling.PreventSubsequent;
+                    return false;
+                }
+            }
+            else
+            {
+                for(int i = 0; i < toolsSelection.Length; i++)
+                {
+                    if(toolsSelection[i] != null && toolsSelection[i].index >= selection.SelectionBoxIndex &&
+                        selection.SelectionBoxIndex < (toolsSelection[i].index + toolsSelection[i].boxes.Length))
+                    {
+                        if(byPlayer.Entity.Controls.Sneak)
+                        {
+                            //TODO: remove tool & recalc
+                            handling = EnumHandling.PreventSubsequent;
+                            return false;
+                        }
+                        else
+                        {
+                            selection = selection.Clone();
+                            selection.SelectionBoxIndex -= toolsSelection[i].index;
+                            var behResult = inventory.GetBehavior(i).OnBlockInteractStart(world, byPlayer, selection, ref handling);
+                            if(handling != EnumHandling.PassThrough) return behResult;
+                        }
+                        break;
+                    }
+                }
+            }
+
+            ItemStack itemstack = slot.Itemstack;
+            if(itemstack != null)
+            {
+                if(byPlayer.Entity.Controls.Sneak && OnUseItem(byPlayer, slot))
+                {
+                    if(world.Side == EnumAppSide.Client)
+                    {
+                        ((IClientPlayer)byPlayer).TriggerFpAnimation(EnumHandInteract.HeldItemInteract);
+                    }
+                    handling = EnumHandling.PreventSubsequent;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool OnBlockInteractStep(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection selection, ref EnumHandling handling)
+        {
+            handling = EnumHandling.PassThrough;
+            if(selection.SelectionBoxIndex < blockBoxesCount)
+            {
+                if(recipe != null && startedStep == recipeStep)
+                {
+                    if(tools.TryGetValue(recipe.steps[recipeStep].tool, out var tool))
+                    {
+                        selection = selection.Clone();
+                        selection.SelectionBoxIndex = -1;
+                        return tool.OnBlockInteractStep(secondsUsed, world, byPlayer, selection, ref handling);
+                    }
+                    else
+                    {
+                        handling = EnumHandling.PreventSubsequent;
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                for(int i = 0; i < toolsSelection.Length; i++)
+                {
+                    if(toolsSelection[i] != null && toolsSelection[i].index >= selection.SelectionBoxIndex &&
+                        selection.SelectionBoxIndex < (toolsSelection[i].index + toolsSelection[i].boxes.Length))
+                    {
+                        selection = selection.Clone();
+                        selection.SelectionBoxIndex -= toolsSelection[i].index;
+                        return inventory.GetBehavior(i).OnBlockInteractStep(secondsUsed, world, byPlayer, selection, ref handling);
+                    }
+                }
+            }
+            return false;
+        }
+
+        public void OnBlockInteractStop(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection selection, ref EnumHandling handling)
+        {
+            handling = EnumHandling.PassThrough;
+            if(selection.SelectionBoxIndex < blockBoxesCount)
+            {
+                if(recipe != null && startedStep == recipeStep)
+                {
+                    if(tools.TryGetValue(recipe.steps[recipeStep].tool, out var tool))
+                    {
+                        selection = selection.Clone();
+                        selection.SelectionBoxIndex = -1;
+                        tool.OnBlockInteractStop(secondsUsed, world, byPlayer, selection, ref handling);
+                    }
+                    handling = EnumHandling.PreventSubsequent;
+                }
+            }
+            else
+            {
+                for(int i = 0; i < toolsSelection.Length; i++)
+                {
+                    if(toolsSelection[i] != null && toolsSelection[i].index >= selection.SelectionBoxIndex &&
+                        selection.SelectionBoxIndex < (toolsSelection[i].index + toolsSelection[i].boxes.Length))
+                    {
+                        selection = selection.Clone();
+                        selection.SelectionBoxIndex -= toolsSelection[i].index;
+                        inventory.GetBehavior(i).OnBlockInteractStop(secondsUsed, world, byPlayer, selection, ref handling);
+                    }
+                }
+            }
+        }
+
+        public bool OnBlockInteractCancel(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection selection, ref EnumHandling handling)
+        {
+            handling = EnumHandling.PassThrough;
+            if(selection.SelectionBoxIndex < blockBoxesCount)
+            {
+                if(recipe != null && startedStep == recipeStep)
+                {
+                    if(tools.TryGetValue(recipe.steps[recipeStep].tool, out var tool))
+                    {
+                        selection = selection.Clone();
+                        selection.SelectionBoxIndex = -1;
+                        return tool.OnBlockInteractCancel(secondsUsed, world, byPlayer, selection, ref handling);
+                    }
+                    else
+                    {
+                        handling = EnumHandling.PreventSubsequent;
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                for(int i = 0; i < toolsSelection.Length; i++)
+                {
+                    if(toolsSelection[i] != null && toolsSelection[i].index >= selection.SelectionBoxIndex &&
+                        selection.SelectionBoxIndex < (toolsSelection[i].index + toolsSelection[i].boxes.Length))
+                    {
+                        selection = selection.Clone();
+                        selection.SelectionBoxIndex -= toolsSelection[i].index;
+                        return inventory.GetBehavior(i).OnBlockInteractCancel(secondsUsed, world, byPlayer, selection, ref handling);
+                    }
+                }
+            }
+            return false;
+        }
+
+        private bool OnUseItem(IPlayer byPlayer, ItemSlot slot)
         {
             if(!(slot.Itemstack.Collectible is IWorkbenchTool tool)) return false;
             var world = byPlayer.Entity.World;
@@ -97,9 +305,17 @@ namespace GlassMaking.Blocks
 
         public override void FromTreeAttributes(ITreeAttribute tree, IWorldAccessor worldForResolving)
         {
+            var code = tree.GetString("recipe");
+            if(!string.IsNullOrEmpty(code))
+            {
+                recipe = mod.GetWorkbenchRecipe(code);
+                recipeStep = tree.GetInt("step");
+            }
             base.FromTreeAttributes(tree, worldForResolving);
+            ingredient = tree.GetItemstack("ingredient");
             if(Api?.World != null)
             {
+                ingredient.ResolveBlockOrItem(Api.World);
                 if(inventory.modifiedSlots.Count > 0)
                 {
                     tools.Clear();
@@ -114,6 +330,35 @@ namespace GlassMaking.Blocks
                     }
                     RebuildSelectionBoxes();
                 }
+            }
+        }
+
+        public override void ToTreeAttributes(ITreeAttribute tree)
+        {
+            base.ToTreeAttributes(tree);
+            tree.SetItemstack("ingredient", ingredient);
+            if(recipe != null)
+            {
+                tree.SetString("recipe", recipe.code.ToShortString());
+                tree.SetInt("step", recipeStep);
+            }
+        }
+
+        public override void OnLoadCollectibleMappings(IWorldAccessor worldForResolve, Dictionary<int, AssetLocation> oldBlockIdMapping, Dictionary<int, AssetLocation> oldItemIdMapping, int schematicSeed)
+        {
+            base.OnLoadCollectibleMappings(worldForResolve, oldBlockIdMapping, oldItemIdMapping, schematicSeed);
+            if(ingredient != null)
+            {
+                ingredient.Collectible.OnLoadCollectibleMappings(worldForResolve, new DummySlot(ingredient), oldBlockIdMapping, oldItemIdMapping);
+            }
+        }
+
+        public override void OnStoreCollectibleMappings(Dictionary<int, AssetLocation> blockIdMapping, Dictionary<int, AssetLocation> itemIdMapping)
+        {
+            base.OnStoreCollectibleMappings(blockIdMapping, itemIdMapping);
+            if(ingredient != null)
+            {
+                ingredient.Collectible.OnStoreCollectibleMappings(Api.World, new DummySlot(ingredient), blockIdMapping, itemIdMapping);
             }
         }
 
@@ -204,6 +449,7 @@ namespace GlassMaking.Blocks
             var boxes = new List<Cuboidf>();
             if(Block.SelectionBoxes != null) boxes.AddRange(Block.SelectionBoxes);
             else boxes.Add(Block.DefaultCollisionBox);
+            blockBoxesCount = boxes.Count;
             for(int i = itemCapacity - 1; i >= 0; i--)
             {
                 var tool = inventory.GetBehavior(i);

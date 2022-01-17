@@ -1,5 +1,4 @@
-﻿using Vintagestory.API.Client;
-using Vintagestory.API.Common;
+﻿using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Blocks
@@ -8,25 +7,50 @@ namespace GlassMaking.Blocks
     {
         public override bool OnBlockInteractStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)
         {
-            ItemSlot slot = byPlayer.InventoryManager.ActiveHotbarSlot;
-            ItemStack itemstack = slot.Itemstack;
-            if(itemstack != null)
+            var be = world.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityWorkbench;
+            if(be != null)
             {
-                blockSel = GetMainBlockSelection(blockSel);
-                var be = world.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityWorkbench;
-                if(be != null)
-                {
-                    if(be.OnUseItem(byPlayer, slot))
-                    {
-                        if(world.Side == EnumAppSide.Client)
-                        {
-                            ((IClientPlayer)byPlayer).TriggerFpAnimation(EnumHandInteract.HeldItemInteract);
-                        }
-                        return true;
-                    }
-                }
+                var handling = EnumHandling.PassThrough;
+                bool result = be.OnBlockInteractStart(world, byPlayer, blockSel, ref handling);
+                if(handling != EnumHandling.PassThrough) return result;
             }
             return base.OnBlockInteractStart(world, byPlayer, blockSel);
+        }
+
+        public override bool OnBlockInteractStep(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)
+        {
+            var be = world.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityWorkbench;
+            if(be != null)
+            {
+                var handling = EnumHandling.PassThrough;
+                bool result = be.OnBlockInteractStep(secondsUsed, world, byPlayer, blockSel, ref handling);
+                if(handling != EnumHandling.PassThrough) return result;
+            }
+            return base.OnBlockInteractStep(secondsUsed, world, byPlayer, blockSel);
+        }
+
+        public override void OnBlockInteractStop(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)
+        {
+            var be = world.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityWorkbench;
+            if(be != null)
+            {
+                var handling = EnumHandling.PassThrough;
+                be.OnBlockInteractStop(secondsUsed, world, byPlayer, blockSel, ref handling);
+                if(handling != EnumHandling.PassThrough) return;
+            }
+            base.OnBlockInteractStop(secondsUsed, world, byPlayer, blockSel);
+        }
+
+        public override bool OnBlockInteractCancel(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, EnumItemUseCancelReason cancelReason)
+        {
+            var be = world.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityWorkbench;
+            if(be != null)
+            {
+                var handling = EnumHandling.PassThrough;
+                bool result = be.OnBlockInteractCancel(secondsUsed, world, byPlayer, blockSel, ref handling);
+                if(handling != EnumHandling.PassThrough) return result;
+            }
+            return base.OnBlockInteractCancel(secondsUsed, world, byPlayer, blockSel, cancelReason);
         }
 
         public override Cuboidf[] GetSelectionBoxes(IBlockAccessor blockAccessor, BlockPos pos)

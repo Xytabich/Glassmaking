@@ -132,6 +132,7 @@
     <Compile Include="src\Common\GuiDialogItemRecipeSelector.cs" />
     <Compile Include="src\Common\HeatGraph.cs" />
     <Compile Include="src\Common\IItemCrafter.cs" />
+    <Compile Include="src\Common\WorkbenchRecipe.cs" />
     <Compile Include="src\GlassblowingTools\GlassblowingToolBehavior.cs" />
     <Compile Include="src\Workbench\IWorkbenchTool.cs" />
     <Compile Include="src\Common\MinMaxFloat.cs" />
