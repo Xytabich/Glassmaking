@@ -2,6 +2,8 @@
 using GlassMaking.Common;
 using GlassMaking.GlassblowingTools;
 using GlassMaking.Items;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
@@ -16,10 +18,28 @@ namespace GlassMaking
         private ICoreServerAPI sapi;
         private RecipeRegistryDictionary<GlassBlowingRecipe> glassblowingRecipes;
         private RecipeRegistryDictionary<WorkbenchRecipe> workbenchRecipes;
+        private Dictionary<AssetLocation, GlassTypeVariant> glassTypes;
 
         public override void Start(ICoreAPI api)
         {
             base.Start(api);
+            glassTypes = new Dictionary<AssetLocation, GlassTypeVariant>();
+            var glassTypeProperties = api.Assets.GetMany<JToken>(api.Logger, "worldproperties/abstract/glasstype.json");
+            foreach(var pair in glassTypeProperties)
+            {
+                try
+                {
+                    var property = pair.Value.ToObject<GlassTypeProperty>(pair.Key.Domain);
+                    foreach(var type in property.Variants)
+                    {
+                        glassTypes[type.Code.Clone()] = type;
+                    }
+                }
+                catch(JsonReaderException ex)
+                {
+                    api.Logger.Error("Syntax error in json file '{0}': {1}", pair.Key, ex.Message);
+                }
+            }
 
             api.RegisterItemClass("glassmaking:glassworkpipe", typeof(ItemGlassworkPipe));
             api.RegisterItemClass("glassmaking:glassblend", typeof(ItemGlassBlend));
@@ -101,6 +121,11 @@ namespace GlassMaking
         public IReadOnlyDictionary<string, GlassBlowingRecipe> GetGlassBlowingRecipes()
         {
             return glassblowingRecipes.Pairs;
+        }
+
+        public IReadOnlyDictionary<AssetLocation, GlassTypeVariant> GetGlassTypes()
+        {
+            return glassTypes;
         }
 
         private void OnSaveGameLoaded()

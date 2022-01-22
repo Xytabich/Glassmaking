@@ -77,31 +77,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="modinfo.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="assets\glassmaking\blocktypes\firebox.json" />
-    <Content Include="assets\glassmaking\blocktypes\glass-smeltery.json" />
-    <Content Include="assets\glassmaking\blocktypes\temperingoven.json" />
-    <Content Include="assets\glassmaking\blocktypes\workbench.json" />
-    <Content Include="assets\glassmaking\itemtypes\workbench\mercurypump.json" />
-    <Content Include="assets\glassmaking\itemtypes\glassshards.json" />
-    <Content Include="assets\glassmaking\itemtypes\glassworkpipe.json" />
-    <Content Include="assets\glassmaking\lang\en.json" />
-    <Content Include="assets\glassmaking\patches\glassBubblingReducer.json" />
-    <Content Include="assets\glassmaking\patches\suppltools.json" />
-    <Content Include="assets\glassmaking\recipes\grid\breakglass.json" />
-    <Content Include="assets\glassmaking\shapes\block\firebox.json" />
-    <Content Include="assets\glassmaking\shapes\block\smeltery\bath.json" />
-    <Content Include="assets\glassmaking\shapes\block\smeltery\cover.json" />
-    <Content Include="assets\glassmaking\shapes\block\smeltery\item.json" />
-    <Content Include="assets\glassmaking\shapes\block\tempering-oven.json" />
-    <Content Include="assets\glassmaking\shapes\block\workbench\item.json" />
-    <Content Include="assets\glassmaking\shapes\block\workbench\other.json" />
-    <Content Include="assets\glassmaking\shapes\block\workbench\main.json" />
-    <Content Include="assets\glassmaking\shapes\block\workbench\tools\mercurypump.json" />
-    <Content Include="assets\glassmaking\shapes\item\glassworkpipe.json" />
-    <Content Include="assets\glassmaking\shapes\item\resource\crushed\glassshards.json" />
-    <Content Include="assets\glassmaking\textures\item\resource\crushed\glassshards.png" />
+    <Content Include="assets\**\*.*" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\Blocks\BlockGlassBlowingMold.cs" />
@@ -129,6 +105,7 @@
     <Compile Include="src\Common\GlassBlend.cs" />
     <Compile Include="src\Common\GlassBlowingRecipe.cs" />
     <Compile Include="src\Common\GlassMoldRecipe.cs" />
+    <Compile Include="src\Common\GlassTypeProperty.cs" />
     <Compile Include="src\Common\GuiDialogItemRecipeSelector.cs" />
     <Compile Include="src\Common\HeatGraph.cs" />
     <Compile Include="src\Common\IItemCrafter.cs" />
@@ -155,7 +132,9 @@
     <Compile Include="src\Utils.cs" />
     <Compile Include="src\Workbench\WorkbenchToolBehavior.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="assets\game\worldproperties\abstract\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

@@ -1,3 +1,5 @@
 {
-	"melts into {0} units of {1}": "Melts into {0} units of {1}"
+    "glassmaking:melts into {0} units of {1}": "Melts into {0} units of {1}",
+    "glassmaking:glassshards": "Glass Shards ({0})",
+    "game:glassblend-plain": "Plain"
 }

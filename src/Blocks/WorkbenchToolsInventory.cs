@@ -1,6 +1,5 @@
 ﻿using GlassMaking.Workbench;
 using System;
-using System.Collections.Generic;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
 
@@ -23,6 +22,7 @@ namespace GlassMaking.Blocks
             this.blockentity = blockentity;
             slots = GenEmptySlots(quantitySlots);
             cachedAttributes = new IAttribute[quantitySlots];
+            behaviors = new WorkbenchToolBehavior[quantitySlots];
         }
 
         public WorkbenchToolsInventory(int quantitySlots, string inventoryID, ICoreAPI api, BlockEntity blockentity) : base(inventoryID, api)
@@ -30,6 +30,7 @@ namespace GlassMaking.Blocks
             this.blockentity = blockentity;
             slots = GenEmptySlots(quantitySlots);
             cachedAttributes = new IAttribute[quantitySlots];
+            behaviors = new WorkbenchToolBehavior[quantitySlots];
         }
 
         public override ItemSlot this[int slotId]

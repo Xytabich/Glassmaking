@@ -1,9 +1,13 @@
 {
-    "code": "glassshards",
+    "code": "glassblend",
     "class": "glassmaking:glassblend",
     "heldTpIdleAnimation": "holdbothhands",
     "shape": { "base": "item/resource/crushed/glassshards" },
     "attributes": {
+        "glassmaking:glassblend": {
+            "code": "game:{glasstype}",
+            "amount": 5
+        },
         "displaycaseable": true,
         "shelvable": true,
         "onDisplayTransform": {
@@ -20,7 +24,20 @@
             "scale": 0.65
         }
     },
-    "creativeinventory": {},
+    "textures": {
+        "material": { "base": "game:block/glass/{glasstype}" },
+        "basemat": { "base": "game:item/resource/crushed/quartz" }
+    },
+    "variantgroups": [
+        {
+            "code": "glasstype",
+            "loadFromProperties": "game:abstract/glasstype"
+        }
+    ],
+    "creativeinventory": {
+        "general": [ "*" ],
+        "items": [ "*" ]
+    },
     "maxstacksize": 64,
     "materialDensity": 500,
     "guiTransform": {

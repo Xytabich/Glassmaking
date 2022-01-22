@@ -228,7 +228,14 @@ namespace GlassMaking.Blocks
 
         private GlassMoldRecipe GetRecipe()
         {
-            if(recipe == null) recipe = Block.Attributes?["glassmold"].AsObject<GlassMoldRecipe>(null, Block.Code.Domain);
+            if(recipe == null)
+            {
+                recipe = Block.Attributes?["glassmold"].AsObject<GlassMoldRecipe>(null, Block.Code.Domain);
+                if(recipe!=null)
+                {
+
+                }
+            }
             return recipe;
         }
 

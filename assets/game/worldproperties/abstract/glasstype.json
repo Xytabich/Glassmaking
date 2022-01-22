@@ -1,0 +1,14 @@
+{
+    "code": "glasstype",
+    "variants": [
+        { "code": "plain" },
+        { "code": "quartz" },
+        { "code": "smoky" },
+        { "code": "red" },
+        { "code": "green" },
+        { "code": "blue" },
+        { "code": "yellow" },
+        { "code": "brown" },
+        { "code": "pink" }
+    ]
+}
