@@ -197,7 +197,7 @@ namespace GlassMaking.Blocks
 
         public bool IsHeatedUp()
         {
-            return temperature > 20;
+            return CalcCurrentTemperature() > 25;
         }
 
         public float GetTemperature()
@@ -229,7 +229,7 @@ namespace GlassMaking.Blocks
                 if(temp < fuelTemperature)
                 {
                     double time = Math.Min((fuelTemperature - temp) / TEMP_INCREASE_PER_HOUR, Math.Min(hours, burnTime));
-                    temp -= (float)(time * TEMP_INCREASE_PER_HOUR);
+                    temp += (float)(time * TEMP_INCREASE_PER_HOUR);
                     hours -= time;
                     burnTime -= time;
                     graph.transitionTime = time;
@@ -268,7 +268,7 @@ namespace GlassMaking.Blocks
                 if(temp < fuelTemperature)
                 {
                     double time = Math.Min((fuelTemperature - temp) / TEMP_INCREASE_PER_HOUR, Math.Min(hours, burnTime));
-                    temp -= (float)(time * TEMP_INCREASE_PER_HOUR);
+                    temp += (float)(time * TEMP_INCREASE_PER_HOUR);
                     hours -= time;
                     burnTime -= time;
                 }

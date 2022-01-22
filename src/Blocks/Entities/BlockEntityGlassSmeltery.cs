@@ -294,12 +294,13 @@ namespace GlassMaking.Blocks
 
         void ITimeBasedHeatReceiver.OnHeatSourceTick(float dt)
         {
-            if(state != SmelteryState.Empty && heatSource.IsHeatedUp())
+            if(state != SmelteryState.Empty && state != SmelteryState.ContainsGlass && heatSource.IsHeatedUp())
             {
                 double timeOffset = 0;
+                var graph = heatSource.CalcHeatGraph();
                 if(state == SmelteryState.ContainsMix)
                 {
-                    if(Api.Side == EnumAppSide.Server && heatSource.CalcHeatGraph().CalcTemperatureHoldTime(timeOffset, MELTING_TEMPERATURE) > 0)
+                    if(Api.Side == EnumAppSide.Server && graph.CalcTemperatureHoldTime(timeOffset, MELTING_TEMPERATURE) > 0)
                     {
                         state = SmelteryState.Melting;
                         processProgress = 0;
@@ -311,7 +312,7 @@ namespace GlassMaking.Blocks
                 if(state == SmelteryState.Melting)
                 {
                     double timeLeft = glassAmount * PROCESS_HOURS_PER_UNIT - processProgress;
-                    double time = heatSource.CalcHeatGraph().CalcTemperatureHoldTime(timeOffset, MELTING_TEMPERATURE);
+                    double time = graph.CalcTemperatureHoldTime(timeOffset, MELTING_TEMPERATURE);
                     processProgress += Math.Min(time, timeLeft);
                     if(Api.Side == EnumAppSide.Server && time >= timeLeft)
                     {
@@ -324,7 +325,7 @@ namespace GlassMaking.Blocks
                 if(state == SmelteryState.Bubbling)
                 {
                     double timeLeft = glassAmount * PROCESS_HOURS_PER_UNIT * BUBBLING_PROCESS_MULTIPLIER - processProgress;
-                    double time = heatSource.CalcHeatGraph().CalcTemperatureHoldTime(timeOffset, BUBBLING_TEMPERATURE);
+                    double time = graph.CalcTemperatureHoldTime(timeOffset, BUBBLING_TEMPERATURE);
                     processProgress += Math.Min(time, timeLeft);
                     if(Api.Side == EnumAppSide.Server && time >= timeLeft)
                     {
