@@ -1,5 +1,4 @@
 ﻿using GlassMaking.Common;
-using System;
 using System.Collections.Generic;
 using System.Text;
 using Vintagestory.API.Client;
@@ -81,13 +80,18 @@ namespace GlassMaking.Items
             if(blend == null) blend = GlassBlend.FromTreeAttributes(inSlot.Itemstack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
             if(blend != null && blend.amount > 0)
             {
-                dsc.AppendLine(Lang.Get("glassmaking:melts into {0} units of {1}", blend.amount, Lang.Get(GlassBlend.GetBlendNameCode(blend.code))));
+                dsc.AppendLine(Lang.Get("glassmaking:Melts into {0} units of {1} glass", blend.amount, Lang.Get(GlassBlend.GetBlendNameCode(blend.code))));
             }
         }
 
         public override string GetHeldItemName(ItemStack itemStack)
         {
-            GlassBlend blend = GlassBlend.FromTreeAttributes(itemStack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
+            GlassBlend blend = GlassBlend.FromJson(itemStack);
+            if(blend != null)
+            {
+                return Lang.Get("glassmaking:glassblend", Lang.Get(GlassBlend.GetBlendNameCode(blend.code)));
+            }
+            blend = GlassBlend.FromTreeAttributes(itemStack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
             if(blend != null)
             {
                 return Lang.Get("glassmaking:glassshards", Lang.Get(GlassBlend.GetBlendNameCode(blend.code)));

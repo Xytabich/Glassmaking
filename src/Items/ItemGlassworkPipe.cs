@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
+using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Util;
@@ -85,25 +86,25 @@ namespace GlassMaking.Items
             var glasslayers = itemstack.Attributes.GetTreeAttribute("glasslayers");
             if(glasslayers != null)
             {
-                dsc.AppendLine("Layers:");
+                dsc.AppendLine(Lang.Get("glassmaking:Layers:"));
                 var codes = ((StringArrayAttribute)glasslayers["code"]).value;
                 var amounts = ((IntArrayAttribute)glasslayers["amount"]).value;
                 for(int i = 0; i < codes.Length; i++)
                 {
-                    dsc.Append("  ").Append(amounts[i]).Append("x ").AppendLine(GlassBlend.GetBlendNameCode(new AssetLocation(codes[i])));
+                    dsc.AppendFormat("  {0}x {1}", amounts[i], Lang.Get(GlassBlend.GetBlendNameCode(new AssetLocation(codes[i])))).AppendLine();
                 }
             }
 
             var glassmelt = itemstack.Attributes.GetTreeAttribute("glassmelt");
             if(glassmelt != null)
             {
-                dsc.AppendLine("Temperature: " + GetGlassTemperature(world, inSlot.Itemstack).ToString("0"));
+                dsc.AppendLine(Lang.Get("Temperature: {0}°C", GetGlassTemperature(world, inSlot.Itemstack).ToString("0")));
                 dsc.AppendLine();
-                dsc.AppendLine("Break down to receive:");
+                dsc.AppendLine(Lang.Get("glassmaking:Break down to receive:"));
                 foreach(var pair in glassmelt)
                 {
-                    int amount = ((IntAttribute)pair.Value).value * 5 / 5;
-                    if(amount > 0) dsc.Append("  ").Append(amount).Append("x ").AppendLine(GlassBlend.GetBlendNameCode(new AssetLocation(pair.Key)));
+                    int amount = ((IntAttribute)pair.Value).value / 5;
+                    if(amount > 0) dsc.AppendFormat("  {0}x {1}", amount, Lang.Get(GlassBlend.GetBlendNameCode(new AssetLocation(pair.Key)))).AppendLine();
                 }
             }
         }

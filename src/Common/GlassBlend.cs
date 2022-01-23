@@ -32,7 +32,7 @@ namespace GlassMaking.Common
 
         public static string GetBlendNameCode(AssetLocation code)
         {
-            return code.Clone().WithPathPrefixOnce("glassblend-").ToShortString();
+            return code.Clone().WithPathPrefixOnce("glassblend-").ToString();
         }
 
         public static GlassBlend FromTreeAttributes(ITreeAttribute tree)

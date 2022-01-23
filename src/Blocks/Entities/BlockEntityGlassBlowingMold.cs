@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
+using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Util;
@@ -92,7 +93,7 @@ namespace GlassMaking.Blocks
             base.GetBlockInfo(forPlayer, dsc);
             if(contents != null)
             {
-                dsc.Append("Contents: ").Append(contents.StackSize).Append("x ").AppendLine(contents.GetName());
+                dsc.AppendLine(Lang.Get("Contents: {0}x{1}", contents.StackSize, contents.GetName()));
             }
         }
 

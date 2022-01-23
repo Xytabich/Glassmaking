@@ -12,13 +12,13 @@
             "isTool": true
         },
         "W": {
-            "code": "glasswork_pipe",
+            "code": "glassworkpipe",
             "type": "item"
         }
     },
     "shapeless": true,
     "output": {
-        "code": "glasswork_pipe",
+        "code": "glassworkpipe",
         "type": "item"
     }
 }

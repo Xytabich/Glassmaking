@@ -66,22 +66,25 @@ namespace GlassMaking.Blocks
                 switch(state)
                 {
                     case SmelteryState.ContainsMix:
-                        dsc.Append("Contains: ").Append(glassAmount).Append("x ").AppendLine(Lang.Get(GlassBlend.GetBlendNameCode(glassCode)));
-                        if(heatSource.IsHeatedUp()) dsc.Append("Temperature: ").AppendLine((heatSource.CalcCurrentTemperature() * TEMPERATURE_MODIFIER).ToString("0"));
+                        dsc.AppendLine(Lang.Get("glassmaking:Contains {0} units of {1} glass", glassAmount, Lang.Get(GlassBlend.GetBlendNameCode(glassCode))));
+                        if(heatSource.IsHeatedUp())
+                        {
+                            dsc.AppendLine(Lang.Get("Temperature: {0}°C", (heatSource.CalcCurrentTemperature() * TEMPERATURE_MODIFIER).ToString("0")));
+                        }
                         break;
                     case SmelteryState.Melting:
-                        dsc.Append("Contains: ").Append(glassAmount).Append("x ").AppendLine(Lang.Get(GlassBlend.GetBlendNameCode(glassCode)));
-                        dsc.Append("Melting progress: ").Append((processProgress / (glassAmount * PROCESS_HOURS_PER_UNIT) * 100).ToString("0")).AppendLine("%");
-                        dsc.Append("Temperature: ").AppendLine((heatSource.CalcCurrentTemperature() * TEMPERATURE_MODIFIER).ToString("0"));
+                        dsc.AppendLine(Lang.Get("glassmaking:Contains {0} units of {1} glass", glassAmount, Lang.Get(GlassBlend.GetBlendNameCode(glassCode))));
+                        dsc.AppendLine(Lang.Get("glassmaking:Glass melting progress: {0}%", (processProgress / (glassAmount * PROCESS_HOURS_PER_UNIT) * 100).ToString("0")));
+                        dsc.AppendLine(Lang.Get("Temperature: {0}°C", (heatSource.CalcCurrentTemperature() * TEMPERATURE_MODIFIER).ToString("0")));
                         break;
                     case SmelteryState.Bubbling:
-                        dsc.Append("Contains: ").Append(glassAmount).Append("x ").AppendLine(Lang.Get(GlassBlend.GetBlendNameCode(glassCode)));
-                        dsc.Append("Bubbling progress: ").Append((processProgress / (glassAmount * PROCESS_HOURS_PER_UNIT * BUBBLING_PROCESS_MULTIPLIER) * 100).ToString("0")).AppendLine("%");
-                        dsc.Append("Temperature: ").AppendLine((heatSource.CalcCurrentTemperature() * TEMPERATURE_MODIFIER).ToString("0"));
+                        dsc.AppendLine(Lang.Get("glassmaking:Contains {0} units of {1} glass", glassAmount, Lang.Get(GlassBlend.GetBlendNameCode(glassCode))));
+                        dsc.AppendLine(Lang.Get("glassmaking:Glass bubbling progress: {0}%", (processProgress / (glassAmount * PROCESS_HOURS_PER_UNIT * BUBBLING_PROCESS_MULTIPLIER) * 100).ToString("0")));
+                        dsc.AppendLine(Lang.Get("Temperature: {0}°C", (heatSource.CalcCurrentTemperature() * TEMPERATURE_MODIFIER).ToString("0")));
                         break;
                     case SmelteryState.ContainsGlass:
-                        dsc.Append("Contains melt: ").Append(glassAmount).Append("x ").AppendLine(Lang.Get(GlassBlend.GetBlendNameCode(glassCode)));
-                        dsc.Append("Temperature: ").AppendLine((heatSource.CalcCurrentTemperature() * TEMPERATURE_MODIFIER).ToString("0"));
+                        dsc.AppendLine(Lang.Get("glassmaking:Contains {0} units of molten {1} glass", glassAmount, Lang.Get(GlassBlend.GetBlendNameCode(glassCode))));
+                        dsc.AppendLine(Lang.Get("Temperature: {0}°C", (heatSource.CalcCurrentTemperature() * TEMPERATURE_MODIFIER).ToString("0")));
                         break;
                 }
             }

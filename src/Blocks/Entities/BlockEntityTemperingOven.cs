@@ -32,6 +32,10 @@ namespace GlassMaking.Blocks
         {
             gridSize = itemCapacity;
             inventory = new InventoryGeneric(itemCapacity, InventoryClassName + "-" + Pos, null);
+            for(int i = itemCapacity - 1; i >= 0; i--)
+            {
+                inventory[i].MaxSlotStackSize = 1;
+            }
             processes = new ItemProcessInfo[itemCapacity];
             meshes = new MeshData[itemCapacity];
         }
@@ -53,17 +57,17 @@ namespace GlassMaking.Blocks
         {
             if(!inventory.Empty)
             {
-                dsc.AppendLine("Contents:");
+                dsc.AppendLine(Lang.Get("Contents:"));
                 for(int i = 0; i < itemCapacity; i++)
                 {
                     if(!inventory[i].Empty)
                     {
                         dsc.Append(inventory[i].GetStackName());
                         float temperature = (inventory[i].Itemstack.Attributes["temperature"] as ITreeAttribute)?.GetFloat("temperature", 20f) ?? 20f;
-                        dsc.Append(" Temperature: ").Append(temperature.ToString("0"));
+                        dsc.Append(' ').Append(Lang.Get("Temperature: {0}°C", temperature.ToString("0")));
                         if(processes[i] != null && processes[i].isHeated)
                         {
-                            dsc.Append(" Tempering: ").Append((Math.Min(processes[i].time / processes[i].temperingTime, 1) * 100).ToString("0")).Append('%');
+                            dsc.Append(' ').Append(Lang.Get("glassmaking:Tempering: {0}", (Math.Min(processes[i].time / processes[i].temperingTime, 1) * 100).ToString("0")));
                         }
                         dsc.AppendLine();
                     }

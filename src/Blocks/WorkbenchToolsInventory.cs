@@ -145,5 +145,12 @@ namespace GlassMaking.Blocks
                 }
             }
         }
+
+        protected override ItemSlot NewSlot(int i)
+        {
+            var slot = base.NewSlot(i);
+            slot.MaxSlotStackSize = 1;
+            return slot;
+        }
     }
 }

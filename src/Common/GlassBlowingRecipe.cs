@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Vintagestory.API.Common;
+using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 
@@ -65,10 +66,10 @@ namespace GlassMaking
 
         public void GetRecipeInfo(ITreeAttribute recipeAttribute, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
         {
-            dsc.Append("Recipe: ").AppendLine(recipeAttribute.GetString("code"));
+            dsc.AppendLine(Lang.Get("glassmaking:Recipe: {0}", Lang.Get(new AssetLocation(recipeAttribute.GetString("code")).WithPathPrefixOnce("glassblowingrecipe-").ToString())));
             int step = recipeAttribute.GetInt("step", 0);
-            dsc.Append("Step ").Append(step + 1).Append('/').Append(steps.Length).AppendLine();
-            dsc.Append("Tool: ").Append(steps[step].tool).AppendLine();
+            dsc.AppendLine(Lang.Get("glassmaking:Step {0}/{1}", step + 1, steps.Length));
+            dsc.AppendLine(Lang.Get("glassmaking:Tool: {0}", Lang.Get("glassmaking:glassblowingtool-" + steps[step].tool)));
         }
 
         public bool TryBeginStep(ItemSlot slot, int index)

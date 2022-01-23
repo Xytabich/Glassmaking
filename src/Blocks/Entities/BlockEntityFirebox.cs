@@ -3,6 +3,7 @@ using System;
 using System.Text;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
+using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 using Vintagestory.GameContent;
@@ -62,17 +63,17 @@ namespace GlassMaking.Blocks
             {
                 if(contents.StackSize > 0)
                 {
-                    dsc.AppendLine("Contents: " + contents.StackSize + "x " + contents.GetName());
+                    dsc.AppendLine(Lang.Get("Contents: {0}x{1}", contents.StackSize, contents.GetName()));
                 }
                 else
                 {
-                    dsc.AppendLine("Fuel: " + contents.GetName());
+                    dsc.AppendLine(Lang.Get("glassmaking:Fuel type: {0}", contents.GetName()));
                 }
             }
             if(burning)
             {
                 var calendar = Api.World.Calendar;
-                dsc.AppendLine("Burn time: " + ((fuelLevel + GetFuelCount() * fuelBurnDuration) * 3600 / (calendar.SpeedOfTime * calendar.CalendarSpeedMul)).ToString("0"));
+                dsc.AppendLine(Lang.Get("Burn duration: {0}s", ((fuelLevel + GetFuelCount() * fuelBurnDuration) * 3600 / (calendar.SpeedOfTime * calendar.CalendarSpeedMul)).ToString("0")));
             }
         }
 
