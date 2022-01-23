@@ -20,7 +20,7 @@ namespace GlassMaking
         public AssetLocation Name { get; set; }
 
         public bool Enabled { get; set; }
-        public IRecipeIngredient[] Ingredients => new IRecipeIngredient[0];
+        public IRecipeIngredient[] Ingredients => recipe;
         public IRecipeOutput Output => output.ReturnedStack;
 
         public Dictionary<string, string[]> GetNameToCodeMapping(IWorldAccessor world)
@@ -29,14 +29,14 @@ namespace GlassMaking
 
             for(int i = 0; i < recipe.Length; i++)
             {
-                if(!string.IsNullOrEmpty(recipe[i].name))
+                if(!string.IsNullOrEmpty(recipe[i].Name))
                 {
                     var part = recipe[i];
-                    int wildcardStartLen = part.code.Path.IndexOf("*");
+                    int wildcardStartLen = part.Code.Path.IndexOf("*");
                     if(wildcardStartLen >= 0)
                     {
                         List<string> codes = new List<string>();
-                        int wildcardEndLen = part.code.Path.Length - wildcardStartLen - 1;
+                        int wildcardEndLen = part.Code.Path.Length - wildcardStartLen - 1;
                         var mod = world.Api.ModLoader.GetModSystem<GlassMakingMod>();
                         foreach(var pair in mod.GetGlassTypes())
                         {
@@ -50,7 +50,7 @@ namespace GlassMaking
                                 }
                             }
                         }
-                        mappings[part.name] = codes.ToArray();
+                        mappings[part.Name] = codes.ToArray();
                     }
                 }
             }
@@ -60,7 +60,7 @@ namespace GlassMaking
 
         public bool Resolve(IWorldAccessor world, string sourceForErrorLogging)
         {
-            throw new System.NotImplementedException();
+            return output.Resolve(world, sourceForErrorLogging);
         }
 
         public GlassMoldRecipe Clone()
@@ -74,14 +74,14 @@ namespace GlassMaking
         }
 
         [JsonObject]
-        public class GlassAmount
+        public class GlassAmount : IRecipeIngredient
         {
             [JsonProperty]
-            public string name;
+            public string Name { get; set; }
             [JsonProperty]
             public string[] allowedVariants;
             [JsonProperty(Required = Required.DisallowNull)]
-            public AssetLocation code;
+            public AssetLocation Code { get; set; }
             [JsonProperty(Required = Required.Always)]
             public int amount;
             [JsonProperty]
@@ -97,10 +97,10 @@ namespace GlassMaking
             public GlassAmount Clone()
             {
                 return new GlassAmount() {
-                    code = code.Clone(),
+                    Code = Code.Clone(),
                     amount = amount,
                     var = var,
-                    name = name
+                    Name = Name
                 };
             }
         }

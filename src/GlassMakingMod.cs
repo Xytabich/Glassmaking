@@ -72,7 +72,7 @@ namespace GlassMaking
             this.sapi = api;
             base.StartServerSide(api);
 
-            api.Event.SaveGameLoaded += OnSaveGameLoaded;
+            api.Event.SaveGameLoaded += OnSaveGameLoadedServer;
         }
 
         public override void StartClientSide(ICoreClientAPI api)
@@ -128,7 +128,7 @@ namespace GlassMaking
             return glassTypes;
         }
 
-        private void OnSaveGameLoaded()
+        private void OnSaveGameLoadedServer()
         {
             sapi.ModLoader.GetModSystem<RecipeLoader>().LoadRecipes<GlassBlowingRecipe>("glassblowing recipe", "recipes/glassblowing", RegisterGlassblowingRecipe);
             sapi.ModLoader.GetModSystem<RecipeLoader>().LoadRecipes<WorkbenchRecipe>("glassworkbench recipe", "recipes/glassworkbench", RegisterWorkbenchRecipe);

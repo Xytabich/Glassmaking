@@ -27,7 +27,7 @@ namespace GlassMaking.GlassblowingTools
 
         public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling, ref EnumHandling handling)
         {
-            if(firstEvent && TryGetRecipeStep(slot, byEntity, out var step))
+            if(firstEvent && byEntity.Controls.Sneak && TryGetRecipeStep(slot, byEntity, out var step))
             {
                 if(step.BeginStep())
                 {
@@ -42,7 +42,7 @@ namespace GlassMaking.GlassblowingTools
 
         public override bool OnHeldInteractStep(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, ref EnumHandling handling)
         {
-            if(TryGetRecipeStep(slot, byEntity, out var step))
+            if(byEntity.Controls.Sneak && TryGetRecipeStep(slot, byEntity, out var step))
             {
                 if(step.ContinueStep())
                 {

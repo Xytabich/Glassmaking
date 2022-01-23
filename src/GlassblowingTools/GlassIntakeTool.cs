@@ -60,6 +60,7 @@ namespace GlassMaking.GlassblowingTools
                                 {
                                     slot.Itemstack.TempAttributes.SetFloat("glassmaking:lastAddGlassTime", 0f);
                                 }
+                                slot.Itemstack.TempAttributes.SetBool("glassmaking:intakeStarted", true);
                                 handHandling = EnumHandHandling.PreventDefault;
                                 handling = EnumHandling.PreventSubsequent;
                             }
@@ -74,7 +75,7 @@ namespace GlassMaking.GlassblowingTools
         {
             if(blockSel != null && TryGetRecipeStep(slot, byEntity, out var step))
             {
-                if(step.ContinueStep())
+                if(slot.Itemstack.TempAttributes.GetBool("glassmaking:intakeStarted", false) && step.ContinueStep())
                 {
                     var source = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityGlassSmeltery;
                     if(source != null && source.CanInteract(byEntity, blockSel))
@@ -152,6 +153,7 @@ namespace GlassMaking.GlassblowingTools
         public override void OnHeldInteractStop(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, ref EnumHandling handling)
         {
             slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:lastAddGlassTime");
+            slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:intakeStarted");
             base.OnHeldInteractStop(secondsUsed, slot, byEntity, blockSel, entitySel, ref handling);
         }
     }

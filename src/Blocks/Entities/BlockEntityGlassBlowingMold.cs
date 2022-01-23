@@ -21,7 +21,6 @@ namespace GlassMaking.Blocks
         private Shape nowTesselatingShape;
         private ICoreClientAPI capi;
 
-        private GlassMoldRecipe recipe = null;
         private bool splittable = false;
         private ItemStack contents = null;
 
@@ -149,7 +148,7 @@ namespace GlassMaking.Blocks
             int layerIndex = layersCode.Length - 1;
             for(int i = layers.Length - 1; i >= 0; i--)
             {
-                if(!string.Equals(layers[i].code.ToShortString(), layersCode[layerIndex], StringComparison.InvariantCulture)) return false;
+                if(!string.Equals(layers[i].Code.ToShortString(), layersCode[layerIndex], StringComparison.InvariantCulture)) return false;
                 if(!layers[i].IsSuitable(layersAmount[layerIndex])) return false;
                 layerIndex--;
             }
@@ -166,13 +165,7 @@ namespace GlassMaking.Blocks
             }
             if(Api.Side == EnumAppSide.Server)
             {
-                var jstack = GetRecipe().output;
-                if(jstack.ResolvedItemstack == null)
-                {
-                    jstack.Resolve(Api.World, "glass mold output for " + Block.Code);
-                }
-
-                var item = jstack.ResolvedItemstack;
+                var item = GetRecipe().output.ResolvedItemstack;
                 if(splittable || hasContentsTransform)
                 {
                     contents = item.Clone();
@@ -228,15 +221,7 @@ namespace GlassMaking.Blocks
 
         private GlassMoldRecipe GetRecipe()
         {
-            if(recipe == null)
-            {
-                recipe = Block.Attributes?["glassmold"].AsObject<GlassMoldRecipe>(null, Block.Code.Domain);
-                if(recipe!=null)
-                {
-
-                }
-            }
-            return recipe;
+            return ((BlockGlassBlowingMold)Block).recipes[0];
         }
 
         private void UpdateMesh()
