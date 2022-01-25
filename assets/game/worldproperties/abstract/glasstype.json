@@ -1,14 +1,41 @@
 {
     "code": "glasstype",
     "variants": [
-        { "code": "plain" },
-        { "code": "quartz" },
-        { "code": "smoky" },
-        { "code": "red" },
-        { "code": "green" },
-        { "code": "blue" },
-        { "code": "yellow" },
-        { "code": "brown" },
-        { "code": "pink" }
+        {
+            "code": "plain",
+            "meltingPoint": 1300
+        },
+        {
+            "code": "quartz",
+            "meltingPoint": 1600
+        },
+        {
+            "code": "smoky",
+            "meltingPoint": 1600
+        },
+        {
+            "code": "red",
+            "meltingPoint": 1300
+        },
+        {
+            "code": "green",
+            "meltingPoint": 1300
+        },
+        {
+            "code": "blue",
+            "meltingPoint": 1300
+        },
+        {
+            "code": "yellow",
+            "meltingPoint": 1300
+        },
+        {
+            "code": "brown",
+            "meltingPoint": 1300
+        },
+        {
+            "code": "pink",
+            "meltingPoint": 1300
+        }
     ]
 }

@@ -15,8 +15,6 @@ namespace GlassMaking.Items
 {
     public class ItemGlassworkPipe : Item, IItemCrafter, IGenericHeldItemAction
     {
-        public const float WORK_TEMPERATURE = 1100;
-
         private GlassMakingMod mod;
         private int maxGlassAmount;
         private ModelTransform glassTransform;
@@ -191,7 +189,7 @@ namespace GlassMaking.Items
                         var glasslayers = itemstack.Attributes.GetTreeAttribute("glasslayers");
                         if(glasslayers != null)
                         {
-                            if(GetGlassTemperature(byEntity.World, itemstack) >= WORK_TEMPERATURE)
+                            if(IsWorkingTemperature(byEntity.World, itemstack))
                             {
                                 var codesAttrib = glasslayers["code"] as StringArrayAttribute;
                                 var amountsAttrib = glasslayers["amount"] as IntArrayAttribute;
@@ -276,7 +274,7 @@ namespace GlassMaking.Items
                     var glasslayers = itemstack.Attributes.GetTreeAttribute("glasslayers");
                     if(glasslayers != null)
                     {
-                        if(GetGlassTemperature(byEntity.World, itemstack) >= WORK_TEMPERATURE)
+                        if(IsWorkingTemperature(byEntity.World, itemstack))
                         {
                             var codesAttrib = glasslayers["code"] as StringArrayAttribute;
                             var amountsAttrib = glasslayers["amount"] as IntArrayAttribute;
@@ -520,14 +518,15 @@ namespace GlassMaking.Items
 
         public override void OnBeforeRender(ICoreClientAPI capi, ItemStack itemstack, EnumItemRenderTarget target, ref ItemRenderInfo renderinfo)
         {
-            if(itemstack.Attributes.HasAttribute("glasslayers"))
+            var glasslayers = itemstack.Attributes.GetTreeAttribute("glasslayers");
+            if(glasslayers != null)
             {
                 var container = MeshContainer.Get(capi, itemstack);
-                var temperature = MeshContainer.TemperatureToState(GetGlassTemperature(capi.World, itemstack));
+                var glassmelt = itemstack.Attributes.GetTreeAttribute("glassmelt");
+                var temperature = MeshContainer.TemperatureToState(GetGlassTemperature(capi.World, itemstack), GetWorkingTemperature(glassmelt));
                 if(container.isDirty || !container.hasMesh || container.temperature != temperature)
                 {
                     container.temperature = temperature;
-                    var glassmelt = itemstack.Attributes.GetTreeAttribute("glassmelt");
                     if(glassmelt != null) UpdateGlassmeltMesh(itemstack, glassmelt, MeshContainer.StateToGlow(temperature));
                 }
 
@@ -542,7 +541,8 @@ namespace GlassMaking.Items
                 if(recipeAttribute != null)
                 {
                     var container = MeshContainer.Get(capi, itemstack);
-                    var temperature = MeshContainer.TemperatureToState(GetGlassTemperature(capi.World, itemstack));
+                    var glassmelt = itemstack.Attributes.GetTreeAttribute("glassmelt");
+                    var temperature = MeshContainer.TemperatureToState(GetGlassTemperature(capi.World, itemstack), GetWorkingTemperature(glassmelt));
                     if(container.isDirty || !container.hasMesh || container.temperature != temperature)
                     {
                         container.temperature = temperature;
@@ -602,6 +602,11 @@ namespace GlassMaking.Items
             }
         }
 
+        public bool IsWorkingTemperature(IWorldAccessor world, ItemStack item)
+        {
+            return GetGlassTemperature(world, item) >= GetWorkingTemperature(item.Attributes.GetTreeAttribute("glassmelt"));
+        }
+
         bool IItemCrafter.PreventRecipeAssignment(IClientPlayer player, ItemStack item)
         {
             return item.Attributes.HasAttribute("recipe") || item.Attributes.HasAttribute("glasslayers");
@@ -640,6 +645,17 @@ namespace GlassMaking.Items
                 }
             }
             return false;
+        }
+
+        private float GetWorkingTemperature(ITreeAttribute pairs)
+        {
+            if(pairs == null) return 0;
+            float point = 0f;
+            foreach(var pair in pairs)
+            {
+                point += mod.GetGlassTypeInfo(new AssetLocation(pair.Key)).meltingPoint;
+            }
+            return point / pairs.Count * 0.8f;
         }
 
         private bool CanAddGlass(EntityAgent byEntity, ItemSlot slot, int amount, AssetLocation code, int multiplier)
@@ -863,10 +879,10 @@ namespace GlassMaking.Items
                 }
             }
 
-            public static TemperatureState TemperatureToState(float temperature)
+            public static TemperatureState TemperatureToState(float temperature, float workingTemperature)
             {
-                if(temperature < 500) return TemperatureState.Cold;
-                if(temperature < 1100) return TemperatureState.Heated;
+                if(temperature < workingTemperature * 0.45f) return TemperatureState.Cold;
+                if(temperature < workingTemperature) return TemperatureState.Heated;
                 return TemperatureState.Working;
             }
 

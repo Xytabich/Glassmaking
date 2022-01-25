@@ -14,9 +14,6 @@ namespace GlassMaking.Blocks
     public class BlockEntityGlassSmeltery : BlockEntity, IBlockEntityContainer, ITimeBasedHeatReceiver
     {
         private const float TEMPERATURE_MODIFIER = 1.1f;
-        private const float BUBBLING_TEMPERATURE = 1450 / TEMPERATURE_MODIFIER;
-        private const float MELTING_TEMPERATURE = 1300 / TEMPERATURE_MODIFIER;
-        private const float MOLTEN_TEMPERATURE = 1200 / TEMPERATURE_MODIFIER;
 
         private const double PROCESS_HOURS_PER_UNIT = 0.001;
         private const double BUBBLING_PROCESS_MULTIPLIER = 3;
@@ -37,12 +34,20 @@ namespace GlassMaking.Blocks
         private AssetLocation glassCode;
         private double processProgress;
 
+        private GlassMakingMod mod;
+        private float meltingTemperature;
+
         private GlassSmelteryInventory inventory = new GlassSmelteryInventory(null, null);
 
         public override void Initialize(ICoreAPI api)
         {
+            mod = api.ModLoader.GetModSystem<GlassMakingMod>();
             base.Initialize(api);
             inventory.LateInitialize("glassmaking:smeltery-" + Pos.X + "/" + Pos.Y + "/" + Pos.Z, api);
+            if(state != SmelteryState.Empty)
+            {
+                meltingTemperature = mod.GetGlassTypeInfo(glassCode).meltingPoint;
+            }
             if(api.Side == EnumAppSide.Client)
             {
                 ICoreClientAPI capi = (ICoreClientAPI)api;
@@ -125,6 +130,14 @@ namespace GlassMaking.Blocks
                 {
                     processProgress = tree.GetDouble("progress");
                 }
+                if(Api?.World != null)
+                {
+                    meltingTemperature = mod.GetGlassTypeInfo(glassCode).meltingPoint;
+                }
+            }
+            else
+            {
+                glassCode = null;
             }
             UpdateRendererFull();
         }
@@ -188,14 +201,19 @@ namespace GlassMaking.Blocks
             if(glassAmount >= maxGlassAmount) return false;
             GlassBlend blend = GlassBlend.FromJson(slot.Itemstack);
             if(blend == null) blend = GlassBlend.FromTreeAttributes(slot.Itemstack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
-            if(blend != null && blend.amount > 0 && (glassCode == null || glassCode.Equals(blend.code)) && (blend.amount + glassAmount) <= maxGlassAmount)
+            if(blend != null && blend.amount > 0 && (blend.amount + glassAmount) <= maxGlassAmount &&
+                (glassCode == null && mod.GetGlassTypeInfo(blend.code) != null || glassCode.Equals(blend.code)))
             {
                 if(Api.Side == EnumAppSide.Server)
                 {
-                    if(glassCode == null) glassCode = blend.code.Clone();
+                    if(glassCode == null)
+                    {
+                        glassCode = blend.code.Clone();
+                        meltingTemperature = mod.GetGlassTypeInfo(glassCode).meltingPoint;
+                    }
                     if(state == SmelteryState.Bubbling || state == SmelteryState.ContainsGlass)
                     {
-                        if(heatSource.CalcCurrentTemperature() >= MELTING_TEMPERATURE)
+                        if(heatSource.CalcCurrentTemperature() >= meltingTemperature)
                         {
                             state = SmelteryState.Melting;
                             processProgress = PROCESS_HOURS_PER_UNIT * glassAmount;
@@ -247,7 +265,7 @@ namespace GlassMaking.Blocks
         {
             if(heatSource != null)
             {
-                if(state == SmelteryState.ContainsGlass && heatSource.CalcCurrentTemperature() >= MOLTEN_TEMPERATURE)
+                if(state == SmelteryState.ContainsGlass && heatSource.CalcCurrentTemperature() >= (meltingTemperature * 0.9f))
                 {
                     return glassAmount;
                 }
@@ -303,7 +321,7 @@ namespace GlassMaking.Blocks
                 var graph = heatSource.CalcHeatGraph();
                 if(state == SmelteryState.ContainsMix)
                 {
-                    if(Api.Side == EnumAppSide.Server && graph.CalcTemperatureHoldTime(timeOffset, MELTING_TEMPERATURE) > 0)
+                    if(Api.Side == EnumAppSide.Server && graph.CalcTemperatureHoldTime(timeOffset, meltingTemperature) > 0)
                     {
                         state = SmelteryState.Melting;
                         processProgress = 0;
@@ -315,7 +333,7 @@ namespace GlassMaking.Blocks
                 if(state == SmelteryState.Melting)
                 {
                     double timeLeft = glassAmount * PROCESS_HOURS_PER_UNIT - processProgress;
-                    double time = graph.CalcTemperatureHoldTime(timeOffset, MELTING_TEMPERATURE);
+                    double time = graph.CalcTemperatureHoldTime(timeOffset, meltingTemperature);
                     processProgress += Math.Min(time, timeLeft);
                     if(Api.Side == EnumAppSide.Server && time >= timeLeft)
                     {
@@ -328,7 +346,7 @@ namespace GlassMaking.Blocks
                 if(state == SmelteryState.Bubbling)
                 {
                     double timeLeft = glassAmount * PROCESS_HOURS_PER_UNIT * BUBBLING_PROCESS_MULTIPLIER - processProgress;
-                    double time = graph.CalcTemperatureHoldTime(timeOffset, BUBBLING_TEMPERATURE);
+                    double time = graph.CalcTemperatureHoldTime(timeOffset, meltingTemperature * 1.11f);
                     processProgress += Math.Min(time, timeLeft);
                     if(Api.Side == EnumAppSide.Server && time >= timeLeft)
                     {

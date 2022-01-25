@@ -123,6 +123,12 @@ namespace GlassMaking
             return glassblowingRecipes.Pairs;
         }
 
+        public GlassTypeVariant GetGlassTypeInfo(AssetLocation code)
+        {
+            if(glassTypes.TryGetValue(code, out var info)) return info;
+            return null;
+        }
+
         public IReadOnlyDictionary<AssetLocation, GlassTypeVariant> GetGlassTypes()
         {
             return glassTypes;

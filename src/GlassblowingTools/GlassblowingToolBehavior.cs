@@ -45,7 +45,7 @@ namespace GlassMaking.GlassblowingTools
             }
             if(pipeSlot != null)
             {
-                if(((ItemGlassworkPipe)pipeSlot.Itemstack.Collectible).GetGlassTemperature(byEntity.World, pipeSlot.Itemstack) >= ItemGlassworkPipe.WORK_TEMPERATURE)
+                if(((ItemGlassworkPipe)pipeSlot.Itemstack.Collectible).IsWorkingTemperature(byEntity.World, pipeSlot.Itemstack))
                 {
                     var recipeAttribute = pipeSlot.Itemstack.Attributes.GetTreeAttribute("recipe");
                     if(recipeAttribute != null)

@@ -11,6 +11,7 @@ namespace GlassMaking.Common
     [JsonObject(MemberSerialization.OptIn)]
     public class GlassTypeVariant : WorldPropertyVariant
     {
-
+        [JsonProperty(Required = Required.Always)]
+        public float meltingPoint;
     }
 }
