@@ -25,11 +25,13 @@
     "item-glassworkpipe": "Glass blower's pipe",
     "game:glassblend-plain": "Plain",
     "game:glassblend-quartz": "Quartz",
-    "game:glassblend-smoky": "Smoky",
+    "game:glassblend-smoky": "Smoky Quartz",
     "game:glassblend-red": "Red",
-    "game:glassblend-green": "Green",
+    "game:glassblend-green": "Olivine",
     "game:glassblend-blue": "Blue",
     "game:glassblend-yellow": "Yellow",
     "game:glassblend-brown": "Browm",
-    "game:glassblend-pink": "Pink"
+    "game:glassblend-pink": "Pink Quartz",
+    "game:glassblend-violet": "Amethyst",
+    "game:glassblend-vintage": "Vintage"
 }

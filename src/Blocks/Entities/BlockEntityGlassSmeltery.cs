@@ -13,7 +13,7 @@ namespace GlassMaking.Blocks
 {
     public class BlockEntityGlassSmeltery : BlockEntity, IBlockEntityContainer, ITimeBasedHeatReceiver
     {
-        private const float TEMPERATURE_MODIFIER = 1.1f;
+        private const float TEMPERATURE_MODIFIER = 1.15f;
 
         private const double PROCESS_HOURS_PER_UNIT = 0.001;
         private const double BUBBLING_PROCESS_MULTIPLIER = 3;

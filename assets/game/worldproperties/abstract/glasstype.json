@@ -19,7 +19,7 @@
         },
         {
             "code": "green",
-            "meltingPoint": 1300
+            "meltingPoint": 1400
         },
         {
             "code": "blue",
@@ -35,6 +35,14 @@
         },
         {
             "code": "pink",
+            "meltingPoint": 1600
+        },
+        {
+            "code": "violet",
+            "meltingPoint": 1400
+        },
+        {
+            "code": "vintage",
             "meltingPoint": 1300
         }
     ]
