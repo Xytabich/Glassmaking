@@ -5,6 +5,7 @@ namespace GlassMaking.Blocks
 {
     public class BlockTemperingOven : HeatedBlockBase
     {
+        public ModelTransform smokeTransform;
         public ModelTransform contentTransform;
 
         public override void OnLoaded(ICoreAPI api)
@@ -12,6 +13,7 @@ namespace GlassMaking.Blocks
             base.OnLoaded(api);
             if(api.Side == EnumAppSide.Client)
             {
+                smokeTransform = Attributes?["smokeTransform"].AsObject<ModelTransform>() ?? ModelTransform.NoTransform;
                 contentTransform = Attributes?["contentTransform"].AsObject<ModelTransform>() ?? ModelTransform.NoTransform;
             }
         }

@@ -5,12 +5,15 @@ using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
+using Vintagestory.API.MathTools;
 using Vintagestory.GameContent;
 
 namespace GlassMaking.Blocks
 {
     public class BlockEntityTemperingOven : BlockEntityDisplay, ITimeBasedHeatReceiver
     {
+        private static SimpleParticleProperties smokeParticles;
+
         public override InventoryBase Inventory => inventory;
         public override string InventoryClassName => "glassmaking:temperingoven";
         public override string AttributeTransformCode => "temperingOvenTransform";
@@ -211,6 +214,11 @@ namespace GlassMaking.Blocks
                     }
                 }
             }
+
+            if(Api.Side == EnumAppSide.Client)
+            {
+                if(heatSource.IsBurning()) EmitParticles();
+            }
         }
 
         public override void ToTreeAttributes(ITreeAttribute tree)
@@ -324,6 +332,25 @@ namespace GlassMaking.Blocks
                 }
             }
             if(itemsCount == 0) gridSize = 0;
+        }
+
+        private void EmitParticles()
+        {
+            if(Api.World.Rand.Next(5) > 0)
+            {
+                var transform = ((BlockTemperingOven)Block).smokeTransform;
+                smokeParticles.MinPos.Set(Pos.X + transform.Translation.X, Pos.Y + transform.Translation.Y, Pos.Z + transform.Translation.Z);
+                smokeParticles.AddPos.Set(transform.ScaleXYZ.X, 0.0, transform.ScaleXYZ.Z);
+                Api.World.SpawnParticles(smokeParticles);
+            }
+        }
+
+        static BlockEntityTemperingOven()
+        {
+            smokeParticles = new SimpleParticleProperties(1f, 1f, ColorUtil.ToRgba(128, 110, 110, 110), new Vec3d(), new Vec3d(), new Vec3f(-0.2f, 0.3f, -0.2f), new Vec3f(0.2f, 0.3f, 0.2f), 2f, 0f, 0.5f, 1f, EnumParticleModel.Quad);
+            smokeParticles.SelfPropelled = true;
+            smokeParticles.OpacityEvolve = new EvolvingNatFloat(EnumTransformFunction.LINEAR, -255f);
+            smokeParticles.SizeEvolve = new EvolvingNatFloat(EnumTransformFunction.LINEAR, 2f);
         }
 
         private class ItemProcessInfo
