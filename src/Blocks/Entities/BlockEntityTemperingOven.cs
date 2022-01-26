@@ -23,14 +23,13 @@ namespace GlassMaking.Blocks
         private ITimeBasedHeatSource heatSource = null;
         private ItemProcessInfo[] processes;
 
-        private int gridSize;
+        private int gridSize = 0;
         private float gridCellSize;
 
         private bool preventMeshUpdate = false;
 
         public BlockEntityTemperingOven()
         {
-            gridSize = itemCapacity;
             inventory = new InventoryGeneric(itemCapacity, InventoryClassName + "-" + Pos, null);
             for(int i = itemCapacity - 1; i >= 0; i--)
             {
@@ -84,7 +83,7 @@ namespace GlassMaking.Blocks
                 {
                     if(!inventory[i].Empty && (processes[i] == null || byPlayer.Entity.Controls.Sneak))
                     {
-                        slot.Itemstack = inventory[i].TakeOut(1);
+                        inventory[i].TryPutInto(Api.World, slot, 1);
                         lastRemoved = slot.Itemstack.Clone();
                         processes[i] = null;
                         removed = true;
@@ -262,8 +261,10 @@ namespace GlassMaking.Blocks
 
         public override void TranslateMesh(MeshData mesh, int index)
         {
-            base.TranslateMesh(mesh, index);
-            //TODO:
+            int x = index % gridSize;
+            int z = index / gridSize;
+            var transform = ((BlockTemperingOven)Block).contentTransform;
+            mesh.Translate(transform.Translation.X + (x + 0.5f) / gridSize * transform.ScaleXYZ.X, transform.Translation.Y, transform.Translation.Z + (z + 0.5f) / gridSize * transform.ScaleXYZ.Z);
         }
 
         public override void updateMeshes()

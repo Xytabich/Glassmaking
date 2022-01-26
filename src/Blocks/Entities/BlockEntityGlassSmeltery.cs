@@ -367,9 +367,9 @@ namespace GlassMaking.Blocks
         {
             if(Api.World.Rand.Next(5) > 0)
             {
-                GetSmokeParameters(out var x, out var z, out var wx, out var wz);
-                smokeParticles.MinPos.Set(Pos.X + 0.5 + x, Pos.Y + 0.75f, Pos.Z + 0.5 + z);
-                smokeParticles.AddPos.Set(wx, 0.0, wz);
+                var transform = ((BlockGlassSmeltery)Block).smokeTransform;
+                smokeParticles.MinPos.Set(Pos.X + transform.Translation.X, Pos.Y + transform.Translation.Y, Pos.Z + transform.Translation.Z);
+                smokeParticles.AddPos.Set(transform.ScaleXYZ.X, 0.0, transform.ScaleXYZ.Z);
                 Api.World.SpawnParticles(smokeParticles);
             }
         }
@@ -398,41 +398,6 @@ namespace GlassMaking.Blocks
                 case "east": return 270;
             }
             return 0;
-        }
-
-        private void GetSmokeParameters(out double x, out double z, out double wx, out double wz)
-        {
-            x = 0;
-            z = 0;
-            wx = 0.25;
-            wz = 0.25;
-            switch(Block.Variant["side"])
-            {
-                case "north":
-                    x = -0.3125;
-                    z = -0.3125;
-                    wx = 0.625;
-                    wz = 0.1875;
-                    break;
-                case "east":
-                    x = 0.125;
-                    z = -0.3125;
-                    wx = 0.1875;
-                    wz = 0.625;
-                    break;
-                case "south":
-                    x = -0.3125;
-                    z = 0.125;
-                    wx = 0.625;
-                    wz = 0.1875;
-                    break;
-                case "west":
-                    x = -0.3125;
-                    z = -0.3125;
-                    wx = 0.1875;
-                    wz = 0.625;
-                    break;
-            }
         }
 
         static BlockEntityGlassSmeltery()

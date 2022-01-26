@@ -8,6 +8,54 @@
         { "name": "UnstableFalling" },
         { "name": "Unplaceable" }
     ],
+    "attributes": {
+        "smokeTransformByType": {
+            "*-north": {
+                "translation": {
+                    "x": 0.1875,
+                    "y": 0.75,
+                    "z": 0.1875
+                },
+                "scaleXYZ": {
+                    "x": 0.625,
+                    "z": 0.1875
+                }
+            },
+            "*-east": {
+                "translation": {
+                    "x": 0.625,
+                    "y": 0.75,
+                    "z": 0.1875
+                },
+                "scaleXYZ": {
+                    "x": 0.1875,
+                    "z": 0.625
+                }
+            },
+            "*-south": {
+                "translation": {
+                    "x": 0.1875,
+                    "y": 0.75,
+                    "z": 0.625
+                },
+                "scaleXYZ": {
+                    "x": 0.625,
+                    "z": 0.1875
+                }
+            },
+            "*-west": {
+                "translation": {
+                    "x": 0.1875,
+                    "y": 0.75,
+                    "z": 0.1875
+                },
+                "scaleXYZ": {
+                    "x": 0.1875,
+                    "z": 0.625
+                }
+            }
+        }
+    },
     "variantgroups": [
         {
             "code": "side",

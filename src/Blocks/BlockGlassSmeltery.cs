@@ -10,6 +10,8 @@ namespace GlassMaking.Blocks
 {
     public class BlockGlassSmeltery : HeatedBlockBase
     {
+        public ModelTransform smokeTransform;
+
         private WorldInteraction[] interactions;
 
         public override void OnLoaded(ICoreAPI api)
@@ -18,6 +20,8 @@ namespace GlassMaking.Blocks
 
             if(api.Side != EnumAppSide.Client) return;
             ICoreClientAPI capi = api as ICoreClientAPI;
+
+            smokeTransform = Attributes?["smokeTransform"].AsObject<ModelTransform>() ?? ModelTransform.NoTransform;
 
             interactions = ObjectCacheUtil.GetOrCreate(api, "glassmaking:blockhelp-smeltery", () => {
                 List<ItemStack> blends = new List<ItemStack>();
