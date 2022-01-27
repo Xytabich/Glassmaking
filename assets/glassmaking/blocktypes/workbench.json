@@ -7,7 +7,7 @@
     "blockmaterial": "Wood",
     "behaviorsByType": {
         "*-right-*": [
-            { "name": "Horizontal2BMultiblock" }
+            { "name": "glassmaking:horizontalmb" }
         ]
     },
     "variantgroups": [
@@ -27,7 +27,7 @@
     },
     "creativeinventory": {
         "general": [ "*-right-north" ],
-        "construction": [ "*-right-north" ]
+        "glassmaking": [ "*-right-north" ]
     },
     "replaceable": 400,
     "resistance": 3.5,

@@ -64,7 +64,7 @@
     ],
     "creativeinventory": {
         "general": [ "*-north" ],
-        "construction": [ "*-north" ]
+        "glassmaking": [ "*-north" ]
     },
     "textures": {
         "mix": { "base": "game:item/resource/ungraded/borax" },

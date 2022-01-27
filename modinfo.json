@@ -1,11 +1,12 @@
 {
-  "type": "code",
-  "modid": "glassmaking",
-  "name": "glassmaking",
-  "author": "Unknown",
-  "description": "To be added",
-  "version": "1.0.0",
-  "dependency": {
-    "game": "1.16.0-pre.4"
-  }
+    "type": "code",
+    "modid": "glassmaking",
+    "name": "Glassmaking",
+    "author": "Xytabich",
+    "description": "Core system for melting and processing glass",
+    "version": "1.0.0",
+    "dependency": {
+        "game": "1.16.0",
+        "survival": "1.16.0"
+    }
 }

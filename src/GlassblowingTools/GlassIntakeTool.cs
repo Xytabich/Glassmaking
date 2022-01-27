@@ -110,7 +110,7 @@ namespace GlassMaking.GlassblowingTools
                                         int consumed = Math.Min(Math.Min(amount - intake, sourceAmount), (byEntity.Controls.Sneak ? 5 : 1) * (5 + (int)(intake * 0.01f)));
 
                                         var code = AssetLocation.Create(step.stepAttributes["code"].AsString(), step.recipe.code.Domain);
-                                        ((ItemGlassworkPipe)slot.Itemstack.Item).AddGlassmelt(byEntity.World, slot.Itemstack, code, consumed, source.GetTemperature());
+                                        ((ItemGlassworkPipe)slot.Itemstack.Collectible).AddGlassmelt(byEntity.World, slot.Itemstack, code, consumed, source.GetTemperature());
 
                                         intake += consumed;
                                         source.RemoveGlass(consumed);

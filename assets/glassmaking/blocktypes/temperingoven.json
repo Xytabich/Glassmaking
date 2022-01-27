@@ -72,7 +72,7 @@
     },
     "creativeinventory": {
         "general": [ "*-north" ],
-        "construction": [ "*-north" ]
+        "glassmaking": [ "*-north" ]
     },
     "replaceable": 400,
     "resistance": 3.5,

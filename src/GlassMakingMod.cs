@@ -57,7 +57,7 @@ namespace GlassMaking
             api.RegisterBlockEntityClass("glassmaking:glassmold", typeof(BlockEntityGlassBlowingMold));
             api.RegisterBlockEntityClass("glassmaking:workbench", typeof(BlockEntityWorkbench));
 
-            api.RegisterBlockBehaviorClass("Horizontal2BMultiblock", typeof(BlockBehaviorHorizontal2BMultiblock));
+            api.RegisterBlockBehaviorClass("glassmaking:horizontalmb", typeof(BlockBehaviorHorizontal2BMultiblock));
 
             api.RegisterCollectibleBehaviorClass("glassmaking:gbt-shears", typeof(ShearsTool));
             api.RegisterCollectibleBehaviorClass("glassmaking:gbt-blowing", typeof(BlowingTool));

@@ -28,6 +28,8 @@ namespace GlassMaking.Blocks
 
         private ITimeBasedHeatReceiver receiver = null;
 
+        private ILoadedSound ambientSound = null;
+
         private bool burning = false;
         private float temperature = 20;
         /// <summary>
@@ -52,6 +54,7 @@ namespace GlassMaking.Blocks
                 renderer = new BlockRendererFirebox(Pos, capi.Tesselator.GetTexSource(Block), capi);
                 capi.Event.RegisterRenderer(renderer, EnumRenderStage.Opaque, "glassmaking:firebox");
                 UpdateRendererFull();
+                ToggleAmbientSounds(burning);
             }
             RegisterGameTickListener(OnCommonTick, 200);
         }
@@ -81,11 +84,13 @@ namespace GlassMaking.Blocks
         {
             base.OnBlockUnloaded();
             renderer?.Dispose();
+            ambientSound?.Dispose();
         }
 
         public override void OnBlockRemoved()
         {
             renderer?.Dispose();
+            ambientSound?.Dispose();
             base.OnBlockRemoved();
         }
 
@@ -99,6 +104,7 @@ namespace GlassMaking.Blocks
             lastTickTime = tree.GetDouble("lastTickTotalHours");
             if(contents != null && Api?.World != null) ApplyFuelParameters();
             UpdateRendererFull();
+            ToggleAmbientSounds(burning);
         }
 
         public override void ToTreeAttributes(ITreeAttribute tree)
@@ -402,6 +408,31 @@ namespace GlassMaking.Blocks
                 fireParticles.basePos.Set(Pos.X + 0.5, Pos.Y + fuelOffset, Pos.Z + 0.5);
                 Api.World.SpawnParticles(smokeParticles);
                 Api.World.SpawnParticles(fireParticles);
+            }
+        }
+
+        private void ToggleAmbientSounds(bool on)
+        {
+            if(Api?.World == null || Api.Side != EnumAppSide.Client) return;
+            if(on)
+            {
+                if(ambientSound == null || !ambientSound.IsPlaying)
+                {
+                    ambientSound = ((IClientWorldAccessor)Api.World).LoadSound(new SoundParams {
+                        Location = new AssetLocation("sounds/environment/fireplace.ogg"),
+                        ShouldLoop = true,
+                        Position = Pos.ToVec3f().Add(0.5f, 0.25f, 0.5f),
+                        DisposeOnFinish = false,
+                        Volume = 1f
+                    });
+                    ambientSound.Start();
+                }
+            }
+            else if(ambientSound != null)
+            {
+                ambientSound.Stop();
+                ambientSound.Dispose();
+                ambientSound = null;
             }
         }
 

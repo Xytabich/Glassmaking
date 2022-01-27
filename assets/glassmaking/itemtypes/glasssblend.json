@@ -36,7 +36,8 @@
     ],
     "creativeinventory": {
         "general": [ "*" ],
-        "items": [ "*" ]
+        "items": [ "*" ],
+        "glassmaking": [ "*" ]
     },
     "maxstacksize": 64,
     "materialDensity": 500,

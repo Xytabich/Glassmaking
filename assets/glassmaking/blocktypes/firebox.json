@@ -12,7 +12,7 @@
     ],
     "creativeinventory": {
         "general": [ "*-north" ],
-        "construction": [ "*-north" ]
+        "glassmaking": [ "*-north" ]
     },
     "textures": {
         "lit": { "base": "game:block/coal/ember" },

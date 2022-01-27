@@ -1,5 +1,5 @@
 {
-    "Melts into {0} units of {1} glass": "Melts into {0} units of {1} glass",
+    "Melts into {0} units of {1} glass": "Melts into {0} units of {1} glass in the Glass smeltery",
     "Contains {0} units of {1} glass": "Contains {0} units of {1} glass",
     "Contains {0} units of molten {1} glass": "Contains {0} units of molten {1} glass",
     "Step {0}/{1}": "Step {0}/{1}",
@@ -15,7 +15,7 @@
     "glassmaking:Break down to receive:": "Break down to receive glass shards:",
     "glassmaking:Fuel type: {0}": "Fuel: {0}",
     "glassmaking:Layers:": "Layers:",
-    "glassmaking:Recipe: {0}": "Recipe: {0",
+    "glassmaking:Recipe: {0}": "Recipe: {0}",
     "glassmaking:Tool: {0}": "Tool: {0}",
     "glassmaking:Tempering: {0}%": "Tempering: {0}%",
     "block-firebox-*": "Firebox",

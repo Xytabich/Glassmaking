@@ -77,7 +77,30 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="modinfo.json" />
-    <Content Include="assets\**\*.*" />
+    <Content Include="assets\game\worldproperties\abstract\glasstype.json" />
+    <Content Include="assets\glassmaking\blocktypes\firebox.json" />
+    <Content Include="assets\glassmaking\blocktypes\smeltery.json" />
+    <Content Include="assets\glassmaking\blocktypes\temperingoven.json" />
+    <Content Include="assets\glassmaking\blocktypes\workbench.json" />
+    <Content Include="assets\glassmaking\itemtypes\glasssblend.json" />
+    <Content Include="assets\glassmaking\itemtypes\glassshards.json" />
+    <Content Include="assets\glassmaking\itemtypes\glassworkpipe.json" />
+    <Content Include="assets\glassmaking\itemtypes\workbench\mercurypump.json" />
+    <Content Include="assets\glassmaking\lang\en.json" />
+    <Content Include="assets\glassmaking\patches\suppltools.json" />
+    <Content Include="assets\glassmaking\recipes\grid\breakglass.json" />
+    <Content Include="assets\glassmaking\shapes\block\firebox.json" />
+    <Content Include="assets\glassmaking\shapes\block\smeltery\bath.json" />
+    <Content Include="assets\glassmaking\shapes\block\smeltery\cover.json" />
+    <Content Include="assets\glassmaking\shapes\block\smeltery\item.json" />
+    <Content Include="assets\glassmaking\shapes\block\tempering-oven.json" />
+    <Content Include="assets\glassmaking\shapes\block\workbench\item.json" />
+    <Content Include="assets\glassmaking\shapes\block\workbench\left.json" />
+    <Content Include="assets\glassmaking\shapes\block\workbench\right.json" />
+    <Content Include="assets\glassmaking\shapes\block\workbench\tools\mercurypump.json" />
+    <Content Include="assets\glassmaking\shapes\item\glassworkpipe.json" />
+    <Content Include="assets\glassmaking\shapes\item\resource\crushed\glassshards.json" />
+    <Content Include="assets\glassmaking\textures\item\resource\crushed\glassshards.png" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\Blocks\BlockGlassBlowingMold.cs" />
@@ -111,6 +134,9 @@
     <Compile Include="src\Common\IItemCrafter.cs" />
     <Compile Include="src\Common\WorkbenchRecipe.cs" />
     <Compile Include="src\GlassblowingTools\GlassblowingToolBehavior.cs" />
+    <Compile Include="src\TemporaryMetadata\IDisposableHandle.cs" />
+    <Compile Include="src\TemporaryMetadata\ITemporaryMetadataPool.cs" />
+    <Compile Include="src\TemporaryMetadata\TemporaryMetadataSystem.cs" />
     <Compile Include="src\Workbench\IWorkbenchTool.cs" />
     <Compile Include="src\Common\MinMaxFloat.cs" />
     <Compile Include="src\Common\RecipeRegistryDictionary.cs" />
@@ -132,9 +158,7 @@
     <Compile Include="src\Utils.cs" />
     <Compile Include="src\Workbench\WorkbenchToolBehavior.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="assets\game\worldproperties\abstract\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

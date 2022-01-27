@@ -33,7 +33,7 @@
     },
     "creativeinventory": {
         "general": [ "*" ],
-        "items": [ "*" ]
+        "glassmaking": [ "*" ]
     },
     "textures": {
         "glass": { "base": "game:block/glass/vintage" },

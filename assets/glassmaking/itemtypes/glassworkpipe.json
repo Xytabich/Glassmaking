@@ -19,8 +19,8 @@
     "shape": { "base": "item/glassworkpipe" },
     "creativeinventory": {
         "general": [ "*" ],
-        "items": [ "*" ],
-        "tools": [ "*" ]
+        "tools": [ "*" ],
+        "glassmaking": [ "*" ]
     },
     "textures": {
         "glass": { "base": "game:item/resource/ungraded/clearquartz" }
