@@ -1,5 +1,6 @@
 ﻿using GlassMaking.Common;
 using System;
+using System.Collections.Generic;
 using System.Text;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
@@ -293,6 +294,19 @@ namespace GlassMaking.Blocks
                 temp -= (float)(Math.Min((temp - 20) / TEMP_DECREASE_PER_HOUR, hours) * TEMP_DECREASE_PER_HOUR);
             }
             return temp;
+        }
+
+        public override void OnLoadCollectibleMappings(IWorldAccessor worldForNewMappings, Dictionary<int, AssetLocation> oldBlockIdMapping, Dictionary<int, AssetLocation> oldItemIdMapping, int schematicSeed)
+        {
+            base.OnLoadCollectibleMappings(worldForNewMappings, oldBlockIdMapping, oldItemIdMapping, schematicSeed);
+            Utils.FixIdMappingOrClear(contentsSlot, oldBlockIdMapping, oldItemIdMapping, worldForNewMappings);
+            if(contents == null) burning = false;
+        }
+
+        public override void OnStoreCollectibleMappings(Dictionary<int, AssetLocation> blockIdMapping, Dictionary<int, AssetLocation> itemIdMapping)
+        {
+            base.OnStoreCollectibleMappings(blockIdMapping, itemIdMapping);
+            contents?.Collectible.OnStoreCollectibleMappings(Api.World, contentsSlot, blockIdMapping, itemIdMapping);
         }
 
         private void OnCommonTick(float dt)

@@ -227,7 +227,7 @@ namespace GlassMaking.Blocks
             inventory.ToTreeAttributes(tree);
             for(int i = 0; i < processes.Length; i++)
             {
-                if(processes[i] != null)
+                if(!inventory[i].Empty && processes[i] != null)
                 {
                     var attrib = tree.GetOrAddTreeAttribute("process" + i);
                     attrib.SetBool("isHeated", processes[i].isHeated);

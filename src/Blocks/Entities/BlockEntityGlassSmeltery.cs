@@ -1,6 +1,7 @@
 ﻿using GlassMaking.Common;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Text;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
@@ -306,6 +307,24 @@ namespace GlassMaking.Blocks
                 EnumParticleModel.Quad,
                 byPlayer
             );
+        }
+
+        public override void OnLoadCollectibleMappings(IWorldAccessor worldForNewMappings, Dictionary<int, AssetLocation> oldBlockIdMapping, Dictionary<int, AssetLocation> oldItemIdMapping, int schematicSeed)
+        {
+            base.OnLoadCollectibleMappings(worldForNewMappings, oldBlockIdMapping, oldItemIdMapping, schematicSeed);
+            foreach(ItemSlot item in inventory)
+            {
+                Utils.FixIdMappingOrClear(item, oldBlockIdMapping, oldItemIdMapping, worldForNewMappings);
+            }
+        }
+
+        public override void OnStoreCollectibleMappings(Dictionary<int, AssetLocation> blockIdMapping, Dictionary<int, AssetLocation> itemIdMapping)
+        {
+            base.OnStoreCollectibleMappings(blockIdMapping, itemIdMapping);
+            foreach(ItemSlot slot in inventory)
+            {
+                Utils.StoreCollectibleMappings(slot, blockIdMapping, itemIdMapping, Api.World);
+            }
         }
 
         void ITimeBasedHeatReceiver.SetHeatSource(ITimeBasedHeatSource heatSource)

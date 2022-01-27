@@ -220,6 +220,18 @@ namespace GlassMaking.Blocks
             }
         }
 
+        public override void OnLoadCollectibleMappings(IWorldAccessor worldForNewMappings, Dictionary<int, AssetLocation> oldBlockIdMapping, Dictionary<int, AssetLocation> oldItemIdMapping, int schematicSeed)
+        {
+            base.OnLoadCollectibleMappings(worldForNewMappings, oldBlockIdMapping, oldItemIdMapping, schematicSeed);
+            Utils.FixIdMappingOrClear(ref contents, oldBlockIdMapping, oldItemIdMapping, worldForNewMappings);
+        }
+
+        public override void OnStoreCollectibleMappings(Dictionary<int, AssetLocation> blockIdMapping, Dictionary<int, AssetLocation> itemIdMapping)
+        {
+            base.OnStoreCollectibleMappings(blockIdMapping, itemIdMapping);
+            contents?.Collectible.OnStoreCollectibleMappings(Api.World, new DummySlot(contents), blockIdMapping, itemIdMapping);
+        }
+
         private GlassMoldRecipe GetRecipe()
         {
             return ((BlockGlassBlowingMold)Block).recipes[0];
