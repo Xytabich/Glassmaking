@@ -111,15 +111,16 @@ namespace GlassMaking.Items
         {
             var itemstack = inSlot.Itemstack;
             var list = interactions.Append(base.GetHeldInteractionHelp(inSlot));
-            if(!itemstack.Attributes.HasAttribute("glasslayers") && !itemstack.Attributes.HasAttribute("recipe"))
+            if(mod.GetGlassBlowingRecipes().Count > 0 && !itemstack.Attributes.HasAttribute("glasslayers") && !itemstack.Attributes.HasAttribute("recipe"))
             {
-                list = new WorldInteraction[] {
+                var tmp = new WorldInteraction[] {
                     new WorldInteraction() {
                         ActionLangCode = "glassmaking:heldhelp-glasspipe-recipe",
                         HotKeyCode = "itemrecipeselect",
                         MouseButton = EnumMouseButton.None
                     }
                 }.Append(list);
+                list = tmp;
             }
             return list;
         }

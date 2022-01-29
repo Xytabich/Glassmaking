@@ -1,0 +1,80 @@
+{
+    "code": "pipepart",
+    "maxstacksize": 1,
+    "shape": { "base": "item/pipepart" },
+    "creativeinventory": {
+        "general": [ "*" ],
+        "items": [ "*" ]
+    },
+    "fpHandTransform": {
+        "translation": {
+            "x": 0.5,
+            "y": -0.25,
+            "z": 0.5
+        },
+        "rotation": {
+            "x": -160,
+            "y": 0,
+            "z": 0
+        },
+        "origin": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "scale": 1.5
+    },
+    "groundTransform": {
+        "translation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "rotation": {
+            "x": 0,
+            "y": -90,
+            "z": 0
+        },
+        "origin": {
+            "x": 0.5,
+            "y": 0,
+            "z": 0.5
+        },
+        "scale": 1.5
+    },
+    "guiTransform": {
+        "translation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "rotation": {
+            "x": 160,
+            "y": -20,
+            "z": -15
+        },
+        "origin": {
+            "x": 0,
+            "y": 0,
+            "z": 1.75
+        },
+        "scale": 1.5
+    },
+    "tpHandTransform": {
+        "translation": {
+            "x": 0,
+            "y": 0.1,
+            "z": 0
+        },
+        "rotation": {
+            "x": 0,
+            "y": 90,
+            "z": -53
+        },
+        "origin": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    }
+}

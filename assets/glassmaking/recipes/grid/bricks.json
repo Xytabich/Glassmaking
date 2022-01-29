@@ -1,0 +1,83 @@
+[
+    {
+        "name": "firebox",
+        "ingredientPattern": "TDT,TDT,TOT",
+        "ingredients": {
+            "O": {
+                "type": "item",
+                "code": "game:burnedbrick-fire",
+                "quantity": 1
+            },
+            "D": {
+                "type": "item",
+                "code": "game:burnedbrick-fire",
+                "quantity": 2
+            },
+            "T": {
+                "type": "item",
+                "code": "game:burnedbrick-fire",
+                "quantity": 3
+            }
+        },
+        "width": 3,
+        "height": 3,
+        "output": {
+            "type": "block",
+            "code": "firebox-north"
+        }
+    },
+    {
+        "name": "smeltery",
+        "ingredientPattern": "OOO,TDT,TOT",
+        "ingredients": {
+            "O": {
+                "type": "item",
+                "code": "game:burnedbrick-fire",
+                "quantity": 1
+            },
+            "D": {
+                "type": "item",
+                "code": "game:burnedbrick-fire",
+                "quantity": 2
+            },
+            "T": {
+                "type": "item",
+                "code": "game:burnedbrick-fire",
+                "quantity": 3
+            }
+        },
+        "width": 3,
+        "height": 3,
+        "output": {
+            "type": "block",
+            "code": "smeltery-north"
+        }
+    },
+    {
+        "name": "temperingoven",
+        "ingredientPattern": "TDT,TOT,TOT",
+        "ingredients": {
+            "O": {
+                "type": "item",
+                "code": "game:burnedbrick-fire",
+                "quantity": 1
+            },
+            "D": {
+                "type": "item",
+                "code": "game:burnedbrick-fire",
+                "quantity": 2
+            },
+            "T": {
+                "type": "item",
+                "code": "game:burnedbrick-fire",
+                "quantity": 3
+            }
+        },
+        "width": 3,
+        "height": 3,
+        "output": {
+            "type": "block",
+            "code": "temperingoven-north"
+        }
+    }
+]

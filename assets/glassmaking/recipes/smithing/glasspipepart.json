@@ -1,0 +1,22 @@
+{
+    "name": "glassworkpart",
+    "ingredient": {
+        "type": "item",
+        "code": "game:ingot-*",
+        "allowedVariants": [ "iron", "meteoriciron", "steel" ]
+    },
+    "pattern": [
+        [
+            "###############",
+            "###############"
+        ],
+        [
+            "###############",
+            "###############"
+        ]
+    ],
+    "output": {
+        "type": "item",
+        "code": "pipepart"
+    }
+}
