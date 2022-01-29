@@ -110,6 +110,7 @@
     <Compile Include="src\Common\IItemCrafter.cs" />
     <Compile Include="src\Common\WorkbenchRecipe.cs" />
     <Compile Include="src\GlassblowingTools\GlassblowingToolBehavior.cs" />
+    <Compile Include="src\Items\BehaviorGlassBlend.cs" />
     <Compile Include="src\TemporaryMetadata\IDisposableHandle.cs" />
     <Compile Include="src\TemporaryMetadata\ITemporaryMetadataPool.cs" />
     <Compile Include="src\TemporaryMetadata\TemporaryMetadataSystem.cs" />

@@ -6,7 +6,7 @@
     "attributes": {
         "glassmaking:glassblend": {
             "code": "game:{glasstype}",
-            "amount": 5
+            "amount": 250
         },
         "displaycaseable": true,
         "shelvable": true,
@@ -24,6 +24,7 @@
             "scale": 0.65
         }
     },
+    "skipVariants": [ "*-quartz" ],
     "textures": {
         "material": { "base": "game:block/glass/{glasstype}" },
         "basemat": { "base": "game:item/resource/crushed/quartz" }

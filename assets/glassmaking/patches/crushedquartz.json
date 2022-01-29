@@ -1,0 +1,43 @@
+[
+    {
+        "file": "game:itemtypes/resource/crushed/crushed",
+        "op": "add",
+        "path": "/behaviorsByType",
+        "value": {}
+    },
+    {
+        "file": "game:itemtypes/resource/crushed/crushed",
+        "op": "add",
+        "path": "/behaviorsByType/*-quartz",
+        "value": []
+    },
+    {
+        "file": "game:itemtypes/resource/crushed/crushed",
+        "op": "add",
+        "path": "/behaviorsByType/*-quartz/-",
+        "value": {
+            "name": "glassmaking:glassblend"
+        }
+    },
+    {
+        "file": "game:itemtypes/resource/crushed/crushed",
+        "op": "add",
+        "path": "/attributesByType",
+        "value": {}
+    },
+    {
+        "file": "game:itemtypes/resource/crushed/crushed",
+        "op": "add",
+        "path": "/attributesByType/*-quartz",
+        "value": {}
+    },
+    {
+        "file": "game:itemtypes/resource/crushed/crushed",
+        "op": "add",
+        "path": "/attributesByType/*-quartz/glassmaking:glassblend",
+        "value": {
+            "code": "game:quartz",
+            "amount": 250
+        }
+    }
+]
