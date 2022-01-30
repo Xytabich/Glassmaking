@@ -15,15 +15,15 @@ namespace GlassMaking.Handbook
         public ItemMeltableInfo(GlassMakingMod mod)
         {
             this.mod = mod;
-            HandbookItemInfoEvent.onGetHandbookInfo += MeltableInfo;
+            HandbookItemInfoEvent.onGetHandbookInfo += GetHandbookInfo;
         }
 
         public void Dispose()
         {
-            HandbookItemInfoEvent.onGetHandbookInfo -= MeltableInfo;
+            HandbookItemInfoEvent.onGetHandbookInfo -= GetHandbookInfo;
         }
 
-        internal void MeltableInfo(ItemSlot inSlot, ICoreClientAPI capi, ItemStack[] allStacks, ActionConsumable<string> openDetailPageFor, HandbookItemInfoSection section, List<RichTextComponentBase> outComponents)
+        internal void GetHandbookInfo(ItemSlot inSlot, ICoreClientAPI capi, ItemStack[] allStacks, ActionConsumable<string> openDetailPageFor, HandbookItemInfoSection section, List<RichTextComponentBase> outComponents)
         {
             if(section != HandbookItemInfoSection.AfterItemHeader) return;
 

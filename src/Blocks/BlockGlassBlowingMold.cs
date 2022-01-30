@@ -4,7 +4,7 @@ using Vintagestory.API.Util;
 
 namespace GlassMaking.Blocks
 {
-    public class BlockGlassBlowingMold : Block
+    public class BlockGlassBlowingMold : Block, IGlassBlowingMold
     {
         public GlassMoldRecipe[] recipes;
 
@@ -99,6 +99,11 @@ namespace GlassMaking.Blocks
             var be = world.BlockAccessor.GetBlockEntity(pos) as BlockEntityGlassBlowingMold;
             if(be != null) items = items.Append(be.GetDropItems() ?? new ItemStack[0]);
             return items;
+        }
+
+        public GlassMoldRecipe[] GetRecipes(IWorldAccessor world, ItemStack stack)
+        {
+            return recipes;
         }
     }
 }

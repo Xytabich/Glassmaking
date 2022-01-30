@@ -184,7 +184,7 @@ namespace GlassMaking.Items
                 var be = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position);
                 if(be != null)
                 {
-                    var mold = be as IGlassBlowingMold;
+                    var mold = be as IEntityGlassBlowingMold;
                     if(mold != null)
                     {
                         var glasslayers = itemstack.Attributes.GetTreeAttribute("glasslayers");
@@ -269,7 +269,7 @@ namespace GlassMaking.Items
             var be = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position);
             if(be != null)
             {
-                var mold = be as IGlassBlowingMold;
+                var mold = be as IEntityGlassBlowingMold;
                 if(mold != null)
                 {
                     var glasslayers = itemstack.Attributes.GetTreeAttribute("glasslayers");

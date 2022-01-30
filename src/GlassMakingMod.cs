@@ -26,7 +26,7 @@ namespace GlassMaking
 
         private Harmony harmony;
 
-        private ItemMeltableInfo meltableInfo;
+        private List<IDisposable> handbookInfoList;
 
         public override void Start(ICoreAPI api)
         {
@@ -101,14 +101,20 @@ namespace GlassMaking
             {
                 api.Logger.Error(e.Message);
             }
-            meltableInfo = new ItemMeltableInfo(this);
+
+            handbookInfoList = new List<IDisposable>();
+            handbookInfoList.Add(new ItemMeltableInfo(this));
+            handbookInfoList.Add(new MoldBlowingRecipeInfo());
         }
 
         public override void Dispose()
         {
             if(capi != null)
             {
-                meltableInfo.Dispose();
+                foreach(var info in handbookInfoList)
+                {
+                    info.Dispose();
+                }
                 harmony.UnpatchAll("glassmaking");
             }
             base.Dispose();

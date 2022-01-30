@@ -10,7 +10,7 @@ using Vintagestory.API.Util;
 
 namespace GlassMaking.Blocks
 {
-    public class BlockEntityGlassBlowingMold : BlockEntity, IGlassBlowingMold, ITexPositionSource
+    public class BlockEntityGlassBlowingMold : BlockEntity, IEntityGlassBlowingMold, ITexPositionSource
     {
         private static AssetLocation openSound = new AssetLocation("sounds/block/vesselopen");
         private static AssetLocation closeSound = new AssetLocation("sounds/block/vesselclose");

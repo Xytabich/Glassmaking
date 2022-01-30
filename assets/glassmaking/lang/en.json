@@ -3,6 +3,7 @@
     "Contains {0} units of {1} glass": "Contains {0} units of {1} glass",
     "Contains {0} units of molten {1} glass": "Contains {0} units of molten {1} glass",
     "Step {0}/{1}": "Step {0}/{1}",
+    "Mold for": "Mold for",
     "glassshards": "Glass shards ({0})",
     "glassblend": "Glass blend ({0})",
     "heldhelp-glasspipe-recipe": "Select recipe",
