@@ -1,9 +1,12 @@
 ﻿using GlassMaking.Blocks;
 using GlassMaking.Common;
 using GlassMaking.GlassblowingTools;
+using GlassMaking.Handbook;
 using GlassMaking.Items;
+using HarmonyLib;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
@@ -15,10 +18,15 @@ namespace GlassMaking
 {
     public class GlassMakingMod : ModSystem
     {
-        private ICoreServerAPI sapi;
+        private ICoreServerAPI sapi = null;
+        private ICoreClientAPI capi = null;
         private RecipeRegistryDictionary<GlassBlowingRecipe> glassblowingRecipes;
         private RecipeRegistryDictionary<WorkbenchRecipe> workbenchRecipes;
         private Dictionary<AssetLocation, GlassTypeVariant> glassTypes;
+
+        private Harmony harmony;
+
+        private ItemMeltableInfo meltableInfo;
 
         public override void Start(ICoreAPI api)
         {
@@ -79,9 +87,31 @@ namespace GlassMaking
 
         public override void StartClientSide(ICoreClientAPI api)
         {
+            this.capi = api;
             base.StartClientSide(api);
             api.Input.RegisterHotKey("itemrecipeselect", Lang.Get("Select Item Recipe"), GlKeys.F, HotkeyType.GUIOrOtherControls);
             api.Gui.RegisterDialog(new GuiDialogItemRecipeSelector(api));
+
+            try
+            {
+                harmony = new Harmony("glassmaking");
+                harmony.PatchAll(typeof(GlassMakingMod).Assembly);
+            }
+            catch(Exception e)
+            {
+                api.Logger.Error(e.Message);
+            }
+            meltableInfo = new ItemMeltableInfo(this);
+        }
+
+        public override void Dispose()
+        {
+            if(capi != null)
+            {
+                meltableInfo.Dispose();
+                harmony.UnpatchAll("glassmaking");
+            }
+            base.Dispose();
         }
 
         public GlassBlowingRecipe GetGlassBlowingRecipe(string code)

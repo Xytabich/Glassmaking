@@ -1,5 +1,5 @@
 {
-    "Melts into {0} units of {1} glass": "Melts into {0} units of {1} glass in the Glass smeltery",
+    "Melts into {0} units of {1} glass": "Melts into {0} units of {1} glass",
     "Contains {0} units of {1} glass": "Contains {0} units of {1} glass",
     "Contains {0} units of molten {1} glass": "Contains {0} units of molten {1} glass",
     "Step {0}/{1}": "Step {0}/{1}",
@@ -11,6 +11,7 @@
     "blockhelp-firebox-fuel": "Add fuel",
     "blockhelp-firebox-ignite": "Ignite",
     "blockhelp-smeltery-add": "Add glass blend or shards",
+    "glassmaking:Melting in the glass smeltery": "Melting in the glass smeltery",
     "glassmaking:Glass melting progress: {0}%": "Glass melting progress: {0}%",
     "glassmaking:Glass bubbling progress: {0}%": "Glass bubbling progress: {0}%",
     "glassmaking:Break down to receive:": "Break down to receive glass shards:",
@@ -36,5 +37,6 @@
     "game:glassblend-pink": "Pink Quartz",
     "game:glassblend-violet": "Amethyst",
     "game:glassblend-vintage": "Vintage",
-    "game:tabname-glassmaking": "Glassmaking"
+    "game:tabname-glassmaking": "Glassmaking",
+    "game:{0} units of {1} glass at {2}°C": "{0} units of {1} glass at {2}°C"
 }

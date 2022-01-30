@@ -74,6 +74,14 @@
       <HintPath>C:\Games\Vintagestory\Lib\protobuf-net.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>C:\Games\Vintagestory\Lib\0Harmony.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="cairo-sharp">
+      <HintPath>C:\Games\Vintagestory\Lib\cairo-sharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="modinfo.json" />
@@ -106,10 +114,14 @@
     <Compile Include="src\Common\GlassMoldRecipe.cs" />
     <Compile Include="src\Common\GlassTypeProperty.cs" />
     <Compile Include="src\Common\GuiDialogItemRecipeSelector.cs" />
+    <Compile Include="src\Handbook\ItemMeltableInfo.cs" />
+    <Compile Include="src\HandbookPatcher\HandbookItemInfoEvent.cs" />
+    <Compile Include="src\HandbookPatcher\HandbookItemInfoPatch.cs" />
     <Compile Include="src\Common\HeatGraph.cs" />
     <Compile Include="src\Common\IItemCrafter.cs" />
     <Compile Include="src\Common\WorkbenchRecipe.cs" />
     <Compile Include="src\GlassblowingTools\GlassblowingToolBehavior.cs" />
+    <Compile Include="src\HandbookPatcher\HandbookItemInfoSection.cs" />
     <Compile Include="src\Items\BehaviorGlassBlend.cs" />
     <Compile Include="src\TemporaryMetadata\IDisposableHandle.cs" />
     <Compile Include="src\TemporaryMetadata\ITemporaryMetadataPool.cs" />

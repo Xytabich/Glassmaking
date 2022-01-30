@@ -166,38 +166,24 @@ namespace GlassMaking.Blocks
             }
         }
 
+        public bool TryReduceBubbling(double hours)
+        {
+            if(state == SmelteryState.Bubbling)
+            {
+                double processDuration = glassAmount * PROCESS_HOURS_PER_UNIT * BUBBLING_PROCESS_MULTIPLIER;
+                // The last half hour the melt should "calm down"
+                if(processProgress >= processDuration - 0.5) return false;
+
+                processProgress = Math.Min(processProgress + hours, processDuration - 0.5);
+                MarkDirty(true);
+                return true;
+            }
+            return false;
+        }
+
         public bool TryAdd(IPlayer byPlayer, ItemSlot slot, int multiplier)
         {
             if(heatSource == null) return false;
-            if(state == SmelteryState.Bubbling)
-            {
-                var reducer = slot.Itemstack.ItemAttributes?["glassmaking:glassBubblingReducer"].AsObject<GlassBubblingReducer>();
-                if(reducer != null)
-                {
-                    if(Api.Side == EnumAppSide.Server)
-                    {
-                        var collectible = slot.Itemstack.Collectible;
-                        slot.TakeOut(1);
-                        processProgress = Math.Min(processProgress + reducer.amount, glassAmount * PROCESS_HOURS_PER_UNIT * BUBBLING_PROCESS_MULTIPLIER);
-                        slot.MarkDirty();
-                        MarkDirty(true);
-                        if(reducer.replacement != null)
-                        {
-                            if(reducer.replacement.Resolve(Api.World, "glassBubblingReducer.replacement from " + collectible.Code))
-                            {
-                                var item = reducer.replacement.ResolvedItemstack;
-                                if(!byPlayer.Entity.TryGiveItemStack(item))
-                                {
-                                    byPlayer.Entity.World.SpawnItemEntity(item, byPlayer.Entity.Pos.XYZ.Add(0.0, 0.5, 0.0));
-                                }
-                            }
-                        }
-                    }
-                    byPlayer.Entity.World.PlaySoundAt(new AssetLocation("sounds/sizzle"), byPlayer, byPlayer);
-                    SpawnGlassUseParticles(byPlayer.Entity.World, null, byPlayer, 10);
-                    return true;
-                }
-            }
 
             if(glassAmount >= maxGlassAmount) return false;
             GlassBlend blend = GlassBlend.FromJson(slot.Itemstack);
@@ -435,14 +421,5 @@ namespace GlassMaking.Blocks
             Bubbling,
             ContainsGlass
         }
-    }
-
-    [JsonObject]
-    internal class GlassBubblingReducer
-    {
-        [JsonProperty]
-        public JsonItemStack replacement = null;
-        [JsonProperty(Required = Required.Always)]
-        public double amount = 1;
     }
 }
