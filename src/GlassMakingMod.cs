@@ -23,6 +23,13 @@ namespace GlassMaking
         private RecipeRegistryDictionary<GlassBlowingRecipe> glassblowingRecipes;
         private RecipeRegistryDictionary<WorkbenchRecipe> workbenchRecipes;
         private Dictionary<AssetLocation, GlassTypeVariant> glassTypes;
+        private Dictionary<string, IPipeBlowingToolDescriptor> pipeToolsDescriptors;
+
+        private List<Block> molds = null;
+        private HashSet<AssetLocation> moldsOutput = null;
+
+        private Dictionary<Tuple<EnumItemClass, int>, ItemStack> temperingRecipes = null;
+        private HashSet<AssetLocation> temperingOutputs = null;
 
         private Harmony harmony;
 
@@ -104,7 +111,17 @@ namespace GlassMaking
 
             handbookInfoList = new List<IDisposable>();
             handbookInfoList.Add(new ItemMeltableInfo(this));
-            handbookInfoList.Add(new MoldBlowingRecipeInfo());
+            handbookInfoList.Add(new BlowingMoldRecipeInfo());
+            handbookInfoList.Add(new BlowingMoldOutputInfo(this));
+            handbookInfoList.Add(new GlassblowingRecipeInfo(this));
+            handbookInfoList.Add(new TemperingRecipeInfo());
+            handbookInfoList.Add(new TemperingOutputInfo(this));
+
+            molds = new List<Block>();
+            moldsOutput = new HashSet<AssetLocation>();
+            temperingRecipes = new Dictionary<Tuple<EnumItemClass, int>, ItemStack>();
+            temperingOutputs = new HashSet<AssetLocation>();
+            api.Event.LevelFinalize += OnClientLevelFinallize;
         }
 
         public override void Dispose()
@@ -170,6 +187,97 @@ namespace GlassMaking
         public IReadOnlyDictionary<AssetLocation, GlassTypeVariant> GetGlassTypes()
         {
             return glassTypes;
+        }
+
+        public void AddPipeToolDescriptor(string tool, IPipeBlowingToolDescriptor descriptor)
+        {
+            if(pipeToolsDescriptors == null) pipeToolsDescriptors = new Dictionary<string, IPipeBlowingToolDescriptor>();
+            pipeToolsDescriptors[tool] = descriptor;
+        }
+
+        public IPipeBlowingToolDescriptor GetPipeToolDescriptor(string tool)
+        {
+            if(pipeToolsDescriptors != null && pipeToolsDescriptors.TryGetValue(tool, out var descriptor))
+            {
+                return descriptor;
+            }
+            return null;
+        }
+
+        public bool TryGetMoldsForItem(CollectibleObject item, out Block[] molds)
+        {
+            if(moldsOutput.Contains(item.Code))
+            {
+                List<Block> list = new List<Block>();
+                foreach(var block in this.molds)
+                {
+                    var mold = (IGlassBlowingMold)block;
+                    foreach(var recipe in mold.GetRecipes())
+                    {
+                        if(recipe.output.Code.Equals(item.Code))
+                        {
+                            list.Add(block);
+                        }
+                    }
+                }
+                molds = list.ToArray();
+                return true;
+            }
+            molds = null;
+            return false;
+        }
+
+        public bool TryGetTemperingMaterialsForItem(ItemStack item, out CollectibleObject[] materials)
+        {
+            if(temperingOutputs.Contains(item.Collectible.Code))
+            {
+                List<CollectibleObject> list = new List<CollectibleObject>();
+                foreach(var pair in temperingRecipes)
+                {
+                    if(pair.Value.Collectible.Equals(pair.Value, item, GlobalConstants.IgnoredStackAttributes))
+                    {
+                        list.Add((pair.Key.Item1 == EnumItemClass.Block) ? (CollectibleObject)capi.World.GetBlock(pair.Key.Item2) : (CollectibleObject)capi.World.GetItem(pair.Key.Item2));
+                    }
+                }
+                materials = list.ToArray();
+                return true;
+            }
+            materials = null;
+            return false;
+        }
+
+        private void OnClientLevelFinallize()
+        {
+            foreach(var block in capi.World.Blocks)
+            {
+                if(block is IGlassBlowingMold mold)
+                {
+                    var recipes = mold.GetRecipes();
+                    if(recipes != null && recipes.Length > 0)
+                    {
+                        molds.Add(block);
+                        foreach(var recipe in recipes)
+                        {
+                            moldsOutput.Add(recipe.output.Code);
+                        }
+                    }
+                }
+            }
+            foreach(var collectible in capi.World.Collectibles)
+            {
+                if(collectible.Attributes != null && collectible.Attributes.KeyExists("glassmaking:tempering"))
+                {
+                    var properties = collectible.Attributes["glassmaking:tempering"];
+                    var output = properties["output"].AsObject<JsonItemStack>(null, collectible.Code.Domain);
+                    if(output.Resolve(capi.World, "recipes collect"))
+                    {
+                        var outputItem = output.ResolvedItemstack;
+                        temperingRecipes.Add(new Tuple<EnumItemClass, int>(collectible.ItemClass, collectible.Id), outputItem);
+                        temperingOutputs.Add(outputItem.Collectible.Code);
+                        return;
+                    }
+                }
+            }
         }
 
         private void OnSaveGameLoadedServer()

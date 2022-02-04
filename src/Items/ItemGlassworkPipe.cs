@@ -78,7 +78,7 @@ namespace GlassMaking.Items
                 var recipe = mod.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
                 if(recipe != null)
                 {
-                    recipe.GetRecipeInfo(recipeAttribute, dsc, world, withDebugInfo);
+                    recipe.GetRecipeInfo(itemstack, recipeAttribute, dsc, world, withDebugInfo);
                 }
             }
             var glasslayers = itemstack.Attributes.GetTreeAttribute("glasslayers");

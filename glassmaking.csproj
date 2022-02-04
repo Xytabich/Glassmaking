@@ -115,6 +115,8 @@
     <Compile Include="src\Common\GlassMoldRecipe.cs" />
     <Compile Include="src\Common\GlassTypeProperty.cs" />
     <Compile Include="src\Common\GuiDialogItemRecipeSelector.cs" />
+    <Compile Include="src\Common\IPipeBlowingToolDescriptor.cs" />
+    <Compile Include="src\Handbook\BlowingMoldOutputInfo.cs" />
     <Compile Include="src\Handbook\ItemMeltableInfo.cs" />
     <Compile Include="src\HandbookPatcher\HandbookItemInfoEvent.cs" />
     <Compile Include="src\HandbookPatcher\HandbookItemInfoPatch.cs" />
@@ -123,7 +125,10 @@
     <Compile Include="src\Common\WorkbenchRecipe.cs" />
     <Compile Include="src\GlassblowingTools\GlassblowingToolBehavior.cs" />
     <Compile Include="src\HandbookPatcher\HandbookItemInfoSection.cs" />
-    <Compile Include="src\Handbook\MoldBlowingRecipeInfo.cs" />
+    <Compile Include="src\Handbook\BlowingMoldRecipeInfo.cs" />
+    <Compile Include="src\Handbook\GlassblowingRecipeInfo.cs" />
+    <Compile Include="src\Handbook\TemperingOutputInfo.cs" />
+    <Compile Include="src\Handbook\TemperingRecipeInfo.cs" />
     <Compile Include="src\Items\BehaviorGlassBlend.cs" />
     <Compile Include="src\TemporaryMetadata\IDisposableHandle.cs" />
     <Compile Include="src\TemporaryMetadata\ITemporaryMetadataPool.cs" />

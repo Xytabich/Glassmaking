@@ -1,4 +1,6 @@
-﻿using Vintagestory.API.Common;
+﻿using System.Collections.Generic;
+using Vintagestory.API.Client;
+using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Util;
 
@@ -6,7 +8,7 @@ namespace GlassMaking.Blocks
 {
     public class BlockGlassBlowingMold : Block, IGlassBlowingMold
     {
-        public GlassMoldRecipe[] recipes;
+        public GlassMoldRecipe[] recipes = null;
 
         public override void OnLoaded(ICoreAPI api)
         {
@@ -17,6 +19,7 @@ namespace GlassMaking.Blocks
             {
                 var world = api.World;
                 var nameToCodeMapping = recipe.GetNameToCodeMapping(world);
+                List<GlassMoldRecipe> recipes = new List<GlassMoldRecipe>();
                 if(nameToCodeMapping.Count > 0)
                 {
                     int qCombs = 0;
@@ -27,9 +30,13 @@ namespace GlassMaking.Blocks
                         else qCombs *= pair.Value.Length;
                         first = false;
                     }
-                    recipes = ArrayUtil.CreateFilled(qCombs, _ => recipe.Clone());
                     if(qCombs > 0)
                     {
+                        recipes.Capacity = qCombs;
+                        for(int i = 0; i < qCombs; i++)
+                        {
+                            recipes.Add(recipe.Clone());
+                        }
                         foreach(var pair in nameToCodeMapping)
                         {
                             string variantCode = pair.Key;
@@ -61,14 +68,18 @@ namespace GlassMaking.Blocks
                 }
                 else
                 {
-                    recipes = new GlassMoldRecipe[] { recipe };
+                    recipes.Add(recipe);
                 }
 
                 string source = Code.ToString();
-                for(int i = 0; i < recipes.Length; i++)
+                for(int i = recipes.Count - 1; i >= 0; i--)
                 {
-                    recipes[i].Resolve(world, source);
+                    if(!recipes[i].Resolve(world, source))
+                    {
+                        recipes.RemoveAt(i);
+                    }
                 }
+                this.recipes = recipes.ToArray();
             }
             else
             {
@@ -101,7 +112,7 @@ namespace GlassMaking.Blocks
             return items;
         }
 
-        public GlassMoldRecipe[] GetRecipes(IWorldAccessor world, ItemStack stack)
+        public GlassMoldRecipe[] GetRecipes()
         {
             return recipes;
         }

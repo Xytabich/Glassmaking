@@ -109,7 +109,7 @@ namespace GlassMaking.Blocks
             }
             else
             {
-                var properties = slot.Itemstack.Collectible.Attributes?["tempering"];
+                var properties = slot.Itemstack.Collectible.Attributes?["glassmaking:tempering"];
                 if(properties != null && properties.Exists)
                 {
                     if(gridSize > 0)
@@ -284,7 +284,7 @@ namespace GlassMaking.Blocks
         private void ResolveProcessInfo(int index)
         {
             var stack = inventory[index].Itemstack;
-            var properties = stack.Collectible.Attributes?["tempering"];
+            var properties = stack.Collectible.Attributes?["glassmaking:tempering"];
             if(properties != null && properties.Exists)
             {
                 var output = properties["output"].AsObject<JsonItemStack>(null, stack.Collectible.Code.Domain);

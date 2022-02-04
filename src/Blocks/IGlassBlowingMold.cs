@@ -1,9 +1,7 @@
-﻿using Vintagestory.API.Common;
-
-namespace GlassMaking.Blocks
+﻿namespace GlassMaking.Blocks
 {
     public interface IGlassBlowingMold
     {
-        GlassMoldRecipe[] GetRecipes(IWorldAccessor world, ItemStack stack);
+        GlassMoldRecipe[] GetRecipes();
     }
 }

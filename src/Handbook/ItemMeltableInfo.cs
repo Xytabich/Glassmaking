@@ -23,7 +23,7 @@ namespace GlassMaking.Handbook
             HandbookItemInfoEvent.onGetHandbookInfo -= GetHandbookInfo;
         }
 
-        internal void GetHandbookInfo(ItemSlot inSlot, ICoreClientAPI capi, ItemStack[] allStacks, ActionConsumable<string> openDetailPageFor, HandbookItemInfoSection section, List<RichTextComponentBase> outComponents)
+        private void GetHandbookInfo(ItemSlot inSlot, ICoreClientAPI capi, ItemStack[] allStacks, ActionConsumable<string> openDetailPageFor, HandbookItemInfoSection section, List<RichTextComponentBase> outComponents)
         {
             if(section != HandbookItemInfoSection.AfterItemHeader) return;
 

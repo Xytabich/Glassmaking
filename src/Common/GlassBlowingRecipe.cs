@@ -64,12 +64,20 @@ namespace GlassMaking
             return true;
         }
 
-        public void GetRecipeInfo(ITreeAttribute recipeAttribute, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
+        public void GetRecipeInfo(ItemStack item, ITreeAttribute recipeAttribute, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
         {
             dsc.AppendLine(Lang.Get("glassmaking:Recipe: {0}", Lang.Get(new AssetLocation(recipeAttribute.GetString("code")).WithPathPrefixOnce("glassblowingrecipe-").ToString())));
             int step = recipeAttribute.GetInt("step", 0);
             dsc.AppendLine(Lang.Get("glassmaking:Step {0}/{1}", step + 1, steps.Length));
-            dsc.AppendLine(Lang.Get("glassmaking:Tool: {0}", Lang.Get("glassmaking:glassblowingtool-" + steps[step].tool)));
+            var descriptor = world.Api.ModLoader.GetModSystem<GlassMakingMod>().GetPipeToolDescriptor(steps[step].tool);
+            if(descriptor == null)
+            {
+                dsc.AppendLine(Lang.Get("glassmaking:Tool: {0}", Lang.Get("glassmaking:glassblowingtool-" + steps[step].tool)));
+            }
+            else
+            {
+                descriptor.GetStepInfoForHeldItem(world, item, this, step, dsc, withDebugInfo);
+            }
         }
 
         public bool TryBeginStep(ItemSlot slot, int index)
