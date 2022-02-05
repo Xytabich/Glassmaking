@@ -66,7 +66,7 @@ namespace GlassMaking.Items
         {
             base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
             var itemstack = inSlot.Itemstack;
-            var recipeAttribute = itemstack.Attributes.GetTreeAttribute("recipe");
+            var recipeAttribute = itemstack.Attributes.GetTreeAttribute("glassmaking:recipe");
             if(recipeAttribute != null)
             {
                 var recipe = mod.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
@@ -105,7 +105,7 @@ namespace GlassMaking.Items
         {
             var itemstack = inSlot.Itemstack;
             var list = interactions.Append(base.GetHeldInteractionHelp(inSlot));
-            if(mod.GetGlassBlowingRecipes().Count > 0 && !itemstack.Attributes.HasAttribute("glasslayers") && !itemstack.Attributes.HasAttribute("recipe"))
+            if(mod.GetGlassBlowingRecipes().Count > 0 && !itemstack.Attributes.HasAttribute("glasslayers") && !itemstack.Attributes.HasAttribute("glassmaking:recipe"))
             {
                 var tmp = new WorldInteraction[] {
                     new WorldInteraction() {
@@ -171,15 +171,16 @@ namespace GlassMaking.Items
 
             if(preventDefault) return;
 
-            var itemstack = slot.Itemstack;
-            if(itemstack.Attributes.HasAttribute("recipe")) return;
             if(firstEvent && blockSel != null)
             {
                 var be = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position);
                 if(be != null)
                 {
+                    var itemstack = slot.Itemstack;
+                    bool hasRecipe = itemstack.Attributes.HasAttribute("glassmaking:recipe");
+
                     var mold = be as IEntityGlassBlowingMold;
-                    if(mold != null)
+                    if(!hasRecipe && mold != null)
                     {
                         var glasslayers = itemstack.Attributes.GetTreeAttribute("glasslayers");
                         if(glasslayers != null)
@@ -223,7 +224,7 @@ namespace GlassMaking.Items
                                 }
                             }
                         }
-                        else
+                        else if(!hasRecipe)
                         {
                             int amount = source.GetGlassAmount();
                             if(amount > 0 && CanAddGlass(byEntity, slot, amount, source.GetGlassCode(), byEntity.Controls.Sneak ? 5 : 1))
@@ -258,13 +259,15 @@ namespace GlassMaking.Items
             }
             if(preventDefault) return result;
 
-            var itemstack = slot.Itemstack;
-            if(itemstack.Attributes.HasAttribute("recipe") || blockSel == null) return false;
+            if(blockSel == null) return false;
             var be = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position);
             if(be != null)
             {
+                var itemstack = slot.Itemstack;
+                bool hasRecipe = itemstack.Attributes.HasAttribute("glassmaking:recipe");
+
                 var mold = be as IEntityGlassBlowingMold;
-                if(mold != null)
+                if(!hasRecipe && mold != null)
                 {
                     var glasslayers = itemstack.Attributes.GetTreeAttribute("glasslayers");
                     if(glasslayers != null)
@@ -386,7 +389,7 @@ namespace GlassMaking.Items
                             }
                         }
                     }
-                    else
+                    else if(!hasRecipe)
                     {
                         if(slot.Itemstack.TempAttributes.HasAttribute("glassmaking:lastAddGlassTime"))
                         {
@@ -458,7 +461,7 @@ namespace GlassMaking.Items
             base.OnModifiedInInventorySlot(world, slot, extractedStack);
             if(api.Side == EnumAppSide.Client)
             {
-                if(slot.Itemstack.Attributes.HasAttribute("glasslayers") || slot.Itemstack.Attributes.HasAttribute("recipe"))
+                if(slot.Itemstack.Attributes.HasAttribute("glasslayers") || slot.Itemstack.Attributes.HasAttribute("glassmaking:recipe"))
                 {
                     SetMeshDirty(slot.Itemstack);
                 }
@@ -480,7 +483,7 @@ namespace GlassMaking.Items
             double lastUpdate = attr.GetDouble("temperatureLastUpdate");
             if(totalHours - lastUpdate > 1.0 / 85)
             {
-                float temperature = Math.Max(0f, attr.GetFloat("temperature", 20f) - Math.Max(0f, (float)(totalHours - lastUpdate) * 180f));
+                float temperature = Math.Max(20f, attr.GetFloat("temperature", 20f) - Math.Max(0f, (float)(totalHours - lastUpdate) * 180f));
                 SetGlassTemperature(world, itemstack, temperature);
                 return temperature;
             }
@@ -498,15 +501,26 @@ namespace GlassMaking.Items
                     itemstack.Attributes["glassTemperature"] = attr;
                 }
                 double totalHours = world.Calendar.TotalHours;
-                if(delayCooldown && attr.GetFloat("temperature") < temperature)
+                float prevTemperature = attr.GetFloat("temperature");
+                if(delayCooldown && prevTemperature < temperature)
                 {
                     totalHours += 0.5;
                 }
+
                 attr.SetDouble("temperatureLastUpdate", totalHours);
                 attr.SetFloat("temperature", temperature);
+
                 if(api.Side == EnumAppSide.Client)
                 {
-                    SetMeshDirty(itemstack);
+                    var glassmelt = itemstack.Attributes.GetTreeAttribute("glassmelt");
+                    if(glassmelt != null)
+                    {
+                        var workTemperature = GetWorkingTemperature(glassmelt);
+                        if(GlasspipeRenderCache.TemperatureToState(prevTemperature, workTemperature) != GlasspipeRenderCache.TemperatureToState(temperature, workTemperature))
+                        {
+                            SetMeshDirty(itemstack);
+                        }
+                    }
                 }
             }
         }
@@ -522,6 +536,7 @@ namespace GlassMaking.Items
                 if(container.isDirty || !container.hasMesh || container.temperature != temperature)
                 {
                     container.temperature = temperature;
+                    container.isDirty = false;
                     if(glassmelt != null) UpdateGlassmeltMesh(itemstack, glassmelt, GlasspipeRenderCache.StateToGlow(temperature));
                 }
 
@@ -532,7 +547,7 @@ namespace GlassMaking.Items
             }
             else
             {
-                var recipeAttribute = itemstack.Attributes.GetTreeAttribute("recipe");
+                var recipeAttribute = itemstack.Attributes.GetTreeAttribute("glassmaking:recipe");
                 if(recipeAttribute != null)
                 {
                     var container = mod.pipeRenderCache.GetOrCreate(itemstack);
@@ -541,6 +556,7 @@ namespace GlassMaking.Items
                     if(container.isDirty || !container.hasMesh || container.temperature != temperature)
                     {
                         container.temperature = temperature;
+                        container.isDirty = false;
                         UpdateRecipeMesh(itemstack, recipeAttribute, GlasspipeRenderCache.StateToGlow(temperature));
                     }
 
@@ -559,7 +575,7 @@ namespace GlassMaking.Items
 
         public bool TryGetRecipeAttribute(ItemStack itemstack, out ITreeAttribute recipeAttribute)
         {
-            recipeAttribute = itemstack.Attributes.GetTreeAttribute("recipe");
+            recipeAttribute = itemstack.Attributes.GetTreeAttribute("glassmaking:recipe");
             return recipeAttribute != null;
         }
 
@@ -567,7 +583,7 @@ namespace GlassMaking.Items
         {
             if(isComplete)
             {
-                slot.Itemstack.Attributes.RemoveAttribute("recipe");
+                slot.Itemstack.Attributes.RemoveAttribute("glassmaking:recipe");
                 slot.Itemstack.Attributes.RemoveAttribute("glassmelt");
                 slot.MarkDirty();
             }
@@ -604,7 +620,7 @@ namespace GlassMaking.Items
 
         bool IItemCrafter.PreventRecipeAssignment(IClientPlayer player, ItemStack item)
         {
-            return item.Attributes.HasAttribute("recipe") || item.Attributes.HasAttribute("glasslayers");
+            return item.Attributes.HasAttribute("glassmaking:recipe") || item.Attributes.HasAttribute("glasslayers");
         }
 
         bool IItemCrafter.TryGetRecipeOutputs(IClientPlayer player, ItemStack item, out KeyValuePair<IAttribute, ItemStack>[] recipeOutputs)
@@ -633,7 +649,7 @@ namespace GlassMaking.Items
                     if(recipe != null)
                     {
                         var slot = player.Entity.RightHandItemSlot;
-                        slot.Itemstack.Attributes.GetOrAddTreeAttribute("recipe").SetString("code", code);
+                        slot.Itemstack.Attributes.GetOrAddTreeAttribute("glassmaking:recipe").SetString("code", code);
                         slot.MarkDirty();
                         return true;
                     }

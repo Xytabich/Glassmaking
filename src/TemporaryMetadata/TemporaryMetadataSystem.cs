@@ -87,7 +87,7 @@ namespace GlassMaking.TemporaryMetadata
                     DateTime now = DateTime.Now;
                     DateTime time = now.Subtract(keepTime);
                     Handle handle;
-                    while((handle = queue.Peek()).enqueueTime <= time)
+                    while(queue.Count > 0 && (handle = queue.Peek()).enqueueTime <= time)
                     {
                         queue.Dequeue();
                         if(handle.updateTime > time)

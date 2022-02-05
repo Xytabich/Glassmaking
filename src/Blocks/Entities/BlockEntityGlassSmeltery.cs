@@ -47,7 +47,17 @@ namespace GlassMaking.Blocks
             inventory.LateInitialize("glassmaking:smeltery-" + Pos.X + "/" + Pos.Y + "/" + Pos.Z, api);
             if(state != SmelteryState.Empty)
             {
-                meltingTemperature = mod.GetGlassTypeInfo(glassCode).meltingPoint;
+                var glassType = mod.GetGlassTypeInfo(glassCode);
+                if(glassType == null)
+                {
+                    state = SmelteryState.Empty;
+                    glassCode = null;
+                    inventory.Clear();
+                }
+                else
+                {
+                    meltingTemperature = mod.GetGlassTypeInfo(glassCode).meltingPoint / TEMPERATURE_MODIFIER;
+                }
             }
             if(api.Side == EnumAppSide.Client)
             {
@@ -75,22 +85,22 @@ namespace GlassMaking.Blocks
                         dsc.AppendLine(Lang.Get("glassmaking:Contains {0} units of {1} glass", glassAmount, Lang.Get(GlassBlend.GetBlendNameCode(glassCode))));
                         if(heatSource.IsHeatedUp())
                         {
-                            dsc.AppendLine(Lang.Get("Temperature: {0}°C", (heatSource.CalcCurrentTemperature() * TEMPERATURE_MODIFIER).ToString("0")));
+                            dsc.AppendLine(Lang.Get("Temperature: {0}°C", GetTemperature().ToString("0")));
                         }
                         break;
                     case SmelteryState.Melting:
                         dsc.AppendLine(Lang.Get("glassmaking:Contains {0} units of {1} glass", glassAmount, Lang.Get(GlassBlend.GetBlendNameCode(glassCode))));
                         dsc.AppendLine(Lang.Get("glassmaking:Glass melting progress: {0}%", (processProgress / (glassAmount * PROCESS_HOURS_PER_UNIT) * 100).ToString("0")));
-                        dsc.AppendLine(Lang.Get("Temperature: {0}°C", (heatSource.CalcCurrentTemperature() * TEMPERATURE_MODIFIER).ToString("0")));
+                        dsc.AppendLine(Lang.Get("Temperature: {0}°C", GetTemperature().ToString("0")));
                         break;
                     case SmelteryState.Bubbling:
                         dsc.AppendLine(Lang.Get("glassmaking:Contains {0} units of {1} glass", glassAmount, Lang.Get(GlassBlend.GetBlendNameCode(glassCode))));
                         dsc.AppendLine(Lang.Get("glassmaking:Glass bubbling progress: {0}%", (processProgress / (glassAmount * PROCESS_HOURS_PER_UNIT * BUBBLING_PROCESS_MULTIPLIER) * 100).ToString("0")));
-                        dsc.AppendLine(Lang.Get("Temperature: {0}°C", (heatSource.CalcCurrentTemperature() * TEMPERATURE_MODIFIER).ToString("0")));
+                        dsc.AppendLine(Lang.Get("Temperature: {0}°C", GetTemperature().ToString("0")));
                         break;
                     case SmelteryState.ContainsGlass:
                         dsc.AppendLine(Lang.Get("glassmaking:Contains {0} units of molten {1} glass", glassAmount, Lang.Get(GlassBlend.GetBlendNameCode(glassCode))));
-                        dsc.AppendLine(Lang.Get("Temperature: {0}°C", (heatSource.CalcCurrentTemperature() * TEMPERATURE_MODIFIER).ToString("0")));
+                        dsc.AppendLine(Lang.Get("Temperature: {0}°C", GetTemperature().ToString("0")));
                         break;
                 }
             }
@@ -133,7 +143,17 @@ namespace GlassMaking.Blocks
                 }
                 if(Api?.World != null)
                 {
-                    meltingTemperature = mod.GetGlassTypeInfo(glassCode).meltingPoint;
+                    var glassType = mod.GetGlassTypeInfo(glassCode);
+                    if(glassType == null)
+                    {
+                        state = SmelteryState.Empty;
+                        glassCode = null;
+                        inventory.Clear();
+                    }
+                    else
+                    {
+                        meltingTemperature = mod.GetGlassTypeInfo(glassCode).meltingPoint / TEMPERATURE_MODIFIER;
+                    }
                 }
             }
             else
@@ -196,7 +216,7 @@ namespace GlassMaking.Blocks
                     if(glassCode == null)
                     {
                         glassCode = blend.code.Clone();
-                        meltingTemperature = mod.GetGlassTypeInfo(glassCode).meltingPoint;
+                        meltingTemperature = mod.GetGlassTypeInfo(glassCode).meltingPoint / TEMPERATURE_MODIFIER;
                     }
                     if(state == SmelteryState.Bubbling || state == SmelteryState.ContainsGlass)
                     {

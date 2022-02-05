@@ -1,5 +1,6 @@
 ﻿using System;
 using Vintagestory.API.Client;
+using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Items
@@ -80,7 +81,7 @@ namespace GlassMaking.Items
         {
             if(info.Y == 0f)
             {
-                AddVertice(mesh, 0, 0, info.X, 8f, glow);
+                AddVertice(mesh, 0, 0, info.X, 8f, isOuter, glow);
                 return 1;
             }
             else
@@ -89,18 +90,18 @@ namespace GlassMaking.Items
                 for(int i = 0; i <= RADIAL_SECTIONS_COUNT; i++)
                 {
                     float angle = step * i;
-                    AddVertice(mesh, GameMath.FastSin(angle) * info.Y, GameMath.FastCos(angle) * info.Y, info.X, Math.Abs(angle - GameMath.PI) * info.Y, glow);
+                    AddVertice(mesh, GameMath.FastSin(angle) * info.Y, GameMath.FastCos(angle) * info.Y, info.X, Math.Abs(angle - GameMath.PI) * info.Y, isOuter, glow);
                 }
                 return RADIAL_SECTIONS_COUNT + 1;
             }
         }
 
-        private static void AddVertice(MeshData mesh, float x, float y, float z, float a, int glow)
+        private static void AddVertice(MeshData mesh, float x, float y, float z, float a, bool isOuter, int glow)
         {
             const float scale = 1f / 16f;
-            mesh.AddVertexWithFlags(x * scale, y * scale, z * scale, 1f - GetUvCoord(z * scale), GetUvCoord(a * scale), ColorUtil.WhiteArgb, glow | (2 << 8));
             var vec = new Vec3f(x, y, 0).Normalize();
-            mesh.AddNormal(vec.X, vec.Y, vec.Z);
+            if(!isOuter) vec = Vec3f.Zero.Clone().Sub(vec);
+            mesh.AddVertexWithFlags(x * scale, y * scale, z * scale, 1f - GetUvCoord(z * scale), GetUvCoord(a * scale), ColorUtil.WhiteArgb, glow | (2 << 8) | VertexFlags.PackNormal(vec));
         }
 
         private static float GetUvCoord(float v)

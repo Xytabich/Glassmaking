@@ -147,11 +147,11 @@ namespace GlassMaking
 
             if(container.data == null || !(container.data is MeshInfo data))
             {
-                container.data = new MeshInfo(code, step, t);
+                container.data = new MeshInfo(code, step, t, glow);
             }
-            else if(!data.Equals(code, step, t))
+            else if(!data.Equals(code, step, t, glow))
             {
-                data.Set(code, step, t);
+                data.Set(code, step, t, glow);
             }
             else
             {
@@ -232,24 +232,27 @@ namespace GlassMaking
             public string code;
             public int step;
             public float progress;
+            public int glow;
 
-            public MeshInfo(string code, int step, float progress)
+            public MeshInfo(string code, int step, float progress, int glow)
             {
                 this.code = code;
                 this.step = step;
                 this.progress = progress;
+                this.glow = glow;
             }
 
-            public void Set(string code, int step, float progress)
+            public void Set(string code, int step, float progress, int glow)
             {
                 this.code = code;
                 this.step = step;
                 this.progress = progress;
+                this.glow = glow;
             }
 
-            public bool Equals(string code, int step, float progress)
+            public bool Equals(string code, int step, float progress, int glow)
             {
-                return this.code == code && this.step == step && this.progress == progress;
+                return this.code == code && this.step == step && this.progress == progress && this.glow == glow;
             }
         }
     }

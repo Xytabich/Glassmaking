@@ -5,25 +5,9 @@ namespace GlassMaking.GlassblowingTools
 {
     public class BlowingTool : GlassblowingToolBehavior
     {
-        //private WorldInteraction[] interactions;
-
         public BlowingTool(CollectibleObject collObj) : base(collObj)
         {
         }
-
-        //public override void OnLoaded(ICoreAPI api)
-        //{
-        //    base.OnLoaded(api);
-        //    if(api.Side == EnumAppSide.Client)
-        //    {
-        //        interactions = new WorldInteraction[1] {
-        //            new WorldInteraction() {
-        //                ActionLangCode = "glassmaking:heldhelp-gbtool-blowing",
-        //                MouseButton = EnumMouseButton.Right
-        //            }
-        //        };
-        //    }
-        //}
 
         public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling, ref EnumHandling handling)
         {

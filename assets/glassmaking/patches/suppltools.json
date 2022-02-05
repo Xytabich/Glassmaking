@@ -2,23 +2,6 @@
     {
         "file": "game:itemtypes/tool/shears",
         "op": "add",
-        "path": "/behaviors",
-        "value": []
-    },
-    {
-        "file": "game:itemtypes/tool/shears",
-        "op": "add",
-        "path": "/behaviors/-",
-        "value": {
-            "name": "glassmaking:gbt-shears",
-            "properties": {
-                "tool": "shears"
-            }
-        }
-    },
-    {
-        "file": "game:itemtypes/tool/shears",
-        "op": "add",
         "path": "/tooltierbytype",
         "value": {
             "*-copper": 2,
@@ -30,6 +13,23 @@
             "*-iron": 4,
             "*-meteoriciron": 4,
             "*-steel": 5
+        }
+    },
+    {
+        "file": "game:itemtypes/tool/shears",
+        "op": "add",
+        "path": "/behaviors",
+        "value": []
+    },
+    {
+        "file": "game:itemtypes/tool/shears",
+        "op": "add",
+        "path": "/behaviors/-",
+        "value": {
+            "name": "glassmaking:gbt-tooluse",
+            "properties": {
+                "tool": "cutoff"
+            }
         }
     }
 ]

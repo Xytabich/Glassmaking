@@ -8,6 +8,8 @@ namespace GlassMaking.GlassblowingTools
     {
         public string toolCode;
 
+        protected int minTier;
+
         protected GlassMakingMod mod;
         protected ICoreAPI api;
 
@@ -26,6 +28,7 @@ namespace GlassMaking.GlassblowingTools
         {
             base.Initialize(properties);
             toolCode = properties?["tool"].AsString();
+            minTier = properties?["minTier"].AsInt() ?? 5;
         }
 
         protected bool TryGetRecipeStep(ItemSlot slot, EntityAgent byEntity, out ToolRecipeStep stepInfo)
@@ -47,7 +50,7 @@ namespace GlassMaking.GlassblowingTools
             {
                 if(((ItemGlassworkPipe)pipeSlot.Itemstack.Collectible).IsWorkingTemperature(byEntity.World, pipeSlot.Itemstack))
                 {
-                    var recipeAttribute = pipeSlot.Itemstack.Attributes.GetTreeAttribute("recipe");
+                    var recipeAttribute = pipeSlot.Itemstack.Attributes.GetTreeAttribute("glassmaking:recipe");
                     if(recipeAttribute != null)
                     {
                         var recipe = mod.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));

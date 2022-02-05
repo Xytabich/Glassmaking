@@ -77,20 +77,10 @@ namespace GlassMaking
             var tmpList = new FastList<FastVec2f>();
 
             FastVec2f vec;
-            int count, prevCount = 0;
-            for(int i = 0; i < shape.segments; i++)
-            {
-                vec = LerpParts(shape.outer, tmpList, shape.segments, i);
-                count = vecCallback.Invoke(mesh, vec, true);
-                if(i != 0) triCallback.Invoke(mesh, prevCount, count, true);
-                prevCount = count;
-            }
-            vec = LerpParts(shape.outer, tmpList, shape.segments, shape.segments);
-            count = vecCallback.Invoke(mesh, vec, true);
-            triCallback.Invoke(mesh, prevCount, count, true);
-
+            int count, prevCount;
             if(shape.inner != null)
             {
+                prevCount = 0;
                 for(int i = 0; i < shape.segments; i++)
                 {
                     vec = LerpParts(shape.inner, tmpList, shape.segments, i);
@@ -102,6 +92,18 @@ namespace GlassMaking
                 count = vecCallback.Invoke(mesh, vec, false);
                 triCallback.Invoke(mesh, prevCount, count, false);
             }
+
+            prevCount = 0;
+            for(int i = 0; i < shape.segments; i++)
+            {
+                vec = LerpParts(shape.outer, tmpList, shape.segments, i);
+                count = vecCallback.Invoke(mesh, vec, true);
+                if(i != 0) triCallback.Invoke(mesh, prevCount, count, true);
+                prevCount = count;
+            }
+            vec = LerpParts(shape.outer, tmpList, shape.segments, shape.segments);
+            count = vecCallback.Invoke(mesh, vec, true);
+            triCallback.Invoke(mesh, prevCount, count, true);
         }
 
         public static void BuildLerpedMesh(MeshData mesh, SmoothRadialShape from, SmoothRadialShape to, float t, Func<MeshData, FastVec2f, bool, int> vecCallback, Action<MeshData, int, int, bool> triCallback)
@@ -113,14 +115,6 @@ namespace GlassMaking
             float fromStep = (float)from.segments / segments;
             float toStep = (float)to.segments / segments;
             int count, prevCount = 0;
-            for(int i = 0; i < segments; i++)
-            {
-                count = AddLerpedVertex(mesh, tmpList, vecCallback, true, from, to, i * fromStep, i * toStep, t);
-                if(i != 0) triCallback.Invoke(mesh, prevCount, count, true);
-                prevCount = count;
-            }
-            count = AddLerpedVertex(mesh, tmpList, vecCallback, true, from, to, from.segments, to.segments, t);
-            triCallback.Invoke(mesh, prevCount, count, true);
 
             if(from.inner != null && to.inner != null)
             {
@@ -133,6 +127,15 @@ namespace GlassMaking
                 count = AddLerpedVertex(mesh, tmpList, vecCallback, false, from, to, from.segments, to.segments, t);
                 triCallback.Invoke(mesh, prevCount, count, false);
             }
+
+            for(int i = 0; i < segments; i++)
+            {
+                count = AddLerpedVertex(mesh, tmpList, vecCallback, true, from, to, i * fromStep, i * toStep, t);
+                if(i != 0) triCallback.Invoke(mesh, prevCount, count, true);
+                prevCount = count;
+            }
+            count = AddLerpedVertex(mesh, tmpList, vecCallback, true, from, to, from.segments, to.segments, t);
+            triCallback.Invoke(mesh, prevCount, count, true);
         }
 
         private static int AddLerpedVertex(MeshData mesh, FastList<FastVec2f> tmpList, Func<MeshData, FastVec2f, bool, int> vecCallback, bool isOuter, SmoothRadialShape from, SmoothRadialShape to, float at, float bt, float t)

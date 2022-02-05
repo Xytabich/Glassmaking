@@ -8,37 +8,9 @@ namespace GlassMaking.GlassblowingTools
 {
     public class GlassIntakeTool : GlassblowingToolBehavior
     {
-        //private WorldInteraction[] interactions;
-
         public GlassIntakeTool(CollectibleObject collObj) : base(collObj)
         {
         }
-
-        //public override void OnLoaded(ICoreAPI api)
-        //{
-        //    List<ItemStack> list = new List<ItemStack>();
-        //    foreach(Block block in api.World.Blocks)
-        //    {
-        //        if(block is BlockGlassSmeltery)
-        //        {
-        //            List<ItemStack> stacks = block.GetHandBookStacks(api);
-        //            if(stacks != null) list.AddRange(stacks);
-        //        }
-        //    }
-        //    interactions = new WorldInteraction[] {
-        //        new WorldInteraction() {
-        //            ActionLangCode = "glassmaking:heldhelp-gbtool-intake",
-        //            MouseButton = EnumMouseButton.Right,
-        //            Itemstacks = list.ToArray()
-        //        },
-        //        new WorldInteraction() {
-        //            ActionLangCode = "glassmaking:heldhelp-gbtool-intake",
-        //            MouseButton = EnumMouseButton.Right,
-        //            HotKeyCode = "sneak",
-        //            Itemstacks = list.ToArray()
-        //        }
-        //    };
-        //}
 
         public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling, ref EnumHandling handling)
         {

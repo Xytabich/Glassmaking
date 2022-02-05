@@ -63,7 +63,7 @@ namespace GlassMaking.Items
             {
                 _mesh.SetTexPos(tex["glass"]);
                 var baseMesh = manager.GetMesh(capi, shape, tex);
-                var toUpload = new MeshData(baseMesh.VerticesCount + _mesh.VerticesCount, baseMesh.IndicesCount + _mesh.IndicesCount, false, true, true, true);
+                var toUpload = new MeshData(baseMesh.VerticesCount + _mesh.VerticesCount, baseMesh.IndicesCount + _mesh.IndicesCount, false, true, true, true).WithColorMaps();
                 toUpload.AddMeshData(baseMesh);
                 _mesh.ModelTransform(meshTransform);
                 toUpload.AddMeshData(_mesh);
@@ -164,7 +164,7 @@ namespace GlassMaking.Items
                 container = new GlasspipeRenderCache(this, id.Value);
                 container.tmpHandle = pool.AllocateHandle(container);
 
-                container._mesh = new MeshData(16, 16, true, true, true, true).WithColorMaps();
+                container._mesh = new MeshData(16, 16, false, true, true, true).WithColorMaps();
                 item.TempAttributes.SetInt("glassmaking:tmpMeshId", id.Value);
                 containers[id.Value] = container;
                 return container;

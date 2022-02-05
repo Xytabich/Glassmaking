@@ -4,15 +4,15 @@ using Vintagestory.API.MathTools;
 
 namespace GlassMaking.GlassblowingTools
 {
-    public class ShearsTool : GlassblowingToolBehavior
+    public class ToolUse : GlassblowingToolBehavior
     {
-        public ShearsTool(CollectibleObject collObj) : base(collObj)
+        public ToolUse(CollectibleObject collObj) : base(collObj)
         {
         }
 
         public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling, ref EnumHandling handling)
         {
-            if(firstEvent && TryGetRecipeStep(slot, byEntity, out var step))
+            if(firstEvent && slot.Itemstack.Collectible.ToolTier >= minTier && TryGetRecipeStep(slot, byEntity, out var step))
             {
                 if(step.BeginStep())
                 {
@@ -27,7 +27,7 @@ namespace GlassMaking.GlassblowingTools
 
         public override bool OnHeldInteractStep(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, ref EnumHandling handling)
         {
-            if(TryGetRecipeStep(slot, byEntity, out var step))
+            if(slot.Itemstack.Collectible.ToolTier >= minTier && TryGetRecipeStep(slot, byEntity, out var step))
             {
                 if(step.ContinueStep())
                 {

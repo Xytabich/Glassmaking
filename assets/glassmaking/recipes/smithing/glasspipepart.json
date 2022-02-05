@@ -3,7 +3,7 @@
     "ingredient": {
         "type": "item",
         "code": "game:ingot-*",
-        "allowedVariants": [ "iron", "meteoriciron", "steel" ]
+        "allowedVariants": [ "steel" ]
     },
     "pattern": [
         [
