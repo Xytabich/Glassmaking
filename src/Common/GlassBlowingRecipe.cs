@@ -57,6 +57,10 @@ namespace GlassMaking
                 world.Logger.Error("Glassblowing recipe with output {0} has no steps or missing output. Ignoring recipe.", Output);
                 return false;
             }
+            foreach(var step in steps)
+            {
+                step.tool = step.tool.ToLowerInvariant();
+            }
             if(!output.Resolve(world, sourceForErrorLogging))
             {
                 return false;
@@ -274,7 +278,7 @@ namespace GlassMaking
 
         public void FromBytes(BinaryReader reader)
         {
-            tool = reader.ReadString();
+            tool = reader.ReadString().ToLowerInvariant();
             if(reader.ReadBoolean())
             {
                 shape = new SmoothRadialShape();

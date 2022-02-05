@@ -48,6 +48,10 @@ namespace GlassMaking
                 world.Logger.Error("Workbench recipe {0} has no steps or missing output. Ignoring recipe.", code);
                 return false;
             }
+            foreach(var step in steps)
+            {
+                step.tool = step.tool.ToLowerInvariant();
+            }
             if(!input.Resolve(world, sourceForErrorLogging))
             {
                 return false;
@@ -145,7 +149,7 @@ namespace GlassMaking
 
         public void FromBytes(BinaryReader reader)
         {
-            tool = reader.ReadString();
+            tool = reader.ReadString().ToLowerInvariant();
             if(reader.ReadBoolean())
             {
                 shape = new CompositeShape();

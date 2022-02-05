@@ -198,12 +198,12 @@ namespace GlassMaking
         public void AddPipeToolDescriptor(string tool, IPipeBlowingToolDescriptor descriptor)
         {
             if(pipeToolsDescriptors == null) pipeToolsDescriptors = new Dictionary<string, IPipeBlowingToolDescriptor>();
-            pipeToolsDescriptors[tool] = descriptor;
+            pipeToolsDescriptors[tool.ToLowerInvariant()] = descriptor;
         }
 
         public IPipeBlowingToolDescriptor GetPipeToolDescriptor(string tool)
         {
-            if(pipeToolsDescriptors != null && pipeToolsDescriptors.TryGetValue(tool, out var descriptor))
+            if(pipeToolsDescriptors != null && pipeToolsDescriptors.TryGetValue(tool.ToLowerInvariant(), out var descriptor))
             {
                 return descriptor;
             }
