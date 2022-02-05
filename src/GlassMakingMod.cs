@@ -3,6 +3,7 @@ using GlassMaking.Common;
 using GlassMaking.GlassblowingTools;
 using GlassMaking.Handbook;
 using GlassMaking.Items;
+using GlassMaking.TemporaryMetadata;
 using HarmonyLib;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -18,6 +19,8 @@ namespace GlassMaking
 {
     public class GlassMakingMod : ModSystem
     {
+        internal GlasspipeCacheManager pipeRenderCache;
+
         private ICoreServerAPI sapi = null;
         private ICoreClientAPI capi = null;
         private RecipeRegistryDictionary<GlassBlowingRecipe> glassblowingRecipes;
@@ -98,6 +101,9 @@ namespace GlassMaking
             base.StartClientSide(api);
             api.Input.RegisterHotKey("itemrecipeselect", Lang.Get("Select Item Recipe"), GlKeys.F, HotkeyType.GUIOrOtherControls);
             api.Gui.RegisterDialog(new GuiDialogItemRecipeSelector(api));
+
+            var pool = api.ModLoader.GetModSystem<TemporaryMetadataSystem>().CreatePool<GlasspipeRenderCache>(TimeSpan.FromSeconds(30));
+            pipeRenderCache = new GlasspipeCacheManager(pool);
 
             try
             {

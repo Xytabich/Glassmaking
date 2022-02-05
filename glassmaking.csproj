@@ -113,6 +113,7 @@
     <Compile Include="src\Common\GlassBlend.cs" />
     <Compile Include="src\Common\GlassBlowingRecipe.cs" />
     <Compile Include="src\Common\GlassMoldRecipe.cs" />
+    <Compile Include="src\Items\GlasspipeRenderCache.cs" />
     <Compile Include="src\Common\GlassTypeProperty.cs" />
     <Compile Include="src\Common\GuiDialogItemRecipeSelector.cs" />
     <Compile Include="src\Common\IPipeBlowingToolDescriptor.cs" />

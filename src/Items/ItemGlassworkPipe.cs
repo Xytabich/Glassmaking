@@ -62,12 +62,6 @@ namespace GlassMaking.Items
             }
         }
 
-        public override void OnUnloaded(ICoreAPI api)
-        {
-            base.OnUnloaded(api);
-            GlasspipeMeshCache.Dispose(api);
-        }
-
         public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
         {
             base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
@@ -470,7 +464,7 @@ namespace GlassMaking.Items
                 }
                 else
                 {
-                    MeshContainer.Remove(api, slot.Itemstack);
+                    mod.pipeRenderCache.Remove(slot.Itemstack);
                 }
             }
         }
@@ -522,13 +516,13 @@ namespace GlassMaking.Items
             var glasslayers = itemstack.Attributes.GetTreeAttribute("glasslayers");
             if(glasslayers != null)
             {
-                var container = MeshContainer.Get(capi, itemstack);
+                var container = mod.pipeRenderCache.GetOrCreate(itemstack);
                 var glassmelt = itemstack.Attributes.GetTreeAttribute("glassmelt");
-                var temperature = MeshContainer.TemperatureToState(GetGlassTemperature(capi.World, itemstack), GetWorkingTemperature(glassmelt));
+                var temperature = GlasspipeRenderCache.TemperatureToState(GetGlassTemperature(capi.World, itemstack), GetWorkingTemperature(glassmelt));
                 if(container.isDirty || !container.hasMesh || container.temperature != temperature)
                 {
                     container.temperature = temperature;
-                    if(glassmelt != null) UpdateGlassmeltMesh(itemstack, glassmelt, MeshContainer.StateToGlow(temperature));
+                    if(glassmelt != null) UpdateGlassmeltMesh(itemstack, glassmelt, GlasspipeRenderCache.StateToGlow(temperature));
                 }
 
                 container.UpdateMeshRef(capi, Shape, capi.Tesselator.GetTextureSource(this), glassTransform);
@@ -541,13 +535,13 @@ namespace GlassMaking.Items
                 var recipeAttribute = itemstack.Attributes.GetTreeAttribute("recipe");
                 if(recipeAttribute != null)
                 {
-                    var container = MeshContainer.Get(capi, itemstack);
+                    var container = mod.pipeRenderCache.GetOrCreate(itemstack);
                     var glassmelt = itemstack.Attributes.GetTreeAttribute("glassmelt");
-                    var temperature = MeshContainer.TemperatureToState(GetGlassTemperature(capi.World, itemstack), GetWorkingTemperature(glassmelt));
+                    var temperature = GlasspipeRenderCache.TemperatureToState(GetGlassTemperature(capi.World, itemstack), GetWorkingTemperature(glassmelt));
                     if(container.isDirty || !container.hasMesh || container.temperature != temperature)
                     {
                         container.temperature = temperature;
-                        UpdateRecipeMesh(itemstack, recipeAttribute, MeshContainer.StateToGlow(temperature));
+                        UpdateRecipeMesh(itemstack, recipeAttribute, GlasspipeRenderCache.StateToGlow(temperature));
                     }
 
                     container.UpdateMeshRef(capi, Shape, capi.Tesselator.GetTextureSource(this), glassTransform);
@@ -557,7 +551,7 @@ namespace GlassMaking.Items
                 }
                 else
                 {
-                    MeshContainer.Remove(capi, itemstack);
+                    mod.pipeRenderCache.Remove(itemstack);
                 }
             }
             base.OnBeforeRender(capi, itemstack, target, ref renderinfo);
@@ -713,7 +707,7 @@ namespace GlassMaking.Items
 
         private void SetMeshDirty(ItemStack item)
         {
-            MeshContainer.Get(api, item).isDirty = true;
+            mod.pipeRenderCache.GetOrCreate(item).isDirty = true;
         }
 
         private void UpdateGlassmeltMesh(ItemStack item, ITreeAttribute glassmelt, int glow)
@@ -723,7 +717,7 @@ namespace GlassMaking.Items
             {
                 count += ((IntAttribute)pair.Value).value;
             }
-            var container = MeshContainer.Get(api, item);
+            var container = mod.pipeRenderCache.GetOrCreate(item);
             var info = container._data as MeltMeshInfo;
             if(info == null || info.count != count || info.glow != glow)
             {
@@ -755,188 +749,7 @@ namespace GlassMaking.Items
             var recipe = mod.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
             if(recipe != null)
             {
-                recipe.UpdateMesh(recipeAttribute, MeshContainer.Get(api, item), glow);
-            }
-        }
-
-        private class MeshContainer : IMeshContainer
-        {
-            private static int counter = 0;
-
-            public object _data;
-            public MeshData _mesh;
-            public MeshRef meshRef = null;
-
-            public bool isDirty = false;
-            public TemperatureState temperature;
-
-            public bool hasMesh => meshRef != null || updateMesh.HasValue;
-
-            object IMeshContainer.data { get { return _data; } set { _data = value; } }
-            MeshData IMeshContainer.mesh { get { return _mesh; } }
-
-            private bool? updateMesh = null;
-            private int prevVertices, prevIndices;
-
-            private MeshContainer() { }
-
-            public void BeginMeshChange()
-            {
-                _mesh.Clear();
-            }
-
-            public void EndMeshChange()
-            {
-                isDirty = false;
-                if(meshRef == null || _mesh.VerticesCount != prevVertices || _mesh.IndicesCount != prevIndices)
-                {
-                    prevVertices = _mesh.VerticesCount;
-                    prevIndices = _mesh.IndicesCount;
-                    updateMesh = true;
-                }
-                else
-                {
-                    updateMesh = false;
-                }
-            }
-
-            public static MeshContainer Get(ICoreAPI api, ItemStack item)
-            {
-                var id = item.TempAttributes.TryGetInt("tmpMeshId");
-                var cache = GlasspipeMeshCache.Get(api);
-                if(id.HasValue && cache.containers.TryGetValue(id.Value, out var container))
-                {
-                    return container;
-                }
-                else
-                {
-                    container = new MeshContainer();
-                    container._mesh = new MeshData(16, 16, true, true, true, true).WithColorMaps();
-                    item.TempAttributes.SetInt("tmpMeshId", counter);
-                    cache.containers[counter] = container;
-                    counter++;
-                    return container;
-                }
-            }
-
-            public static bool TryGet(ICoreAPI api, ItemStack item, out MeshContainer container)
-            {
-                var id = item.TempAttributes.TryGetInt("tmpMeshId");
-                if(id.HasValue)
-                {
-                    if(GlasspipeMeshCache.TryGet(api, out var cache) && cache.containers.TryGetValue(id.Value, out container))
-                    {
-                        return true;
-                    }
-                }
-                container = default;
-                return false;
-            }
-
-            public static void Remove(ICoreAPI api, ItemStack item)
-            {
-                var id = item.TempAttributes.TryGetInt("tmpMeshId");
-                if(id.HasValue)
-                {
-                    item.TempAttributes.RemoveAttribute("tmpMeshId");
-                    if(GlasspipeMeshCache.TryGet(api, out var cache) && cache.containers.TryGetValue(id.Value, out var container))
-                    {
-                        cache.containers.Remove(id.Value);
-                        container.Dispose();
-                    }
-                }
-            }
-
-            public void Dispose()
-            {
-                if(meshRef != null)
-                {
-                    meshRef.Dispose();
-                    meshRef = null;
-                }
-            }
-
-            public void UpdateMeshRef(ICoreClientAPI capi, CompositeShape shape, ITexPositionSource tex, ModelTransform meshTransform)
-            {
-                if(updateMesh.HasValue)
-                {
-                    _mesh.SetTexPos(tex["glass"]);
-                    GlasspipeMeshCache.TryGet(capi, out var cache);
-                    var baseMesh = cache.GetMesh(capi, shape, tex);
-                    var toUpload = new MeshData(baseMesh.VerticesCount + _mesh.VerticesCount, baseMesh.IndicesCount + _mesh.IndicesCount, false, true, true, true);
-                    toUpload.AddMeshData(baseMesh);
-                    _mesh.ModelTransform(meshTransform);
-                    toUpload.AddMeshData(_mesh);
-                    if(updateMesh.Value)
-                    {
-                        if(meshRef != null) meshRef.Dispose();
-                        meshRef = capi.Render.UploadMesh(toUpload);
-                    }
-                    else
-                    {
-                        capi.Render.UpdateMesh(meshRef, toUpload);
-                    }
-                    updateMesh = null;
-                }
-            }
-
-            public static TemperatureState TemperatureToState(float temperature, float workingTemperature)
-            {
-                if(temperature < workingTemperature * 0.45f) return TemperatureState.Cold;
-                if(temperature < workingTemperature) return TemperatureState.Heated;
-                return TemperatureState.Working;
-            }
-
-            public static int StateToGlow(TemperatureState state)
-            {
-                switch(state)
-                {
-                    case TemperatureState.Heated: return 127;
-                    case TemperatureState.Working: return 255;
-                    default: return 0;
-                }
-            }
-        }
-
-        private class GlasspipeMeshCache
-        {
-            public const string KEY = "glassmaking:glasspipemesh";
-
-            public Dictionary<int, MeshContainer> containers = new Dictionary<int, MeshContainer>();
-
-            private MeshData mesh = null;
-
-            public MeshData GetMesh(ICoreClientAPI capi, CompositeShape shape, ITexPositionSource tex)
-            {
-                if(mesh == null)
-                {
-                    Shape shapeBase = capi.Assets.TryGet(new AssetLocation(shape.Base.Domain, "shapes/" + shape.Base.Path + ".json")).ToObject<Shape>();
-                    capi.Tesselator.TesselateShape("pipemesh", shapeBase, out mesh, tex, new Vec3f(shape.rotateX, shape.rotateY, shape.rotateZ), 0, 0, 0);
-                }
-                return mesh;
-            }
-
-            public static GlasspipeMeshCache Get(ICoreAPI api)
-            {
-                return ObjectCacheUtil.GetOrCreate(api, KEY, () => new GlasspipeMeshCache());
-            }
-
-            public static bool TryGet(ICoreAPI api, out GlasspipeMeshCache cache)
-            {
-                cache = ObjectCacheUtil.TryGet<GlasspipeMeshCache>(api, KEY);
-                return cache != null;
-            }
-
-            public static void Dispose(ICoreAPI api)
-            {
-                if(TryGet(api, out var cache))
-                {
-                    ObjectCacheUtil.Delete(api, KEY);
-                    foreach(var pair in cache.containers)
-                    {
-                        pair.Value.Dispose();
-                    }
-                }
+                recipe.UpdateMesh(recipeAttribute, mod.pipeRenderCache.GetOrCreate(item), glow);
             }
         }
 
@@ -950,13 +763,6 @@ namespace GlassMaking.Items
                 this.count = count;
                 this.glow = glow;
             }
-        }
-
-        private enum TemperatureState
-        {
-            Cold,
-            Heated,
-            Working
         }
 
         public interface IMeshContainer

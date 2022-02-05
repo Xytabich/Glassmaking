@@ -7,16 +7,36 @@ namespace GlassMaking.TemporaryMetadata
 {
     public class TemporaryMetadataSystem : ModSystem
     {
-        private List<ITemporaryMetadataPool> pools = new List<ITemporaryMetadataPool>();
+        private ICoreClientAPI capi = null;
+        private List<ITemporaryMetadataPool> pools = null;
+        private long tickListenerId;
 
         public override void StartClientSide(ICoreClientAPI api)
         {
             base.StartClientSide(api);
-            api.Event.RegisterGameTickListener(OnTick, 1000);
+            tickListenerId = api.Event.RegisterGameTickListener(OnTick, 1000);
+        }
+
+        public override void Dispose()
+        {
+            if(capi != null)
+            {
+                capi.Event.UnregisterGameTickListener(tickListenerId);
+                if(pools != null)
+                {
+                    foreach(var pool in pools)
+                    {
+                        pool.Dispose();
+                    }
+                    pools = null;
+                }
+            }
+            base.Dispose();
         }
 
         public ITemporaryMetadataPool<T> CreatePool<T>(TimeSpan keepTime) where T : IDisposable
         {
+            if(pools == null) pools = new List<ITemporaryMetadataPool>();
             var pool = new TmpPool<T>(keepTime);
             pools.Add(pool);
             return pool;
@@ -24,9 +44,12 @@ namespace GlassMaking.TemporaryMetadata
 
         private void OnTick(float dt)
         {
-            for(int i = pools.Count - 1; i >= 0; i--)
+            if(pools != null)
             {
-                pools[i].Update();
+                for(int i = pools.Count - 1; i >= 0; i--)
+                {
+                    pools[i].Update();
+                }
             }
         }
 
@@ -41,6 +64,15 @@ namespace GlassMaking.TemporaryMetadata
                 this.keepTime = keepTime;
             }
 
+            public void Dispose()
+            {
+                foreach(var handle in queue)
+                {
+                    handle.Dispose(true);
+                }
+                queue = null;
+            }
+
             IDisposableHandle ITemporaryMetadataPool<T>.AllocateHandle(T disposable)
             {
                 var handle = new Handle(disposable);
@@ -50,20 +82,23 @@ namespace GlassMaking.TemporaryMetadata
 
             void ITemporaryMetadataPool.Update()
             {
-                DateTime now = DateTime.Now;
-                DateTime time = now.Subtract(keepTime);
-                Handle handle;
-                while((handle = queue.Peek()).enqueueTime <= time)
+                if(queue.Count > 0)
                 {
-                    queue.Dequeue();
-                    if(handle.updateTime > time)
+                    DateTime now = DateTime.Now;
+                    DateTime time = now.Subtract(keepTime);
+                    Handle handle;
+                    while((handle = queue.Peek()).enqueueTime <= time)
                     {
-                        handle.enqueueTime = now;
-                        queue.Enqueue(handle);
-                    }
-                    else
-                    {
-                        handle.Dispose(true);
+                        queue.Dequeue();
+                        if(handle.updateTime > time)
+                        {
+                            handle.enqueueTime = now;
+                            queue.Enqueue(handle);
+                        }
+                        else
+                        {
+                            handle.Dispose(true);
+                        }
                     }
                 }
             }
@@ -103,7 +138,7 @@ namespace GlassMaking.TemporaryMetadata
             }
         }
 
-        private interface ITemporaryMetadataPool
+        private interface ITemporaryMetadataPool : IDisposable
         {
             void Update();
         }
