@@ -63,14 +63,15 @@ namespace GlassMaking.Items
             base.OnUnloaded(api);
 
             Dictionary<string, MeshRef> blendMeshrefs = ObjectCacheUtil.TryGet<Dictionary<string, MeshRef>>(api, "glassmaking:blendMeshRefs");
-            if(blendMeshrefs == null) return;
-
-            foreach(var val in blendMeshrefs.Values)
+            if(blendMeshrefs != null)
             {
-                val?.Dispose();
-            }
+                foreach(var val in blendMeshrefs.Values)
+                {
+                    val?.Dispose();
+                }
 
-            api.ObjectCache.Remove("glassmaking:blendMeshRefs");
+                api.ObjectCache.Remove("glassmaking:blendMeshRefs");
+            }
         }
 
         public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
@@ -107,11 +108,14 @@ namespace GlassMaking.Items
             Dictionary<string, MeshRef> blendMeshrefs = ObjectCacheUtil.GetOrCreate(capi, "glassmaking:blendMeshRefs", () => new Dictionary<string, MeshRef>());
             string key = blend.code.ToString();
 
-            if(!blendMeshrefs.TryGetValue(key, out renderinfo.ModelRef))
+            MeshRef meshRef;
+            if(!blendMeshrefs.TryGetValue(key, out meshRef))
             {
                 var mesh = GenMesh(itemstack, capi.ItemTextureAtlas);
-                renderinfo.ModelRef = blendMeshrefs[key] = mesh == null ? renderinfo.ModelRef : capi.Render.UploadMesh(mesh);
+                meshRef = mesh == null ? renderinfo.ModelRef : capi.Render.UploadMesh(mesh);
+                blendMeshrefs[key] = meshRef;
             }
+            renderinfo.ModelRef = meshRef;
         }
 
         public MeshData GenMesh(ItemStack itemstack, ITextureAtlasAPI targetAtlas, BlockPos forBlockPos = null)
