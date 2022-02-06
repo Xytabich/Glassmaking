@@ -61,6 +61,7 @@ namespace GlassMaking
 
             api.RegisterItemClass("glassmaking:glassworkpipe", typeof(ItemGlassworkPipe));
             api.RegisterItemClass("glassmaking:glassblend", typeof(ItemGlassBlend));
+            api.RegisterItemClass("glassmaking:wettable", typeof(ItemWettable));
 
             api.RegisterBlockClass("glassmaking:firebox", typeof(BlockFirebox));
             api.RegisterBlockClass("glassmaking:temperingoven", typeof(BlockTemperingOven));
@@ -78,6 +79,7 @@ namespace GlassMaking
             api.RegisterBlockBehaviorClass("glassmaking:horizontalmb", typeof(BlockBehaviorHorizontal2BMultiblock));
 
             api.RegisterCollectibleBehaviorClass("glassmaking:gbt-tooluse", typeof(ToolUse));
+            api.RegisterCollectibleBehaviorClass("glassmaking:gbt-dryable", typeof(DryableTool));
             api.RegisterCollectibleBehaviorClass("glassmaking:gbt-blowing", typeof(BlowingTool));
             api.RegisterCollectibleBehaviorClass("glassmaking:gbt-glassintake", typeof(GlassIntakeTool));
 

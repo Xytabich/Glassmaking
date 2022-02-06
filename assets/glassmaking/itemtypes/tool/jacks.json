@@ -1,0 +1,170 @@
+{
+    "code": "jacks",
+    "damagedby": [ "attacking" ],
+    "behaviors": [
+        {
+            "name": "glassmaking:gbt-tooluse",
+            "properties": {
+                "tool": "flare",
+                "minTier": 0,
+                "transform": {
+                    "origin": {
+                        "x": -0.5,
+                        "y": -0.5,
+                        "z": -0.5
+                    },
+                    "translation": {
+                        "x": 0.24,
+                        "y": 0.1,
+                        "z": -0.5
+                    },
+                    "rotation": {
+                        "y": 22,
+                        "z": 25
+                    }
+                },
+                "animation": {
+                    "origin": {
+                        "x": -0.5,
+                        "y": -0.5,
+                        "z": -0.5
+                    },
+                    "translation": {
+                        "x": 0.24,
+                        "y": 0.1,
+                        "z": -0.5
+                    },
+                    "rotation": {
+                        "y": 28,
+                        "z": 25
+                    }
+                },
+                "speed": 6
+            }
+        },
+        {
+            "name": "glassmaking:gbt-tooluse",
+            "properties": {
+                "tool": "recess",
+                "minTier": 0,
+                "transform": {
+                    "origin": {
+                        "x": -0.5,
+                        "y": -0.5,
+                        "z": -0.5
+                    },
+                    "translation": {
+                        "x": 0.24,
+                        "y": 0.1,
+                        "z": -0.5
+                    },
+                    "rotation": {
+                        "y": 22,
+                        "z": 25
+                    }
+                },
+                "animation": {
+                    "origin": {
+                        "x": -0.5,
+                        "y": -0.5,
+                        "z": -0.5
+                    },
+                    "translation": {
+                        "x": 0.24,
+                        "y": 0.1,
+                        "z": -0.5
+                    },
+                    "rotation": {
+                        "y": 28,
+                        "z": 25
+                    }
+                },
+                "speed": 6
+            }
+        }
+    ],
+    "attributes": {
+        "toolrackTransform": {
+            "translation": { "y": 0.7 },
+            "rotation": { "y": 180 },
+            "scale": 1.5
+        }
+    },
+    "shape": { "base": "item/tool/jacks" },
+    "heldTpHitAnimation": "shears",
+    "attackpower": 2.5,
+    "durability": 4000,
+    "creativeinventory": {
+        "general": [ "*" ],
+        "items": [ "*" ],
+        "tools": [ "*" ],
+        "glassmaking": [ "*" ]
+    },
+    "guiTransform": {
+        "translation": {
+            "x": 0.5,
+            "y": 0,
+            "z": 0
+        },
+        "rotation": {
+            "x": -89,
+            "y": 45,
+            "z": 33
+        },
+        "origin": {
+            "x": 0.85,
+            "y": 0.4,
+            "z": 0.48
+        },
+        "scale": 2.5
+    },
+    "fpHandTransform": {
+        "translation": {
+            "x": -0.24,
+            "y": 0.1,
+            "z": 0.1
+        },
+        "rotation": {
+            "x": -35,
+            "y": 15,
+            "z": 90
+        },
+        "scale": 2.45
+    },
+    "groundTransform": {
+        "translation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "origin": {
+            "x": 0.5,
+            "y": 0,
+            "z": 0.5
+        },
+        "scale": 3.6
+    },
+    "tpHandTransform": {
+        "translation": {
+            "x": -0.9,
+            "y": -0.11,
+            "z": -0.35
+        },
+        "rotation": {
+            "x": -10,
+            "y": 0,
+            "z": -25
+        },
+        "origin": {
+            "x": 0.68,
+            "y": 0,
+            "z": 0.42
+        },
+        "scale": 1
+    }
+}

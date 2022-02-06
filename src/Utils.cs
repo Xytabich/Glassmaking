@@ -89,5 +89,39 @@ namespace GlassMaking
                 itemSlot.Itemstack.Collectible.OnStoreCollectibleMappings(world, itemSlot, blockIdMapping, itemIdMapping);
             }
         }
+
+        public static Vec3f Lerp(this Vec3f self, Vec3f target, float t)
+        {
+            self.X += (target.X - self.X) * t;
+            self.Y += (target.Y - self.Y) * t;
+            self.Z += (target.Z - self.Z) * t;
+            return self;
+        }
+
+        public static Vec3f LerpDelta(this Vec3f self, Vec3f delta, float t)
+        {
+            self.X += delta.X * t;
+            self.Y += delta.Y * t;
+            self.Z += delta.Z * t;
+            return self;
+        }
+
+        public static ModelTransform Lerp(this ModelTransform self, ModelTransform target, float t)
+        {
+            self.Origin = self.Origin.Lerp(target.Origin, t);
+            self.Translation = self.Translation.Lerp(target.Translation, t);
+            self.Rotation = self.Rotation.Lerp(target.Rotation, t);
+            self.ScaleXYZ = self.ScaleXYZ.Lerp(target.ScaleXYZ, t);
+            return self;
+        }
+
+        public static ModelTransform LerpDelta(this ModelTransform self, ModelTransform delta, float t)
+        {
+            self.Origin = self.Origin.LerpDelta(delta.Origin, t);
+            self.Translation = self.Translation.LerpDelta(delta.Translation, t);
+            self.Rotation = self.Rotation.LerpDelta(delta.Rotation, t);
+            self.ScaleXYZ = self.ScaleXYZ.LerpDelta(delta.ScaleXYZ, t);
+            return self;
+        }
     }
 }

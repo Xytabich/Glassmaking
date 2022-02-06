@@ -1,0 +1,132 @@
+{
+    "code": "paddle",
+    "class": "glassmaking:wettable",
+    "behaviors": [
+        {
+            "name": "glassmaking:gbt-dryable",
+            "properties": {
+                "tool": "flatten",
+                "transform": {
+                    "origin": {
+                        "x": -0.5,
+                        "y": -0.5,
+                        "z": -0.5
+                    },
+                    "translation": {
+                        "x": 0.24,
+                        "y": 0.1,
+                        "z": -0.5
+                    },
+                    "rotation": {
+                        "y": 22,
+                        "z": 25
+                    }
+                },
+                "animation": {
+                    "origin": {
+                        "x": -0.5,
+                        "y": -0.5,
+                        "z": -0.5
+                    },
+                    "translation": {
+                        "x": 0.24,
+                        "y": 0.1,
+                        "z": -0.5
+                    },
+                    "rotation": {
+                        "y": 28,
+                        "z": 25
+                    }
+                },
+                "speed": 6
+            }
+        }
+    ],
+    "damagedby": [ "attacking" ],
+    "attributes": {
+        "toolrackTransform": {
+            "translation": { "y": 0.7 },
+            "rotation": { "y": 180 },
+            "scale": 1.5
+        },
+        "maxHumidity": 0.25,
+        "evaporation": 0.03
+    },
+    "shape": { "base": "item/tool/paddle" },
+    "heldTpHitAnimation": "shears",
+    "attackpower": 0.5,
+    "durability": 500,
+    "creativeinventory": {
+        "general": [ "*" ],
+        "items": [ "*" ],
+        "tools": [ "*" ],
+        "glassmaking": [ "*" ]
+    },
+    "guiTransform": {
+        "translation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "rotation": {
+            "x": -90,
+            "y": 45,
+            "z": 30
+        },
+        "origin": {
+            "x": 0.85,
+            "y": 0.6,
+            "z": 0.48
+        },
+        "scale": 2.3
+    },
+    "fpHandTransform": {
+        "translation": {
+            "x": -0.24,
+            "y": 0.1,
+            "z": 0.1
+        },
+        "rotation": {
+            "x": -35,
+            "y": 15,
+            "z": 90
+        },
+        "scale": 2.45
+    },
+    "groundTransform": {
+        "translation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "origin": {
+            "x": 0.5,
+            "y": 0,
+            "z": 0.5
+        },
+        "scale": 3.6
+    },
+    "tpHandTransform": {
+        "translation": {
+            "x": -0.3,
+            "y": 0,
+            "z": -0.525
+        },
+        "rotation": {
+            "x": 50,
+            "y": 0,
+            "z": -5
+        },
+        "origin": {
+            "x": 0.25,
+            "y": 0,
+            "z": 0.5
+        },
+        "scale": 1
+    }
+}

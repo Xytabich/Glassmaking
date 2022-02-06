@@ -8,8 +8,6 @@ namespace GlassMaking.GlassblowingTools
     {
         public string toolCode;
 
-        protected int minTier;
-
         protected GlassMakingMod mod;
         protected ICoreAPI api;
 
@@ -28,7 +26,6 @@ namespace GlassMaking.GlassblowingTools
         {
             base.Initialize(properties);
             toolCode = properties?["tool"].AsString();
-            minTier = properties?["minTier"].AsInt() ?? 5;
         }
 
         protected bool TryGetRecipeStep(ItemSlot slot, EntityAgent byEntity, out ToolRecipeStep stepInfo)

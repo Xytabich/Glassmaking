@@ -1,25 +1,24 @@
-﻿using System;
+﻿using GlassMaking.Common;
+using System;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 
 namespace GlassMaking.GlassblowingTools
 {
-    public class ToolUse : GlassblowingToolBehavior
+    public class DryableTool : GlassblowingToolBehavior
     {
-        protected int minTier;
         protected ModelTransform transform;
         protected ModelTransform animationTransform;
         protected float animationSpeed;
 
-        public ToolUse(CollectibleObject collObj) : base(collObj)
+        public DryableTool(CollectibleObject collObj) : base(collObj)
         {
         }
 
         public override void Initialize(JsonObject properties)
         {
             base.Initialize(properties);
-            minTier = properties?["minTier"].AsInt() ?? 5;
             transform = properties?["transform"].AsObject<ModelTransform>()?.EnsureDefaultValues() ?? ModelTransform.NoTransform;
             animationTransform = properties?["animation"].AsObject<ModelTransform>()?.EnsureDefaultValues() ?? ModelTransform.NoTransform;
             animationSpeed = properties?["speed"].AsFloat() ?? 0f;
@@ -27,9 +26,9 @@ namespace GlassMaking.GlassblowingTools
 
         public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling, ref EnumHandling handling)
         {
-            if(firstEvent && slot.Itemstack.Collectible.ToolTier >= minTier && TryGetRecipeStep(slot, byEntity, out var step))
+            if(TryGetRecipeStep(slot, byEntity, out var step) && slot.Itemstack.Collectible is IWettable wettable)
             {
-                if(step.BeginStep())
+                if(wettable.GetHumidity(slot.Itemstack, byEntity.World) >= step.stepAttributes["consume"].AsFloat(0) && step.BeginStep())
                 {
                     if(api.Side == EnumAppSide.Client) step.SetProgress(0);
                     handHandling = EnumHandHandling.PreventDefault;
@@ -42,9 +41,9 @@ namespace GlassMaking.GlassblowingTools
 
         public override bool OnHeldInteractStep(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, ref EnumHandling handling)
         {
-            if(slot.Itemstack.Collectible.ToolTier >= minTier && TryGetRecipeStep(slot, byEntity, out var step))
+            if(TryGetRecipeStep(slot, byEntity, out var step) && slot.Itemstack.Collectible is IWettable wettable)
             {
-                if(step.ContinueStep())
+                if(step.ContinueStep() && wettable.GetHumidity(slot.Itemstack, byEntity.World) >= step.stepAttributes["consume"].AsFloat(0))
                 {
                     if(byEntity.Api.Side == EnumAppSide.Client)
                     {
@@ -80,6 +79,12 @@ namespace GlassMaking.GlassblowingTools
                         if(damage > 0)
                         {
                             slot.Itemstack.Item.DamageItem(byEntity.World, byEntity, slot, damage);
+                            slot.MarkDirty();
+                        }
+                        float consume = step.stepAttributes["consume"].AsFloat(0);
+                        if(consume > 0)
+                        {
+                            wettable.ConsumeHumidity(slot.Itemstack, consume, byEntity.World);
                             slot.MarkDirty();
                         }
                         step.CompleteStep(byEntity);
