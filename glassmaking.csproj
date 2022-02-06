@@ -118,7 +118,10 @@
     <Compile Include="src\Items\GlasspipeRenderCache.cs" />
     <Compile Include="src\Common\GlassTypeProperty.cs" />
     <Compile Include="src\Common\GuiDialogItemRecipeSelector.cs" />
-    <Compile Include="src\Common\IPipeBlowingToolDescriptor.cs" />
+    <Compile Include="src\ToolDescriptors\BlowingToolDescriptor.cs" />
+    <Compile Include="src\ToolDescriptors\DryableToolDescriptor.cs" />
+    <Compile Include="src\ToolDescriptors\IntakeToolDescriptor.cs" />
+    <Compile Include="src\ToolDescriptors\IPipeBlowingToolDescriptor.cs" />
     <Compile Include="src\Handbook\BlowingMoldOutputInfo.cs" />
     <Compile Include="src\Handbook\ItemMeltableInfo.cs" />
     <Compile Include="src\HandbookPatcher\HandbookItemInfoEvent.cs" />
@@ -137,6 +140,8 @@
     <Compile Include="src\TemporaryMetadata\IDisposableHandle.cs" />
     <Compile Include="src\TemporaryMetadata\ITemporaryMetadataPool.cs" />
     <Compile Include="src\TemporaryMetadata\TemporaryMetadataSystem.cs" />
+    <Compile Include="src\ToolDescriptors\ToolBehaviorDescriptor.cs" />
+    <Compile Include="src\ToolDescriptors\ToolUseDescriptor.cs" />
     <Compile Include="src\Workbench\IWorkbenchTool.cs" />
     <Compile Include="src\Common\MinMaxFloat.cs" />
     <Compile Include="src\Common\RecipeRegistryDictionary.cs" />

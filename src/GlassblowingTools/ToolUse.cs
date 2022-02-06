@@ -7,7 +7,8 @@ namespace GlassMaking.GlassblowingTools
 {
     public class ToolUse : GlassblowingToolBehavior
     {
-        protected int minTier;
+        public int minTier;
+
         protected ModelTransform transform;
         protected ModelTransform animationTransform;
         protected float animationSpeed;
@@ -19,10 +20,10 @@ namespace GlassMaking.GlassblowingTools
         public override void Initialize(JsonObject properties)
         {
             base.Initialize(properties);
-            minTier = properties?["minTier"].AsInt() ?? 5;
-            transform = properties?["transform"].AsObject<ModelTransform>()?.EnsureDefaultValues() ?? ModelTransform.NoTransform;
-            animationTransform = properties?["animation"].AsObject<ModelTransform>()?.EnsureDefaultValues() ?? ModelTransform.NoTransform;
-            animationSpeed = properties?["speed"].AsFloat() ?? 0f;
+            minTier = properties["minTier"].AsInt(5);
+            transform = properties["transform"].AsObject<ModelTransform>()?.EnsureDefaultValues() ?? ModelTransform.NoTransform;
+            animationTransform = properties["animation"].AsObject<ModelTransform>()?.EnsureDefaultValues() ?? ModelTransform.NoTransform;
+            animationSpeed = properties["speed"].AsFloat(0);
         }
 
         public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling, ref EnumHandling handling)

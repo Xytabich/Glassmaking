@@ -4,6 +4,7 @@ using GlassMaking.GlassblowingTools;
 using GlassMaking.Handbook;
 using GlassMaking.Items;
 using GlassMaking.TemporaryMetadata;
+using GlassMaking.ToolDescriptors;
 using HarmonyLib;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -26,13 +27,15 @@ namespace GlassMaking
         private RecipeRegistryDictionary<GlassBlowingRecipe> glassblowingRecipes;
         private RecipeRegistryDictionary<WorkbenchRecipe> workbenchRecipes;
         private Dictionary<AssetLocation, GlassTypeVariant> glassTypes;
-        private Dictionary<string, IPipeBlowingToolDescriptor> pipeToolsDescriptors;
+        private Dictionary<string, IPipeBlowingToolDescriptor> pipeToolDescriptors;
 
         private List<Block> molds = null;
         private HashSet<AssetLocation> moldsOutput = null;
 
         private Dictionary<Tuple<EnumItemClass, int>, ItemStack> annealRecipes = null;
         private HashSet<AssetLocation> annealOutputs = null;
+
+        private List<ToolBehaviorDescriptor> descriptors = null;
 
         private Harmony harmony;
 
@@ -125,6 +128,12 @@ namespace GlassMaking
             handbookInfoList.Add(new AnnealRecipeInfo());
             handbookInfoList.Add(new AnnealOutputInfo(this));
 
+            descriptors = new List<ToolBehaviorDescriptor>();
+            descriptors.Add(new ToolUseDescriptor(this));
+            descriptors.Add(new DryableToolDescriptor(this));
+            descriptors.Add(new IntakeToolDescriptor(this));
+            descriptors.Add(new BlowingToolDescriptor(this));
+
             molds = new List<Block>();
             moldsOutput = new HashSet<AssetLocation>();
             annealRecipes = new Dictionary<Tuple<EnumItemClass, int>, ItemStack>();
@@ -136,6 +145,10 @@ namespace GlassMaking
         {
             if(capi != null)
             {
+                foreach(var descriptor in descriptors)
+                {
+                    descriptor.OnUnloaded();
+                }
                 foreach(var info in handbookInfoList)
                 {
                     info.Dispose();
@@ -199,13 +212,13 @@ namespace GlassMaking
 
         public void AddPipeToolDescriptor(string tool, IPipeBlowingToolDescriptor descriptor)
         {
-            if(pipeToolsDescriptors == null) pipeToolsDescriptors = new Dictionary<string, IPipeBlowingToolDescriptor>();
-            pipeToolsDescriptors[tool.ToLowerInvariant()] = descriptor;
+            if(pipeToolDescriptors == null) pipeToolDescriptors = new Dictionary<string, IPipeBlowingToolDescriptor>();
+            pipeToolDescriptors[tool.ToLowerInvariant()] = descriptor;
         }
 
         public IPipeBlowingToolDescriptor GetPipeToolDescriptor(string tool)
         {
-            if(pipeToolsDescriptors != null && pipeToolsDescriptors.TryGetValue(tool.ToLowerInvariant(), out var descriptor))
+            if(pipeToolDescriptors != null && pipeToolDescriptors.TryGetValue(tool.ToLowerInvariant(), out var descriptor))
             {
                 return descriptor;
             }
@@ -282,9 +295,12 @@ namespace GlassMaking
                         var outputItem = output.ResolvedItemstack;
                         annealRecipes.Add(new Tuple<EnumItemClass, int>(collectible.ItemClass, collectible.Id), outputItem);
                         annealOutputs.Add(outputItem.Collectible.Code);
-                        return;
                     }
                 }
+            }
+            foreach(var descriptor in descriptors)
+            {
+                descriptor.OnLoaded(capi);
             }
         }
 

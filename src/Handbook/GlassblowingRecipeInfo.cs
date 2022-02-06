@@ -52,7 +52,7 @@ namespace GlassMaking.Handbook
                         var descriptor = mod.GetPipeToolDescriptor(steps[j].tool);
                         if(descriptor == null)
                         {
-                            outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:Step {0} tool: {1}", j + 1,
+                            outComponents.Add(new RichTextComponent(capi, "• " + Lang.Get("glassmaking:Step {0} tool: {1}", j + 1,
                                 Lang.Get("glassmaking:glassblowingtool-" + steps[j].tool)) + "\n", CairoFont.WhiteSmallText()));
                         }
                         else
