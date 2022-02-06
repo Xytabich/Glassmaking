@@ -10,13 +10,13 @@ using Vintagestory.GameContent;
 
 namespace GlassMaking.Blocks
 {
-    public class BlockEntityTemperingOven : BlockEntityDisplay, ITimeBasedHeatReceiver
+    public class BlockEntityAnnealer : BlockEntityDisplay, ITimeBasedHeatReceiver
     {
         private static SimpleParticleProperties smokeParticles;
 
         public override InventoryBase Inventory => inventory;
-        public override string InventoryClassName => "glassmaking:temperingoven";
-        public override string AttributeTransformCode => "temperingOvenTransform";
+        public override string InventoryClassName => "glassmaking:annealer";
+        public override string AttributeTransformCode => "annealerTransform";
 
         protected virtual int itemCapacity => 9;
 
@@ -31,7 +31,7 @@ namespace GlassMaking.Blocks
 
         private bool preventMeshUpdate = false;
 
-        public BlockEntityTemperingOven()
+        public BlockEntityAnnealer()
         {
             inventory = new InventoryGeneric(itemCapacity, InventoryClassName + "-" + Pos, null);
             for(int i = itemCapacity - 1; i >= 0; i--)
@@ -69,7 +69,7 @@ namespace GlassMaking.Blocks
                         dsc.Append(' ').Append(Lang.Get("Temperature: {0}°C", temperature.ToString("0")));
                         if(processes[i] != null && processes[i].isHeated)
                         {
-                            dsc.Append(' ').Append(Lang.Get("glassmaking:Tempering: {0}", (Math.Min(processes[i].time / processes[i].temperingTime, 1) * 100).ToString("0")));
+                            dsc.Append(' ').Append(Lang.Get("glassmaking:Annealing: {0}", (Math.Min(processes[i].time / processes[i].annealTime, 1) * 100).ToString("0")));
                         }
                         dsc.AppendLine();
                     }
@@ -109,12 +109,12 @@ namespace GlassMaking.Blocks
             }
             else
             {
-                var properties = slot.Itemstack.Collectible.Attributes?["glassmaking:tempering"];
+                var properties = slot.Itemstack.Collectible.Attributes?["glassmaking:anneal"];
                 if(properties != null && properties.Exists)
                 {
                     if(gridSize > 0)
                     {
-                        float size = slot.Itemstack.Collectible.Attributes?["temperingOvenSize"].AsFloat(1f) ?? 1f;
+                        float size = slot.Itemstack.Collectible.Attributes?["annealerSize"].AsFloat(1f) ?? 1f;
                         if(size > gridCellSize) return false;
 
                         int len = gridSize * gridSize;
@@ -134,7 +134,7 @@ namespace GlassMaking.Blocks
                     }
                     else
                     {
-                        float size = slot.Itemstack.Collectible.Attributes?["temperingOvenSize"].AsFloat(1f) ?? 1f;
+                        float size = slot.Itemstack.Collectible.Attributes?["annealerSize"].AsFloat(1f) ?? 1f;
                         if(size > 1) return false;
                         if(size <= 1f / 3f)
                         {
@@ -189,7 +189,7 @@ namespace GlassMaking.Blocks
                             {
                                 if(Api.Side == EnumAppSide.Server)
                                 {
-                                    var time = graph.CalcHeatingTime(temperature, 1000f, process.temperingTemperature.max);
+                                    var time = graph.CalcHeatingTime(temperature, 1000f, process.annealTemperature.max);
                                     if(time.HasValue)
                                     {
                                         process.isHeated = true;
@@ -200,8 +200,8 @@ namespace GlassMaking.Blocks
                             }
                             if(process.isHeated)
                             {
-                                process.time += Math.Max(0, Math.Min((temperature - process.temperingTemperature.min) / 90f, totalHours - heatSource.GetLastTickTime()) - timeOffset);
-                                if(process.time >= process.temperingTime && Api.Side == EnumAppSide.Server)
+                                process.time += Math.Max(0, Math.Min((temperature - process.annealTemperature.min) / 90f, totalHours - heatSource.GetLastTickTime()) - timeOffset);
+                                if(process.time >= process.annealTime && Api.Side == EnumAppSide.Server)
                                 {
                                     processes[i] = null;
                                     slot.Itemstack = process.output.Clone();
@@ -271,7 +271,7 @@ namespace GlassMaking.Blocks
         {
             int x = index % gridSize;
             int z = index / gridSize;
-            var transform = ((BlockTemperingOven)Block).contentTransform;
+            var transform = ((BlockAnnealer)Block).contentTransform;
             mesh.Translate(transform.Translation.X + (x + 0.5f) / gridSize * transform.ScaleXYZ.X, transform.Translation.Y, transform.Translation.Z + (z + 0.5f) / gridSize * transform.ScaleXYZ.Z);
         }
 
@@ -284,14 +284,14 @@ namespace GlassMaking.Blocks
         private void ResolveProcessInfo(int index)
         {
             var stack = inventory[index].Itemstack;
-            var properties = stack.Collectible.Attributes?["glassmaking:tempering"];
+            var properties = stack.Collectible.Attributes?["glassmaking:anneal"];
             if(properties != null && properties.Exists)
             {
                 var output = properties["output"].AsObject<JsonItemStack>(null, stack.Collectible.Code.Domain);
-                if(output.Resolve(Api.World, "tempering oven"))
+                if(output.Resolve(Api.World, "annealer"))
                 {
-                    processes[index].temperingTemperature = properties["temperature"].AsObject<MinMaxFloat>();
-                    processes[index].temperingTime = properties["time"].AsInt() / 3600.0;
+                    processes[index].annealTemperature = properties["temperature"].AsObject<MinMaxFloat>();
+                    processes[index].annealTime = properties["time"].AsInt() / 3600.0;
                     processes[index].output = output.ResolvedItemstack;
                     return;
                 }
@@ -309,7 +309,7 @@ namespace GlassMaking.Blocks
                 if(!slot.Empty)
                 {
                     itemsCount++;
-                    maxSize = Math.Max(maxSize, slot.Itemstack.ItemAttributes?["temperingOvenSize"].AsFloat(1f) ?? 1f);
+                    maxSize = Math.Max(maxSize, slot.Itemstack.ItemAttributes?["annealerSize"].AsFloat(1f) ?? 1f);
                 }
             }
             if(itemsCount > 0 && gridSize == 0)
@@ -338,14 +338,14 @@ namespace GlassMaking.Blocks
         {
             if(Api.World.Rand.Next(5) > 0)
             {
-                var transform = ((BlockTemperingOven)Block).smokeTransform;
+                var transform = ((BlockAnnealer)Block).smokeTransform;
                 smokeParticles.MinPos.Set(Pos.X + transform.Translation.X, Pos.Y + transform.Translation.Y, Pos.Z + transform.Translation.Z);
                 smokeParticles.AddPos.Set(transform.ScaleXYZ.X, 0.0, transform.ScaleXYZ.Z);
                 Api.World.SpawnParticles(smokeParticles);
             }
         }
 
-        static BlockEntityTemperingOven()
+        static BlockEntityAnnealer()
         {
             smokeParticles = new SimpleParticleProperties(1f, 1f, ColorUtil.ToRgba(128, 110, 110, 110), new Vec3d(), new Vec3d(), new Vec3f(-0.2f, 0.3f, -0.2f), new Vec3f(0.2f, 0.3f, 0.2f), 2f, 0f, 0.5f, 1f, EnumParticleModel.Quad);
             smokeParticles.SelfPropelled = true;
@@ -355,8 +355,8 @@ namespace GlassMaking.Blocks
 
         private class ItemProcessInfo
         {
-            public MinMaxFloat temperingTemperature;
-            public double temperingTime;
+            public MinMaxFloat annealTemperature;
+            public double annealTime;
             public ItemStack output;
             public bool isHeated;
             public double time;

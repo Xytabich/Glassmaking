@@ -3,7 +3,7 @@ using Vintagestory.API.Common;
 
 namespace GlassMaking.Blocks
 {
-    public class BlockTemperingOven : HeatedBlockBase
+    public class BlockAnnealer : HeatedBlockBase
     {
         public ModelTransform smokeTransform;
         public ModelTransform contentTransform;
@@ -20,7 +20,7 @@ namespace GlassMaking.Blocks
 
         public override bool OnBlockInteractStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)
         {
-            BlockEntityTemperingOven be = world.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityTemperingOven;
+            BlockEntityAnnealer be = world.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityAnnealer;
             if(be != null)
             {
                 if(be.TryInteract(byPlayer, byPlayer.InventoryManager.ActiveHotbarSlot))

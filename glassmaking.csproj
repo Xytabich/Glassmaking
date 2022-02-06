@@ -88,8 +88,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\Blocks\BlockGlassBlowingMold.cs" />
-    <Compile Include="src\Blocks\BlockTemperingOven.cs" />
-    <Compile Include="src\Blocks\Entities\BlockEntityTemperingOven.cs" />
+    <Compile Include="src\Blocks\BlockAnnealer.cs" />
+    <Compile Include="src\Blocks\Entities\BlockEntityAnnealer.cs" />
     <Compile Include="src\Blocks\Entities\BlockEntityWorkbench.cs" />
     <Compile Include="src\Blocks\BlockWorkbench.cs" />
     <Compile Include="src\Blocks\IGlassBlowingMold.cs" />
@@ -130,8 +130,8 @@
     <Compile Include="src\HandbookPatcher\HandbookItemInfoSection.cs" />
     <Compile Include="src\Handbook\BlowingMoldRecipeInfo.cs" />
     <Compile Include="src\Handbook\GlassblowingRecipeInfo.cs" />
-    <Compile Include="src\Handbook\TemperingOutputInfo.cs" />
-    <Compile Include="src\Handbook\TemperingRecipeInfo.cs" />
+    <Compile Include="src\Handbook\AnnealOutputInfo.cs" />
+    <Compile Include="src\Handbook\AnnealRecipeInfo.cs" />
     <Compile Include="src\Items\BehaviorGlassBlend.cs" />
     <Compile Include="src\Items\ItemWettable.cs" />
     <Compile Include="src\TemporaryMetadata\IDisposableHandle.cs" />

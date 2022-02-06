@@ -31,8 +31,8 @@ namespace GlassMaking
         private List<Block> molds = null;
         private HashSet<AssetLocation> moldsOutput = null;
 
-        private Dictionary<Tuple<EnumItemClass, int>, ItemStack> temperingRecipes = null;
-        private HashSet<AssetLocation> temperingOutputs = null;
+        private Dictionary<Tuple<EnumItemClass, int>, ItemStack> annealRecipes = null;
+        private HashSet<AssetLocation> annealOutputs = null;
 
         private Harmony harmony;
 
@@ -64,14 +64,14 @@ namespace GlassMaking
             api.RegisterItemClass("glassmaking:wettable", typeof(ItemWettable));
 
             api.RegisterBlockClass("glassmaking:firebox", typeof(BlockFirebox));
-            api.RegisterBlockClass("glassmaking:temperingoven", typeof(BlockTemperingOven));
+            api.RegisterBlockClass("glassmaking:annealer", typeof(BlockAnnealer));
             api.RegisterBlockClass("glassmaking:smeltery", typeof(BlockGlassSmeltery));
             api.RegisterBlockClass("glassmaking:glassmold", typeof(BlockGlassBlowingMold));
             api.RegisterBlockClass("glassmaking:workbench", typeof(BlockWorkbench));
             api.RegisterBlockClass("Horizontal2BMultiblock", typeof(BlockHorizontal2BMultiblock));
 
             api.RegisterBlockEntityClass("glassmaking:firebox", typeof(BlockEntityFirebox));
-            api.RegisterBlockEntityClass("glassmaking:temperingoven", typeof(BlockEntityTemperingOven));
+            api.RegisterBlockEntityClass("glassmaking:annealer", typeof(BlockEntityAnnealer));
             api.RegisterBlockEntityClass("glassmaking:smeltery", typeof(BlockEntityGlassSmeltery));
             api.RegisterBlockEntityClass("glassmaking:glassmold", typeof(BlockEntityGlassBlowingMold));
             api.RegisterBlockEntityClass("glassmaking:workbench", typeof(BlockEntityWorkbench));
@@ -122,13 +122,13 @@ namespace GlassMaking
             handbookInfoList.Add(new BlowingMoldRecipeInfo());
             handbookInfoList.Add(new BlowingMoldOutputInfo(this));
             handbookInfoList.Add(new GlassblowingRecipeInfo(this));
-            handbookInfoList.Add(new TemperingRecipeInfo());
-            handbookInfoList.Add(new TemperingOutputInfo(this));
+            handbookInfoList.Add(new AnnealRecipeInfo());
+            handbookInfoList.Add(new AnnealOutputInfo(this));
 
             molds = new List<Block>();
             moldsOutput = new HashSet<AssetLocation>();
-            temperingRecipes = new Dictionary<Tuple<EnumItemClass, int>, ItemStack>();
-            temperingOutputs = new HashSet<AssetLocation>();
+            annealRecipes = new Dictionary<Tuple<EnumItemClass, int>, ItemStack>();
+            annealOutputs = new HashSet<AssetLocation>();
             api.Event.LevelFinalize += OnClientLevelFinallize;
         }
 
@@ -235,14 +235,14 @@ namespace GlassMaking
             return false;
         }
 
-        public bool TryGetTemperingMaterialsForItem(ItemStack item, out CollectibleObject[] materials)
+        public bool TryGetMaterialsForAnneal(ItemStack forOutputItem, out CollectibleObject[] materials)
         {
-            if(temperingOutputs.Contains(item.Collectible.Code))
+            if(annealOutputs.Contains(forOutputItem.Collectible.Code))
             {
                 List<CollectibleObject> list = new List<CollectibleObject>();
-                foreach(var pair in temperingRecipes)
+                foreach(var pair in annealRecipes)
                 {
-                    if(pair.Value.Collectible.Equals(pair.Value, item, GlobalConstants.IgnoredStackAttributes))
+                    if(pair.Value.Collectible.Equals(pair.Value, forOutputItem, GlobalConstants.IgnoredStackAttributes))
                     {
                         list.Add((pair.Key.Item1 == EnumItemClass.Block) ? (CollectibleObject)capi.World.GetBlock(pair.Key.Item2) : (CollectibleObject)capi.World.GetItem(pair.Key.Item2));
                     }
@@ -273,15 +273,15 @@ namespace GlassMaking
             }
             foreach(var collectible in capi.World.Collectibles)
             {
-                if(collectible.Attributes != null && collectible.Attributes.KeyExists("glassmaking:tempering"))
+                if(collectible.Attributes != null && collectible.Attributes.KeyExists("glassmaking:anneal"))
                 {
-                    var properties = collectible.Attributes["glassmaking:tempering"];
+                    var properties = collectible.Attributes["glassmaking:anneal"];
                     var output = properties["output"].AsObject<JsonItemStack>(null, collectible.Code.Domain);
                     if(output.Resolve(capi.World, "recipes collect"))
                     {
                         var outputItem = output.ResolvedItemstack;
-                        temperingRecipes.Add(new Tuple<EnumItemClass, int>(collectible.ItemClass, collectible.Id), outputItem);
-                        temperingOutputs.Add(outputItem.Collectible.Code);
+                        annealRecipes.Add(new Tuple<EnumItemClass, int>(collectible.ItemClass, collectible.Id), outputItem);
+                        annealOutputs.Add(outputItem.Collectible.Code);
                         return;
                     }
                 }

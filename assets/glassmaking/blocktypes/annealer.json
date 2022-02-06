@@ -1,7 +1,7 @@
 {
-    "code": "temperingoven",
-    "class": "glassmaking:temperingoven",
-    "entityclass": "glassmaking:temperingoven",
+    "code": "annealer",
+    "class": "glassmaking:annealer",
+    "entityclass": "glassmaking:annealer",
     "blockmaterial": "Ceramic",
     "behaviors": [
         { "name": "HorizontalOrientable" },
@@ -80,19 +80,19 @@
     "lightAbsorption": 3,
     "shapeByType": {
         "*-north": {
-            "base": "block/tempering-oven",
+            "base": "block/annealer",
             "rotateY": 0
         },
         "*-east": {
-            "base": "block/tempering-oven",
+            "base": "block/annealer",
             "rotateY": 270
         },
         "*-south": {
-            "base": "block/tempering-oven",
+            "base": "block/annealer",
             "rotateY": 180
         },
         "*-west": {
-            "base": "block/tempering-oven",
+            "base": "block/annealer",
             "rotateY": 90
         }
     },
