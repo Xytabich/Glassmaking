@@ -1,5 +1,4 @@
 {
-    "name": "glassworkpart",
     "ingredient": {
         "type": "item",
         "code": "game:ingot-*",
@@ -7,16 +6,13 @@
     },
     "pattern": [
         [
-            "###############",
-            "###############"
-        ],
-        [
-            "###############",
-            "###############"
+            "#######",
+            "#______",
+            "#######"
         ]
     ],
     "output": {
         "type": "item",
-        "code": "pipepart"
+        "code": "parchoffipart"
     }
 }

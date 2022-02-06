@@ -1,20 +1,25 @@
 {
-    "width": 2,
+    "width": 3,
     "height": 1,
-    "ingredientPattern": "SW",
+    "ingredientPattern": "KWS",
     "ingredients": {
+        "K": {
+            "type": "item",
+            "code": "game:knife-*",
+            "isTool": true
+        },
         "S": {
             "code": "game:plank-*",
             "type": "item"
         },
         "W": {
-            "code": "glassworkpipepart",
+            "code": "parchoffipart",
             "type": "item"
         }
     },
     "shapeless": true,
     "output": {
-        "code": "glassworkpipe",
+        "code": "parchoffi",
         "type": "item"
     }
 }

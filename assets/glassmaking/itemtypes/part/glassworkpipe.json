@@ -1,7 +1,7 @@
 {
-    "code": "pipepart",
+    "code": "glassworkpipepart",
     "maxstacksize": 1,
-    "shape": { "base": "item/pipepart" },
+    "shape": { "base": "item/part/glassworkpipe" },
     "creativeinventory": {
         "general": [ "*" ],
         "items": [ "*" ]

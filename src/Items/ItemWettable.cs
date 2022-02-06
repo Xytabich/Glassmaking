@@ -102,6 +102,7 @@ namespace GlassMaking.Items
 
                 if(attr == null)
                 {
+                    stack.Attributes["transitionstate"] = new TreeAttribute();
                     UpdateAndGetTransitionState(api.World, new DummySlot(stack), type);
                     attr = (ITreeAttribute)stack.Attributes["transitionstate"];
                 }
@@ -121,7 +122,7 @@ namespace GlassMaking.Items
 
             if(!(itemstack.Attributes["transitionstate"] is ITreeAttribute))
             {
-                itemstack.Attributes["transitionstate"] = new TreeAttribute();
+                return null;
             }
 
             ITreeAttribute attr = (ITreeAttribute)itemstack.Attributes["transitionstate"];
@@ -174,6 +175,13 @@ namespace GlassMaking.Items
             }
 
             float freshHoursLeft = Math.Max(0, freshHours[0] - transitionedHours[0]);
+            if(freshHoursLeft <= 0)
+            {
+                itemstack.Attributes.RemoveAttribute("transitionstate");
+                if(!(inslot is DummySlot)) inslot.MarkDirty();
+                return null;
+            }
+
             states[0] = new TransitionState() {
                 FreshHoursLeft = freshHoursLeft,
                 TransitionLevel = 0,
