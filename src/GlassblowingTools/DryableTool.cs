@@ -59,7 +59,6 @@ namespace GlassMaking.GlassblowingTools
 
                         ModelTransform rightTransform = new ModelTransform();
                         rightTransform.EnsureDefaultValues();
-
                         float pt = GameMath.Min(secondsUsed * speed * 1.5f, 1f);
                         float at = GameMath.FastSin(secondsUsed * animationSpeed);
                         rightTransform.Lerp(transform, pt).Lerp(animationTransform, at);

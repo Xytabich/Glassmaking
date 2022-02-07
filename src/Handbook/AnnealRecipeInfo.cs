@@ -2,6 +2,7 @@
 using GlassMaking.Common;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
@@ -42,7 +43,7 @@ namespace GlassMaking.Handbook
                     var annealTemperature = properties["temperature"].AsObject<MinMaxFloat>();
                     var annealTime = properties["time"].AsInt() / 3600.0;
                     outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:Heat up to {0}, then keep the temperature above {1} for {2} hours",
-                        annealTemperature.max.ToString("0"), annealTemperature.min.ToString("0"), annealTime.ToString("0.0")) + "\n", CairoFont.WhiteSmallText()));
+                        annealTemperature.max.ToString("0"), annealTemperature.min.ToString("0"), annealTime.ToString("G", CultureInfo.InvariantCulture)) + "\n", CairoFont.WhiteSmallText()));
 
                     outComponents.Add(new ClearFloatTextComponent(capi, 7f));
                 }

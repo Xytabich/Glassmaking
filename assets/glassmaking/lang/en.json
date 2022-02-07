@@ -41,7 +41,7 @@
     "glassmaking:Take {0} units of {1} glass": "Take {0} units of {1} glass",
     "glassmaking:Consumes {0} humidity": "Consumes {0}L humidity",
     "block-firebox-*": "Firebox",
-    "block-smeltery-*": "Glass smeltery",
+    "block-smeltery-*": "Small glass smeltery",
     "block-annealer-*": "Annealer",
     "block-workbench-*": "Glassmaker's workbench",
     "item-glassworkpipe": "Glass blower's pipe",

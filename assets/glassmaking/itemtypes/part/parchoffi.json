@@ -1,5 +1,6 @@
 {
     "code": "parchoffipart",
+    "maxstacksize": 4,
     "shape": { "base": "item/part/parchoffi" },
     "creativeinventory": {
         "general": [ "*" ],

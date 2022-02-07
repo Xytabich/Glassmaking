@@ -117,18 +117,20 @@ namespace GlassMaking
         public void OnStepComplete(ItemSlot slot, EntityAgent byEntity)
         {
             if(byEntity.Api.Side != EnumAppSide.Server) return;
-            if(((ItemGlassworkPipe)slot.Itemstack.Collectible).TryGetRecipeAttribute(slot.Itemstack, out var recipeAttribute))
+            var pipe = (ItemGlassworkPipe)slot.Itemstack.Collectible;
+            if(pipe.TryGetRecipeAttribute(slot.Itemstack, out var recipeAttribute))
             {
                 int step = recipeAttribute.GetInt("step", 0) + 1;
                 if(step >= steps.Length)
                 {
                     var item = output.ResolvedItemstack.Clone();
+                    item.Collectible.SetTemperature(byEntity.World, item, pipe.GetGlassTemperature(byEntity.World, slot.Itemstack));
                     if(!byEntity.TryGiveItemStack(item))
                     {
                         byEntity.World.SpawnItemEntity(item, byEntity.Pos.XYZ.Add(0.0, 0.5, 0.0));
                     }
                     slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:blowingStep");
-                    ((ItemGlassworkPipe)slot.Itemstack.Collectible).OnRecipeUpdated(slot, true);
+                    pipe.OnRecipeUpdated(slot, true);
                 }
                 else
                 {
