@@ -48,6 +48,14 @@
             "translation": { "y": 0.7 },
             "rotation": { "y": 180 },
             "scale": 1.5
+        },
+        "handbook": {
+            "extraSections": [
+                {
+                    "title": "glassmaking:handbook-glassblower-tools",
+                    "text": "glassmaking:item-handbooktext-tweezers"
+                }
+            ]
         }
     },
     "shape": { "base": "item/tool/tweezers" },

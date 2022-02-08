@@ -5,7 +5,13 @@
     "shape": { "base": "item/resource/crushed/glassshards" },
     "attributes": {
         "handbook": {
-            "groupBy": [ "glassblend-*" ]
+            "groupBy": [ "glassblend-*" ],
+            "extraSections": [
+                {
+                    "title": "glassmaking:handbook-melting-glass",
+                    "text": "glassmaking:item-handbooktext-glassblend"
+                }
+            ]
         },
         "glassmaking:glassblend": {
             "code": "game:{glasstype}",

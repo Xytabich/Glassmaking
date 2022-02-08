@@ -9,6 +9,14 @@
         { "name": "Unplaceable" }
     ],
     "attributes": {
+        "handbook": {
+            "extraSections": [
+                {
+                    "title": "glassmaking:handbook-melting-glass",
+                    "text": "glassmaking:block-handbooktext-smeltery"
+                }
+            ]
+        },
         "smokeTransformByType": {
             "*-north": {
                 "translation": {

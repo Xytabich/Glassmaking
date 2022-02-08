@@ -18,6 +18,14 @@
                 "z": 0.5
             },
             "scale": 0.65
+        },
+        "handbook": {
+            "extraSections": [
+                {
+                    "title": "glassmaking:handbook-melting-glass",
+                    "text": "glassmaking:item-handbooktext-glassshards"
+                }
+            ]
         }
     },
     "creativeinventory": {},

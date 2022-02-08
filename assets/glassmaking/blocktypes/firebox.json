@@ -10,6 +10,16 @@
             "loadFromProperties": "abstract/horizontalorientation"
         }
     ],
+    "attributes": {
+        "handbook": {
+            "extraSections": [
+                {
+                    "title": "glassmaking:block-handbooktitle-firebox",
+                    "text": "glassmaking:block-handbooktext-firebox"
+                }
+            ]
+        }
+    },
     "creativeinventory": {
         "general": [ "*-north" ],
         "glassmaking": [ "*-north" ]

@@ -49,6 +49,14 @@
             "rotation": { "y": 180 },
             "scale": 1.5
         },
+        "handbook": {
+            "extraSections": [
+                {
+                    "title": "glassmaking:handbook-glassblower-tools",
+                    "text": "glassmaking:item-handbooktext-paddle"
+                }
+            ]
+        },
         "maxHumidity": 0.25,
         "evaporation": 0.03
     },
