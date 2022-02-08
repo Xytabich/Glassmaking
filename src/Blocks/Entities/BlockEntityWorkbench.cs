@@ -44,6 +44,7 @@ namespace GlassMaking.Blocks
         {
             mod = api.ModLoader.GetModSystem<GlassMakingMod>();
             base.Initialize(api);
+            ingredient?.ResolveBlockOrItem(api.World);
             for(int i = itemCapacity - 1; i >= 0; i--)
             {
                 var tool = inventory.GetBehavior(i);
@@ -315,7 +316,7 @@ namespace GlassMaking.Blocks
             ingredient = tree.GetItemstack("ingredient");
             if(Api?.World != null)
             {
-                ingredient.ResolveBlockOrItem(Api.World);
+                ingredient?.ResolveBlockOrItem(Api.World);
                 if(inventory.modifiedSlots.Count > 0)
                 {
                     tools.Clear();
