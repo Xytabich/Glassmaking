@@ -92,6 +92,7 @@
     <Compile Include="src\Blocks\Entities\BlockEntityAnnealer.cs" />
     <Compile Include="src\Blocks\Entities\BlockEntityWorkbench.cs" />
     <Compile Include="src\Blocks\BlockWorkbench.cs" />
+    <Compile Include="src\Blocks\IBurnerModifier.cs" />
     <Compile Include="src\Blocks\IGlassBlowingMold.cs" />
     <Compile Include="src\Blocks\ITimeBasedHeatReceiver.cs" />
     <Compile Include="src\Blocks\ITimeBasedHeatSource.cs" />

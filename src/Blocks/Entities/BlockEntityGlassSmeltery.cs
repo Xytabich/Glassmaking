@@ -1,5 +1,4 @@
 ﻿using GlassMaking.Common;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,19 +11,20 @@ using Vintagestory.API.Util;
 
 namespace GlassMaking.Blocks
 {
-    public class BlockEntityGlassSmeltery : BlockEntity, IBlockEntityContainer, ITimeBasedHeatReceiver
+    public class BlockEntityGlassSmeltery : BlockEntity, IBlockEntityContainer, ITimeBasedHeatReceiver, IBurnerModifier
     {
-        private const float TEMPERATURE_MODIFIER = 1.15f;
-
         private const double PROCESS_HOURS_PER_UNIT = 0.001;
         private const double BUBBLING_PROCESS_MULTIPLIER = 3;
 
         private static SimpleParticleProperties smokeParticles;
 
-        protected virtual int maxGlassAmount => 1000;
+        float IBurnerModifier.durationModifier => 1f;
+        float IBurnerModifier.temperatureModifier => 1.15f;
 
         IInventory IBlockEntityContainer.Inventory => inventory;
         string IBlockEntityContainer.InventoryClassName => inventory.ClassName;
+
+        protected virtual int maxGlassAmount => 1000;
 
         private BlockRendererGlassSmeltery renderer = null;
 
@@ -56,7 +56,7 @@ namespace GlassMaking.Blocks
                 }
                 else
                 {
-                    meltingTemperature = mod.GetGlassTypeInfo(glassCode).meltingPoint / TEMPERATURE_MODIFIER;
+                    meltingTemperature = mod.GetGlassTypeInfo(glassCode).meltingPoint;
                 }
             }
             if(api.Side == EnumAppSide.Client)
@@ -152,7 +152,7 @@ namespace GlassMaking.Blocks
                     }
                     else
                     {
-                        meltingTemperature = mod.GetGlassTypeInfo(glassCode).meltingPoint / TEMPERATURE_MODIFIER;
+                        meltingTemperature = mod.GetGlassTypeInfo(glassCode).meltingPoint;
                     }
                 }
             }
@@ -216,7 +216,7 @@ namespace GlassMaking.Blocks
                     if(glassCode == null)
                     {
                         glassCode = blend.code.Clone();
-                        meltingTemperature = mod.GetGlassTypeInfo(glassCode).meltingPoint / TEMPERATURE_MODIFIER;
+                        meltingTemperature = mod.GetGlassTypeInfo(glassCode).meltingPoint;
                     }
                     if(state == SmelteryState.Bubbling || state == SmelteryState.ContainsGlass)
                     {
@@ -265,7 +265,7 @@ namespace GlassMaking.Blocks
 
         public float GetTemperature()
         {
-            return heatSource.CalcCurrentTemperature() * TEMPERATURE_MODIFIER;
+            return heatSource.CalcCurrentTemperature();
         }
 
         public int GetGlassAmount()

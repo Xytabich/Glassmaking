@@ -169,5 +169,14 @@ namespace GlassMaking.Common
             }
             return currentTemperature;
         }
+
+        public HeatGraph MultiplyTemperature(float multiplier)
+        {
+            HeatGraph graph = this;
+            graph.startTemperature *= multiplier;
+            graph.workingTemperature *= multiplier;
+            graph.endTemperature *= multiplier;
+            return graph;
+        }
     }
 }

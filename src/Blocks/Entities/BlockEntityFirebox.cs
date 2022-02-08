@@ -28,6 +28,7 @@ namespace GlassMaking.Blocks
         private BlockRendererFirebox renderer = null;
 
         private ITimeBasedHeatReceiver receiver = null;
+        private IBurnerModifier modifier = null;
 
         private ILoadedSound ambientSound = null;
 
@@ -39,7 +40,12 @@ namespace GlassMaking.Blocks
         private float fuelLevel = 0f;
         // Fuel parameters
         private float fuelTemperature = 0f;
-        private float fuelBurnDuration = 0f;
+
+        private float _fuelBurnDuration = 0f;
+        private float fuelBurnDuration => _fuelBurnDuration * durationModifier;
+
+        private float temperatureModifier => modifier == null ? 1f : modifier.temperatureModifier;
+        private float durationModifier => modifier == null ? 1f : modifier.durationModifier;
 
         private double lastTickTime;
 
@@ -129,6 +135,7 @@ namespace GlassMaking.Blocks
             {
                 if(this.receiver != null) this.receiver.SetHeatSource(null);
                 this.receiver = receiver;
+                modifier = receiver as IBurnerModifier;
                 if(receiver != null) receiver.SetHeatSource(this);
             }
         }
@@ -162,7 +169,7 @@ namespace GlassMaking.Blocks
                 {
                     if(Api.Side == EnumAppSide.Server)
                     {
-                        if(!burning && temperature >= 300)
+                        if(!burning && temperature * temperatureModifier >= 300)
                         {
                             burning = true;
                             ApplyFuelParameters();
@@ -205,12 +212,12 @@ namespace GlassMaking.Blocks
 
         public bool IsHeatedUp()
         {
-            return CalcCurrentTemperature() > 25;
+            return CalcCurrentTemperature() > 25 * temperatureModifier;
         }
 
         public float GetTemperature()
         {
-            return temperature;
+            return temperature * temperatureModifier;
         }
 
         public double GetLastTickTime()
@@ -262,7 +269,7 @@ namespace GlassMaking.Blocks
             }
             graph.endTemperature = temp;
 
-            return graph;
+            return graph.MultiplyTemperature(temperatureModifier);
         }
 
         public float CalcCurrentTemperature(double totalHours = 0)
@@ -293,7 +300,7 @@ namespace GlassMaking.Blocks
             {
                 temp -= (float)(Math.Min((temp - 20) / TEMP_DECREASE_PER_HOUR, hours) * TEMP_DECREASE_PER_HOUR);
             }
-            return temp;
+            return temp * temperatureModifier;
         }
 
         public override void OnLoadCollectibleMappings(IWorldAccessor worldForNewMappings, Dictionary<int, AssetLocation> oldBlockIdMapping, Dictionary<int, AssetLocation> oldItemIdMapping, int schematicSeed)
@@ -390,8 +397,8 @@ namespace GlassMaking.Blocks
             var combustibleProps = contents.Collectible.CombustibleProps;//TODO: smoke level?
             fuelTemperature = combustibleProps.BurnTemperature;
             var calendar = Api.World.Calendar;
-            fuelBurnDuration = combustibleProps.BurnDuration * calendar.SpeedOfTime * calendar.CalendarSpeedMul;
-            fuelBurnDuration *= 1f / 3600f;
+            _fuelBurnDuration = combustibleProps.BurnDuration * calendar.SpeedOfTime * calendar.CalendarSpeedMul;
+            _fuelBurnDuration *= 1f / 3600f;
         }
 
         private void UpdateRendererFull()
@@ -410,7 +417,7 @@ namespace GlassMaking.Blocks
 
         private void UpdateRendererParameters()
         {
-            renderer.SetParameters(burning, Math.Min(128, (int)((temperature / 1500f) * 128)));
+            renderer.SetParameters(burning, Math.Min(128, (int)((temperature * temperatureModifier / 1500f) * 128)));
         }
 
         private void EmitParticles()
