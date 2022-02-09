@@ -78,8 +78,8 @@ namespace GlassMaking.Blocks
                         {
                             (byPlayer as IClientPlayer).TriggerFpAnimation(EnumHandInteract.HeldItemInteract);
                         }
-                        return true;
                     }
+                    return true;
                 }
             }
             return false;

@@ -173,38 +173,54 @@
     },
     "sideopaqueByType": {
         "*-north": {
-            "all": false,
-            "north": true
+            "down": false,
+            "up": false,
+            "horizontals": true,
+            "north": false
         },
         "*-east": {
-            "all": false,
-            "east": true
+            "down": false,
+            "up": false,
+            "horizontals": true,
+            "east": false
         },
         "*-south": {
-            "all": false,
-            "south": true
+            "down": false,
+            "up": false,
+            "horizontals": true,
+            "south": false
         },
         "*-west": {
-            "all": false,
-            "west": true
+            "down": false,
+            "up": false,
+            "horizontals": true,
+            "west": false
         }
     },
     "sidesolidByType": {
         "*-north": {
             "all": false,
-            "north": true
+            "east": true,
+            "north": true,
+            "west": true
         },
         "*-east": {
             "all": false,
+            "north": true,
+            "south": true,
             "east": true
         },
         "*-south": {
             "all": false,
-            "south": true
+            "east": true,
+            "south": true,
+            "west": true
         },
         "*-west": {
             "all": false,
-            "west": true
+            "west": true,
+            "south": true,
+            "north": true
         }
     },
     "guiTransform": {
