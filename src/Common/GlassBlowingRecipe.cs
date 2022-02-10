@@ -16,7 +16,7 @@ namespace GlassMaking
     [JsonObject(MemberSerialization.OptIn)]
     public class GlassBlowingRecipe : IRecipeBase, IByteSerializable, IRecipeBase<GlassBlowingRecipe>
     {
-        private static SmoothRadialShape EmptyShape = new SmoothRadialShape() { segments = 1, outer = new SmoothRadialShape.ShapePart[] { new SmoothRadialShape.ShapePart() { vertices = new float[][] { new float[] { -1.5f, 0 } } } } };
+        private static SmoothRadialShape EmptyShape = new SmoothRadialShape() { segments = 1, outer = new SmoothRadialShape.ShapePart[] { new SmoothRadialShape.ShapePart() { vertices = new float[][] { new float[] { -1.5f, 0 } } } }, inner = new SmoothRadialShape.ShapePart[] { new SmoothRadialShape.ShapePart() { vertices = new float[][] { new float[] { -1.5f, 0 } } } } };
 
         public int recipeId;
 
@@ -182,7 +182,7 @@ namespace GlassMaking
 
             if(prevShape == null) prevShape = EmptyShape;
             container.BeginMeshChange();
-            SmoothRadialShape.BuildLerpedMesh(container.mesh, prevShape, steps[step].shape, t,
+            SmoothRadialShape.BuildLerpedMesh(container.mesh, prevShape, steps[step].shape, EmptyShape, t,
                 (m, i, o) => GlasspipeRenderUtil.GenerateRadialVertices(m, i, o, glow), GlasspipeRenderUtil.GenerateRadialFaces);
             container.EndMeshChange();
         }
