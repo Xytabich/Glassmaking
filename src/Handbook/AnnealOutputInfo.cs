@@ -32,10 +32,13 @@ namespace GlassMaking.Handbook
                 outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:Obtained by annealing") + "\n", CairoFont.WhiteSmallText().WithWeight(FontWeight.Bold)));
                 foreach(var material in materials)
                 {
-                    var element = new ItemstackTextComponent(capi, new ItemStack(material), 40.0, 10.0,
-                        EnumFloat.Inline, cs => openDetailPageFor(GuiHandbookItemStackPage.PageCodeForStack(cs)));
-                    element.offY = GuiElement.scaled(7.0);
-                    outComponents.Add(element);
+                    var handbook = material.GetHandBookStacks(capi);
+                    if(handbook != null && handbook.Count > 0)
+                    {
+                        var element = new SlideshowItemstackTextComponent(capi, handbook.ToArray(), 40.0, EnumFloat.Inline,
+                            cs => openDetailPageFor(GuiHandbookItemStackPage.PageCodeForStack(cs)));
+                        outComponents.Add(element);
+                    }
                 }
                 outComponents.Add(new ClearFloatTextComponent(capi, 7f));
             }
