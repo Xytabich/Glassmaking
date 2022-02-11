@@ -22,7 +22,7 @@ namespace GlassMaking.GlassblowingTools
             base.Initialize(properties);
             minTier = properties["minTier"].AsInt(5);
             transform = properties["transform"].AsObject<ModelTransform>()?.EnsureDefaultValues() ?? ModelTransform.NoTransform;
-            animationTransform = properties["animation"].AsObject<ModelTransform>()?.EnsureDefaultValues() ?? ModelTransform.NoTransform;
+            animationTransform = properties["animation"].AsObject<ModelTransform>()?.EnsureDefaultValues() ?? transform;
             animationSpeed = properties["speed"].AsFloat(0);
         }
 
@@ -62,7 +62,7 @@ namespace GlassMaking.GlassblowingTools
                         ModelTransform rightTransform = new ModelTransform();
                         rightTransform.EnsureDefaultValues();
                         float pt = GameMath.Min(secondsUsed * speed * 1.5f, 1f);
-                        float at = GameMath.FastSin(secondsUsed * animationSpeed);
+                        float at = GameMath.FastSin(secondsUsed * animationSpeed) * 0.5f + 0.5f;
                         rightTransform.Lerp(transform, pt).Lerp(animationTransform, at);
                         byEntity.Controls.UsingHeldItemTransformBefore = rightTransform;
 
