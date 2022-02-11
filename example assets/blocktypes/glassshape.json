@@ -1,0 +1,78 @@
+{
+    "code": "glassshape",
+    "shape": { "base": "block/glassshape" },
+    "drawtype": "json",
+    "creativeinventory": {
+        "general": [ "*" ],
+        "construction": [ "*" ]
+    },
+    "lightAbsorption": 0,
+    "textures": {
+        "glass0": { "base": "game:block/glass/vintage" },
+        "glass1": { "base": "game:block/glass/green" },
+        "glass2": { "base": "game:block/glass/violet" }
+    },
+    "texturesByType": {
+        "*-raw": { "glass0": { "base": "game:block/glass/quartz" } }
+    },
+    "attributesByType": {
+        "*-raw": {
+            "glassmaking:anneal": {
+                "temperature": {
+                    "min": 200,
+                    "max": 600
+                },
+                "time": 10800,
+                "output": {
+                    "type": "block",
+                    "code": "glassshape-annealed"
+                }
+            }
+        }
+    },
+    "attributes": {
+        "annealOvenSize": 0.5
+    },
+    "variantgroups": [
+        {
+            "code": "materialtype",
+            "states": [ "raw", "annealed" ]
+        }
+    ],
+    "sideopaque": {
+        "all": false
+    },
+    "sideao": { "all": true },
+    "emitsideao": { "all": false },
+    "sidesolid": { "all": false },
+    "blockmaterial": "Wood",
+    "replaceable": 600,
+    "resistance": 3,
+    "sounds": {
+        "place": "game:player/buildhigh",
+        "break": "game:block/glass",
+        "hit": "game:block/glass"
+    },
+    "groundTransform": {
+        "origin": {
+            "x": 0.5,
+            "y": -0.01,
+            "z": 0.5
+        }
+    },
+    "heldTpIdleAnimation": "holdbothhandslarge",
+    "heldTpUseAnimation": "twohandplaceblock",
+    "tpHandTransform": {
+        "translation": {
+            "x": -1.2,
+            "y": -1.1,
+            "z": -0.8
+        },
+        "rotation": {
+            "x": -2,
+            "y": 25,
+            "z": -78
+        },
+        "scale": 0.37
+    }
+}

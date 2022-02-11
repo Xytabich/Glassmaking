@@ -8,5 +8,6 @@
     "dependency": {
         "game": "1.16.0",
         "survival": "1.16.0"
-    }
+    },
+    "website": "https://github.com/Xytabich/Glassmaking"
 }
