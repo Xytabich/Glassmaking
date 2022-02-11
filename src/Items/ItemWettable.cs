@@ -1,9 +1,12 @@
 ﻿using GlassMaking.Common;
 using System;
+using System.Collections.Generic;
 using System.Text;
+using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
+using Vintagestory.API.Util;
 using Vintagestory.GameContent;
 
 namespace GlassMaking.Items
@@ -15,11 +18,32 @@ namespace GlassMaking.Items
         private float capacity;
         private float evaporation;
 
+        private WorldInteraction[] interactions;
+
         public override void OnLoaded(ICoreAPI api)
         {
             base.OnLoaded(api);
             capacity = Attributes["maxHumidity"].AsFloat();
             evaporation = Attributes["evaporation"].AsFloat();
+            if(api.Side == EnumAppSide.Client)
+            {
+                interactions = ObjectCacheUtil.GetOrCreate(api, "glassmaking:heldhelp-wettable", () => {
+                    var capi = (ICoreClientAPI)api;
+                    var containers = api.World.GetItem(waterCode).GetHandBookStacks(capi) ?? new List<ItemStack>();
+                    return new WorldInteraction[] {
+                        new WorldInteraction() {
+                            ActionLangCode = "glassmaking:heldhelp-wettable-wet",
+                            MouseButton = EnumMouseButton.Right,
+                            Itemstacks = containers.ToArray()
+                        }
+                    };
+                });
+            }
+        }
+
+        public override WorldInteraction[] GetHeldInteractionHelp(ItemSlot inSlot)
+        {
+            return interactions.Append(base.GetHeldInteractionHelp(inSlot));
         }
 
         public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling)

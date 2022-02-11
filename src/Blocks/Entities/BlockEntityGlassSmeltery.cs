@@ -18,8 +18,9 @@ namespace GlassMaking.Blocks
 
         private static SimpleParticleProperties smokeParticles;
 
-        float IBurnerModifier.durationModifier => 1f;
-        float IBurnerModifier.temperatureModifier => 1.15f;
+        //TODO: temporary modifiers until a big smeltery is made; default modifiers: dur:1.0, temp:1.1
+        float IBurnerModifier.durationModifier => 0.75f;
+        float IBurnerModifier.temperatureModifier => 1.5f;
 
         IInventory IBlockEntityContainer.Inventory => inventory;
         string IBlockEntityContainer.InventoryClassName => inventory.ClassName;
