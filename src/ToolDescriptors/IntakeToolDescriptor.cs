@@ -45,7 +45,8 @@ namespace GlassMaking.ToolDescriptors
         public override void GetStepInfoForHandbook(ICoreClientAPI capi, ItemStack item, GlassBlowingRecipe recipe, int stepIndex, ActionConsumable<string> openDetailPageFor, List<RichTextComponentBase> outComponents)
         {
             var step = recipe.steps[stepIndex];
-            outComponents.Add(new RichTextComponent(capi, "• " + Lang.Get("glassmaking:Step {0}: {1}", stepIndex + 1, Lang.Get("Take {0} units of {1} glass", step.attributes["amount"].AsInt(),
+            outComponents.Add(new RichTextComponent(capi, "• " + Lang.Get("glassmaking:Step {0}: {1}", stepIndex + 1,
+                Lang.Get("glassmaking:Take {0} units of {1} glass", step.attributes["amount"].AsInt(),
                 Lang.Get(GlassBlend.GetBlendNameCode(new AssetLocation(step.attributes["code"].AsString()))))) + "\n", CairoFont.WhiteSmallText()));
 
             outComponents.Add(new SlideshowItemstackTextComponent(capi, items, 40.0, EnumFloat.Inline,
@@ -56,8 +57,8 @@ namespace GlassMaking.ToolDescriptors
         public override void GetStepInfoForHeldItem(IWorldAccessor world, ItemStack item, GlassBlowingRecipe recipe, int stepIndex, StringBuilder dsc, bool withDebugInfo)
         {
             var step = recipe.steps[stepIndex];
-            dsc.AppendLine("• " + Lang.Get("Take {0} units of {1} glass", step.attributes["amount"].AsInt(),
-                GlassBlend.GetBlendNameCode(new AssetLocation(step.attributes["code"].AsString()))));
+            dsc.AppendLine("• " + Lang.Get("glassmaking:Take {0} units of {1} glass", step.attributes["amount"].AsInt(),
+                Lang.Get(GlassBlend.GetBlendNameCode(new AssetLocation(step.attributes["code"].AsString())))));
         }
     }
 }

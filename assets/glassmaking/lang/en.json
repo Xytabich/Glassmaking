@@ -54,7 +54,7 @@
     "glassmaking:Mold layers:": "Layers:",
     "glassmaking:Recipe: {0}": "Recipe: {0}",
     "glassmaking:Tool: {0}": "Tool: {0}",
-    "glassmaking:Annealing: {0}%": "Annealing: {0}%",
+    "glassmaking:Annealing: {0}": "Annealing: {0}%",
     "glassmaking:Step {0} tool: {1}": "Step {0}, tool: {1}",
     "glassmaking:Step {0}: {1}": "Step {0}: {1}",
     "glassmaking:{0} for {1} seconds": "{0} ({1}s)",

@@ -70,7 +70,7 @@ namespace GlassMaking
 
         public void GetRecipeInfo(ItemStack item, ITreeAttribute recipeAttribute, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
         {
-            dsc.AppendLine(Lang.Get("glassmaking:Recipe: {0}", Lang.Get(new AssetLocation(recipeAttribute.GetString("code")).WithPathPrefixOnce("glassblowingrecipe-").ToString())));
+            dsc.AppendLine(Lang.Get("glassmaking:Recipe: {0}", output.ResolvedItemstack.Collectible.GetHeldItemName(output.ResolvedItemstack)));
             int step = recipeAttribute.GetInt("step", 0);
             dsc.AppendLine(Lang.Get("glassmaking:Step {0}/{1}", step + 1, steps.Length));
             var descriptor = world.Api.ModLoader.GetModSystem<GlassMakingMod>().GetPipeToolDescriptor(steps[step].tool);

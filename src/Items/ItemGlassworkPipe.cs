@@ -96,7 +96,7 @@ namespace GlassMaking.Items
                 foreach(var pair in glassmelt)
                 {
                     int amount = ((IntAttribute)pair.Value).value / 5;
-                    if(amount > 0) dsc.AppendFormat("  {0}x {1}", amount, Lang.Get(GlassBlend.GetBlendNameCode(new AssetLocation(pair.Key)))).AppendLine();
+                    if(amount > 0) dsc.AppendFormat("• {0}x {1}", amount, Lang.Get(GlassBlend.GetBlendNameCode(new AssetLocation(pair.Key)))).AppendLine();
                 }
             }
         }
