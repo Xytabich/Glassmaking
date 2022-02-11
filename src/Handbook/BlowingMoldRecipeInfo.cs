@@ -1,5 +1,6 @@
 ﻿using Cairo;
 using GlassMaking.Blocks;
+using GlassMaking.Common;
 using System;
 using System.Collections.Generic;
 using Vintagestory.API.Client;
@@ -39,9 +40,24 @@ namespace GlassMaking.Handbook
                                 EnumFloat.Inline, cs => openDetailPageFor(GuiHandbookItemStackPage.PageCodeForStack(cs)));
                             element.offY = GuiElement.scaled(7.0);
                             outComponents.Add(element);
+                            outComponents.Add(new ClearFloatTextComponent(capi));
+                            outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:Mold layers:") + "\n", CairoFont.WhiteSmallText()));
+                            foreach(var layer in recipe.recipe)
+                            {
+                                if(layer.var > 0)
+                                {
+                                    outComponents.Add(new RichTextComponent(capi, "• " + Lang.Get("glassmaking:{0} glass {1}-{2} units",
+                                        Lang.Get(GlassBlend.GetBlendNameCode(layer.Code)), layer.amount, layer.amount + layer.var) + "\n", CairoFont.WhiteSmallText()));
+                                }
+                                else
+                                {
+                                    outComponents.Add(new RichTextComponent(capi, "• " + Lang.Get("glassmaking:{0} glass {1} units",
+                                        Lang.Get(GlassBlend.GetBlendNameCode(layer.Code)), layer.amount) + "\n", CairoFont.WhiteSmallText()));
+                                }
+                            }
+                            outComponents.Add(new ClearFloatTextComponent(capi, 7f));
                         }
                     }
-                    outComponents.Add(new ClearFloatTextComponent(capi, 7f));
                 }
             }
         }

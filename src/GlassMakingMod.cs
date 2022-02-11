@@ -89,7 +89,8 @@ namespace GlassMaking
             api.RegisterCollectibleBehaviorClass("glassmaking:glassblend", typeof(BehaviorGlassBlend));
 
             glassblowingRecipes = api.RegisterRecipeRegistry<RecipeRegistryDictionary<GlassBlowingRecipe>>("glassblowing");
-            workbenchRecipes = api.RegisterRecipeRegistry<RecipeRegistryDictionary<WorkbenchRecipe>>("glassworkbench");
+            //workbenchRecipes = api.RegisterRecipeRegistry<RecipeRegistryDictionary<WorkbenchRecipe>>("glassworkbench");
+            workbenchRecipes = new RecipeRegistryDictionary<WorkbenchRecipe>();
         }
 
         public override void StartServerSide(ICoreServerAPI api)

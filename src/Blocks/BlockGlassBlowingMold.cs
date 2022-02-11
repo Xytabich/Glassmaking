@@ -14,7 +14,7 @@ namespace GlassMaking.Blocks
         {
             base.OnLoaded(api);
 
-            var recipe = Attributes?["glassmold"].AsObject<GlassMoldRecipe>(null, Code.Domain);
+            var recipe = Attributes?["glassmaking:glassmold"].AsObject<GlassMoldRecipe>(null, Code.Domain);
             if(recipe != null)
             {
                 var world = api.World;

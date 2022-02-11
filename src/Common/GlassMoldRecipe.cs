@@ -14,7 +14,7 @@ namespace GlassMaking
         [JsonProperty(Required = Required.Always)]
         public GlassAmount[] recipe;
         [JsonProperty]
-        public float fillTime = 1f;
+        public float fillTime = 3f;
 
         [JsonProperty]
         public AssetLocation Name { get; set; }
