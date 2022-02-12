@@ -19,7 +19,7 @@ namespace GlassMaking
 		[JsonProperty]
 		public AssetLocation Name { get; set; }
 
-		public bool Enabled { get; set; }
+		public bool Enabled { get; set; } = true;
 		public IRecipeIngredient[] Ingredients => Recipe;
 		IRecipeOutput IRecipeBase<GlassMoldRecipe>.Output => Output.ReturnedStack;
 

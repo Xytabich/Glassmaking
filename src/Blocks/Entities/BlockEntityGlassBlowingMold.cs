@@ -138,35 +138,31 @@ namespace GlassMaking.Blocks
 				return false;
 			}
 
-			var layers = GetRecipe().Recipe;
-			if(layersCode.Length < layers.Length)
+			int index = FindRecipeIndex(layersCode, layersAmount);
+			if(index < 0)
 			{
 				fillTime = 0;
 				return false;
 			}
 
-			fillTime = GetRecipe().FillTime;
-			int layerIndex = layersCode.Length - 1;
-			for(int i = layers.Length - 1; i >= 0; i--)
-			{
-				if(!string.Equals(layers[i].Code.ToShortString(), layersCode[layerIndex], StringComparison.InvariantCulture)) return false;
-				if(!layers[i].IsSuitable(layersAmount[layerIndex])) return false;
-				layerIndex--;
-			}
+			fillTime = ((BlockGlassBlowingMold)Block).Recipes[index].FillTime;
 			return true;
 		}
 
 		public void TakeGlass(EntityAgent byEntity, string[] layersCode, int[] layersAmount)
 		{
-			var recipe = GetRecipe().Recipe;
+			int index = FindRecipeIndex(layersCode, layersAmount);
+			var recipe = ((BlockGlassBlowingMold)Block).Recipes[index];
+
+			var layers = recipe.Recipe;
 			int layerIndex = layersCode.Length - 1;
-			for(int i = recipe.Length - 1; i >= 0; i--)
+			for(int i = layers.Length - 1; i >= 0; i--)
 			{
-				layersAmount[layerIndex] -= recipe[i].Amount;
+				layersAmount[layerIndex] -= layers[i].Amount;
 			}
 			if(Api.Side == EnumAppSide.Server)
 			{
-				var item = GetRecipe().Output.ResolvedItemstack;
+				var item = recipe.Output.ResolvedItemstack;
 				if(splittable || hasContentsTransform)
 				{
 					contents = item.Clone();
@@ -232,9 +228,36 @@ namespace GlassMaking.Blocks
 			contents?.Collectible.OnStoreCollectibleMappings(Api.World, new DummySlot(contents), blockIdMapping, itemIdMapping);
 		}
 
-		private GlassMoldRecipe GetRecipe()
+		private int FindRecipeIndex(string[] layersCode, int[] layersAmount)
 		{
-			return ((BlockGlassBlowingMold)Block).Recipes[0];
+			var recipes = ((BlockGlassBlowingMold)Block).Recipes;
+			for(int i = 0; i < recipes.Length; i++)
+			{
+				if(IsSuitableRecipe(recipes[i], layersCode, layersAmount))
+				{
+					return i;
+				}
+			}
+			return -1;
+		}
+
+		private bool IsSuitableRecipe(GlassMoldRecipe recipe, string[] layersCode, int[] layersAmount)
+		{
+			var layers = recipe.Recipe;
+			if(layersCode.Length < layers.Length)
+			{
+				return false;
+			}
+
+			int layerIndex = layersCode.Length - 1;
+			for(int i = layers.Length - 1; i >= 0; i--)
+			{
+				if(!string.Equals(layers[i].Code.ToShortString(), layersCode[layerIndex], StringComparison.InvariantCulture)) return false;
+				if(!layers[i].IsSuitable(layersAmount[layerIndex])) return false;
+				layerIndex--;
+			}
+
+			return true;
 		}
 
 		private void UpdateMesh()
