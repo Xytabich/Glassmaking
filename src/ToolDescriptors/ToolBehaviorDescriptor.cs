@@ -31,7 +31,7 @@ namespace GlassMaking.ToolDescriptors
 				{
 					if(IsSuitableBehavior(item, beh))
 					{
-						var code = ((GlassblowingToolBehavior)beh).toolCode;
+						var code = ((GlassblowingToolBehavior)beh).ToolCode;
 						mod.AddPipeToolDescriptor(code, this);
 						if(capi != null)
 						{

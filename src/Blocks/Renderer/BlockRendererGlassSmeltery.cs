@@ -31,18 +31,18 @@ namespace GlassMaking.Blocks
 			this.api = api;
 			this.bathMesh = bathMesh;
 			this.bathTextureId = bathTextureId;
-			this.mixTexture = tex["mix"];
-			this.meltTexture = tex["melt"];
+			mixTexture = tex["mix"];
+			meltTexture = tex["melt"];
 		}
 
 		public void SetHeight(float percent)
 		{
-			if(this.height != percent)
+			if(height != percent)
 			{
-				this.height = percent;
+				height = percent;
 				meshRef?.Dispose();
 				meshRef = null;
-				if(this.height != 0)
+				if(height != 0)
 				{
 					meshRef = api.Render.UploadMesh(GenerateMesh());
 				}

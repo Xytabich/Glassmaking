@@ -125,7 +125,7 @@ namespace GlassMaking.Blocks
 			foreach(var stack in wi.Itemstacks)
 			{
 				var blend = GlassBlend.FromJson(stack);
-				if(blend.code.Equals(code) && blend.amount * stack.StackSize <= canAddAmount)
+				if(blend.Code.Equals(code) && blend.Amount * stack.StackSize <= canAddAmount)
 				{
 					list.Add(stack);
 				}

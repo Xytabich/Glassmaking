@@ -10,9 +10,9 @@ namespace GlassMaking
 {
 	public class GuiDialogItemRecipeSelector : GenericItemAction.GuiHeldItemActionDialog
 	{
-		private const double floatyDialogPosition = 0.5;
+		private const double FLOATY_DIALOG_POSITION = 0.5;
 
-		private const double floatyDialogAlign = 0.75;
+		private const double FLOATY_DIALOG_ALIGN = 0.75;
 
 		public override string ToggleKeyCombinationCode => null;
 
@@ -39,7 +39,7 @@ namespace GlassMaking
 			var player = capi.World.Player;
 			var itemstack = player?.InventoryManager?.ActiveHotbarSlot?.Itemstack;
 			if(itemstack == null) return false;
-			this.item = itemstack.Collectible;
+			item = itemstack.Collectible;
 
 			bool sourceSelected = false;
 			IItemCrafter source;
@@ -132,7 +132,7 @@ namespace GlassMaking
 		{
 			if(capi.Settings.Bool["immersiveMouseMode"] && blockPos?.Position != null)
 			{
-				Vec3d vec3d = MatrixToolsd.Project(new Vec3d(blockPos.Position.X + 0.5, blockPos.Position.Y + floatyDialogPosition, blockPos.Position.Z + 0.5), capi.Render.PerspectiveProjectionMat, capi.Render.PerspectiveViewMat, capi.Render.FrameWidth, capi.Render.FrameHeight);
+				Vec3d vec3d = MatrixToolsd.Project(new Vec3d(blockPos.Position.X + 0.5, blockPos.Position.Y + FLOATY_DIALOG_POSITION, blockPos.Position.Z + 0.5), capi.Render.PerspectiveProjectionMat, capi.Render.PerspectiveViewMat, capi.Render.FrameWidth, capi.Render.FrameHeight);
 				if(vec3d.Z < 0.0)
 				{
 					return;
@@ -141,7 +141,7 @@ namespace GlassMaking
 				SingleComposer.Bounds.fixedOffsetX = 0.0;
 				SingleComposer.Bounds.fixedOffsetY = 0.0;
 				SingleComposer.Bounds.absFixedX = vec3d.X - SingleComposer.Bounds.OuterWidth / 2.0;
-				SingleComposer.Bounds.absFixedY = capi.Render.FrameHeight - vec3d.Y - SingleComposer.Bounds.OuterHeight * floatyDialogAlign;
+				SingleComposer.Bounds.absFixedY = capi.Render.FrameHeight - vec3d.Y - SingleComposer.Bounds.OuterHeight * FLOATY_DIALOG_ALIGN;
 				SingleComposer.Bounds.absMarginX = 0.0;
 				SingleComposer.Bounds.absMarginY = 0.0;
 			}

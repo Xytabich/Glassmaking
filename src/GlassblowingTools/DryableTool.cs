@@ -28,7 +28,7 @@ namespace GlassMaking.GlassblowingTools
 		{
 			if(firstEvent && TryGetRecipeStep(slot, byEntity, out var step, true, true) && slot.Itemstack.Collectible is IWettable wettable)
 			{
-				if(wettable.GetHumidity(slot.Itemstack, byEntity.World) >= step.stepAttributes["consume"].AsFloat(0) && step.BeginStep())
+				if(wettable.GetHumidity(slot.Itemstack, byEntity.World) >= step.StepAttributes["consume"].AsFloat(0) && step.BeginStep())
 				{
 					if(api.Side == EnumAppSide.Client) step.SetProgress(0);
 					handHandling = EnumHandHandling.PreventDefault;
@@ -43,7 +43,7 @@ namespace GlassMaking.GlassblowingTools
 		{
 			if(TryGetRecipeStep(slot, byEntity, out var step) && slot.Itemstack.Collectible is IWettable wettable)
 			{
-				if(step.ContinueStep() && wettable.GetHumidity(slot.Itemstack, byEntity.World) >= step.stepAttributes["consume"].AsFloat(0))
+				if(step.ContinueStep() && wettable.GetHumidity(slot.Itemstack, byEntity.World) >= step.StepAttributes["consume"].AsFloat(0))
 				{
 					if(byEntity.Api.Side == EnumAppSide.Client)
 					{
@@ -67,20 +67,20 @@ namespace GlassMaking.GlassblowingTools
 						byEntity.Controls.HandUse = EnumHandInteract.None;
 					}
 
-					float time = step.stepAttributes["time"].AsFloat(1);
+					float time = step.StepAttributes["time"].AsFloat(1);
 					if(api.Side == EnumAppSide.Client)
 					{
 						step.SetProgress(Math.Max(secondsUsed - 1f, 0f) / time);
 					}
 					if(byEntity.Api.Side == EnumAppSide.Server && secondsUsed >= time)
 					{
-						int damage = step.stepAttributes["damage"].AsInt(1);
+						int damage = step.StepAttributes["damage"].AsInt(1);
 						if(damage > 0)
 						{
 							slot.Itemstack.Item.DamageItem(byEntity.World, byEntity, slot, damage);
 							slot.MarkDirty();
 						}
-						float consume = step.stepAttributes["consume"].AsFloat(0);
+						float consume = step.StepAttributes["consume"].AsFloat(0);
 						if(consume > 0)
 						{
 							wettable.ConsumeHumidity(slot.Itemstack, consume, byEntity.World);

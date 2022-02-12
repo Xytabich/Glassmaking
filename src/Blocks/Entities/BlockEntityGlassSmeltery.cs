@@ -19,8 +19,8 @@ namespace GlassMaking.Blocks
 		private static SimpleParticleProperties smokeParticles;
 
 		//TODO: temporary modifiers until a big smeltery is made; default modifiers: dur:1.0, temp:1.1
-		float IBurnerModifier.durationModifier => 0.75f;
-		float IBurnerModifier.temperatureModifier => 1.5f;
+		float IBurnerModifier.DurationModifier => 0.75f;
+		float IBurnerModifier.TemperatureModifier => 1.5f;
 
 		IInventory IBlockEntityContainer.Inventory => inventory;
 		string IBlockEntityContainer.InventoryClassName => inventory.ClassName;
@@ -209,14 +209,14 @@ namespace GlassMaking.Blocks
 			if(glassAmount >= maxGlassAmount) return false;
 			GlassBlend blend = GlassBlend.FromJson(slot.Itemstack);
 			if(blend == null) blend = GlassBlend.FromTreeAttributes(slot.Itemstack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
-			if(blend != null && blend.amount > 0 && (blend.amount + glassAmount) <= maxGlassAmount &&
-				(glassCode == null && mod.GetGlassTypeInfo(blend.code) != null || glassCode.Equals(blend.code)))
+			if(blend != null && blend.Amount > 0 && (blend.Amount + glassAmount) <= maxGlassAmount &&
+				(glassCode == null && mod.GetGlassTypeInfo(blend.Code) != null || glassCode.Equals(blend.Code)))
 			{
 				if(Api.Side == EnumAppSide.Server)
 				{
 					if(glassCode == null)
 					{
-						glassCode = blend.code.Clone();
+						glassCode = blend.Code.Clone();
 						meltingTemperature = mod.GetGlassTypeInfo(glassCode).meltingPoint;
 					}
 					if(state == SmelteryState.Bubbling || state == SmelteryState.ContainsGlass)
@@ -231,14 +231,14 @@ namespace GlassMaking.Blocks
 							state = SmelteryState.ContainsMix;
 						}
 					}
-					int consume = Math.Min(Math.Min(multiplier, slot.Itemstack.StackSize), (maxGlassAmount - glassAmount) / blend.amount);
+					int consume = Math.Min(Math.Min(multiplier, slot.Itemstack.StackSize), (maxGlassAmount - glassAmount) / blend.Amount);
 					var item = slot.TakeOut(consume);
 					if(state == SmelteryState.Empty || state == SmelteryState.ContainsMix)
 					{
 						inventory.AddItem(item);
 						state = SmelteryState.ContainsMix;
 					}
-					glassAmount += blend.amount * consume;
+					glassAmount += blend.Amount * consume;
 					slot.MarkDirty();
 					MarkDirty(true);
 				}

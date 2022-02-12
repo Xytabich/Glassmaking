@@ -2,7 +2,7 @@
 {
 	public interface IBurnerModifier
 	{
-		float durationModifier { get; }
-		float temperatureModifier { get; }
+		float DurationModifier { get; }
+		float TemperatureModifier { get; }
 	}
 }

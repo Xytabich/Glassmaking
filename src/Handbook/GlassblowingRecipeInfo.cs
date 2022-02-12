@@ -29,7 +29,7 @@ namespace GlassMaking.Handbook
 			List<GlassBlowingRecipe> recipes = null;
 			foreach(var recipe in mod.GetGlassBlowingRecipes())
 			{
-				if(recipe.Value.output.ResolvedItemstack != null && recipe.Value.output.ResolvedItemstack.Equals(capi.World, itemstack, GlobalConstants.IgnoredStackAttributes))
+				if(recipe.Value.Output.ResolvedItemstack != null && recipe.Value.Output.ResolvedItemstack.Equals(capi.World, itemstack, GlobalConstants.IgnoredStackAttributes))
 				{
 					if(recipes == null) recipes = new List<GlassBlowingRecipe>();
 					recipes.Add(recipe.Value);
@@ -46,14 +46,14 @@ namespace GlassMaking.Handbook
 						outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:Steps for recipe {0}", i + 1) + "\n", CairoFont.WhiteSmallText()));
 					}
 					var recipe = recipes[i];
-					var steps = recipe.steps;
+					var steps = recipe.Steps;
 					for(int j = 0; j < steps.Length; j++)
 					{
-						var descriptor = mod.GetPipeToolDescriptor(steps[j].tool);
+						var descriptor = mod.GetPipeToolDescriptor(steps[j].Tool);
 						if(descriptor == null)
 						{
 							outComponents.Add(new RichTextComponent(capi, "• " + Lang.Get("glassmaking:Step {0} tool: {1}", j + 1,
-								Lang.Get("glassmaking:glassblowingtool-" + steps[j].tool)) + "\n", CairoFont.WhiteSmallText()));
+								Lang.Get("glassmaking:glassblowingtool-" + steps[j].Tool)) + "\n", CairoFont.WhiteSmallText()));
 						}
 						else
 						{

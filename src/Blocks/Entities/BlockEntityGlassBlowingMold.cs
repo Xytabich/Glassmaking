@@ -138,14 +138,14 @@ namespace GlassMaking.Blocks
 				return false;
 			}
 
-			var layers = GetRecipe().recipe;
+			var layers = GetRecipe().Recipe;
 			if(layersCode.Length < layers.Length)
 			{
 				fillTime = 0;
 				return false;
 			}
 
-			fillTime = GetRecipe().fillTime;
+			fillTime = GetRecipe().FillTime;
 			int layerIndex = layersCode.Length - 1;
 			for(int i = layers.Length - 1; i >= 0; i--)
 			{
@@ -158,15 +158,15 @@ namespace GlassMaking.Blocks
 
 		public void TakeGlass(EntityAgent byEntity, string[] layersCode, int[] layersAmount)
 		{
-			var recipe = GetRecipe().recipe;
+			var recipe = GetRecipe().Recipe;
 			int layerIndex = layersCode.Length - 1;
 			for(int i = recipe.Length - 1; i >= 0; i--)
 			{
-				layersAmount[layerIndex] -= recipe[i].amount;
+				layersAmount[layerIndex] -= recipe[i].Amount;
 			}
 			if(Api.Side == EnumAppSide.Server)
 			{
-				var item = GetRecipe().output.ResolvedItemstack;
+				var item = GetRecipe().Output.ResolvedItemstack;
 				if(splittable || hasContentsTransform)
 				{
 					contents = item.Clone();
@@ -234,7 +234,7 @@ namespace GlassMaking.Blocks
 
 		private GlassMoldRecipe GetRecipe()
 		{
-			return ((BlockGlassBlowingMold)Block).recipes[0];
+			return ((BlockGlassBlowingMold)Block).Recipes[0];
 		}
 
 		private void UpdateMesh()

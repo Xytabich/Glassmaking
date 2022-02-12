@@ -44,8 +44,8 @@ namespace GlassMaking.Blocks
 		private float _fuelBurnDuration = 0f;
 		private float fuelBurnDuration => _fuelBurnDuration * durationModifier;
 
-		private float temperatureModifier => modifier == null ? 1f : modifier.temperatureModifier;
-		private float durationModifier => modifier == null ? 1f : modifier.durationModifier;
+		private float temperatureModifier => modifier == null ? 1f : modifier.TemperatureModifier;
+		private float durationModifier => modifier == null ? 1f : modifier.DurationModifier;
 
 		private double lastTickTime;
 
@@ -231,12 +231,12 @@ namespace GlassMaking.Blocks
 			HeatGraph graph = default;
 
 			float temp = temperature;
-			graph.startTemperature = temp;
-			graph.workingTemperature = temp;
+			graph.StartTemperature = temp;
+			graph.WorkingTemperature = temp;
 
 			if(totalHours <= 0) totalHours = Api.World.Calendar.TotalHours;
 			double hours = totalHours - lastTickTime;
-			graph.totalTime = Math.Max(hours, 0);
+			graph.TotalTime = Math.Max(hours, 0);
 
 			if(burning && hours > 0)
 			{
@@ -247,27 +247,27 @@ namespace GlassMaking.Blocks
 					temp += (float)(time * TEMP_INCREASE_PER_HOUR);
 					hours -= time;
 					burnTime -= time;
-					graph.transitionTime = time;
-					graph.workingTemperature = temp;
+					graph.TransitionTime = time;
+					graph.WorkingTemperature = temp;
 				}
 				else if(temp > fuelTemperature)
 				{
-					graph.transitionTime = Math.Min((temp - fuelTemperature) / TEMP_DECREASE_PER_HOUR, hours);
-					temp -= (float)(graph.transitionTime * TEMP_DECREASE_PER_HOUR);
-					graph.workingTemperature = temp;
+					graph.TransitionTime = Math.Min((temp - fuelTemperature) / TEMP_DECREASE_PER_HOUR, hours);
+					temp -= (float)(graph.TransitionTime * TEMP_DECREASE_PER_HOUR);
+					graph.WorkingTemperature = temp;
 				}
 				if(hours > 0)
 				{
-					graph.holdTime = Math.Min(burnTime, hours);
-					hours -= graph.holdTime;
+					graph.HoldTime = Math.Min(burnTime, hours);
+					hours -= graph.HoldTime;
 				}
 			}
 			if(hours > 0)
 			{
-				graph.coolingTime = Math.Min((temp - 20) / TEMP_DECREASE_PER_HOUR, hours);
-				temp -= (float)(graph.coolingTime * TEMP_DECREASE_PER_HOUR);
+				graph.CoolingTime = Math.Min((temp - 20) / TEMP_DECREASE_PER_HOUR, hours);
+				temp -= (float)(graph.CoolingTime * TEMP_DECREASE_PER_HOUR);
 			}
-			graph.endTemperature = temp;
+			graph.EndTemperature = temp;
 
 			return graph.MultiplyTemperature(temperatureModifier);
 		}

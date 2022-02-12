@@ -69,14 +69,14 @@ namespace GlassMaking.GlassblowingTools
 						byEntity.Controls.HandUse = EnumHandInteract.None;
 					}
 
-					float time = step.stepAttributes["time"].AsFloat(1);
+					float time = step.StepAttributes["time"].AsFloat(1);
 					if(api.Side == EnumAppSide.Client)
 					{
 						step.SetProgress(Math.Max(secondsUsed - 1f, 0f) / time);
 					}
 					if(byEntity.Api.Side == EnumAppSide.Server && secondsUsed >= time)
 					{
-						int damage = step.stepAttributes["damage"].AsInt(1);
+						int damage = step.StepAttributes["damage"].AsInt(1);
 						if(damage > 0)
 						{
 							slot.Itemstack.Item.DamageItem(byEntity.World, byEntity, slot, damage);

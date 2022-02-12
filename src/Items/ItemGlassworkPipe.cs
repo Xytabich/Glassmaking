@@ -690,7 +690,7 @@ namespace GlassMaking.Items
 			int index = 0;
 			foreach(var pair in recipes)
 			{
-				recipeOutputs[index++] = new KeyValuePair<IAttribute, ItemStack>(new StringAttribute(pair.Key), pair.Value.output.ResolvedItemstack);
+				recipeOutputs[index++] = new KeyValuePair<IAttribute, ItemStack>(new StringAttribute(pair.Key), pair.Value.Output.ResolvedItemstack);
 			}
 			return index > 0;
 		}
@@ -818,12 +818,12 @@ namespace GlassMaking.Items
 
 				var root = Math.Pow(count * invPI, 1.0 / 3.0);
 				var shape = new SmoothRadialShape();
-				shape.segments = GameMath.Max(1, (int)Math.Floor(root)) * 2 + 3;
+				shape.Segments = GameMath.Max(1, (int)Math.Floor(root)) * 2 + 3;
 
 				float radius = (float)Math.Sqrt(count * invPI / root);
 				float length = (float)(root * 1.5);
-				shape.outer = new SmoothRadialShape.ShapePart[] { new SmoothRadialShape.ShapePart() {
-					vertices = new float[][] {
+				shape.Outer = new SmoothRadialShape.ShapePart[] { new SmoothRadialShape.ShapePart() {
+					Vertices = new float[][] {
 					   new float[] { -3, 0 },
 					   new float[] { length * 0.1f, radius  },
 					   new float[] { length, radius },
@@ -847,8 +847,8 @@ namespace GlassMaking.Items
 
 		private class MeltMeshInfo
 		{
-			public int count;
-			public int glow;
+			internal int count;
+			internal int glow;
 
 			public MeltMeshInfo(int count, int glow)
 			{
@@ -859,8 +859,8 @@ namespace GlassMaking.Items
 
 		public interface IMeshContainer
 		{
-			object data { get; set; }
-			MeshData mesh { get; }
+			object Data { get; set; }
+			MeshData Mesh { get; }
 
 			void BeginMeshChange();
 

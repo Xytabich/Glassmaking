@@ -8,7 +8,7 @@ namespace GlassMaking.GlassblowingTools
 {
 	public abstract class GlassblowingToolBehavior : CollectibleBehavior
 	{
-		public string toolCode;
+		public string ToolCode;
 
 		protected GlassMakingMod mod;
 		protected ICoreAPI api;
@@ -27,7 +27,7 @@ namespace GlassMaking.GlassblowingTools
 		public override void Initialize(JsonObject properties)
 		{
 			base.Initialize(properties);
-			toolCode = properties?["tool"].AsString();
+			ToolCode = properties?["tool"].AsString();
 		}
 
 		protected bool TryGetRecipeStep(ItemSlot slot, EntityAgent byEntity, out ToolRecipeStep stepInfo, bool workingTemperatureRequired = true, bool showWarning = false)
@@ -56,9 +56,9 @@ namespace GlassMaking.GlassblowingTools
 						if(recipe != null)
 						{
 							var step = recipe.GetStepIndex(recipeAttribute);
-							if(step >= 0 && recipe.steps[step].tool == toolCode)
+							if(step >= 0 && recipe.Steps[step].Tool == ToolCode)
 							{
-								stepInfo = new ToolRecipeStep(step, pipeSlot, recipe, recipe.steps[step].attributes);
+								stepInfo = new ToolRecipeStep(step, pipeSlot, recipe, recipe.Steps[step].Attributes);
 								return true;
 							}
 						}
@@ -75,44 +75,44 @@ namespace GlassMaking.GlassblowingTools
 
 		protected sealed class ToolRecipeStep
 		{
-			public int index;
-			public ItemSlot pipeSlot;
-			public GlassBlowingRecipe recipe;
-			public JsonObject stepAttributes;
+			public int Index;
+			public ItemSlot PipeSlot;
+			public GlassBlowingRecipe Recipe;
+			public JsonObject StepAttributes;
 
 			private bool isComplete = false;
 
 			public ToolRecipeStep(int index, ItemSlot pipeSlot, GlassBlowingRecipe recipe, JsonObject stepAttributes)
 			{
-				this.index = index;
-				this.pipeSlot = pipeSlot;
-				this.recipe = recipe;
-				this.stepAttributes = stepAttributes;
+				this.Index = index;
+				this.PipeSlot = pipeSlot;
+				this.Recipe = recipe;
+				this.StepAttributes = stepAttributes;
 			}
 
 			public bool BeginStep()
 			{
-				return recipe.TryBeginStep(pipeSlot, index);
+				return Recipe.TryBeginStep(PipeSlot, Index);
 			}
 
 			public bool ContinueStep()
 			{
-				return recipe.IsCurrentStep(pipeSlot, index);
+				return Recipe.IsCurrentStep(PipeSlot, Index);
 			}
 
 			/// <param name="progress">0.0-1.0</param>
 			public void SetProgress(float progress)
 			{
-				if(pipeSlot.Itemstack == null) return;
+				if(PipeSlot.Itemstack == null) return;
 				if(isComplete) return;
-				recipe.OnStepProgress(pipeSlot, progress);
+				Recipe.OnStepProgress(PipeSlot, progress);
 			}
 
 			public void CompleteStep(EntityAgent byEntity)
 			{
 				if(isComplete) return;
 				isComplete = true;
-				recipe.OnStepComplete(pipeSlot, byEntity);
+				Recipe.OnStepComplete(PipeSlot, byEntity);
 			}
 		}
 	}

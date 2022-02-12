@@ -26,8 +26,8 @@ namespace GlassMaking.Blocks
 		{
 			this.pos = pos;
 			this.api = api;
-			this.unlitTexture = tex["unlit"];
-			this.litTexture = tex["lit"];
+			unlitTexture = tex["unlit"];
+			litTexture = tex["lit"];
 		}
 
 		public void SetHeight(int contentHeight)

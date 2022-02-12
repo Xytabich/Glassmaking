@@ -28,7 +28,7 @@ namespace GlassMaking.ToolDescriptors
 				{
 					if(IsSuitableBehavior(item, beh))
 					{
-						var code = ((GlassblowingToolBehavior)beh).toolCode;
+						var code = ((GlassblowingToolBehavior)beh).ToolCode;
 						toolCodes.Add(code);
 						mod.AddPipeToolDescriptor(code, this);
 					}
@@ -52,10 +52,10 @@ namespace GlassMaking.ToolDescriptors
 
 		public override void GetStepInfoForHandbook(ICoreClientAPI capi, ItemStack item, GlassBlowingRecipe recipe, int stepIndex, ActionConsumable<string> openDetailPageFor, List<RichTextComponentBase> outComponents)
 		{
-			var step = recipe.steps[stepIndex];
+			var step = recipe.Steps[stepIndex];
 			outComponents.Add(new RichTextComponent(capi, "• " + Lang.Get("glassmaking:Step {0}: {1}", stepIndex + 1,
-				Lang.Get("glassmaking:Take {0} units of {1} glass", step.attributes["amount"].AsInt(),
-				Lang.Get(GlassBlend.GetBlendNameCode(new AssetLocation(step.attributes["code"].AsString()))))) + "\n", CairoFont.WhiteSmallText()));
+				Lang.Get("glassmaking:Take {0} units of {1} glass", step.Attributes["amount"].AsInt(),
+				Lang.Get(GlassBlend.GetBlendNameCode(new AssetLocation(step.Attributes["code"].AsString()))))) + "\n", CairoFont.WhiteSmallText()));
 
 			outComponents.Add(new SlideshowItemstackTextComponent(capi, items, 40.0, EnumFloat.Inline,
 				cs => openDetailPageFor(GuiHandbookItemStackPage.PageCodeForStack(cs))));
@@ -64,16 +64,16 @@ namespace GlassMaking.ToolDescriptors
 
 		public override void GetStepInfoForHeldItem(IWorldAccessor world, ItemStack item, GlassBlowingRecipe recipe, int stepIndex, StringBuilder dsc, bool withDebugInfo)
 		{
-			var step = recipe.steps[stepIndex];
-			dsc.AppendLine("• " + Lang.Get("glassmaking:Take {0} units of {1} glass", step.attributes["amount"].AsInt(),
-				Lang.Get(GlassBlend.GetBlendNameCode(new AssetLocation(step.attributes["code"].AsString())))));
+			var step = recipe.Steps[stepIndex];
+			dsc.AppendLine("• " + Lang.Get("glassmaking:Take {0} units of {1} glass", step.Attributes["amount"].AsInt(),
+				Lang.Get(GlassBlend.GetBlendNameCode(new AssetLocation(step.Attributes["code"].AsString())))));
 		}
 
 		public override bool TryGetWorkingTemperature(IWorldAccessor world, ItemStack itemStack, GlassBlowingRecipe recipe, int currentStepIndex, out float temperature)
 		{
-			var steps = recipe.steps;
+			var steps = recipe.Steps;
 			int lastIndex = currentStepIndex - 1;
-			if(toolCodes.Contains(steps[currentStepIndex].tool) && itemStack.Attributes.GetInt("glassmaking:toolIntakeAmount", 0) > 0)
+			if(toolCodes.Contains(steps[currentStepIndex].Tool) && itemStack.Attributes.GetInt("glassmaking:toolIntakeAmount", 0) > 0)
 			{
 				lastIndex++;
 			}
@@ -81,9 +81,9 @@ namespace GlassMaking.ToolDescriptors
 			temperature = 0f;
 			for(int i = 0; i <= lastIndex; i++)
 			{
-				if(toolCodes.Contains(steps[i].tool))
+				if(toolCodes.Contains(steps[i].Tool))
 				{
-					var info = mod.GetGlassTypeInfo(new AssetLocation(steps[i].attributes["code"].AsString()));
+					var info = mod.GetGlassTypeInfo(new AssetLocation(steps[i].Attributes["code"].AsString()));
 					temperature = Math.Max(info.meltingPoint * 0.8f, temperature);
 				}
 			}
@@ -92,24 +92,24 @@ namespace GlassMaking.ToolDescriptors
 
 		public override void GetBreakDrops(IWorldAccessor world, ItemStack itemStack, GlassBlowingRecipe recipe, int currentStepIndex, List<ItemStack> outList)
 		{
-			var steps = recipe.steps;
+			var steps = recipe.Steps;
 			var amountByCode = new Dictionary<string, int>();
-			if(toolCodes.Contains(steps[currentStepIndex].tool))
+			if(toolCodes.Contains(steps[currentStepIndex].Tool))
 			{
 				int intake = itemStack.Attributes.GetInt("glassmaking:toolIntakeAmount", 0);
 				if(intake > 0)
 				{
-					amountByCode[steps[currentStepIndex].attributes["code"].AsString()] = intake;
+					amountByCode[steps[currentStepIndex].Attributes["code"].AsString()] = intake;
 				}
 			}
 
 			for(int i = 0; i < currentStepIndex; i++)
 			{
-				if(toolCodes.Contains(steps[i].tool))
+				if(toolCodes.Contains(steps[i].Tool))
 				{
-					var code = steps[i].attributes["code"].AsString();
+					var code = steps[i].Attributes["code"].AsString();
 					if(!amountByCode.TryGetValue(code, out var amount)) amount = 0;
-					amountByCode[code] = amount + steps[i].attributes["amount"].AsInt();
+					amountByCode[code] = amount + steps[i].Attributes["amount"].AsInt();
 				}
 			}
 			if(amountByCode.Count == 0) return;

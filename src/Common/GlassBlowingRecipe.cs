@@ -16,18 +16,18 @@ namespace GlassMaking
 	[JsonObject(MemberSerialization.OptIn)]
 	public class GlassBlowingRecipe : IRecipeBase, IByteSerializable, IRecipeBase<GlassBlowingRecipe>
 	{
-		private static SmoothRadialShape EmptyShape = new SmoothRadialShape() { segments = 1, outer = new SmoothRadialShape.ShapePart[] { new SmoothRadialShape.ShapePart() { vertices = new float[][] { new float[] { -1.5f, 0 } } } }, inner = new SmoothRadialShape.ShapePart[] { new SmoothRadialShape.ShapePart() { vertices = new float[][] { new float[] { -1.5f, 0 } } } } };
+		private static SmoothRadialShape EmptyShape = new SmoothRadialShape() { Segments = 1, Outer = new SmoothRadialShape.ShapePart[] { new SmoothRadialShape.ShapePart() { Vertices = new float[][] { new float[] { -1.5f, 0 } } } }, Inner = new SmoothRadialShape.ShapePart[] { new SmoothRadialShape.ShapePart() { Vertices = new float[][] { new float[] { -1.5f, 0 } } } } };
 
-		public int recipeId;
-
-		[JsonProperty]
-		public AssetLocation code;
+		public int RecipeId;
 
 		[JsonProperty]
-		public JsonItemStack output;
+		public AssetLocation Code;
 
 		[JsonProperty]
-		public GlassBlowingRecipeStep[] steps;
+		public JsonItemStack Output;
+
+		[JsonProperty]
+		public GlassBlowingRecipeStep[] Steps;
 
 		public AssetLocation Name { get; set; }
 
@@ -35,9 +35,9 @@ namespace GlassMaking
 
 		public IRecipeIngredient[] Ingredients { get; } = new IRecipeIngredient[0];
 
-		public IRecipeOutput Output => output;
+		IRecipeOutput IRecipeBase<GlassBlowingRecipe>.Output => Output;
 
-		AssetLocation IRecipeBase.code => code;
+		AssetLocation IRecipeBase.Code => Code;
 
 		public Dictionary<string, string[]> GetNameToCodeMapping(IWorldAccessor world)
 		{
@@ -47,21 +47,21 @@ namespace GlassMaking
 		public int GetStepIndex(ITreeAttribute recipeAttribute)
 		{
 			int step = recipeAttribute.GetInt("step", 0);
-			return step < 0 || step >= steps.Length ? -1 : step;
+			return step < 0 || step >= Steps.Length ? -1 : step;
 		}
 
 		public bool Resolve(IWorldAccessor world, string sourceForErrorLogging)
 		{
-			if(steps == null || steps.Length == 0 || output == null)
+			if(Steps == null || Steps.Length == 0 || Output == null)
 			{
 				world.Logger.Error("Glassblowing recipe with output {0} has no steps or missing output. Ignoring recipe.", Output);
 				return false;
 			}
-			foreach(var step in steps)
+			foreach(var step in Steps)
 			{
-				step.tool = step.tool.ToLowerInvariant();
+				step.Tool = step.Tool.ToLowerInvariant();
 			}
-			if(!output.Resolve(world, sourceForErrorLogging))
+			if(!Output.Resolve(world, sourceForErrorLogging))
 			{
 				return false;
 			}
@@ -70,13 +70,13 @@ namespace GlassMaking
 
 		public void GetRecipeInfo(ItemStack item, ITreeAttribute recipeAttribute, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
 		{
-			dsc.AppendLine(Lang.Get("glassmaking:Recipe: {0}", output.ResolvedItemstack.Collectible.GetHeldItemName(output.ResolvedItemstack)));
+			dsc.AppendLine(Lang.Get("glassmaking:Recipe: {0}", Output.ResolvedItemstack.Collectible.GetHeldItemName(Output.ResolvedItemstack)));
 			int step = recipeAttribute.GetInt("step", 0);
-			dsc.AppendLine(Lang.Get("glassmaking:Step {0}/{1}", step + 1, steps.Length));
-			var descriptor = world.Api.ModLoader.GetModSystem<GlassMakingMod>().GetPipeToolDescriptor(steps[step].tool);
+			dsc.AppendLine(Lang.Get("glassmaking:Step {0}/{1}", step + 1, Steps.Length));
+			var descriptor = world.Api.ModLoader.GetModSystem<GlassMakingMod>().GetPipeToolDescriptor(Steps[step].Tool);
 			if(descriptor == null)
 			{
-				dsc.AppendLine(Lang.Get("glassmaking:Tool: {0}", Lang.Get("glassmaking:glassblowingtool-" + steps[step].tool)));
+				dsc.AppendLine(Lang.Get("glassmaking:Tool: {0}", Lang.Get("glassmaking:glassblowingtool-" + Steps[step].Tool)));
 			}
 			else
 			{
@@ -90,7 +90,7 @@ namespace GlassMaking
 			var tools = new HashSet<string>();
 			for(int i = 0; i <= step; i++)
 			{
-				tools.Add(steps[i].tool);
+				tools.Add(Steps[i].Tool);
 			}
 			var mod = world.Api.ModLoader.GetModSystem<GlassMakingMod>();
 			foreach(var tool in tools)
@@ -109,7 +109,7 @@ namespace GlassMaking
 			var tools = new HashSet<string>();
 			for(int i = 0; i <= step; i++)
 			{
-				tools.Add(steps[i].tool);
+				tools.Add(Steps[i].Tool);
 			}
 
 			float maxTemperature = 0f;
@@ -165,9 +165,9 @@ namespace GlassMaking
 			if(pipe.TryGetRecipeAttribute(slot.Itemstack, out var recipeAttribute))
 			{
 				int step = recipeAttribute.GetInt("step", 0) + 1;
-				if(step >= steps.Length)
+				if(step >= Steps.Length)
 				{
-					var item = output.ResolvedItemstack.Clone();
+					var item = Output.ResolvedItemstack.Clone();
 					item.Collectible.SetTemperature(byEntity.World, item, pipe.GetGlassTemperature(byEntity.World, slot.Itemstack));
 					if(!byEntity.TryGiveItemStack(item))
 					{
@@ -191,9 +191,9 @@ namespace GlassMaking
 			int step = recipeAttribute.GetInt("step", 0);
 			float t = GameMath.Clamp(recipeAttribute.GetFloat("progress", 0), 0, 1);
 
-			if(container.data == null || !(container.data is MeshInfo data))
+			if(container.Data == null || !(container.Data is MeshInfo data))
 			{
-				container.data = new MeshInfo(code, step, t, glow);
+				container.Data = new MeshInfo(code, step, t, glow);
 			}
 			else if(!data.Equals(code, step, t, glow))
 			{
@@ -207,18 +207,18 @@ namespace GlassMaking
 			SmoothRadialShape prevShape = null;
 			for(int i = step - 1; i >= 0; i--)
 			{
-				if(steps[i].shape != null)
+				if(Steps[i].Shape != null)
 				{
-					prevShape = steps[i].shape;
+					prevShape = Steps[i].Shape;
 					break;
 				}
 			}
-			if(steps[step].shape == null)
+			if(Steps[step].Shape == null)
 			{
 				container.BeginMeshChange();
 				if(prevShape != null)
 				{
-					SmoothRadialShape.BuildMesh(container.mesh, prevShape, (m, i, o) => GlasspipeRenderUtil.GenerateRadialVertices(m, i, o, glow), GlasspipeRenderUtil.GenerateRadialFaces);
+					SmoothRadialShape.BuildMesh(container.Mesh, prevShape, (m, i, o) => GlasspipeRenderUtil.GenerateRadialVertices(m, i, o, glow), GlasspipeRenderUtil.GenerateRadialFaces);
 				}
 				container.EndMeshChange();
 				return;
@@ -226,43 +226,43 @@ namespace GlassMaking
 
 			if(prevShape == null) prevShape = EmptyShape;
 			container.BeginMeshChange();
-			SmoothRadialShape.BuildLerpedMesh(container.mesh, prevShape, steps[step].shape, EmptyShape, t,
+			SmoothRadialShape.BuildLerpedMesh(container.Mesh, prevShape, Steps[step].Shape, EmptyShape, t,
 				(m, i, o) => GlasspipeRenderUtil.GenerateRadialVertices(m, i, o, glow), GlasspipeRenderUtil.GenerateRadialFaces);
 			container.EndMeshChange();
 		}
 
 		public void ToBytes(BinaryWriter writer)
 		{
-			writer.Write(code);
-			writer.Write(steps.Length);
-			for(int i = 0; i < steps.Length; i++)
+			writer.Write(Code);
+			writer.Write(Steps.Length);
+			for(int i = 0; i < Steps.Length; i++)
 			{
-				steps[i].ToBytes(writer);
+				Steps[i].ToBytes(writer);
 			}
-			output.ToBytes(writer);
+			Output.ToBytes(writer);
 		}
 
 		public void FromBytes(BinaryReader reader, IWorldAccessor resolver)
 		{
-			code = reader.ReadAssetLocation();
-			steps = new GlassBlowingRecipeStep[reader.ReadInt32()];
-			for(int i = 0; i < steps.Length; i++)
+			Code = reader.ReadAssetLocation();
+			Steps = new GlassBlowingRecipeStep[reader.ReadInt32()];
+			for(int i = 0; i < Steps.Length; i++)
 			{
-				steps[i] = new GlassBlowingRecipeStep();
-				steps[i].FromBytes(reader);
+				Steps[i] = new GlassBlowingRecipeStep();
+				Steps[i].FromBytes(reader);
 			}
-			output = new JsonItemStack();
-			output.FromBytes(reader, resolver.ClassRegistry);
-			output.Resolve(resolver, "[FromBytes]");
+			Output = new JsonItemStack();
+			Output.FromBytes(reader, resolver.ClassRegistry);
+			Output.Resolve(resolver, "[FromBytes]");
 		}
 
 		public GlassBlowingRecipe Clone()
 		{
 			return new GlassBlowingRecipe() {
-				recipeId = recipeId,
-				code = code.Clone(),
-				output = output.Clone(),
-				steps = Array.ConvertAll(steps, CloneStep),
+				RecipeId = RecipeId,
+				Code = Code.Clone(),
+				Output = Output.Clone(),
+				Steps = Array.ConvertAll(Steps, CloneStep),
 				Name = Name.Clone(),
 				Enabled = Enabled
 			};
@@ -275,10 +275,10 @@ namespace GlassMaking
 
 		private class MeshInfo
 		{
-			public string code;
-			public int step;
-			public float progress;
-			public int glow;
+			internal string code;
+			internal int step;
+			internal float progress;
+			internal int glow;
 
 			public MeshInfo(string code, int step, float progress, int glow)
 			{
@@ -307,44 +307,44 @@ namespace GlassMaking
 	public sealed class GlassBlowingRecipeStep
 	{
 		[JsonProperty(Required = Required.Always)]
-		public string tool;
+		public string Tool;
 
 		[JsonProperty]
-		public SmoothRadialShape shape;
+		public SmoothRadialShape Shape;
 
 		[JsonProperty]
 		[JsonConverter(typeof(JsonAttributesConverter))]
-		public JsonObject attributes;
+		public JsonObject Attributes;
 
 		public void ToBytes(BinaryWriter writer)
 		{
-			writer.Write(tool);
-			writer.Write(shape != null);
-			if(shape != null) shape.ToBytes(writer);
-			writer.Write(attributes != null);
-			if(attributes != null) writer.Write(attributes.Token.ToString());
+			writer.Write(Tool);
+			writer.Write(Shape != null);
+			if(Shape != null) Shape.ToBytes(writer);
+			writer.Write(Attributes != null);
+			if(Attributes != null) writer.Write(Attributes.Token.ToString());
 		}
 
 		public void FromBytes(BinaryReader reader)
 		{
-			tool = reader.ReadString().ToLowerInvariant();
+			Tool = reader.ReadString().ToLowerInvariant();
 			if(reader.ReadBoolean())
 			{
-				shape = new SmoothRadialShape();
-				shape.FromBytes(reader);
+				Shape = new SmoothRadialShape();
+				Shape.FromBytes(reader);
 			}
 			if(reader.ReadBoolean())
 			{
-				attributes = new JsonObject(JToken.Parse(reader.ReadString()));
+				Attributes = new JsonObject(JToken.Parse(reader.ReadString()));
 			}
 		}
 
 		public GlassBlowingRecipeStep Clone()
 		{
 			return new GlassBlowingRecipeStep() {
-				tool = tool,
-				shape = shape.Clone(),
-				attributes = attributes?.Clone()
+				Tool = Tool,
+				Shape = Shape.Clone(),
+				Attributes = Attributes?.Clone()
 			};
 		}
 	}

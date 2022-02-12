@@ -7,14 +7,14 @@ namespace GlassMaking.Blocks
 {
 	public class BlockGlassBlowingMold : Block, IGlassBlowingMold
 	{
-		public GlassMoldRecipe[] recipes = null;
+		public GlassMoldRecipe[] Recipes = null;
 
 		public override void OnLoaded(ICoreAPI api)
 		{
 			base.OnLoaded(api);
 
 			var recipe = Attributes?["glassmaking:glassmold"].AsObject<GlassMoldRecipe>(null, Code.Domain);
-			if(recipe != null)
+			if(recipe != null && recipe.Enabled)
 			{
 				var world = api.World;
 				var nameToCodeMapping = recipe.GetNameToCodeMapping(world);
@@ -78,11 +78,11 @@ namespace GlassMaking.Blocks
 						recipes.RemoveAt(i);
 					}
 				}
-				this.recipes = recipes.ToArray();
+				this.Recipes = recipes.ToArray();
 			}
 			else
 			{
-				recipes = new GlassMoldRecipe[0];
+				Recipes = new GlassMoldRecipe[0];
 			}
 		}
 
@@ -113,7 +113,7 @@ namespace GlassMaking.Blocks
 
 		public GlassMoldRecipe[] GetRecipes()
 		{
-			return recipes;
+			return Recipes;
 		}
 	}
 }

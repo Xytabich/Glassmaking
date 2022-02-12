@@ -11,20 +11,20 @@ namespace GlassMaking.Items
 
 	internal class GlasspipeRenderCache : IMeshContainer, IDisposable
 	{
-		public object _data;
-		public MeshData _mesh;
-		public MeshRef meshRef = null;
+		internal object _data;
+		internal MeshData _mesh;
+		internal MeshRef meshRef = null;
 
-		public bool isDirty = false;
-		public TemperatureState temperature;
+		internal bool isDirty = false;
+		internal TemperatureState temperature;
 
-		public bool hasMesh => meshRef != null || updateMesh.HasValue;
+		internal bool hasMesh => meshRef != null || updateMesh.HasValue;
 
 		internal int id;
 		internal IDisposableHandle tmpHandle;
 
-		object IMeshContainer.data { get { return _data; } set { _data = value; } }
-		MeshData IMeshContainer.mesh { get { return _mesh; } }
+		object IMeshContainer.Data { get { return _data; } set { _data = value; } }
+		MeshData IMeshContainer.Mesh { get { return _mesh; } }
 
 		private bool? updateMesh = null;
 		private int prevVertices, prevIndices;

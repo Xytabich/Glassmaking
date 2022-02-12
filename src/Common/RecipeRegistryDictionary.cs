@@ -17,8 +17,8 @@ namespace GlassMaking.Common
 
 		public RecipeRegistryDictionary(List<T> recipes, Dictionary<string, T> pairs)
 		{
-			this.Recipes = recipes;
-			this.Pairs = pairs;
+			Recipes = recipes;
+			Pairs = pairs;
 		}
 
 		public override void FromBytes(IWorldAccessor resolver, int quantity, byte[] data)
@@ -56,12 +56,12 @@ namespace GlassMaking.Common
 		public void AddRecipe(T rec)
 		{
 			Recipes.Add(rec);
-			Pairs[rec.code.ToShortString()] = rec;
+			Pairs[rec.Code.ToShortString()] = rec;
 		}
 	}
 
 	public interface IRecipeBase
 	{
-		AssetLocation code { get; }
+		AssetLocation Code { get; }
 	}
 }

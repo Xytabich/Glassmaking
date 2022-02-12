@@ -50,7 +50,7 @@ namespace GlassMaking.Blocks
 				var tool = inventory.GetBehavior(i);
 				if(tool != null)
 				{
-					tools[tool.toolCode] = tool;
+					tools[tool.ToolCode] = tool;
 					UpdateToolBounds(i);
 				}
 			}
@@ -100,7 +100,7 @@ namespace GlassMaking.Blocks
 				else if(recipe != null)
 				{
 					startedStep = recipeStep;
-					if(tools.TryGetValue(recipe.steps[recipeStep].tool, out var tool))
+					if(tools.TryGetValue(recipe.Steps[recipeStep].Tool, out var tool))
 					{
 						selection = selection.Clone();
 						selection.SelectionBoxIndex = -1;
@@ -159,7 +159,7 @@ namespace GlassMaking.Blocks
 			{
 				if(recipe != null && startedStep == recipeStep)
 				{
-					if(tools.TryGetValue(recipe.steps[recipeStep].tool, out var tool))
+					if(tools.TryGetValue(recipe.Steps[recipeStep].Tool, out var tool))
 					{
 						selection = selection.Clone();
 						selection.SelectionBoxIndex = -1;
@@ -195,7 +195,7 @@ namespace GlassMaking.Blocks
 			{
 				if(recipe != null && startedStep == recipeStep)
 				{
-					if(tools.TryGetValue(recipe.steps[recipeStep].tool, out var tool))
+					if(tools.TryGetValue(recipe.Steps[recipeStep].Tool, out var tool))
 					{
 						selection = selection.Clone();
 						selection.SelectionBoxIndex = -1;
@@ -226,7 +226,7 @@ namespace GlassMaking.Blocks
 			{
 				if(recipe != null && startedStep == recipeStep)
 				{
-					if(tools.TryGetValue(recipe.steps[recipeStep].tool, out var tool))
+					if(tools.TryGetValue(recipe.Steps[recipeStep].Tool, out var tool))
 					{
 						selection = selection.Clone();
 						selection.SelectionBoxIndex = -1;
@@ -285,7 +285,7 @@ namespace GlassMaking.Blocks
 
 					var behavior = inventory.GetBehavior(i);
 					toolsSelection[i] = new SelectionInfo() { boxes = boxes };
-					tools.Add(behavior.toolCode, behavior);
+					tools.Add(behavior.ToolCode, behavior);
 
 					RebuildSelectionBoxes();
 					updateMesh(i);
@@ -323,7 +323,7 @@ namespace GlassMaking.Blocks
 					for(int i = itemCapacity - 1; i >= 0; i--)
 					{
 						var tool = inventory.GetBehavior(i);
-						if(tool != null) tools[tool.toolCode] = tool;
+						if(tool != null) tools[tool.ToolCode] = tool;
 					}
 					for(int i = inventory.modifiedSlots.Count - 1; i >= 0; i--)
 					{
@@ -340,7 +340,7 @@ namespace GlassMaking.Blocks
 			tree.SetItemstack("ingredient", ingredient);
 			if(recipe != null)
 			{
-				tree.SetString("recipe", recipe.code.ToShortString());
+				tree.SetString("recipe", recipe.Code.ToShortString());
 				tree.SetInt("step", recipeStep);
 			}
 		}

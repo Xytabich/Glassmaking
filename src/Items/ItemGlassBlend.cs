@@ -33,7 +33,7 @@ namespace GlassMaking.Items
 
 				if(textureCode == "material" && curBlend != null)
 				{
-					texturePath = curBlend.code.Clone().WithPathPrefix("block/glass/");
+					texturePath = curBlend.Code.Clone().WithPathPrefix("block/glass/");
 				}
 
 				// Prio 2: Get from collectible textures, use "all" code
@@ -79,9 +79,9 @@ namespace GlassMaking.Items
 			base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
 			GlassBlend blend = GlassBlend.FromJson(inSlot.Itemstack);
 			if(blend == null) blend = GlassBlend.FromTreeAttributes(inSlot.Itemstack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
-			if(blend != null && blend.amount > 0)
+			if(blend != null && blend.Amount > 0)
 			{
-				dsc.AppendLine(Lang.Get("glassmaking:Melts into {0} units of {1} glass", blend.amount, Lang.Get(GlassBlend.GetBlendNameCode(blend.code))));
+				dsc.AppendLine(Lang.Get("glassmaking:Melts into {0} units of {1} glass", blend.Amount, Lang.Get(GlassBlend.GetBlendNameCode(blend.Code))));
 			}
 		}
 
@@ -90,12 +90,12 @@ namespace GlassMaking.Items
 			GlassBlend blend = GlassBlend.FromJson(itemStack);
 			if(blend != null)
 			{
-				return Lang.Get("glassmaking:glassblend", Lang.Get(GlassBlend.GetBlendNameCode(blend.code)));
+				return Lang.Get("glassmaking:glassblend", Lang.Get(GlassBlend.GetBlendNameCode(blend.Code)));
 			}
 			blend = GlassBlend.FromTreeAttributes(itemStack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
 			if(blend != null)
 			{
-				return Lang.Get("glassmaking:glassshards", Lang.Get(GlassBlend.GetBlendNameCode(blend.code)));
+				return Lang.Get("glassmaking:glassshards", Lang.Get(GlassBlend.GetBlendNameCode(blend.Code)));
 			}
 			return base.GetHeldItemName(itemStack);
 		}
@@ -106,7 +106,7 @@ namespace GlassMaking.Items
 			if(blend == null) return;
 
 			Dictionary<string, MeshRef> blendMeshrefs = ObjectCacheUtil.GetOrCreate(capi, "glassmaking:blendMeshRefs", () => new Dictionary<string, MeshRef>());
-			string key = blend.code.ToString();
+			string key = blend.Code.ToString();
 
 			MeshRef meshRef;
 			if(!blendMeshrefs.TryGetValue(key, out meshRef))
@@ -131,7 +131,7 @@ namespace GlassMaking.Items
 			GlassBlend blend = GlassBlend.FromTreeAttributes(itemstack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
 			if(blend != null)
 			{
-				return "glassmaking:shards|" + blend.code.ToString();
+				return "glassmaking:shards|" + blend.Code.ToString();
 			}
 			return "glassmaking:blend|" + Code.ToString();
 		}

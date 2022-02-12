@@ -27,8 +27,8 @@ namespace GlassMaking
 		/// <param name="y"></param>
 		public FastVec2f(float x, float y)
 		{
-			this.X = x;
-			this.Y = y;
+			X = x;
+			Y = y;
 		}
 
 		/// <summary>
@@ -37,8 +37,8 @@ namespace GlassMaking
 		/// <param name="values"></param>
 		public FastVec2f(float[] values)
 		{
-			this.X = values[0];
-			this.Y = values[1];
+			X = values[0];
+			Y = values[1];
 		}
 
 		/// <summary>
@@ -64,8 +64,8 @@ namespace GlassMaking
 
 		public void Negate()
 		{
-			this.X = -X;
-			this.Y = -Y;
+			X = -X;
+			Y = -Y;
 		}
 
 
@@ -123,8 +123,8 @@ namespace GlassMaking
 		/// <returns></returns>
 		public FastVec2f Add(float x, float y)
 		{
-			this.X += x;
-			this.Y += y;
+			X += x;
+			Y += y;
 			return this;
 		}
 
@@ -135,8 +135,8 @@ namespace GlassMaking
 		/// <returns></returns>
 		public FastVec2f Mul(float multiplier)
 		{
-			this.X *= multiplier;
-			this.Y *= multiplier;
+			X *= multiplier;
+			Y *= multiplier;
 			return this;
 		}
 
@@ -270,8 +270,8 @@ namespace GlassMaking
 		/// <param name="y"></param>
 		public FastVec2f Set(float x, float y)
 		{
-			this.X = x;
-			this.Y = y;
+			X = x;
+			Y = y;
 			return this;
 		}
 
@@ -281,15 +281,15 @@ namespace GlassMaking
 		/// <param name="vec"></param>
 		public FastVec2f Set(Vec2d vec)
 		{
-			this.X = (float)vec.X;
-			this.Y = (float)vec.Y;
+			X = (float)vec.X;
+			Y = (float)vec.Y;
 			return this;
 		}
 
 		public FastVec2f Set(float[] vec)
 		{
-			this.X = vec[0];
-			this.Y = vec[1];
+			X = vec[0];
+			Y = vec[1];
 			return this;
 		}
 
@@ -299,8 +299,8 @@ namespace GlassMaking
 		/// <param name="vec"></param>
 		public void Set(FastVec2f vec)
 		{
-			this.X = (float)vec.X;
-			this.Y = (float)vec.Y;
+			X = (float)vec.X;
+			Y = (float)vec.Y;
 		}
 
 		/// <summary>

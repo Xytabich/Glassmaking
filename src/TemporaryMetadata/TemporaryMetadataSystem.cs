@@ -105,8 +105,8 @@ namespace GlassMaking.TemporaryMetadata
 
 			private class Handle : IDisposableHandle
 			{
-				public DateTime enqueueTime;
-				public DateTime updateTime;
+				internal DateTime enqueueTime;
+				internal DateTime updateTime;
 
 				private T disposable;
 

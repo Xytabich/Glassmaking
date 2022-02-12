@@ -10,9 +10,9 @@ namespace GlassMaking.Common
 		public const string PROPERTY_NAME = "glassmaking:glassblend";
 
 		[JsonProperty(Required = Required.DisallowNull)]
-		public AssetLocation code;
+		public AssetLocation Code;
 		[JsonProperty(Required = Required.Always)]
-		public int amount;
+		public int Amount;
 
 		public GlassBlend()
 		{
@@ -20,14 +20,14 @@ namespace GlassMaking.Common
 
 		public GlassBlend(AssetLocation code, int amount)
 		{
-			this.code = code;
-			this.amount = amount;
+			Code = code;
+			Amount = amount;
 		}
 
 		public void ToTreeAttributes(ITreeAttribute tree)
 		{
-			tree.SetString("code", code.ToShortString());
-			tree.SetInt("amount", amount);
+			tree.SetString("code", Code.ToShortString());
+			tree.SetInt("amount", Amount);
 		}
 
 		public static string GetBlendNameCode(AssetLocation code)

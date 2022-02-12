@@ -8,68 +8,68 @@ namespace GlassMaking.Common
 		/// <summary>
 		/// Transition time to working temperature
 		/// </summary>
-		public double transitionTime;
+		public double TransitionTime;
 		/// <summary>
 		/// Working temperature holding time
 		/// </summary>
-		public double holdTime;
-		public double coolingTime;
+		public double HoldTime;
+		public double CoolingTime;
 		/// <summary>
 		/// The total time of the graph, the value may be greater than the sum of the time of all states
 		/// </summary>
-		public double totalTime;
+		public double TotalTime;
 
-		public float startTemperature;
-		public float workingTemperature;
-		public float endTemperature;
+		public float StartTemperature;
+		public float WorkingTemperature;
+		public float EndTemperature;
 
 		public double CalcTemperatureHoldTime(double timeOffset, float temperature)
 		{
-			if(timeOffset >= totalTime) return 0;
-			if(startTemperature < temperature && workingTemperature < temperature) return 0;
-			if(startTemperature > temperature && endTemperature > temperature) return totalTime;
+			if(timeOffset >= TotalTime) return 0;
+			if(StartTemperature < temperature && WorkingTemperature < temperature) return 0;
+			if(StartTemperature > temperature && EndTemperature > temperature) return TotalTime;
 
 			double time = 0;
-			if(workingTemperature < temperature)
+			if(WorkingTemperature < temperature)
 			{
-				if(transitionTime <= timeOffset) return 0;
-				time += Math.Max(0, transitionTime * (startTemperature - temperature) / (startTemperature - workingTemperature) - timeOffset);
+				if(TransitionTime <= timeOffset) return 0;
+				time += Math.Max(0, TransitionTime * (StartTemperature - temperature) / (StartTemperature - WorkingTemperature) - timeOffset);
 			}
 			else
 			{
-				if(transitionTime > timeOffset)
+				if(TransitionTime > timeOffset)
 				{
-					if(startTemperature >= temperature)
+					if(StartTemperature >= temperature)
 					{
-						time += (transitionTime - timeOffset);
+						time += (TransitionTime - timeOffset);
 					}
 					else
 					{
-						time = transitionTime * (workingTemperature - temperature) / (workingTemperature - startTemperature);
-						time = Math.Min(transitionTime - timeOffset, time);
+						time = TransitionTime * (WorkingTemperature - temperature) / (WorkingTemperature - StartTemperature);
+						time = Math.Min(TransitionTime - timeOffset, time);
 					}
 				}
-				timeOffset = Math.Max(0, timeOffset - transitionTime);
-				if(holdTime > timeOffset)
+				timeOffset = Math.Max(0, timeOffset - TransitionTime);
+				if(HoldTime > timeOffset)
 				{
-					time += (holdTime - timeOffset);
+					time += (HoldTime - timeOffset);
 				}
-				timeOffset = Math.Max(0, timeOffset - holdTime);
-				if(coolingTime > timeOffset)
+				timeOffset = Math.Max(0, timeOffset - HoldTime);
+				if(CoolingTime > timeOffset)
 				{
-					if(endTemperature >= temperature)
+					if(EndTemperature >= temperature)
 					{
-						time += (coolingTime - timeOffset);
+						time += (CoolingTime - timeOffset);
 					}
 					else
 					{
-						time += Math.Max(0, coolingTime * (workingTemperature - temperature) / (workingTemperature - endTemperature) - timeOffset);
+						time += Math.Max(0, CoolingTime * (WorkingTemperature - temperature) / (WorkingTemperature - EndTemperature) - timeOffset);
 					}
 				}
-				if(endTemperature >= temperature)
+				if(EndTemperature >= temperature)
 				{
-					timeOffset = Math.Max(0, timeOffset - coolingTime);
-					time += totalTime - transitionTime - holdTime - coolingTime - timeOffset;
+					timeOffset = Math.Max(0, timeOffset - CoolingTime);
+					time += TotalTime - TransitionTime - HoldTime - CoolingTime - timeOffset;
 				}
 			}
 			return time;
@@ -77,94 +77,94 @@ namespace GlassMaking.Common
 
 		public float GetTemperature(double timeOffset)
 		{
-			if(transitionTime > 0 && timeOffset <= transitionTime)
+			if(TransitionTime > 0 && timeOffset <= TransitionTime)
 			{
-				return GameMath.Lerp(startTemperature, workingTemperature, (float)(timeOffset / transitionTime));
+				return GameMath.Lerp(StartTemperature, WorkingTemperature, (float)(timeOffset / TransitionTime));
 			}
-			if(holdTime > 0 && (timeOffset - transitionTime) <= holdTime)
+			if(HoldTime > 0 && (timeOffset - TransitionTime) <= HoldTime)
 			{
-				return workingTemperature;
+				return WorkingTemperature;
 			}
-			if(coolingTime > 0)
+			if(CoolingTime > 0)
 			{
-				return GameMath.Lerp(workingTemperature, endTemperature, (float)((timeOffset - (transitionTime + holdTime)) / coolingTime));
+				return GameMath.Lerp(WorkingTemperature, EndTemperature, (float)((timeOffset - (TransitionTime + HoldTime)) / CoolingTime));
 			}
-			return endTemperature;
+			return EndTemperature;
 		}
 
 		public double? CalcHeatingTime(float startTemperature, float tempPerHour, float targetTemperature)
 		{
 			if(startTemperature >= targetTemperature) return 0;
-			if(workingTemperature < targetTemperature || this.startTemperature < targetTemperature) return null;
+			if(WorkingTemperature < targetTemperature || StartTemperature < targetTemperature) return null;
 			var t = (targetTemperature - startTemperature) / tempPerHour;
-			if(t > totalTime) return null;
+			if(t > TotalTime) return null;
 			if(GetTemperature(t) < targetTemperature) return null;
 			return t;
 		}
 
 		public float CalcFinalTemperature(float currentTemperature, float increasePerHour, float decreasePerHour)
 		{
-			if(transitionTime > 0)
+			if(TransitionTime > 0)
 			{
-				double delta = (workingTemperature - startTemperature) / transitionTime;
-				double change = startTemperature > currentTemperature ? increasePerHour : -decreasePerHour;
-				double t = (startTemperature - currentTemperature) / (change - delta);
-				if(t > transitionTime) t = transitionTime;
+				double delta = (WorkingTemperature - StartTemperature) / TransitionTime;
+				double change = StartTemperature > currentTemperature ? increasePerHour : -decreasePerHour;
+				double t = (StartTemperature - currentTemperature) / (change - delta);
+				if(t > TransitionTime) t = TransitionTime;
 				currentTemperature += (float)(change * t);
-				if(t < transitionTime)
+				if(t < TransitionTime)
 				{
 					change = delta < 0 ? -decreasePerHour : increasePerHour;
 					if(Math.Abs(change) >= Math.Abs(delta))
 					{
-						currentTemperature = workingTemperature;
+						currentTemperature = WorkingTemperature;
 					}
 					else
 					{
-						currentTemperature += (float)((transitionTime - t) * change);
+						currentTemperature += (float)((TransitionTime - t) * change);
 					}
 				}
 			}
-			if(holdTime > 0)
+			if(HoldTime > 0)
 			{
-				double change = workingTemperature < currentTemperature ? -decreasePerHour : increasePerHour;
-				double t = (workingTemperature - currentTemperature) / change;
-				if(t > holdTime)
+				double change = WorkingTemperature < currentTemperature ? -decreasePerHour : increasePerHour;
+				double t = (WorkingTemperature - currentTemperature) / change;
+				if(t > HoldTime)
 				{
-					currentTemperature += (float)(holdTime * change);
+					currentTemperature += (float)(HoldTime * change);
 				}
 				else
 				{
-					currentTemperature = workingTemperature;
+					currentTemperature = WorkingTemperature;
 				}
 			}
-			if(coolingTime > 0)
+			if(CoolingTime > 0)
 			{
-				double delta = (workingTemperature - endTemperature) / coolingTime;
+				double delta = (WorkingTemperature - EndTemperature) / CoolingTime;
 				double t = 0;
-				if(currentTemperature < workingTemperature)
+				if(currentTemperature < WorkingTemperature)
 				{
-					t = (workingTemperature - currentTemperature) / (increasePerHour + delta);
-					if(t > coolingTime) t = coolingTime;
+					t = (WorkingTemperature - currentTemperature) / (increasePerHour + delta);
+					if(t > CoolingTime) t = CoolingTime;
 					currentTemperature += (float)(increasePerHour * t);
 				}
-				if(t < coolingTime)
+				if(t < CoolingTime)
 				{
 					if(decreasePerHour > delta)
 					{
-						currentTemperature = endTemperature;
+						currentTemperature = EndTemperature;
 					}
 					else
 					{
-						currentTemperature += (float)((coolingTime - t) * -decreasePerHour);
+						currentTemperature += (float)((CoolingTime - t) * -decreasePerHour);
 					}
 				}
 			}
-			if(currentTemperature > endTemperature)
+			if(currentTemperature > EndTemperature)
 			{
-				var coldTime = totalTime - transitionTime - holdTime - coolingTime;
+				var coldTime = TotalTime - TransitionTime - HoldTime - CoolingTime;
 				if(coldTime > 0)
 				{
-					currentTemperature = (float)Math.Max(endTemperature, currentTemperature - coldTime * decreasePerHour);
+					currentTemperature = (float)Math.Max(EndTemperature, currentTemperature - coldTime * decreasePerHour);
 				}
 			}
 			return currentTemperature;
@@ -173,9 +173,9 @@ namespace GlassMaking.Common
 		public HeatGraph MultiplyTemperature(float multiplier)
 		{
 			HeatGraph graph = this;
-			graph.startTemperature *= multiplier;
-			graph.workingTemperature *= multiplier;
-			graph.endTemperature *= multiplier;
+			graph.StartTemperature *= multiplier;
+			graph.WorkingTemperature *= multiplier;
+			graph.EndTemperature *= multiplier;
 			return graph;
 		}
 	}

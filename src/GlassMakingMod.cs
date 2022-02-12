@@ -101,7 +101,7 @@ namespace GlassMaking
 
 		public override void StartServerSide(ICoreServerAPI api)
 		{
-			this.sapi = api;
+			sapi = api;
 			base.StartServerSide(api);
 
 			api.Event.SaveGameLoaded += OnSaveGameLoadedServer;
@@ -109,7 +109,7 @@ namespace GlassMaking
 
 		public override void StartClientSide(ICoreClientAPI api)
 		{
-			this.capi = api;
+			capi = api;
 			base.StartClientSide(api);
 			api.Input.RegisterHotKey("itemrecipeselect", Lang.Get("Select Item Recipe"), GlKeys.F, HotkeyType.GUIOrOtherControls);
 			api.Gui.RegisterDialog(new GuiDialogItemRecipeSelector(api));
@@ -236,7 +236,7 @@ namespace GlassMaking
 					var mold = (IGlassBlowingMold)block;
 					foreach(var recipe in mold.GetRecipes())
 					{
-						if(recipe.output.Code.Equals(item.Code))
+						if(recipe.Output.Code.Equals(item.Code))
 						{
 							list.Add(block);
 						}
@@ -280,7 +280,7 @@ namespace GlassMaking
 						molds.Add(block);
 						foreach(var recipe in recipes)
 						{
-							moldsOutput.Add(recipe.output.Code);
+							moldsOutput.Add(recipe.Output.Code);
 						}
 					}
 				}
@@ -317,13 +317,13 @@ namespace GlassMaking
 
 		private void RegisterGlassblowingRecipe(GlassBlowingRecipe r)
 		{
-			r.recipeId = glassblowingRecipes.Recipes.Count;
+			r.RecipeId = glassblowingRecipes.Recipes.Count;
 			glassblowingRecipes.AddRecipe(r);
 		}
 
 		private void RegisterWorkbenchRecipe(WorkbenchRecipe r)
 		{
-			r.recipeId = workbenchRecipes.Recipes.Count;
+			r.RecipeId = workbenchRecipes.Recipes.Count;
 			workbenchRecipes.AddRecipe(r);
 		}
 	}

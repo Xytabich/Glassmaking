@@ -21,12 +21,12 @@ namespace GlassMaking.GlassblowingTools
 				{
 					int sourceAmount = source.GetGlassAmount();
 					var sourceGlassCode = source.GetGlassCode();
-					if(sourceAmount > 0 && sourceGlassCode.Equals(new AssetLocation(step.stepAttributes["code"].AsString())))
+					if(sourceAmount > 0 && sourceGlassCode.Equals(new AssetLocation(step.StepAttributes["code"].AsString())))
 					{
 						if(step.BeginStep())
 						{
 							int intake = slot.Itemstack.Attributes.GetInt("glassmaking:toolIntakeAmount", 0);
-							if(sourceAmount > 0 && intake < step.stepAttributes["amount"].AsInt())
+							if(sourceAmount > 0 && intake < step.StepAttributes["amount"].AsInt())
 							{
 								if(byEntity.World.Side == EnumAppSide.Server)
 								{
@@ -54,10 +54,10 @@ namespace GlassMaking.GlassblowingTools
 					{
 						int sourceAmount = source.GetGlassAmount();
 						var sourceGlassCode = source.GetGlassCode();
-						if(sourceAmount > 0 && sourceGlassCode.Equals(new AssetLocation(step.stepAttributes["code"].AsString())))
+						if(sourceAmount > 0 && sourceGlassCode.Equals(new AssetLocation(step.StepAttributes["code"].AsString())))
 						{
 							int intake = slot.Itemstack.Attributes.GetInt("glassmaking:toolIntakeAmount", 0);
-							int amount = step.stepAttributes["amount"].AsInt();
+							int amount = step.StepAttributes["amount"].AsInt();
 							if(intake < amount)
 							{
 								const float speed = 1.5f;
@@ -132,12 +132,12 @@ namespace GlassMaking.GlassblowingTools
 		private int GetAmountFromPreviousSteps(ToolRecipeStep stepInfo)
 		{
 			int amount = 0;
-			var steps = stepInfo.recipe.steps;
-			for(int i = 0; i < stepInfo.index; i++)
+			var steps = stepInfo.Recipe.Steps;
+			for(int i = 0; i < stepInfo.Index; i++)
 			{
-				if(steps[i].tool == toolCode)
+				if(steps[i].Tool == ToolCode)
 				{
-					amount += steps[i].attributes["amount"].AsInt();
+					amount += steps[i].Attributes["amount"].AsInt();
 				}
 			}
 			return amount;

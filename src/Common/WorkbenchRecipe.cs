@@ -12,19 +12,19 @@ namespace GlassMaking
 	[JsonObject(MemberSerialization.OptIn)]
 	public class WorkbenchRecipe : IRecipeBase, IByteSerializable, IRecipeBase<WorkbenchRecipe>
 	{
-		public int recipeId;
+		public int RecipeId;
 
 		[JsonProperty]
-		public AssetLocation code;
+		public AssetLocation Code;
 
 		[JsonProperty]
-		public JsonItemStack input;
+		public JsonItemStack Input;
 
 		[JsonProperty]
-		public JsonItemStack output;
+		public JsonItemStack Output;
 
 		[JsonProperty]
-		public WorkbenchRecipeStep[] steps;
+		public WorkbenchRecipeStep[] Steps;
 
 		public AssetLocation Name { get; set; }
 
@@ -32,9 +32,9 @@ namespace GlassMaking
 
 		public IRecipeIngredient[] Ingredients { get; } = new IRecipeIngredient[0];
 
-		public IRecipeOutput Output => output;
+		IRecipeOutput IRecipeBase<WorkbenchRecipe>.Output => Output;
 
-		AssetLocation IRecipeBase.code => code;
+		AssetLocation IRecipeBase.Code => Code;
 
 		public Dictionary<string, string[]> GetNameToCodeMapping(IWorldAccessor world)
 		{
@@ -43,20 +43,20 @@ namespace GlassMaking
 
 		public bool Resolve(IWorldAccessor world, string sourceForErrorLogging)
 		{
-			if(steps == null || steps.Length == 0 || input == null || output == null)
+			if(Steps == null || Steps.Length == 0 || Input == null || Output == null)
 			{
-				world.Logger.Error("Workbench recipe {0} has no steps or missing output. Ignoring recipe.", code);
+				world.Logger.Error("Workbench recipe {0} has no steps or missing output. Ignoring recipe.", Code);
 				return false;
 			}
-			foreach(var step in steps)
+			foreach(var step in Steps)
 			{
-				step.tool = step.tool.ToLowerInvariant();
+				step.Tool = step.Tool.ToLowerInvariant();
 			}
-			if(!input.Resolve(world, sourceForErrorLogging))
+			if(!Input.Resolve(world, sourceForErrorLogging))
 			{
 				return false;
 			}
-			if(!output.Resolve(world, sourceForErrorLogging))
+			if(!Output.Resolve(world, sourceForErrorLogging))
 			{
 				return false;
 			}
@@ -65,41 +65,41 @@ namespace GlassMaking
 
 		public void ToBytes(BinaryWriter writer)
 		{
-			writer.Write(code);
-			writer.Write(steps.Length);
-			for(int i = 0; i < steps.Length; i++)
+			writer.Write(Code);
+			writer.Write(Steps.Length);
+			for(int i = 0; i < Steps.Length; i++)
 			{
-				steps[i].ToBytes(writer);
+				Steps[i].ToBytes(writer);
 			}
-			input.ToBytes(writer);
-			output.ToBytes(writer);
+			Input.ToBytes(writer);
+			Output.ToBytes(writer);
 		}
 
 		public void FromBytes(BinaryReader reader, IWorldAccessor resolver)
 		{
-			code = reader.ReadAssetLocation();
-			steps = new WorkbenchRecipeStep[reader.ReadInt32()];
-			for(int i = 0; i < steps.Length; i++)
+			Code = reader.ReadAssetLocation();
+			Steps = new WorkbenchRecipeStep[reader.ReadInt32()];
+			for(int i = 0; i < Steps.Length; i++)
 			{
-				steps[i] = new WorkbenchRecipeStep();
-				steps[i].FromBytes(reader);
+				Steps[i] = new WorkbenchRecipeStep();
+				Steps[i].FromBytes(reader);
 			}
-			input = new JsonItemStack();
-			input.FromBytes(reader, resolver.ClassRegistry);
-			input.Resolve(resolver, "[FromBytes]");
-			output = new JsonItemStack();
-			output.FromBytes(reader, resolver.ClassRegistry);
-			output.Resolve(resolver, "[FromBytes]");
+			Input = new JsonItemStack();
+			Input.FromBytes(reader, resolver.ClassRegistry);
+			Input.Resolve(resolver, "[FromBytes]");
+			Output = new JsonItemStack();
+			Output.FromBytes(reader, resolver.ClassRegistry);
+			Output.Resolve(resolver, "[FromBytes]");
 		}
 
 		public WorkbenchRecipe Clone()
 		{
 			return new WorkbenchRecipe() {
-				recipeId = recipeId,
-				code = code.Clone(),
-				input = input.Clone(),
-				output = output.Clone(),
-				steps = Array.ConvertAll(steps, CloneStep),
+				RecipeId = RecipeId,
+				Code = Code.Clone(),
+				Input = Input.Clone(),
+				Output = Output.Clone(),
+				Steps = Array.ConvertAll(Steps, CloneStep),
 				Name = Name.Clone(),
 				Enabled = Enabled
 			};
@@ -115,69 +115,69 @@ namespace GlassMaking
 	public sealed class WorkbenchRecipeStep
 	{
 		[JsonProperty(Required = Required.Always)]
-		public string tool;
+		public string Tool;
 
 		[JsonProperty]
-		public CompositeShape shape;
+		public CompositeShape Shape;
 
 		[JsonProperty]
 		[JsonConverter(typeof(JsonAttributesConverter))]
-		public JsonObject attributes;
+		public JsonObject Attributes;
 
 		public void ToBytes(BinaryWriter writer)
 		{
-			writer.Write(tool);
-			writer.Write(shape != null);
-			if(shape != null)
+			writer.Write(Tool);
+			writer.Write(Shape != null);
+			if(Shape != null)
 			{
-				writer.Write(shape.Base);
-				writer.Write(shape.InsertBakedTextures);
-				writer.Write((short)(shape.rotateX % 360f * 64f));
-				writer.Write((short)(shape.rotateY % 360f * 64f));
-				writer.Write((short)(shape.rotateZ % 360f * 64f));
-				writer.Write(shape.offsetX);
-				writer.Write(shape.offsetY);
-				writer.Write(shape.offsetZ);
-				writer.Write((short)(shape.Scale * 64f));
-				writer.Write((byte)shape.Format);
-				writer.Write(shape.VoxelizeTexture);
-				writer.Write(shape.QuantityElements ?? 0);
+				writer.Write(Shape.Base);
+				writer.Write(Shape.InsertBakedTextures);
+				writer.Write((short)(Shape.rotateX % 360f * 64f));
+				writer.Write((short)(Shape.rotateY % 360f * 64f));
+				writer.Write((short)(Shape.rotateZ % 360f * 64f));
+				writer.Write(Shape.offsetX);
+				writer.Write(Shape.offsetY);
+				writer.Write(Shape.offsetZ);
+				writer.Write((short)(Shape.Scale * 64f));
+				writer.Write((byte)Shape.Format);
+				writer.Write(Shape.VoxelizeTexture);
+				writer.Write(Shape.QuantityElements ?? 0);
 			}
-			writer.Write(attributes != null);
-			if(attributes != null) writer.Write(attributes.Token.ToString());
+			writer.Write(Attributes != null);
+			if(Attributes != null) writer.Write(Attributes.Token.ToString());
 		}
 
 		public void FromBytes(BinaryReader reader)
 		{
-			tool = reader.ReadString().ToLowerInvariant();
+			Tool = reader.ReadString().ToLowerInvariant();
 			if(reader.ReadBoolean())
 			{
-				shape = new CompositeShape();
-				shape.Base = reader.ReadAssetLocation();
-				shape.InsertBakedTextures = reader.ReadBoolean();
-				shape.rotateX = reader.ReadInt16() / 64f;
-				shape.rotateY = reader.ReadInt16() / 64f;
-				shape.rotateZ = reader.ReadInt16() / 64f;
-				shape.offsetX = reader.ReadSingle();
-				shape.offsetY = reader.ReadSingle();
-				shape.offsetZ = reader.ReadSingle();
-				shape.Scale = reader.ReadInt16() / 64f + 1f;
-				shape.Format = (EnumShapeFormat)reader.ReadByte();
-				shape.VoxelizeTexture = reader.ReadBoolean();
-				shape.QuantityElements = reader.ReadInt32();
+				Shape = new CompositeShape();
+				Shape.Base = reader.ReadAssetLocation();
+				Shape.InsertBakedTextures = reader.ReadBoolean();
+				Shape.rotateX = reader.ReadInt16() / 64f;
+				Shape.rotateY = reader.ReadInt16() / 64f;
+				Shape.rotateZ = reader.ReadInt16() / 64f;
+				Shape.offsetX = reader.ReadSingle();
+				Shape.offsetY = reader.ReadSingle();
+				Shape.offsetZ = reader.ReadSingle();
+				Shape.Scale = reader.ReadInt16() / 64f + 1f;
+				Shape.Format = (EnumShapeFormat)reader.ReadByte();
+				Shape.VoxelizeTexture = reader.ReadBoolean();
+				Shape.QuantityElements = reader.ReadInt32();
 			}
 			if(reader.ReadBoolean())
 			{
-				attributes = new JsonObject(JToken.Parse(reader.ReadString()));
+				Attributes = new JsonObject(JToken.Parse(reader.ReadString()));
 			}
 		}
 
 		public WorkbenchRecipeStep Clone()
 		{
 			return new WorkbenchRecipeStep() {
-				tool = tool,
-				shape = shape.Clone(),
-				attributes = attributes?.Clone()
+				Tool = Tool,
+				Shape = Shape.Clone(),
+				Attributes = Attributes?.Clone()
 			};
 		}
 	}

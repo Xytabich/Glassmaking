@@ -354,11 +354,11 @@ namespace GlassMaking.Blocks
 
 		private class ItemProcessInfo
 		{
-			public MinMaxFloat annealTemperature;
-			public double annealTime;
-			public ItemStack output;
-			public bool isHeated;
-			public double time;
+			internal MinMaxFloat annealTemperature;
+			internal double annealTime;
+			internal ItemStack output;
+			internal bool isHeated;
+			internal double time;
 		}
 	}
 }

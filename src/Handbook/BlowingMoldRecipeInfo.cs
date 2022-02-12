@@ -34,25 +34,25 @@ namespace GlassMaking.Handbook
 					outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:Mold for") + "\n", CairoFont.WhiteSmallText().WithWeight(FontWeight.Bold)));
 					foreach(var recipe in recipes)
 					{
-						if(recipe.output.ResolvedItemstack != null)
+						if(recipe.Output.ResolvedItemstack != null)
 						{
-							var element = new ItemstackTextComponent(capi, recipe.output.ResolvedItemstack, 40.0, 10.0,
+							var element = new ItemstackTextComponent(capi, recipe.Output.ResolvedItemstack, 40.0, 10.0,
 								EnumFloat.Inline, cs => openDetailPageFor(GuiHandbookItemStackPage.PageCodeForStack(cs)));
 							element.offY = GuiElement.scaled(7.0);
 							outComponents.Add(element);
 							outComponents.Add(new ClearFloatTextComponent(capi));
 							outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:Mold layers:") + "\n", CairoFont.WhiteSmallText()));
-							foreach(var layer in recipe.recipe)
+							foreach(var layer in recipe.Recipe)
 							{
-								if(layer.var > 0)
+								if(layer.Var > 0)
 								{
 									outComponents.Add(new RichTextComponent(capi, "• " + Lang.Get("glassmaking:{0} glass {1}-{2} units",
-										Lang.Get(GlassBlend.GetBlendNameCode(layer.Code)), layer.amount, layer.amount + layer.var) + "\n", CairoFont.WhiteSmallText()));
+										Lang.Get(GlassBlend.GetBlendNameCode(layer.Code)), layer.Amount, layer.Amount + layer.Var) + "\n", CairoFont.WhiteSmallText()));
 								}
 								else
 								{
 									outComponents.Add(new RichTextComponent(capi, "• " + Lang.Get("glassmaking:{0} glass {1} units",
-										Lang.Get(GlassBlend.GetBlendNameCode(layer.Code)), layer.amount) + "\n", CairoFont.WhiteSmallText()));
+										Lang.Get(GlassBlend.GetBlendNameCode(layer.Code)), layer.Amount) + "\n", CairoFont.WhiteSmallText()));
 								}
 							}
 							outComponents.Add(new ClearFloatTextComponent(capi, 7f));

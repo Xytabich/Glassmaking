@@ -7,7 +7,7 @@ namespace GlassMaking.Workbench
 {
 	public abstract class WorkbenchToolBehavior
 	{
-		public string toolCode;
+		public string ToolCode;
 
 		/// <summary>
 		/// The block for this behavior instance.
@@ -16,14 +16,14 @@ namespace GlassMaking.Workbench
 
 		public ICoreAPI Api;
 
-		public ItemSlot slot;
+		public ItemSlot Slot;
 
 		protected Cuboidf[] boundingBoxes;
 
 		public WorkbenchToolBehavior(string toolCode, BlockEntity blockentity, Cuboidf[] boundingBoxes)
 		{
-			this.toolCode = toolCode.ToLowerInvariant();
-			this.Blockentity = blockentity;
+			this.ToolCode = toolCode.ToLowerInvariant();
+			Blockentity = blockentity;
 			this.boundingBoxes = boundingBoxes;
 		}
 
@@ -32,8 +32,8 @@ namespace GlassMaking.Workbench
 		/// </summary>
 		public virtual void OnLoaded(ICoreAPI api, ItemSlot slot)
 		{
-			this.Api = api;
-			this.slot = slot;
+			Api = api;
+			this.Slot = slot;
 		}
 
 		public virtual void OnUnloaded()

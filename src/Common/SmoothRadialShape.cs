@@ -11,52 +11,52 @@ namespace GlassMaking
 	public class SmoothRadialShape
 	{
 		[JsonProperty(Required = Required.Always)]
-		public int segments;
+		public int Segments;
 		[JsonProperty, JsonConverter(typeof(ShapePartConverter))]
-		public ShapePart[] inner = null;
+		public ShapePart[] Inner = null;
 		[JsonProperty(Required = Required.Always), JsonConverter(typeof(ShapePartConverter))]
-		public ShapePart[] outer;
+		public ShapePart[] Outer;
 
 		public void ToBytes(BinaryWriter writer)
 		{
-			writer.Write(segments);
-			writer.Write(outer.Length);
-			for(int i = 0; i < outer.Length; i++)
+			writer.Write(Segments);
+			writer.Write(Outer.Length);
+			for(int i = 0; i < Outer.Length; i++)
 			{
-				outer[i].ToBytes(writer);
+				Outer[i].ToBytes(writer);
 			}
-			if(inner == null)
+			if(Inner == null)
 			{
 				writer.Write(0);
 			}
 			else
 			{
-				writer.Write(inner.Length);
-				for(int i = 0; i < inner.Length; i++)
+				writer.Write(Inner.Length);
+				for(int i = 0; i < Inner.Length; i++)
 				{
-					inner[i].ToBytes(writer);
+					Inner[i].ToBytes(writer);
 				}
 			}
 		}
 
 		public void FromBytes(BinaryReader reader)
 		{
-			segments = reader.ReadInt32();
-			outer = new ShapePart[reader.ReadInt32()];
-			for(int i = 0; i < outer.Length; i++)
+			Segments = reader.ReadInt32();
+			Outer = new ShapePart[reader.ReadInt32()];
+			for(int i = 0; i < Outer.Length; i++)
 			{
-				outer[i] = new ShapePart();
-				outer[i].FromBytes(reader);
+				Outer[i] = new ShapePart();
+				Outer[i].FromBytes(reader);
 			}
 			int innerCount = reader.ReadInt32();
-			if(innerCount == 0) inner = null;
+			if(innerCount == 0) Inner = null;
 			else
 			{
-				inner = new ShapePart[innerCount];
+				Inner = new ShapePart[innerCount];
 				for(int i = 0; i < innerCount; i++)
 				{
-					inner[i] = new ShapePart();
-					inner[i].FromBytes(reader);
+					Inner[i] = new ShapePart();
+					Inner[i].FromBytes(reader);
 				}
 			}
 		}
@@ -64,85 +64,85 @@ namespace GlassMaking
 		public SmoothRadialShape Clone()
 		{
 			return new SmoothRadialShape() {
-				segments = segments,
-				outer = Array.ConvertAll(outer, x => x.Clone()),
-				inner = inner == null ? null : Array.ConvertAll(inner, x => x.Clone())
+				Segments = Segments,
+				Outer = Array.ConvertAll(Outer, x => x.Clone()),
+				Inner = Inner == null ? null : Array.ConvertAll(Inner, x => x.Clone())
 			};
 		}
 
 		public static void BuildMesh(MeshData mesh, SmoothRadialShape shape, Func<MeshData, FastVec2f, bool, int> vecCallback, Action<MeshData, int, int, bool> triCallback)
 		{
-			if(shape.segments <= 0) return;
+			if(shape.Segments <= 0) return;
 
 			var tmpList = new FastList<FastVec2f>();
 
 			FastVec2f vec;
 			int count, prevCount;
-			if(shape.inner != null)
+			if(shape.Inner != null)
 			{
 				prevCount = 0;
-				for(int i = 0; i < shape.segments; i++)
+				for(int i = 0; i < shape.Segments; i++)
 				{
-					vec = LerpParts(shape.inner, tmpList, shape.segments, i);
+					vec = LerpParts(shape.Inner, tmpList, shape.Segments, i);
 					count = vecCallback.Invoke(mesh, vec, false);
 					if(i != 0) triCallback.Invoke(mesh, prevCount, count, false);
 					prevCount = count;
 				}
-				vec = LerpParts(shape.inner, tmpList, shape.segments, shape.segments);
+				vec = LerpParts(shape.Inner, tmpList, shape.Segments, shape.Segments);
 				count = vecCallback.Invoke(mesh, vec, false);
 				triCallback.Invoke(mesh, prevCount, count, false);
 			}
 
 			prevCount = 0;
-			for(int i = 0; i < shape.segments; i++)
+			for(int i = 0; i < shape.Segments; i++)
 			{
-				vec = LerpParts(shape.outer, tmpList, shape.segments, i);
+				vec = LerpParts(shape.Outer, tmpList, shape.Segments, i);
 				count = vecCallback.Invoke(mesh, vec, true);
 				if(i != 0) triCallback.Invoke(mesh, prevCount, count, true);
 				prevCount = count;
 			}
-			vec = LerpParts(shape.outer, tmpList, shape.segments, shape.segments);
+			vec = LerpParts(shape.Outer, tmpList, shape.Segments, shape.Segments);
 			count = vecCallback.Invoke(mesh, vec, true);
 			triCallback.Invoke(mesh, prevCount, count, true);
 		}
 
 		public static void BuildLerpedMesh(MeshData mesh, SmoothRadialShape from, SmoothRadialShape to, SmoothRadialShape defaultShape, float t, Func<MeshData, FastVec2f, bool, int> vecCallback, Action<MeshData, int, int, bool> triCallback)
 		{
-			int segments = (int)Math.Ceiling(GameMath.Lerp(from.segments, to.segments, t));
+			int segments = (int)Math.Ceiling(GameMath.Lerp(from.Segments, to.Segments, t));
 			if(segments <= 0) return;
 
 			var tmpList = new FastList<FastVec2f>();
 			float step = 1f / segments;
 			int count, prevCount = 0;
 
-			if(from.inner != null || to.inner != null)
+			if(from.Inner != null || to.Inner != null)
 			{
-				var fs = from.inner == null ? defaultShape : from;
-				var ts = to.inner == null ? defaultShape : to;
+				var fs = from.Inner == null ? defaultShape : from;
+				var ts = to.Inner == null ? defaultShape : to;
 				for(int i = 0; i < segments; i++)
 				{
-					count = AddLerpedVertex(mesh, tmpList, vecCallback, false, fs, ts, i * step * fs.segments, i * step * ts.segments, t);
+					count = AddLerpedVertex(mesh, tmpList, vecCallback, false, fs, ts, i * step * fs.Segments, i * step * ts.Segments, t);
 					if(i != 0) triCallback.Invoke(mesh, prevCount, count, false);
 					prevCount = count;
 				}
-				count = AddLerpedVertex(mesh, tmpList, vecCallback, false, fs, ts, fs.segments, ts.segments, t);
+				count = AddLerpedVertex(mesh, tmpList, vecCallback, false, fs, ts, fs.Segments, ts.Segments, t);
 				triCallback.Invoke(mesh, prevCount, count, false);
 			}
 
 			for(int i = 0; i < segments; i++)
 			{
-				count = AddLerpedVertex(mesh, tmpList, vecCallback, true, from, to, i * step * from.segments, i * step * to.segments, t);
+				count = AddLerpedVertex(mesh, tmpList, vecCallback, true, from, to, i * step * from.Segments, i * step * to.Segments, t);
 				if(i != 0) triCallback.Invoke(mesh, prevCount, count, true);
 				prevCount = count;
 			}
-			count = AddLerpedVertex(mesh, tmpList, vecCallback, true, from, to, from.segments, to.segments, t);
+			count = AddLerpedVertex(mesh, tmpList, vecCallback, true, from, to, from.Segments, to.Segments, t);
 			triCallback.Invoke(mesh, prevCount, count, true);
 		}
 
 		private static int AddLerpedVertex(MeshData mesh, FastList<FastVec2f> tmpList, Func<MeshData, FastVec2f, bool, int> vecCallback, bool isOuter, SmoothRadialShape from, SmoothRadialShape to, float at, float bt, float t)
 		{
-			var a = LerpParts(isOuter ? from.outer : from.inner, tmpList, from.segments, at);
-			var b = LerpParts(isOuter ? to.outer : to.inner, tmpList, to.segments, bt);
+			var a = LerpParts(isOuter ? from.Outer : from.Inner, tmpList, from.Segments, at);
+			var b = LerpParts(isOuter ? to.Outer : to.Inner, tmpList, to.Segments, bt);
 			return vecCallback.Invoke(mesh, FastVec2f.Lerp(a, b, t), isOuter);
 		}
 
@@ -159,14 +159,14 @@ namespace GlassMaking
 			{
 				for(int i = 0; i < parts.Length; i++)
 				{
-					if(t <= parts[i].segments)
+					if(t <= parts[i].Segments)
 					{
-						parts[i].Interpolate(tmpList, t / parts[i].segments);
+						parts[i].Interpolate(tmpList, t / parts[i].Segments);
 						return tmpList[0];
 					}
 					else
 					{
-						t -= parts[i].segments;
+						t -= parts[i].Segments;
 					}
 				}
 				parts[parts.Length - 1].Interpolate(tmpList, 1);
@@ -177,49 +177,49 @@ namespace GlassMaking
 		public class ShapePart
 		{
 			[JsonProperty(Required = Required.Always)]
-			public int segments;
+			public int Segments;
 			[JsonProperty(Required = Required.Always)]
-			public float[][] vertices;
+			public float[][] Vertices;
 
 			public void Interpolate(FastList<FastVec2f> tmpList, float t)
 			{
-				if(vertices.Length == 0) tmpList.Add(new FastVec2f(0, 0));
-				if(vertices.Length == 1) tmpList.Add(new FastVec2f(vertices[0]));
-				for(int i = 0; i < vertices.Length; i++)
+				if(Vertices.Length == 0) tmpList.Add(new FastVec2f(0, 0));
+				if(Vertices.Length == 1) tmpList.Add(new FastVec2f(Vertices[0]));
+				for(int i = 0; i < Vertices.Length; i++)
 				{
-					tmpList.Add(new FastVec2f(vertices[i]));
+					tmpList.Add(new FastVec2f(Vertices[i]));
 				}
 				Utils.InterpolateBezier(tmpList, t);
 			}
 
 			public void ToBytes(BinaryWriter writer)
 			{
-				writer.Write(segments);
-				writer.Write(vertices.Length);
-				for(int i = 0; i < vertices.Length; i++)
+				writer.Write(Segments);
+				writer.Write(Vertices.Length);
+				for(int i = 0; i < Vertices.Length; i++)
 				{
-					writer.Write(vertices[i][0]);
-					writer.Write(vertices[i][1]);
+					writer.Write(Vertices[i][0]);
+					writer.Write(Vertices[i][1]);
 				}
 			}
 
 			public void FromBytes(BinaryReader reader)
 			{
-				segments = reader.ReadInt32();
-				vertices = new float[reader.ReadInt32()][];
-				for(int i = 0; i < vertices.Length; i++)
+				Segments = reader.ReadInt32();
+				Vertices = new float[reader.ReadInt32()][];
+				for(int i = 0; i < Vertices.Length; i++)
 				{
 					float x = reader.ReadSingle();
 					float y = reader.ReadSingle();
-					vertices[i] = new float[2] { x, y };
+					Vertices[i] = new float[2] { x, y };
 				}
 			}
 
 			public ShapePart Clone()
 			{
 				return new ShapePart() {
-					segments = segments,
-					vertices = Array.ConvertAll(vertices, v => new float[] { v[0], v[1] })
+					Segments = Segments,
+					Vertices = Array.ConvertAll(Vertices, v => new float[] { v[0], v[1] })
 				};
 			}
 		}
@@ -243,7 +243,7 @@ namespace GlassMaking
 					{
 						return arr.ToObject<ShapePart[]>();
 					}
-					return new ShapePart[] { new ShapePart() { vertices = arr.ToObject<float[][]>() } };
+					return new ShapePart[] { new ShapePart() { Vertices = arr.ToObject<float[][]>() } };
 				}
 				return new ShapePart[0];
 			}
