@@ -6,111 +6,111 @@ using Vintagestory.API.MathTools;
 
 namespace GlassMaking.GlassblowingTools
 {
-    public class DryableTool : GlassblowingToolBehavior
-    {
-        protected ModelTransform transform;
-        protected ModelTransform animationTransform;
-        protected float animationSpeed;
+	public class DryableTool : GlassblowingToolBehavior
+	{
+		protected ModelTransform transform;
+		protected ModelTransform animationTransform;
+		protected float animationSpeed;
 
-        public DryableTool(CollectibleObject collObj) : base(collObj)
-        {
-        }
+		public DryableTool(CollectibleObject collObj) : base(collObj)
+		{
+		}
 
-        public override void Initialize(JsonObject properties)
-        {
-            base.Initialize(properties);
-            transform = properties?["transform"].AsObject<ModelTransform>()?.EnsureDefaultValues() ?? ModelTransform.NoTransform;
-            animationTransform = properties?["animation"].AsObject<ModelTransform>()?.EnsureDefaultValues() ?? transform;
-            animationSpeed = properties?["speed"].AsFloat() ?? 0f;
-        }
+		public override void Initialize(JsonObject properties)
+		{
+			base.Initialize(properties);
+			transform = properties?["transform"].AsObject<ModelTransform>()?.EnsureDefaultValues() ?? ModelTransform.NoTransform;
+			animationTransform = properties?["animation"].AsObject<ModelTransform>()?.EnsureDefaultValues() ?? transform;
+			animationSpeed = properties?["speed"].AsFloat() ?? 0f;
+		}
 
-        public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling, ref EnumHandling handling)
-        {
-            if(firstEvent && TryGetRecipeStep(slot, byEntity, out var step, true, true) && slot.Itemstack.Collectible is IWettable wettable)
-            {
-                if(wettable.GetHumidity(slot.Itemstack, byEntity.World) >= step.stepAttributes["consume"].AsFloat(0) && step.BeginStep())
-                {
-                    if(api.Side == EnumAppSide.Client) step.SetProgress(0);
-                    handHandling = EnumHandHandling.PreventDefault;
-                    handling = EnumHandling.PreventSubsequent;
-                    return;
-                }
-            }
-            base.OnHeldInteractStart(slot, byEntity, blockSel, entitySel, firstEvent, ref handHandling, ref handling);
-        }
+		public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling, ref EnumHandling handling)
+		{
+			if(firstEvent && TryGetRecipeStep(slot, byEntity, out var step, true, true) && slot.Itemstack.Collectible is IWettable wettable)
+			{
+				if(wettable.GetHumidity(slot.Itemstack, byEntity.World) >= step.stepAttributes["consume"].AsFloat(0) && step.BeginStep())
+				{
+					if(api.Side == EnumAppSide.Client) step.SetProgress(0);
+					handHandling = EnumHandHandling.PreventDefault;
+					handling = EnumHandling.PreventSubsequent;
+					return;
+				}
+			}
+			base.OnHeldInteractStart(slot, byEntity, blockSel, entitySel, firstEvent, ref handHandling, ref handling);
+		}
 
-        public override bool OnHeldInteractStep(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, ref EnumHandling handling)
-        {
-            if(TryGetRecipeStep(slot, byEntity, out var step) && slot.Itemstack.Collectible is IWettable wettable)
-            {
-                if(step.ContinueStep() && wettable.GetHumidity(slot.Itemstack, byEntity.World) >= step.stepAttributes["consume"].AsFloat(0))
-                {
-                    if(byEntity.Api.Side == EnumAppSide.Client)
-                    {
-                        const float speed = 2f;
-                        ModelTransform leftTransform = new ModelTransform();
-                        leftTransform.EnsureDefaultValues();
-                        leftTransform.Origin.Set(0f, 0f, 0f);
-                        leftTransform.Scale = 1f + Math.Min(0.25f, speed * secondsUsed / 3f);
-                        leftTransform.Rotation.Y = Math.Min(25f, secondsUsed * 45f * speed);
-                        leftTransform.Rotation.X = GameMath.Lerp(0f, 0.5f * GameMath.Clamp(byEntity.Pos.Pitch - (float)Math.PI, -0.2f, 1.0995574f) * GameMath.RAD2DEG, Math.Min(1, secondsUsed * speed * 4f));
-                        leftTransform.Rotation.Z = secondsUsed * 90f % 360f;
-                        byEntity.Controls.LeftUsingHeldItemTransformBefore = leftTransform;
+		public override bool OnHeldInteractStep(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, ref EnumHandling handling)
+		{
+			if(TryGetRecipeStep(slot, byEntity, out var step) && slot.Itemstack.Collectible is IWettable wettable)
+			{
+				if(step.ContinueStep() && wettable.GetHumidity(slot.Itemstack, byEntity.World) >= step.stepAttributes["consume"].AsFloat(0))
+				{
+					if(byEntity.Api.Side == EnumAppSide.Client)
+					{
+						const float speed = 2f;
+						ModelTransform leftTransform = new ModelTransform();
+						leftTransform.EnsureDefaultValues();
+						leftTransform.Origin.Set(0f, 0f, 0f);
+						leftTransform.Scale = 1f + Math.Min(0.25f, speed * secondsUsed / 3f);
+						leftTransform.Rotation.Y = Math.Min(25f, secondsUsed * 45f * speed);
+						leftTransform.Rotation.X = GameMath.Lerp(0f, 0.5f * GameMath.Clamp(byEntity.Pos.Pitch - (float)Math.PI, -0.2f, 1.0995574f) * GameMath.RAD2DEG, Math.Min(1, secondsUsed * speed * 4f));
+						leftTransform.Rotation.Z = secondsUsed * 90f % 360f;
+						byEntity.Controls.LeftUsingHeldItemTransformBefore = leftTransform;
 
-                        ModelTransform rightTransform = new ModelTransform();
-                        rightTransform.EnsureDefaultValues();
-                        float pt = GameMath.Min(secondsUsed * speed * 1.5f, 1f);
-                        float at = GameMath.FastSin(secondsUsed * animationSpeed) * 0.5f + 0.5f;
-                        rightTransform.Lerp(transform, pt).Lerp(animationTransform, at);
-                        byEntity.Controls.UsingHeldItemTransformBefore = rightTransform;
+						ModelTransform rightTransform = new ModelTransform();
+						rightTransform.EnsureDefaultValues();
+						float pt = GameMath.Min(secondsUsed * speed * 1.5f, 1f);
+						float at = GameMath.FastSin(secondsUsed * animationSpeed) * 0.5f + 0.5f;
+						rightTransform.Lerp(transform, pt).Lerp(animationTransform, at);
+						byEntity.Controls.UsingHeldItemTransformBefore = rightTransform;
 
-                        byEntity.Controls.HandUse = EnumHandInteract.None;
-                    }
+						byEntity.Controls.HandUse = EnumHandInteract.None;
+					}
 
-                    float time = step.stepAttributes["time"].AsFloat(1);
-                    if(api.Side == EnumAppSide.Client)
-                    {
-                        step.SetProgress(Math.Max(secondsUsed - 1f, 0f) / time);
-                    }
-                    if(byEntity.Api.Side == EnumAppSide.Server && secondsUsed >= time)
-                    {
-                        int damage = step.stepAttributes["damage"].AsInt(1);
-                        if(damage > 0)
-                        {
-                            slot.Itemstack.Item.DamageItem(byEntity.World, byEntity, slot, damage);
-                            slot.MarkDirty();
-                        }
-                        float consume = step.stepAttributes["consume"].AsFloat(0);
-                        if(consume > 0)
-                        {
-                            wettable.ConsumeHumidity(slot.Itemstack, consume, byEntity.World);
-                            slot.MarkDirty();
-                        }
-                        step.CompleteStep(byEntity);
-                        handling = EnumHandling.PreventSubsequent;
-                        return false;
-                    }
-                    handling = EnumHandling.PreventSubsequent;
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            return base.OnHeldInteractStep(secondsUsed, slot, byEntity, blockSel, entitySel, ref handling);
-        }
+					float time = step.stepAttributes["time"].AsFloat(1);
+					if(api.Side == EnumAppSide.Client)
+					{
+						step.SetProgress(Math.Max(secondsUsed - 1f, 0f) / time);
+					}
+					if(byEntity.Api.Side == EnumAppSide.Server && secondsUsed >= time)
+					{
+						int damage = step.stepAttributes["damage"].AsInt(1);
+						if(damage > 0)
+						{
+							slot.Itemstack.Item.DamageItem(byEntity.World, byEntity, slot, damage);
+							slot.MarkDirty();
+						}
+						float consume = step.stepAttributes["consume"].AsFloat(0);
+						if(consume > 0)
+						{
+							wettable.ConsumeHumidity(slot.Itemstack, consume, byEntity.World);
+							slot.MarkDirty();
+						}
+						step.CompleteStep(byEntity);
+						handling = EnumHandling.PreventSubsequent;
+						return false;
+					}
+					handling = EnumHandling.PreventSubsequent;
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			return base.OnHeldInteractStep(secondsUsed, slot, byEntity, blockSel, entitySel, ref handling);
+		}
 
-        public override void OnHeldInteractStop(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, ref EnumHandling handling)
-        {
-            if(api.Side == EnumAppSide.Client && TryGetRecipeStep(slot, byEntity, out var step))
-            {
-                if(step.ContinueStep())
-                {
-                    step.SetProgress(0);
-                }
-            }
-            base.OnHeldInteractStop(secondsUsed, slot, byEntity, blockSel, entitySel, ref handling);
-        }
-    }
+		public override void OnHeldInteractStop(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, ref EnumHandling handling)
+		{
+			if(api.Side == EnumAppSide.Client && TryGetRecipeStep(slot, byEntity, out var step))
+			{
+				if(step.ContinueStep())
+				{
+					step.SetProgress(0);
+				}
+			}
+			base.OnHeldInteractStop(secondsUsed, slot, byEntity, blockSel, entitySel, ref handling);
+		}
+	}
 }

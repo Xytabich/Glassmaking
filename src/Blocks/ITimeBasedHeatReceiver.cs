@@ -1,9 +1,9 @@
 ﻿namespace GlassMaking.Blocks
 {
-    public interface ITimeBasedHeatReceiver
-    {
-        void SetHeatSource(ITimeBasedHeatSource heatSource);
+	public interface ITimeBasedHeatReceiver
+	{
+		void SetHeatSource(ITimeBasedHeatSource heatSource);
 
-        void OnHeatSourceTick(float dt);
-    }
+		void OnHeatSourceTick(float dt);
+	}
 }

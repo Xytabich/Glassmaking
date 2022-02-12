@@ -9,34 +9,34 @@ using Vintagestory.GameContent;
 
 namespace GlassMaking.ToolDescriptors
 {
-    public class DryableToolDescriptor : ToolBehaviorDescriptor<DryableTool>
-    {
-        public DryableToolDescriptor(GlassMakingMod mod) : base(mod)
-        {
-        }
+	public class DryableToolDescriptor : ToolBehaviorDescriptor<DryableTool>
+	{
+		public DryableToolDescriptor(GlassMakingMod mod) : base(mod)
+		{
+		}
 
-        public override void GetStepInfoForHandbook(ICoreClientAPI capi, ItemStack item, GlassBlowingRecipe recipe, int stepIndex, ActionConsumable<string> openDetailPageFor, List<RichTextComponentBase> outComponents)
-        {
-            var step = recipe.steps[stepIndex];
-            outComponents.Add(new RichTextComponent(capi, "• " + Lang.Get("glassmaking:Step {0}: {1}", stepIndex + 1, Lang.Get("glassmaking:{0} for {1} seconds",
-                Lang.Get("glassmaking:glassblowingtool-" + step.tool), step.attributes["time"].AsFloat(1).ToString("G", CultureInfo.InvariantCulture))) + "\n", CairoFont.WhiteSmallText()));
+		public override void GetStepInfoForHandbook(ICoreClientAPI capi, ItemStack item, GlassBlowingRecipe recipe, int stepIndex, ActionConsumable<string> openDetailPageFor, List<RichTextComponentBase> outComponents)
+		{
+			var step = recipe.steps[stepIndex];
+			outComponents.Add(new RichTextComponent(capi, "• " + Lang.Get("glassmaking:Step {0}: {1}", stepIndex + 1, Lang.Get("glassmaking:{0} for {1} seconds",
+				Lang.Get("glassmaking:glassblowingtool-" + step.tool), step.attributes["time"].AsFloat(1).ToString("G", CultureInfo.InvariantCulture))) + "\n", CairoFont.WhiteSmallText()));
 
-            float consume = step.attributes["consume"].AsFloat(0);
-            if(consume > 0)
-            {
-                outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:Consumes {0} humidity", consume.ToString("G", CultureInfo.InvariantCulture)) + "\n", CairoFont.WhiteSmallText()));
-            }
+			float consume = step.attributes["consume"].AsFloat(0);
+			if(consume > 0)
+			{
+				outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:Consumes {0} humidity", consume.ToString("G", CultureInfo.InvariantCulture)) + "\n", CairoFont.WhiteSmallText()));
+			}
 
-            outComponents.Add(new SlideshowItemstackTextComponent(capi, handbookItemsByType[step.tool], 40.0, EnumFloat.Inline,
-                cs => openDetailPageFor(GuiHandbookItemStackPage.PageCodeForStack(cs))));
-            outComponents.Add(new ClearFloatTextComponent(capi));
-        }
+			outComponents.Add(new SlideshowItemstackTextComponent(capi, handbookItemsByType[step.tool], 40.0, EnumFloat.Inline,
+				cs => openDetailPageFor(GuiHandbookItemStackPage.PageCodeForStack(cs))));
+			outComponents.Add(new ClearFloatTextComponent(capi));
+		}
 
-        public override void GetStepInfoForHeldItem(IWorldAccessor world, ItemStack item, GlassBlowingRecipe recipe, int stepIndex, StringBuilder dsc, bool withDebugInfo)
-        {
-            var step = recipe.steps[stepIndex];
-            dsc.AppendLine("• " + Lang.Get("glassmaking:{0} for {1} seconds", Lang.Get("glassmaking:glassblowingtool-" + step.tool),
-                step.attributes["time"].AsFloat(1).ToString("G", CultureInfo.InvariantCulture)));
-        }
-    }
+		public override void GetStepInfoForHeldItem(IWorldAccessor world, ItemStack item, GlassBlowingRecipe recipe, int stepIndex, StringBuilder dsc, bool withDebugInfo)
+		{
+			var step = recipe.steps[stepIndex];
+			dsc.AppendLine("• " + Lang.Get("glassmaking:{0} for {1} seconds", Lang.Get("glassmaking:glassblowingtool-" + step.tool),
+				step.attributes["time"].AsFloat(1).ToString("G", CultureInfo.InvariantCulture)));
+		}
+	}
 }

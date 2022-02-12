@@ -4,10 +4,10 @@ using Vintagestory.API.Datastructures;
 
 namespace GlassMaking
 {
-    [JsonObject]
-    public class WorkbenchToolInfo
-    {
-        public AssetLocation code;
-        public JsonObject attributes;
-    }
+	[JsonObject]
+	public class WorkbenchToolInfo
+	{
+		public AssetLocation code;
+		public JsonObject attributes;
+	}
 }
