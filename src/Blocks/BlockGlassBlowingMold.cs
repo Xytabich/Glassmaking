@@ -78,7 +78,7 @@ namespace GlassMaking.Blocks
 						recipes.RemoveAt(i);
 					}
 				}
-				this.Recipes = recipes.ToArray();
+				Recipes = recipes.ToArray();
 			}
 			else
 			{

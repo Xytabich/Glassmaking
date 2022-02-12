@@ -89,8 +89,8 @@ namespace GlassMaking
 
 			public bool IsSuitable(int amount)
 			{
-				if(amount < this.Amount) return false;
-				if(Var > 0) return (amount - this.Amount) <= Var;
+				if(amount < Amount) return false;
+				if(Var > 0) return (amount - Amount) <= Var;
 				return true;
 			}
 

@@ -22,7 +22,7 @@ namespace GlassMaking.Workbench
 
 		public WorkbenchToolBehavior(string toolCode, BlockEntity blockentity, Cuboidf[] boundingBoxes)
 		{
-			this.ToolCode = toolCode.ToLowerInvariant();
+			ToolCode = toolCode.ToLowerInvariant();
 			Blockentity = blockentity;
 			this.boundingBoxes = boundingBoxes;
 		}
@@ -33,7 +33,7 @@ namespace GlassMaking.Workbench
 		public virtual void OnLoaded(ICoreAPI api, ItemSlot slot)
 		{
 			Api = api;
-			this.Slot = slot;
+			Slot = slot;
 		}
 
 		public virtual void OnUnloaded()

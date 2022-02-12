@@ -84,10 +84,10 @@ namespace GlassMaking.GlassblowingTools
 
 			public ToolRecipeStep(int index, ItemSlot pipeSlot, GlassBlowingRecipe recipe, JsonObject stepAttributes)
 			{
-				this.Index = index;
-				this.PipeSlot = pipeSlot;
-				this.Recipe = recipe;
-				this.StepAttributes = stepAttributes;
+				Index = index;
+				PipeSlot = pipeSlot;
+				Recipe = recipe;
+				StepAttributes = stepAttributes;
 			}
 
 			public bool BeginStep()
