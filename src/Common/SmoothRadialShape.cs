@@ -121,25 +121,25 @@ namespace GlassMaking
 				var ts = to.inner == null ? defaultShape : to;
 				for(int i = 0; i < segments; i++)
 				{
-					count = AddLerpedVertex(mesh, tmpList, vecCallback, false, fs, ts, defaultShape, i * step * fs.segments, i * step * ts.segments, t);
+					count = AddLerpedVertex(mesh, tmpList, vecCallback, false, fs, ts, i * step * fs.segments, i * step * ts.segments, t);
 					if(i != 0) triCallback.Invoke(mesh, prevCount, count, false);
 					prevCount = count;
 				}
-				count = AddLerpedVertex(mesh, tmpList, vecCallback, false, fs, ts, defaultShape, fs.segments, ts.segments, t);
+				count = AddLerpedVertex(mesh, tmpList, vecCallback, false, fs, ts, fs.segments, ts.segments, t);
 				triCallback.Invoke(mesh, prevCount, count, false);
 			}
 
 			for(int i = 0; i < segments; i++)
 			{
-				count = AddLerpedVertex(mesh, tmpList, vecCallback, true, from, to, defaultShape, i * step * from.segments, i * step * to.segments, t);
+				count = AddLerpedVertex(mesh, tmpList, vecCallback, true, from, to, i * step * from.segments, i * step * to.segments, t);
 				if(i != 0) triCallback.Invoke(mesh, prevCount, count, true);
 				prevCount = count;
 			}
-			count = AddLerpedVertex(mesh, tmpList, vecCallback, true, from, to, defaultShape, from.segments, to.segments, t);
+			count = AddLerpedVertex(mesh, tmpList, vecCallback, true, from, to, from.segments, to.segments, t);
 			triCallback.Invoke(mesh, prevCount, count, true);
 		}
 
-		private static int AddLerpedVertex(MeshData mesh, FastList<FastVec2f> tmpList, Func<MeshData, FastVec2f, bool, int> vecCallback, bool isOuter, SmoothRadialShape from, SmoothRadialShape to, SmoothRadialShape defaultShape, float at, float bt, float t)
+		private static int AddLerpedVertex(MeshData mesh, FastList<FastVec2f> tmpList, Func<MeshData, FastVec2f, bool, int> vecCallback, bool isOuter, SmoothRadialShape from, SmoothRadialShape to, float at, float bt, float t)
 		{
 			var a = LerpParts(isOuter ? from.outer : from.inner, tmpList, from.segments, at);
 			var b = LerpParts(isOuter ? to.outer : to.inner, tmpList, to.segments, bt);

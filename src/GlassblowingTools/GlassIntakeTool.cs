@@ -81,7 +81,6 @@ namespace GlassMaking.GlassblowingTools
 										slot.Itemstack.TempAttributes.SetFloat("glassmaking:lastAddGlassTime", (float)Math.Floor(secondsUsed));
 										int consumed = Math.Min(Math.Min(amount - intake, sourceAmount), (byEntity.Controls.Sneak ? 5 : 1) * (5 + (int)(intake * 0.01f)));
 
-										var code = AssetLocation.Create(step.stepAttributes["code"].AsString(), step.recipe.code.Domain);
 										((ItemGlassworkPipe)slot.Itemstack.Collectible).ChangeGlassTemperature(byEntity.World, slot.Itemstack,
 											GetAmountFromPreviousSteps(step) + intake + consumed, consumed, source.GetTemperature());
 

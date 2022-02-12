@@ -242,7 +242,7 @@ namespace GlassMaking
 		}
 
 		/// <summary>
-		/// Creates a new vectors that is the normalized version of this vector. 
+		/// Creates a new vectors that is the normalized version of this vector.
 		/// </summary>
 		/// <returns></returns>
 		public FastVec2f NormalizedCopy()
