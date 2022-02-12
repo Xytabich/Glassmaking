@@ -10,41 +10,63 @@ namespace GlassMaking.ToolDescriptors
     {
         protected GlassMakingMod mod;
 
-        protected Dictionary<string, ItemStack[]> itemsByType;
+        protected Dictionary<string, ItemStack[]> handbookItemsByType;
 
         public ToolBehaviorDescriptor(GlassMakingMod mod)
         {
             this.mod = mod;
         }
 
-        public override void OnLoaded(ICoreClientAPI capi)
+        public override void OnLoaded(ICoreAPI api)
         {
-            var byType = new Dictionary<string, List<ItemStack>>();
-            foreach(var item in capi.World.Collectibles)
+            var capi = api as ICoreClientAPI;
+            Dictionary<string, List<ItemStack>> byType = null;
+            if(capi != null)
+            {
+                byType = new Dictionary<string, List<ItemStack>>();
+            }
+            foreach(var item in api.World.Collectibles)
             {
                 foreach(var beh in item.CollectibleBehaviors)
                 {
                     if(IsSuitableBehavior(item, beh))
                     {
                         var code = ((GlassblowingToolBehavior)beh).toolCode;
-                        if(!byType.TryGetValue(code, out var list))
-                        {
-                            byType[code] = list = new List<ItemStack>();
-                        }
                         mod.AddPipeToolDescriptor(code, this);
-                        List<ItemStack> stacks = item.GetHandBookStacks(capi);
-                        if(stacks != null) list.AddRange(stacks);
+                        if(capi != null)
+                        {
+                            if(!byType.TryGetValue(code, out var list))
+                            {
+                                byType[code] = list = new List<ItemStack>();
+                            }
+                            List<ItemStack> stacks = item.GetHandBookStacks(capi);
+                            if(stacks != null) list.AddRange(stacks);
+                        }
                     }
                 }
             }
-            itemsByType = new Dictionary<string, ItemStack[]>(byType.Count);
-            foreach(var pair in byType)
+            if(capi != null)
             {
-                itemsByType[pair.Key] = pair.Value.ToArray();
+                handbookItemsByType = new Dictionary<string, ItemStack[]>(byType.Count);
+                foreach(var pair in byType)
+                {
+                    handbookItemsByType[pair.Key] = pair.Value.ToArray();
+                }
             }
         }
 
         public override void OnUnloaded()
+        {
+
+        }
+
+        public virtual bool TryGetWorkingTemperature(IWorldAccessor world, ItemStack item, GlassBlowingRecipe recipe, int currentStepIndex, out float temperature)
+        {
+            temperature = 0;
+            return false;
+        }
+
+        public virtual void GetBreakDrops(IWorldAccessor world, ItemStack item, GlassBlowingRecipe recipe, int currentStepIndex, List<ItemStack> outList)
         {
 
         }
@@ -61,7 +83,7 @@ namespace GlassMaking.ToolDescriptors
 
     public abstract class ToolBehaviorDescriptor
     {
-        public abstract void OnLoaded(ICoreClientAPI capi);
+        public abstract void OnLoaded(ICoreAPI api);
 
         public abstract void OnUnloaded();
     }

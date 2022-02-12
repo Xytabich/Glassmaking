@@ -1,5 +1,7 @@
 ﻿using GlassMaking.Items;
+using Vintagestory.API.Client;
 using Vintagestory.API.Common;
+using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 
 namespace GlassMaking.GlassblowingTools
@@ -28,7 +30,7 @@ namespace GlassMaking.GlassblowingTools
             toolCode = properties?["tool"].AsString();
         }
 
-        protected bool TryGetRecipeStep(ItemSlot slot, EntityAgent byEntity, out ToolRecipeStep stepInfo)
+        protected bool TryGetRecipeStep(ItemSlot slot, EntityAgent byEntity, out ToolRecipeStep stepInfo, bool workingTemperatureRequired = true, bool showWarning = false)
         {
             ItemSlot pipeSlot = null;
             if(slot.Itemstack.Collectible is ItemGlassworkPipe)
@@ -45,7 +47,7 @@ namespace GlassMaking.GlassblowingTools
             }
             if(pipeSlot != null)
             {
-                if(((ItemGlassworkPipe)pipeSlot.Itemstack.Collectible).IsWorkingTemperature(byEntity.World, pipeSlot.Itemstack))
+                if(!workingTemperatureRequired || ((ItemGlassworkPipe)pipeSlot.Itemstack.Collectible).IsWorkingTemperature(byEntity.World, pipeSlot.Itemstack))
                 {
                     var recipeAttribute = pipeSlot.Itemstack.Attributes.GetTreeAttribute("glassmaking:recipe");
                     if(recipeAttribute != null)
@@ -61,6 +63,10 @@ namespace GlassMaking.GlassblowingTools
                             }
                         }
                     }
+                }
+                else if(showWarning && api.Side == EnumAppSide.Client)
+                {
+                    ((ICoreClientAPI)api).TriggerIngameError(this, "toocold", Lang.Get("glassmaking:The workpiece is not hot enough to work"));
                 }
             }
             stepInfo = null;

@@ -53,7 +53,7 @@ namespace GlassMaking.Blocks
             }
         }
 
-        public void Clear()
+        public new void Clear()
         {
             slots.Clear();
         }

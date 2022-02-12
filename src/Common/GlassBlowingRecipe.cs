@@ -84,6 +84,50 @@ namespace GlassMaking
             }
         }
 
+        public void GetBreakDrops(ItemStack itemStack, ITreeAttribute recipeAttribute, IWorldAccessor world, List<ItemStack> outList)
+        {
+            int step = recipeAttribute.GetInt("step", 0);
+            var tools = new HashSet<string>();
+            for(int i = 0; i <= step; i++)
+            {
+                tools.Add(steps[i].tool);
+            }
+            var mod = world.Api.ModLoader.GetModSystem<GlassMakingMod>();
+            foreach(var tool in tools)
+            {
+                var descriptor = mod.GetPipeToolDescriptor(tool);
+                if(descriptor != null)
+                {
+                    descriptor.GetBreakDrops(world, itemStack, this, step, outList);
+                }
+            }
+        }
+
+        public float GetWorkingTemperature(ItemStack itemStack, ITreeAttribute recipeAttribute, IWorldAccessor world)
+        {
+            int step = recipeAttribute.GetInt("step", 0);
+            var tools = new HashSet<string>();
+            for(int i = 0; i <= step; i++)
+            {
+                tools.Add(steps[i].tool);
+            }
+
+            float maxTemperature = 0f;
+            var mod = world.Api.ModLoader.GetModSystem<GlassMakingMod>();
+            foreach(var tool in tools)
+            {
+                var descriptor = mod.GetPipeToolDescriptor(tool);
+                if(descriptor != null)
+                {
+                    if(descriptor.TryGetWorkingTemperature(world, itemStack, this, step, out float temp))
+                    {
+                        maxTemperature = Math.Max(maxTemperature, temp);
+                    }
+                }
+            }
+            return maxTemperature;
+        }
+
         public bool TryBeginStep(ItemSlot slot, int index)
         {
             int current = slot.Itemstack.TempAttributes.GetInt("glassmaking:blowingStep", 0);

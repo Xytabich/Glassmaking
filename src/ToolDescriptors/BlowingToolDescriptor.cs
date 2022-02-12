@@ -14,9 +14,9 @@ namespace GlassMaking.ToolDescriptors
         {
         }
 
-        public override void OnLoaded(ICoreClientAPI capi)
+        public override void OnLoaded(ICoreAPI api)
         {
-            foreach(var item in capi.World.Collectibles)
+            foreach(var item in api.World.Collectibles)
             {
                 foreach(var beh in item.CollectibleBehaviors)
                 {

@@ -14,7 +14,7 @@ namespace GlassMaking.GlassblowingTools
 
         public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling, ref EnumHandling handling)
         {
-            if(firstEvent && blockSel != null && TryGetRecipeStep(slot, byEntity, out var step))
+            if(firstEvent && blockSel != null && TryGetRecipeStep(slot, byEntity, out var step, true, true))
             {
                 var source = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityGlassSmeltery;
                 if(source != null && source.CanInteract(byEntity, blockSel))
@@ -82,7 +82,8 @@ namespace GlassMaking.GlassblowingTools
                                         int consumed = Math.Min(Math.Min(amount - intake, sourceAmount), (byEntity.Controls.Sneak ? 5 : 1) * (5 + (int)(intake * 0.01f)));
 
                                         var code = AssetLocation.Create(step.stepAttributes["code"].AsString(), step.recipe.code.Domain);
-                                        ((ItemGlassworkPipe)slot.Itemstack.Collectible).AddGlassmelt(byEntity.World, slot.Itemstack, code, consumed, source.GetTemperature());
+                                        ((ItemGlassworkPipe)slot.Itemstack.Collectible).ChangeGlassTemperature(byEntity.World, slot.Itemstack,
+                                            GetAmountFromPreviousSteps(step) + intake + consumed, consumed, source.GetTemperature());
 
                                         intake += consumed;
                                         source.RemoveGlass(consumed);
@@ -127,6 +128,20 @@ namespace GlassMaking.GlassblowingTools
             slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:lastAddGlassTime");
             slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:intakeStarted");
             base.OnHeldInteractStop(secondsUsed, slot, byEntity, blockSel, entitySel, ref handling);
+        }
+
+        private int GetAmountFromPreviousSteps(ToolRecipeStep stepInfo)
+        {
+            int amount = 0;
+            var steps = stepInfo.recipe.steps;
+            for(int i = 0; i < stepInfo.index; i++)
+            {
+                if(steps[i].tool == toolCode)
+                {
+                    amount += steps[i].attributes["amount"].AsInt();
+                }
+            }
+            return amount;
         }
     }
 }

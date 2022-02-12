@@ -26,7 +26,7 @@ namespace GlassMaking.GlassblowingTools
 
         public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling, ref EnumHandling handling)
         {
-            if(TryGetRecipeStep(slot, byEntity, out var step) && slot.Itemstack.Collectible is IWettable wettable)
+            if(firstEvent && TryGetRecipeStep(slot, byEntity, out var step, true, true) && slot.Itemstack.Collectible is IWettable wettable)
             {
                 if(wettable.GetHumidity(slot.Itemstack, byEntity.World) >= step.stepAttributes["consume"].AsFloat(0) && step.BeginStep())
                 {

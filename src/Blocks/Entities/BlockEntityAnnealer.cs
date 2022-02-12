@@ -66,7 +66,7 @@ namespace GlassMaking.Blocks
                     {
                         dsc.Append(inventory[i].GetStackName());
                         float temperature = (inventory[i].Itemstack.Attributes["temperature"] as ITreeAttribute)?.GetFloat("temperature", 20f) ?? 20f;
-                        dsc.AppendLine(Lang.Get("Temperature: {0}°C", temperature.ToString("0")));
+                        dsc.Append("  ").AppendLine(Lang.Get("Temperature: {0}°C", temperature.ToString("0")));
                         if(processes[i] != null && processes[i].isHeated)
                         {
                             dsc.AppendLine(Lang.Get("glassmaking:Annealing: {0}", (Math.Min(processes[i].time / processes[i].annealTime, 1) * 100).ToString("0")));

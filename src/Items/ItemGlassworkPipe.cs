@@ -73,6 +73,21 @@ namespace GlassMaking.Items
                 if(recipe != null)
                 {
                     recipe.GetRecipeInfo(itemstack, recipeAttribute, dsc, world, withDebugInfo);
+
+                    dsc.AppendLine(Lang.Get("Temperature: {0}°C", GetGlassTemperature(world, inSlot.Itemstack).ToString("0")));
+
+                    List<ItemStack> items = new List<ItemStack>();
+                    recipe.GetBreakDrops(itemstack, recipeAttribute, world, items);
+
+                    if(items.Count > 0)
+                    {
+                        dsc.AppendLine();
+                        dsc.AppendLine(Lang.Get("glassmaking:Break down to receive:"));
+                        foreach(var item in items)
+                        {
+                            dsc.AppendFormat("• {0}x {1}", item.StackSize, item.GetName()).AppendLine();
+                        }
+                    }
                 }
             }
             var glasslayers = itemstack.Attributes.GetTreeAttribute("glasslayers");
@@ -81,22 +96,31 @@ namespace GlassMaking.Items
                 dsc.AppendLine(Lang.Get("glassmaking:Layers:"));
                 var codes = ((StringArrayAttribute)glasslayers["code"]).value;
                 var amounts = ((IntArrayAttribute)glasslayers["amount"]).value;
+                var amountByCode = new Dictionary<string, int>();
                 for(int i = 0; i < codes.Length; i++)
                 {
-                    dsc.AppendFormat("  {0}x {1}", amounts[i], Lang.Get(GlassBlend.GetBlendNameCode(new AssetLocation(codes[i])))).AppendLine();
-                }
-            }
+                    dsc.AppendFormat("• {0}x {1}", amounts[i], Lang.Get(GlassBlend.GetBlendNameCode(new AssetLocation(codes[i])))).AppendLine();
 
-            var glassmelt = itemstack.Attributes.GetTreeAttribute("glassmelt");
-            if(glassmelt != null)
-            {
+                    if(!amountByCode.TryGetValue(codes[i], out var amount)) amount = 0;
+                    amountByCode[codes[i]] = amount + amounts[i];
+                }
+
                 dsc.AppendLine(Lang.Get("Temperature: {0}°C", GetGlassTemperature(world, inSlot.Itemstack).ToString("0")));
-                dsc.AppendLine();
-                dsc.AppendLine(Lang.Get("glassmaking:Break down to receive:"));
-                foreach(var pair in glassmelt)
+
+                bool showHeader = true;
+                foreach(var pair in amountByCode)
                 {
-                    int amount = ((IntAttribute)pair.Value).value / 5;
-                    if(amount > 0) dsc.AppendFormat("• {0}x {1}", amount, Lang.Get(GlassBlend.GetBlendNameCode(new AssetLocation(pair.Key)))).AppendLine();
+                    int amount = pair.Value / 5;
+                    if(amount > 0)
+                    {
+                        if(showHeader)
+                        {
+                            dsc.AppendLine();
+                            dsc.AppendLine(Lang.Get("glassmaking:Break down to receive:"));
+                            showHeader = false;
+                        }
+                        dsc.AppendFormat("• {0}x {1}", amount, Lang.Get("glassmaking:glassshards", Lang.Get(GlassBlend.GetBlendNameCode(new AssetLocation(pair.Key)))));
+                    }
                 }
             }
         }
@@ -123,20 +147,53 @@ namespace GlassMaking.Items
         {
             if(gridRecipe.Output.ResolvedItemstack?.Item is ItemGlassworkPipe && gridRecipe.Attributes?.IsTrue("breakglass") == true)
             {
-                var glassmelt = stackInSlot.Itemstack.Attributes.GetTreeAttribute("glassmelt");
-                if(glassmelt != null)
+                if(api.Side == EnumAppSide.Server)
                 {
-                    var shardsItem = api.World.GetItem(new AssetLocation("glassmaking", "glassshards"));
-                    foreach(var pair in glassmelt)
+                    var itemstack = stackInSlot.Itemstack;
+                    var recipeAttribute = itemstack.Attributes.GetTreeAttribute("glassmaking:recipe");
+                    if(recipeAttribute != null)
                     {
-                        int count = ((IntAttribute)pair.Value).value * quantity / 5;
-                        if(count > 0)
+                        var recipe = mod.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
+                        if(recipe != null)
                         {
-                            var item = new ItemStack(shardsItem, count);
-                            new GlassBlend(new AssetLocation(pair.Key), 5).ToTreeAttributes(item.Attributes.GetOrAddTreeAttribute(GlassBlend.PROPERTY_NAME));
-                            if(!byPlayer.Entity.TryGiveItemStack(item))
+                            var entity = byPlayer.Entity;
+                            List<ItemStack> items = new List<ItemStack>();
+                            recipe.GetBreakDrops(itemstack, recipeAttribute, entity.World, items);
+                            foreach(var item in items)
                             {
-                                byPlayer.Entity.World.SpawnItemEntity(item, byPlayer.Entity.Pos.XYZ.Add(0.0, 0.5, 0.0));
+                                item.StackSize *= quantity;
+                                if(!entity.TryGiveItemStack(item))
+                                {
+                                    entity.World.SpawnItemEntity(item, byPlayer.Entity.Pos.XYZ.Add(0.0, 0.5, 0.0));
+                                }
+                            }
+                        }
+                    }
+                    var glasslayers = itemstack.Attributes.GetTreeAttribute("glasslayers");
+                    if(glasslayers != null)
+                    {
+                        var codes = ((StringArrayAttribute)glasslayers["code"]).value;
+                        var amounts = ((IntArrayAttribute)glasslayers["amount"]).value;
+                        var amountByCode = new Dictionary<string, int>();
+                        for(int i = 0; i < codes.Length; i++)
+                        {
+                            if(!amountByCode.TryGetValue(codes[i], out var amount)) amount = 0;
+                            amountByCode[codes[i]] = amount + amounts[i];
+                        }
+
+                        var shardsItem = api.World.GetItem(new AssetLocation("glassmaking", "glassshards"));
+                        var entity = byPlayer.Entity;
+                        foreach(var pair in amountByCode)
+                        {
+                            int count = pair.Value * quantity / 5;
+                            if(count > 0)
+                            {
+                                var item = new ItemStack(shardsItem, count);
+                                new GlassBlend(new AssetLocation(pair.Key), 5).ToTreeAttributes(item.Attributes.GetOrAddTreeAttribute(GlassBlend.PROPERTY_NAME));
+                                if(!entity.TryGiveItemStack(item))
+                                {
+                                    entity.World.SpawnItemEntity(item, byPlayer.Entity.Pos.XYZ.Add(0.0, 0.5, 0.0));
+                                }
                             }
                         }
                     }
@@ -150,7 +207,7 @@ namespace GlassMaking.Items
             if(gridRecipe.Output.ResolvedItemstack?.Item is ItemGlassworkPipe && ingredient.ResolvedItemstack?.Item is ItemGlassworkPipe &&
                 gridRecipe.Attributes?.IsTrue("breakglass") == true)
             {
-                return inputStack.Attributes.HasAttribute("glassmelt");
+                return inputStack.Attributes.HasAttribute("glassmaking:recipe") || inputStack.Attributes.HasAttribute("glasslayers");
             }
             return base.MatchesForCrafting(inputStack, gridRecipe, ingredient);
         }
@@ -206,6 +263,10 @@ namespace GlassMaking.Items
                                     return;
                                 }
                             }
+                            else if(api.Side == EnumAppSide.Client)
+                            {
+                                ((ICoreClientAPI)api).TriggerIngameError(this, "toocold", Lang.Get("glassmaking:The workpiece is not hot enough to work"));
+                            }
                         }
                     }
                     var source = be as BlockEntityGlassSmeltery;
@@ -213,12 +274,21 @@ namespace GlassMaking.Items
                     {
                         if(byEntity.Controls.Sprint)
                         {
-                            if(slot.Itemstack.Attributes.HasAttribute("glassmelt"))
+                            if(hasRecipe || itemstack.Attributes.HasAttribute("glasslayers"))
                             {
+                                float temperature = GetGlassTemperature(byEntity.World, itemstack);
                                 float temp = source.GetTemperature();
-                                if(temp > GetGlassTemperature(byEntity.World, itemstack))
+                                if(temp > temperature)
                                 {
-                                    slot.Itemstack.TempAttributes.SetFloat("glassmaking:lastHeatTime", 0f);
+                                    float minTemperature = GetWorkingTemperature(byEntity.World, slot.Itemstack) * 0.45f;
+                                    if(temperature >= minTemperature)
+                                    {
+                                        slot.Itemstack.TempAttributes.SetFloat("glassmaking:lastHeatTime", 0f);
+                                    }
+                                    else if(api.Side == EnumAppSide.Client)
+                                    {
+                                        ((ICoreClientAPI)api).TriggerIngameError(this, "toocold", Lang.Get("glassmaking:Unable to reheat a cold workpiece"));
+                                    }
                                     handling = EnumHandHandling.PreventDefault;
                                     return;
                                 }
@@ -227,7 +297,7 @@ namespace GlassMaking.Items
                         else if(!hasRecipe)
                         {
                             int amount = source.GetGlassAmount();
-                            if(amount > 0 && CanAddGlass(byEntity, slot, amount, source.GetGlassCode(), byEntity.Controls.Sneak ? 5 : 1))
+                            if(amount > 0 && HasFreeSpace(slot.Itemstack))
                             {
                                 slot.Itemstack.TempAttributes.SetFloat("glassmaking:lastAddGlassTime", 0f);
                                 handling = EnumHandHandling.PreventDefault;
@@ -302,7 +372,6 @@ namespace GlassMaking.Items
                                             shards[codesAttrib.value[i]] = count + amountsAttrib.value[i];
                                         }
                                     }
-                                    itemstack.Attributes.RemoveAttribute("glassmelt");
                                     itemstack.Attributes.RemoveAttribute("glasslayers");
                                     slot.MarkDirty();
 
@@ -359,33 +428,36 @@ namespace GlassMaking.Items
                 {
                     if(byEntity.Controls.Sprint)
                     {
-                        if(slot.Itemstack.Attributes.HasAttribute("glassmelt") && slot.Itemstack.TempAttributes.HasAttribute("glassmaking:lastHeatTime"))
+                        if(hasRecipe || itemstack.Attributes.HasAttribute("glasslayers"))
                         {
+                            float temperature = GetGlassTemperature(byEntity.World, itemstack);
                             float temp = source.GetTemperature();
-                            float current = GetGlassTemperature(byEntity.World, itemstack);
-                            if(temp > current)
+                            if(temp > temperature)
                             {
-                                if(api.Side == EnumAppSide.Client)
+                                float minTemperature = GetWorkingTemperature(byEntity.World, slot.Itemstack) * 0.45f;
+                                if(temperature >= minTemperature)
                                 {
-                                    const float speed = 1.5f;
-                                    ModelTransform modelTransform = new ModelTransform();
-                                    modelTransform.EnsureDefaultValues();
-                                    modelTransform.Origin.Set(0f, 0f, 0f);
-                                    modelTransform.Translation.Set(-Math.Min(0.5f, speed * secondsUsed), -Math.Min(0.5f, speed * secondsUsed), Math.Min(0.5f, speed * secondsUsed));
-                                    modelTransform.Scale = 1f - Math.Min(0.1f, speed * secondsUsed / 4f);
-                                    modelTransform.Rotation.X = -Math.Min(10f, secondsUsed * 45f * speed);
-                                    modelTransform.Rotation.Y = -Math.Min(15f, secondsUsed * 45f * speed) + GameMath.FastSin(secondsUsed * 1.5f);
-                                    modelTransform.Rotation.Z = secondsUsed * 90f % 360f;
-                                    byEntity.Controls.UsingHeldItemTransformBefore = modelTransform;
+                                    if(api.Side == EnumAppSide.Client)
+                                    {
+                                        const float speed = 1.5f;
+                                        ModelTransform modelTransform = new ModelTransform();
+                                        modelTransform.EnsureDefaultValues();
+                                        modelTransform.Origin.Set(0f, 0f, 0f);
+                                        modelTransform.Translation.Set(-Math.Min(0.5f, speed * secondsUsed), -Math.Min(0.5f, speed * secondsUsed), Math.Min(0.5f, speed * secondsUsed));
+                                        modelTransform.Scale = 1f - Math.Min(0.1f, speed * secondsUsed / 4f);
+                                        modelTransform.Rotation.X = -Math.Min(10f, secondsUsed * 45f * speed);
+                                        modelTransform.Rotation.Y = -Math.Min(15f, secondsUsed * 45f * speed) + GameMath.FastSin(secondsUsed * 1.5f);
+                                        modelTransform.Rotation.Z = secondsUsed * 90f % 360f;
+                                        byEntity.Controls.UsingHeldItemTransformBefore = modelTransform;
+                                    }
+                                    if(api.Side == EnumAppSide.Server && slot.Itemstack.TempAttributes.GetFloat("glassmaking:lastHeatTime") + 1f <= secondsUsed)
+                                    {
+                                        slot.Itemstack.TempAttributes.SetFloat("glassmaking:lastHeatTime", (float)Math.Floor(secondsUsed));
+                                        SetGlassTemperature(byEntity.World, slot.Itemstack, GameMath.Min(temp, temperature + 100));
+                                        slot.MarkDirty();
+                                    }
+                                    return true;
                                 }
-                                const float useTime = 1f;
-                                if(api.Side == EnumAppSide.Server && slot.Itemstack.TempAttributes.GetFloat("glassmaking:lastHeatTime") + useTime <= secondsUsed)
-                                {
-                                    slot.Itemstack.TempAttributes.SetFloat("glassmaking:lastHeatTime", (float)Math.Floor(secondsUsed));
-                                    SetGlassTemperature(byEntity.World, slot.Itemstack, GameMath.Min(temp, current + 100));
-                                    slot.MarkDirty();
-                                }
-                                return true;
                             }
                         }
                     }
@@ -394,7 +466,7 @@ namespace GlassMaking.Items
                         if(slot.Itemstack.TempAttributes.HasAttribute("glassmaking:lastAddGlassTime"))
                         {
                             int amount = source.GetGlassAmount();
-                            if(amount > 0 && CanAddGlass(byEntity, slot, amount, source.GetGlassCode(), byEntity.Controls.Sneak ? 5 : 1))
+                            if(amount > 0 && HasFreeSpace(slot.Itemstack))
                             {
                                 const float speed = 1.5f;
                                 if(api.Side == EnumAppSide.Client)
@@ -512,14 +584,10 @@ namespace GlassMaking.Items
 
                 if(api.Side == EnumAppSide.Client)
                 {
-                    var glassmelt = itemstack.Attributes.GetTreeAttribute("glassmelt");
-                    if(glassmelt != null)
+                    var workTemperature = GetWorkingTemperature(world, itemstack);
+                    if(GlasspipeRenderCache.TemperatureToState(prevTemperature, workTemperature) != GlasspipeRenderCache.TemperatureToState(temperature, workTemperature))
                     {
-                        var workTemperature = GetWorkingTemperature(glassmelt);
-                        if(GlasspipeRenderCache.TemperatureToState(prevTemperature, workTemperature) != GlasspipeRenderCache.TemperatureToState(temperature, workTemperature))
-                        {
-                            SetMeshDirty(itemstack);
-                        }
+                        SetMeshDirty(itemstack);
                     }
                 }
             }
@@ -531,13 +599,12 @@ namespace GlassMaking.Items
             if(glasslayers != null)
             {
                 var container = mod.pipeRenderCache.GetOrCreate(itemstack);
-                var glassmelt = itemstack.Attributes.GetTreeAttribute("glassmelt");
-                var temperature = GlasspipeRenderCache.TemperatureToState(GetGlassTemperature(capi.World, itemstack), GetWorkingTemperature(glassmelt));
+                var temperature = GlasspipeRenderCache.TemperatureToState(GetGlassTemperature(capi.World, itemstack), GetWorkingTemperature(capi.World, itemstack));
                 if(container.isDirty || !container.hasMesh || container.temperature != temperature)
                 {
                     container.temperature = temperature;
                     container.isDirty = false;
-                    if(glassmelt != null) UpdateGlassmeltMesh(itemstack, glassmelt, GlasspipeRenderCache.StateToGlow(temperature));
+                    UpdateGlasslayersMesh(itemstack, glasslayers, GlasspipeRenderCache.StateToGlow(temperature));
                 }
 
                 container.UpdateMeshRef(capi, Shape, capi.Tesselator.GetTextureSource(this), glassTransform);
@@ -551,8 +618,7 @@ namespace GlassMaking.Items
                 if(recipeAttribute != null)
                 {
                     var container = mod.pipeRenderCache.GetOrCreate(itemstack);
-                    var glassmelt = itemstack.Attributes.GetTreeAttribute("glassmelt");
-                    var temperature = GlasspipeRenderCache.TemperatureToState(GetGlassTemperature(capi.World, itemstack), GetWorkingTemperature(glassmelt));
+                    var temperature = GlasspipeRenderCache.TemperatureToState(GetGlassTemperature(capi.World, itemstack), GetWorkingTemperature(capi.World, itemstack));
                     if(container.isDirty || !container.hasMesh || container.temperature != temperature)
                     {
                         container.temperature = temperature;
@@ -584,7 +650,6 @@ namespace GlassMaking.Items
             if(isComplete)
             {
                 slot.Itemstack.Attributes.RemoveAttribute("glassmaking:recipe");
-                slot.Itemstack.Attributes.RemoveAttribute("glassmelt");
                 slot.MarkDirty();
             }
             else if(api.Side == EnumAppSide.Client)
@@ -593,29 +658,21 @@ namespace GlassMaking.Items
             }
         }
 
-        public void AddGlassmelt(IWorldAccessor world, ItemStack item, AssetLocation code, int amount, float temperature)
+        public void ChangeGlassTemperature(IWorldAccessor world, ItemStack item, int totalGlass, int addedGlass, float addedGlassTemperature)
         {
-            string glassCode = code.ToShortString();
-            var glassmelt = item.Attributes.GetOrAddTreeAttribute("glassmelt");
-            glassmelt.SetInt(glassCode, glassmelt.GetInt(glassCode) + amount);
-            int currentAmount = 0;
-            foreach(var pair in glassmelt)
+            if(totalGlass == addedGlass)
             {
-                currentAmount += ((IntAttribute)pair.Value).value;
-            }
-            if(currentAmount == 0)
-            {
-                SetGlassTemperature(world, item, temperature);
+                SetGlassTemperature(world, item, addedGlassTemperature);
             }
             else
             {
-                SetGlassTemperature(world, item, GameMath.Lerp(GetGlassTemperature(world, item), temperature, (float)amount / currentAmount));
+                SetGlassTemperature(world, item, GameMath.Lerp(GetGlassTemperature(world, item), addedGlassTemperature, (float)addedGlass / totalGlass));
             }
         }
 
         public bool IsWorkingTemperature(IWorldAccessor world, ItemStack item)
         {
-            return GetGlassTemperature(world, item) >= GetWorkingTemperature(item.Attributes.GetTreeAttribute("glassmelt"));
+            return GetGlassTemperature(world, item) >= GetWorkingTemperature(world, item);
         }
 
         bool IItemCrafter.PreventRecipeAssignment(IClientPlayer player, ItemStack item)
@@ -658,26 +715,44 @@ namespace GlassMaking.Items
             return false;
         }
 
-        private float GetWorkingTemperature(ITreeAttribute pairs)
+        private float GetWorkingTemperature(IWorldAccessor world, ItemStack itemStack)
         {
-            if(pairs == null) return 0;
-            float point = 0f;
-            foreach(var pair in pairs)
+            var recipeAttribute = itemStack.Attributes.GetTreeAttribute("glassmaking:recipe");
+            if(recipeAttribute != null)
             {
-                point += mod.GetGlassTypeInfo(new AssetLocation(pair.Key)).meltingPoint;
+                var recipe = mod.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
+                if(recipe != null)
+                {
+                    return recipe.GetWorkingTemperature(itemStack, recipeAttribute, world);
+                }
+                return 0;
             }
-            return point / pairs.Count * 0.8f;
+
+            var glasslayers = itemStack.Attributes.GetTreeAttribute("glasslayers");
+            if(glasslayers == null) return 0;
+
+            var codesAttrib = glasslayers["code"] as StringArrayAttribute;
+            if(codesAttrib.value.Length == 0) return 0;
+
+            float point = 0f;
+            foreach(var code in codesAttrib.value)
+            {
+                point += mod.GetGlassTypeInfo(new AssetLocation(code)).meltingPoint;
+            }
+            return point / codesAttrib.value.Length * 0.8f;
         }
 
-        private bool CanAddGlass(EntityAgent byEntity, ItemSlot slot, int amount, AssetLocation code, int multiplier)
+        private bool HasFreeSpace(ItemStack itemStack)
         {
-            var glassmelt = slot.Itemstack.Attributes.GetTreeAttribute("glassmelt");
-            if(glassmelt != null)
+            var glasslayers = itemStack.Attributes.GetTreeAttribute("glasslayers");
+            if(glasslayers != null)
             {
+                var amountsAttrib = glasslayers["amount"] as IntArrayAttribute;
+
                 int count = 0;
-                foreach(var pair in glassmelt)
+                foreach(int amount in amountsAttrib.value)
                 {
-                    count += ((IntAttribute)pair.Value).value;
+                    count += amount;
                 }
                 if(count >= maxGlassAmount) return false;
             }
@@ -686,13 +761,6 @@ namespace GlassMaking.Items
 
         private bool AddGlass(EntityAgent byEntity, ItemSlot slot, int amount, AssetLocation code, int multiplier, float temperature, out int consumed)
         {
-            int currentAmount = 0;
-            var glassmelt = slot.Itemstack.Attributes.GetOrAddTreeAttribute("glassmelt");
-            foreach(var pair in glassmelt)
-            {
-                currentAmount += ((IntAttribute)pair.Value).value;
-            }
-
             var glasslayers = slot.Itemstack.Attributes.GetOrAddTreeAttribute("glasslayers");
             var codesAttrib = glasslayers["code"] as StringArrayAttribute;
             var amountsAttrib = glasslayers["amount"] as IntArrayAttribute;
@@ -702,6 +770,12 @@ namespace GlassMaking.Items
                 glasslayers["code"] = codesAttrib;
                 amountsAttrib = new IntArrayAttribute(new int[0]);
                 glasslayers["amount"] = amountsAttrib;
+            }
+
+            int currentAmount = 0;
+            foreach(var c in amountsAttrib.value)
+            {
+                currentAmount += c;
             }
 
             string glassCode = code.ToShortString();
@@ -716,7 +790,7 @@ namespace GlassMaking.Items
                 amountsAttrib.value = amountsAttrib.value.Append(consumed);
             }
 
-            AddGlassmelt(byEntity.World, slot.Itemstack, code, consumed, temperature);
+            ChangeGlassTemperature(byEntity.World, slot.Itemstack, currentAmount + consumed, consumed, temperature);
 
             return true;
         }
@@ -726,13 +800,15 @@ namespace GlassMaking.Items
             mod.pipeRenderCache.GetOrCreate(item).isDirty = true;
         }
 
-        private void UpdateGlassmeltMesh(ItemStack item, ITreeAttribute glassmelt, int glow)
+        private void UpdateGlasslayersMesh(ItemStack item, ITreeAttribute glasslayers, int glow)
         {
             int count = 0;
-            foreach(var pair in glassmelt)
+            var amountsAttrib = glasslayers["amount"] as IntArrayAttribute;
+            foreach(var c in amountsAttrib.value)
             {
-                count += ((IntAttribute)pair.Value).value;
+                count += c;
             }
+
             var container = mod.pipeRenderCache.GetOrCreate(item);
             var info = container._data as MeltMeshInfo;
             if(info == null || info.count != count || info.glow != glow)

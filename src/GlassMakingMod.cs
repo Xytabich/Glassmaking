@@ -91,6 +91,12 @@ namespace GlassMaking
             glassblowingRecipes = api.RegisterRecipeRegistry<RecipeRegistryDictionary<GlassBlowingRecipe>>("glassblowing");
             //workbenchRecipes = api.RegisterRecipeRegistry<RecipeRegistryDictionary<WorkbenchRecipe>>("glassworkbench");
             workbenchRecipes = new RecipeRegistryDictionary<WorkbenchRecipe>();
+
+            descriptors = new List<ToolBehaviorDescriptor>();
+            descriptors.Add(new ToolUseDescriptor(this));
+            descriptors.Add(new DryableToolDescriptor(this));
+            descriptors.Add(new IntakeToolDescriptor(this));
+            descriptors.Add(new BlowingToolDescriptor(this));
         }
 
         public override void StartServerSide(ICoreServerAPI api)
@@ -129,12 +135,6 @@ namespace GlassMaking
             handbookInfoList.Add(new AnnealRecipeInfo());
             handbookInfoList.Add(new AnnealOutputInfo(this));
 
-            descriptors = new List<ToolBehaviorDescriptor>();
-            descriptors.Add(new ToolUseDescriptor(this));
-            descriptors.Add(new DryableToolDescriptor(this));
-            descriptors.Add(new IntakeToolDescriptor(this));
-            descriptors.Add(new BlowingToolDescriptor(this));
-
             molds = new List<Block>();
             moldsOutput = new HashSet<AssetLocation>();
             annealRecipes = new Dictionary<Tuple<EnumItemClass, int>, ItemStack>();
@@ -144,12 +144,12 @@ namespace GlassMaking
 
         public override void Dispose()
         {
+            foreach(var descriptor in descriptors)
+            {
+                descriptor.OnUnloaded();
+            }
             if(capi != null)
             {
-                foreach(var descriptor in descriptors)
-                {
-                    descriptor.OnUnloaded();
-                }
                 foreach(var info in handbookInfoList)
                 {
                     info.Dispose();
@@ -309,6 +309,10 @@ namespace GlassMaking
         {
             sapi.ModLoader.GetModSystem<RecipeLoader>().LoadRecipes<GlassBlowingRecipe>("glassblowing recipe", "recipes/glassblowing", RegisterGlassblowingRecipe);
             //sapi.ModLoader.GetModSystem<RecipeLoader>().LoadRecipes<WorkbenchRecipe>("glassworkbench recipe", "recipes/glassworkbench", RegisterWorkbenchRecipe);
+            foreach(var descriptor in descriptors)
+            {
+                descriptor.OnLoaded(sapi);
+            }
         }
 
         private void RegisterGlassblowingRecipe(GlassBlowingRecipe r)

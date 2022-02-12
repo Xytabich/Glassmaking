@@ -11,7 +11,7 @@ namespace GlassMaking.GlassblowingTools
 
         public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling, ref EnumHandling handling)
         {
-            if(firstEvent && byEntity.Controls.Sneak && TryGetRecipeStep(slot, byEntity, out var step))
+            if(firstEvent && byEntity.Controls.Sneak && TryGetRecipeStep(slot, byEntity, out var step, true, true))
             {
                 if(step.BeginStep())
                 {
