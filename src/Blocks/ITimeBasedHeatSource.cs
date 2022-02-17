@@ -34,4 +34,9 @@ namespace GlassMaking.Blocks
 		/// </summary>
 		HeatGraph CalcHeatGraph(double calendarTotalHours = 0);
 	}
+
+	public interface ITimeBasedHeatSourceContainer : ITimeBasedHeatSource
+	{
+		void SetReceiver(ITimeBasedHeatReceiver receiver);
+	}
 }

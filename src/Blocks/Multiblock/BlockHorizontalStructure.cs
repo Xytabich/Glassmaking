@@ -60,8 +60,7 @@ namespace GlassMaking.Blocks
 							{
 								if(api.World.GetBlock(structure[x, y, z]) is BlockHorizontalStructure sblock)
 								{
-									sblock.mainOffset = new Vec3i(-(x + structureOffset.X), -(y + structureOffset.Y), -(z + structureOffset.Z));
-									sblock.isSurrogate = true;
+									sblock.InitSurrogate(new Vec3i(-(x + structureOffset.X), -(y + structureOffset.Y), -(z + structureOffset.Z)));
 								}
 							}
 						}
@@ -220,6 +219,18 @@ namespace GlassMaking.Blocks
 
 				base.OnBlockBroken(world, pos, byPlayer, dropQuantityMultiplier);
 			}
+		}
+
+		protected internal virtual void InitSurrogate(Vec3i mainOffset)
+		{
+			if(isSurrogate)
+			{
+				if(this.mainOffset.Equals(mainOffset)) return;
+
+				throw new Exception("Unable to initialize structure with different main block coordinates");
+			}
+			this.mainOffset = mainOffset;
+			isSurrogate = true;
 		}
 
 		protected virtual void RemoveSurrogateBlock(IWorldAccessor world, BlockPos pos)

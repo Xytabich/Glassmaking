@@ -29,7 +29,7 @@ namespace GlassMaking.Blocks
 						List<ItemStack> stacks = obj.GetHandBookStacks(capi);
 						if(stacks != null) fuelStacklist.AddRange(stacks);
 					}
-					if(obj is Block && (obj as Block).HasBehavior<BlockBehaviorCanIgnite>())
+					if(obj is Block block && block.HasBehavior<BlockBehaviorCanIgnite>())
 					{
 						List<ItemStack> stacks = obj.GetHandBookStacks(capi);
 						if(stacks != null) canIgniteStacks.AddRange(stacks);

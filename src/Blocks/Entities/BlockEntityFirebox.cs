@@ -11,7 +11,7 @@ using Vintagestory.GameContent;
 
 namespace GlassMaking.Blocks
 {
-	public class BlockEntityFirebox : BlockEntity, ITimeBasedHeatSource, IHeatSource
+	public class BlockEntityFirebox : BlockEntity, ITimeBasedHeatSource, ITimeBasedHeatSourceContainer, IHeatSource
 	{
 		private const float TEMP_INCREASE_PER_HOUR = 1500;
 		private const float TEMP_DECREASE_PER_HOUR = 2000;

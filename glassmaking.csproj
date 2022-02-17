@@ -89,6 +89,7 @@
   <ItemGroup>
     <Compile Include="src\Blocks\BlockGlassBlowingMold.cs" />
     <Compile Include="src\Blocks\BlockAnnealer.cs" />
+    <Compile Include="src\Blocks\BlockLargeSmeltery.cs" />
     <Compile Include="src\Blocks\Entities\BlockEntityAnnealer.cs" />
     <Compile Include="src\Blocks\Entities\BlockEntityWorkbench.cs" />
     <Compile Include="src\Blocks\BlockWorkbench.cs" />
