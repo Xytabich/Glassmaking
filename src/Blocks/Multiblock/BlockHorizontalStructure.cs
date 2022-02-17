@@ -11,7 +11,7 @@ namespace GlassMaking.Blocks
 		protected AssetLocation[,,] structure;
 
 		//These values are set by the main block
-		protected Vec3i mainOffset;
+		protected Vec3i mainOffset = null;
 		protected bool isSurrogate = false;
 
 		public override void OnLoaded(ICoreAPI api)
@@ -48,7 +48,7 @@ namespace GlassMaking.Blocks
 				}
 				if(structureOffset == null)
 				{
-					throw new Exception("The structure must include the main block");
+					throw new Exception(string.Format("The structure {0} must include the main block", Code));
 				}
 				for(int x = 0; x < sx; x++)
 				{

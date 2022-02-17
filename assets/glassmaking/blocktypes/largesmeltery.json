@@ -1,45 +1,41 @@
 {
 	"code": "largesmeltery",
 	"class": "glassmaking:blockmb",
-	"behaviorsByType": { "*-main-*": [ { "name": "HorizontalOrientable" } ] },
+	"behaviorsByType": { "*": [ { "name": "HorizontalOrientable" } ] },
 	"variantgroups": [
-		{
-			"code": "type",
-			"states": [ "main", "surrogate" ]
-		},
 		{
 			"code": "side",
 			"loadFromProperties": "abstract/horizontalorientation"
 		}
 	],
 	"attributesByType": {
-		"*-main-north": {
+		"*-north": {
 			"structure": {
-				"codes": [ [ [ "blockmb-surrogate-{side}", "blockmb-main-{side}" ] ] ]
+				"codes": [ [ [ "smelteryplan-{side}", "largesmeltery-{side}" ] ] ]
 			}
 		},
-		"*-main-east": {
+		"*-east": {
 			"structure": {
-				"codes": [ [ [ "blockmb-surrogate-{side}", "blockmb-main-{side}" ] ] ],
+				"codes": [ [ [ "smelteryplan-{side}", "largesmeltery-{side}" ] ] ],
 				"rotateY": 270
 			}
 		},
-		"*-main-south": {
+		"*-south": {
 			"structure": {
-				"codes": [ [ [ "blockmb-surrogate-{side}", "blockmb-main-{side}" ] ] ],
+				"codes": [ [ [ "smelteryplan-{side}", "largesmeltery-{side}" ] ] ],
 				"rotateY": 180
 			}
 		},
-		"*-main-west": {
+		"*-west": {
 			"structure": {
-				"codes": [ [ [ "blockmb-surrogate-{side}", "blockmb-main-{side}" ] ] ],
+				"codes": [ [ [ "smelteryplan-{side}", "largesmeltery-{side}" ] ] ],
 				"rotateY": 90
 			}
 		}
 	},
 	"creativeinventory": {
-		"general": [ "*-main-north" ],
-		"glassmaking": [ "*-main-north" ]
+		"general": [ "*-north" ],
+		"glassmaking": [ "*-north" ]
 	},
 	"replaceable": 400,
 	"resistance": 3.5,

@@ -1,11 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using GlassMaking.Blocks.Multiblock;
+using Newtonsoft.Json;
 using System;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Util;
 
-namespace GlassMaking.Blocks.Multiblock
+namespace GlassMaking.Blocks
 {
 	public class BlockHorizontalStructurePlan : BlockHorizontalStructure
 	{

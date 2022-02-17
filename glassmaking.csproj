@@ -109,6 +109,8 @@
     <Compile Include="src\Blocks\IHeaterPlaceableBlock.cs" />
     <Compile Include="src\Blocks\GlassSmelteryInventory.cs" />
     <Compile Include="src\Blocks\Multiblock\BlockHorizontalStructure.cs" />
+    <Compile Include="src\Blocks\Multiblock\BlockHorizontalStructurePlan.cs" />
+    <Compile Include="src\Blocks\Multiblock\IStructurePlanMainBlock.cs" />
     <Compile Include="src\Blocks\Renderer\BlockRendererFirebox.cs" />
     <Compile Include="src\Blocks\Renderer\BlockRendererGlassSmeltery.cs" />
     <Compile Include="src\Blocks\WorkbenchToolsInventory.cs" />
@@ -167,7 +169,58 @@
     <Compile Include="src\Workbench\WorkbenchToolBehavior.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="assets\**\*.*" />
+    <Content Include="assets\game\worldproperties\abstract\glasstype.json" />
+    <Content Include="assets\glassmaking\blocktypes\annealer.json" />
+    <Content Include="assets\glassmaking\blocktypes\firebox.json" />
+    <Content Include="assets\glassmaking\blocktypes\largesmeltery.json" />
+    <Content Include="assets\glassmaking\blocktypes\largesmelteryplan.json" />
+    <Content Include="assets\glassmaking\blocktypes\smeltery.json" />
+    <Content Include="assets\glassmaking\blocktypes\workbench.json" />
+    <Content Include="assets\glassmaking\config\handbook\glassmaking.json" />
+    <Content Include="assets\glassmaking\itemtypes\glasssblend.json" />
+    <Content Include="assets\glassmaking\itemtypes\glassshards.json" />
+    <Content Include="assets\glassmaking\itemtypes\glassworkpipe.json" />
+    <Content Include="assets\glassmaking\itemtypes\part\glassworkpipe.json" />
+    <Content Include="assets\glassmaking\itemtypes\part\parchoffi.json" />
+    <Content Include="assets\glassmaking\itemtypes\tool\jacks.json" />
+    <Content Include="assets\glassmaking\itemtypes\tool\paddle.json" />
+    <Content Include="assets\glassmaking\itemtypes\tool\parchoffi.json" />
+    <Content Include="assets\glassmaking\itemtypes\tool\tweezers.json" />
+    <Content Include="assets\glassmaking\lang\en.json" />
+    <Content Include="assets\glassmaking\patches\crushedquartz.json" />
+    <Content Include="assets\glassmaking\patches\suppltools.json" />
+    <Content Include="assets\glassmaking\recipes\grid\breakglass.json" />
+    <Content Include="assets\glassmaking\recipes\grid\bricks.json" />
+    <Content Include="assets\glassmaking\recipes\grid\glasspipe.json" />
+    <Content Include="assets\glassmaking\recipes\grid\paddle.json" />
+    <Content Include="assets\glassmaking\recipes\grid\parchoffi.json" />
+    <Content Include="assets\glassmaking\recipes\smithing\glassworkpipepart.json" />
+    <Content Include="assets\glassmaking\recipes\smithing\parchoffipart.json" />
+    <Content Include="assets\glassmaking\recipes\smithing\tools.json" />
+    <Content Include="assets\glassmaking\shapes\block\annealer.json" />
+    <Content Include="assets\glassmaking\shapes\block\firebox.json" />
+    <Content Include="assets\glassmaking\shapes\block\smeltery\bath.json" />
+    <Content Include="assets\glassmaking\shapes\block\smeltery\cover.json" />
+    <Content Include="assets\glassmaking\shapes\block\smeltery\item.json" />
+    <Content Include="assets\glassmaking\shapes\block\workbench\item.json" />
+    <Content Include="assets\glassmaking\shapes\block\workbench\left.json" />
+    <Content Include="assets\glassmaking\shapes\block\workbench\right.json" />
+    <Content Include="assets\glassmaking\shapes\item\glassworkpipe.json" />
+    <Content Include="assets\glassmaking\shapes\item\part\glassworkpipe.json" />
+    <Content Include="assets\glassmaking\shapes\item\part\parchoffi.json" />
+    <Content Include="assets\glassmaking\shapes\item\resource\crushed\glassshards.json" />
+    <Content Include="assets\glassmaking\shapes\item\tool\jacks.json" />
+    <Content Include="assets\glassmaking\shapes\item\tool\paddle.json" />
+    <Content Include="assets\glassmaking\shapes\item\tool\parchoffi.json" />
+    <Content Include="assets\glassmaking\shapes\item\tool\tweezers.json" />
+    <Content Include="assets\glassmaking\textures\block\frame.png" />
+    <Content Include="assets\glassmaking\textures\item\resource\crushed\glassshards.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\glassmaking\blocktypes\largesmelteryplan.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="assets\glassmaking\textures\block\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

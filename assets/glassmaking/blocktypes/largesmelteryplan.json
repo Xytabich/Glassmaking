@@ -1,0 +1,30 @@
+{
+	"code": "smelteryplan",
+	"class": "glassmaking:structureplan",
+	"variantgroups": [
+		{
+			"code": "side",
+			"loadFromProperties": "abstract/horizontalorientation"
+		}
+	],
+	"attributes": {
+		"replacement": {
+			"block": {
+				"type": "block",
+				"code": "game:creativeblock-0"
+			}
+		}
+	},
+	"collisionboxes": [],
+	"lightAbsorption": 0,
+	"drawtype": "cube",
+	"textures": {
+		"all": { "base": "block/frame" }
+	},
+	"sideopaque": {
+		"all": false
+	},
+	"sidesolid": {
+		"all": false
+	}
+}

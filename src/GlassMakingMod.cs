@@ -74,6 +74,7 @@ namespace GlassMaking
 			api.RegisterBlockClass("Horizontal2BMultiblock", typeof(BlockHorizontal2BMultiblock));
 
 			api.RegisterBlockClass("glassmaking:blockmb", typeof(BlockHorizontalStructure));
+			api.RegisterBlockClass("glassmaking:structureplan", typeof(BlockHorizontalStructurePlan));
 
 			api.RegisterBlockEntityClass("glassmaking:firebox", typeof(BlockEntityFirebox));
 			api.RegisterBlockEntityClass("glassmaking:annealer", typeof(BlockEntityAnnealer));
