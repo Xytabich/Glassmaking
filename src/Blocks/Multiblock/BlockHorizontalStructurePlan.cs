@@ -13,14 +13,23 @@ namespace GlassMaking.Blocks
 		protected ReplacementInfo replacement;
 
 		private bool isLoaded = false;
-
 		private WorldInteraction[] interactions;
 
 		public override void OnLoaded(ICoreAPI api)
 		{
 			base.OnLoaded(api);
 			isLoaded = true;
-			replacement = Attributes["replacement"].AsObject<ReplacementInfo>();
+			replacement = Attributes["replacement"].AsObject<ReplacementInfo>(null, Code.Domain);
+			replacement.Resolve(api.World);
+			interactions = new WorldInteraction[] {
+				new WorldInteraction()
+				{
+					ActionLangCode = "glassmaking:blockhelp-plan-put",
+					HotKeyCode = null,
+					MouseButton = EnumMouseButton.Right,
+					Itemstacks = new ItemStack[] { (replacement.requirement ?? replacement.block).ResolvedItemstack }
+				}
+			};
 			InitReplacement();
 		}
 
@@ -40,8 +49,12 @@ namespace GlassMaking.Blocks
 					var item = byPlayer.Entity.RightHandItemSlot.TakeOut(requirement.ResolvedItemstack.StackSize);
 					RemoveSurrogateBlock(world, blockSel.Position);
 
-					replacement.block.ResolvedItemstack.Block.DoPlaceBlock(world, byPlayer,
-						blockSel, replacement.block == requirement ? item : replacement.block.ResolvedItemstack);
+					var block = replacement.block.ResolvedItemstack.Block;
+					var stack = replacement.block == requirement ? item : replacement.block.ResolvedItemstack;
+					world.PlaySoundAt(block.GetSounds(world.BlockAccessor, blockSel.Position, stack)?.Place,
+						blockSel.Position.X + 0.5, blockSel.Position.Y + 0.5, blockSel.Position.Z + 0.5, byPlayer, true, 16f);
+
+					block.DoPlaceBlock(world, byPlayer, blockSel, stack);
 
 					if(world.BlockAccessor.GetBlock(GetMainBlockPosition(blockSel.Position)) is IStructurePlanMainBlock mainBlock)
 					{
@@ -63,29 +76,17 @@ namespace GlassMaking.Blocks
 		{
 			if(isLoaded && isSurrogate)
 			{
-				if(replacement.block.Resolve(api.World, "structure plan block"))
+				if(replacement.block.Type != EnumItemClass.Block)
 				{
-					if(replacement.block.Type != EnumItemClass.Block)
-					{
-						throw new Exception("The replacement must be a block");
-					}
-					if(replacement.requirement != null)
-					{
-						replacement.requirement.Resolve(api.World, "structure plan requirement");
-					}
-					if(replacement.block.ResolvedItemstack.Block is BlockHorizontalStructure structure)
-					{
-						structure.InitSurrogate(mainOffset);
-					}
-					interactions = new WorldInteraction[] {
-						new WorldInteraction()
-						{
-							ActionLangCode = "glassmaking:blockhelp-plan-put",
-							HotKeyCode = null,
-							MouseButton = EnumMouseButton.Right,
-							Itemstacks = new ItemStack[] { (replacement.requirement ?? replacement.block).ResolvedItemstack }
-						}
-					};
+					throw new Exception("The replacement must be a block");
+				}
+				if(replacement.requirement != null)
+				{
+					replacement.requirement.Resolve(api.World, "structure plan requirement");
+				}
+				if(replacement.block.ResolvedItemstack.Block is BlockHorizontalStructure structure)
+				{
+					structure.InitSurrogate(mainOffset);
 				}
 			}
 		}
@@ -94,8 +95,14 @@ namespace GlassMaking.Blocks
 		protected class ReplacementInfo
 		{
 			[JsonProperty(Required = Required.Always)]
-			public JsonItemStack block = null;
+			public JsonItemStack block;
 			public JsonItemStack requirement = null;
+
+			public void Resolve(IWorldAccessor world)
+			{
+				block.Resolve(world, "structure plan");
+				requirement?.Resolve(world, "structure plan");
+			}
 		}
 	}
 }

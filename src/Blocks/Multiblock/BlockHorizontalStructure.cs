@@ -8,7 +8,7 @@ namespace GlassMaking.Blocks
 	public class BlockHorizontalStructure : Block
 	{
 		protected Vec3i structureOffset = null;
-		protected AssetLocation[,,] structure;
+		protected Block[,,] structure;
 
 		//These values are set by the main block
 		protected Vec3i mainOffset = null;
@@ -20,27 +20,32 @@ namespace GlassMaking.Blocks
 			if(Attributes != null && Attributes.KeyExists("structure"))
 			{
 				mainOffset = Vec3i.Zero;
-				this.structure = Attributes["structure"].AsObject<Structure>(null, Code.Domain).GetRotated();
-				int sx = structure.GetLength(0), sy = structure.GetLength(1), sz = structure.GetLength(2);
+				var codes = Attributes["structure"].AsObject<Structure>(null, Code.Domain).GetRotated();
+				int sx = codes.GetLength(0), sy = codes.GetLength(1), sz = codes.GetLength(2);
+				structure = new Block[sx, sy, sz];
 				for(int x = 0; x < sx; x++)
 				{
 					for(int y = 0; y < sy; y++)
 					{
 						for(int z = 0; z < sz; z++)
 						{
-							if(structure[x, y, z] != null)
+							if(codes[x, y, z] != null)
 							{
-								if(string.IsNullOrWhiteSpace(structure[x, y, z].Path))
+								if(string.IsNullOrWhiteSpace(codes[x, y, z].Path))
 								{
-									structure[x, y, z] = null;
+									codes[x, y, z] = null;
 								}
-								else if(Code.Equals(structure[x, y, z]))
+								else
 								{
-									if(structureOffset != null)
+									structure[x, y, z] = api.World.GetBlock(codes[x, y, z]);
+									if(structure[x, y, z].Id == Id)
 									{
-										throw new Exception("Structure must have only one main block");
+										if(structureOffset != null)
+										{
+											throw new Exception("Structure must have only one main block");
+										}
+										structureOffset = new Vec3i(-x, -y, -z);
 									}
-									structureOffset = new Vec3i(-x, -y, -z);
 								}
 							}
 						}
@@ -56,9 +61,9 @@ namespace GlassMaking.Blocks
 					{
 						for(int z = 0; z < sz; z++)
 						{
-							if(structure[x, y, z] != null && !Code.Equals(structure[x, y, z]))
+							if(structure[x, y, z] != null && structure[x, y, z].Id != Id)
 							{
-								if(api.World.GetBlock(structure[x, y, z]) is BlockHorizontalStructure sblock)
+								if(structure[x, y, z] is BlockHorizontalStructure sblock)
 								{
 									sblock.InitSurrogate(new Vec3i(-(x + structureOffset.X), -(y + structureOffset.Y), -(z + structureOffset.Z)));
 								}
@@ -133,11 +138,11 @@ namespace GlassMaking.Blocks
 				{
 					for(int z = 0; z < sz; z++)
 					{
-						if(structure[x, y, z] == null || Code.Equals(structure[x, y, z])) continue;
+						if(structure[x, y, z] == null || structure[x, y, z].Id == Id) continue;
 
 						var sel = blockSel.Clone();
 						sel.Position = blockSel.Position.AddCopy(x + structureOffset.X, y + structureOffset.Y, z + structureOffset.Z);
-						if(!world.GetBlock(structure[x, y, z]).CanPlaceBlock(world, byPlayer, sel, ref failureCode))
+						if(!structure[x, y, z].CanPlaceBlock(world, byPlayer, sel, ref failureCode))
 						{
 							return false;
 						}
@@ -160,11 +165,11 @@ namespace GlassMaking.Blocks
 					{
 						for(int z = 0; z < sz; z++)
 						{
-							if(structure[x, y, z] == null || Code.Equals(structure[x, y, z])) continue;
+							if(structure[x, y, z] == null || structure[x, y, z].Id == Id) continue;
 
 							var sel = blockSel.Clone();
 							sel.Position = blockSel.Position.AddCopy(x + structureOffset.X, y + structureOffset.Y, z + structureOffset.Z);
-							world.GetBlock(structure[x, y, z]).DoPlaceBlock(world, byPlayer, sel, byItemStack);
+							structure[x, y, z].DoPlaceBlock(world, byPlayer, sel, byItemStack);
 						}
 					}
 				}
@@ -198,7 +203,7 @@ namespace GlassMaking.Blocks
 					{
 						for(int z = 0; z < sz; z++)
 						{
-							if(structure[x, y, z] == null || Code.Equals(structure[x, y, z])) continue;
+							if(structure[x, y, z] == null || structure[x, y, z].Id == Id) continue;
 
 							offset.Set(x + structureOffset.X, y + structureOffset.Y, z + structureOffset.Z);
 							var spos = pos.AddCopy(offset);
