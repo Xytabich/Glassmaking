@@ -25,7 +25,7 @@ namespace GlassMaking.Blocks
 		private MeshRef bathMesh;
 		private int bathTextureId;
 
-		public BlockRendererGlassSmeltery(BlockPos pos, ITexPositionSource tex, ICoreClientAPI api, MeshRef bathMesh, int bathTextureId)
+		public BlockRendererGlassSmeltery(BlockPos pos, ITexPositionSource tex, ICoreClientAPI api, MeshRef bathMesh, int bathTextureId)//TODO: add parameters: melt offset, melt max height, melt min width, melt max width (to create a cone)
 		{
 			this.pos = pos;
 			this.api = api;
@@ -63,6 +63,7 @@ namespace GlassMaking.Blocks
 		{
 			IStandardShaderProgram standardShaderProgram = api.Render.PreparedStandardShader(pos.X, pos.Y, pos.Z, new Vec4f(1f + glowLevel / 128f, 1f + glowLevel / 128f, 1f + glowLevel / 512f, 1f));
 			standardShaderProgram.ExtraGlow = glowLevel;
+			standardShaderProgram.ExtraZOffset = 0.0001f;
 			IRenderAPI render = api.Render;
 			Vec3d cameraPos = api.World.Player.Entity.CameraPos;
 			standardShaderProgram.ViewMatrix = render.CameraMatrixOriginf;

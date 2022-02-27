@@ -78,7 +78,8 @@ namespace GlassMaking.Blocks
 					{
 						if(block.TryPlaceBlock(world, byPlayer, new BlockSelection { Position = blockSel.Position.UpCopy(), Face = BlockFacing.UP }, itemstack, Variant["side"]))
 						{
-							world.PlaySoundAt(Sounds?.Place, blockSel.Position.X + 0.5, blockSel.Position.Y + 1, blockSel.Position.Z + 0.5, byPlayer, true, 16f);
+							world.PlaySoundAt(itemstack.Block.GetSounds(world.BlockAccessor, blockSel.Position.UpCopy(), itemstack)?.Place,
+								blockSel.Position.X + 0.5, blockSel.Position.Y + 1, blockSel.Position.Z + 0.5, byPlayer, true, 16f);
 							if(byPlayer.WorldData.CurrentGameMode != EnumGameMode.Creative)
 							{
 								byPlayer.InventoryManager.ActiveHotbarSlot.TakeOut(1);

@@ -1,0 +1,99 @@
+{
+	"code": "largesmeltery",
+	"classByType": {
+		"*-hearth-*": "glassmaking:larsmelhearth",
+		"*-arch-*": "glassmaking:horstruct"
+	},
+	"entityclassByType": {
+		"*-hearth-*": "glassmaking:larsmelhearth"
+	},
+	"variantgroups": [
+		{
+			"code": "sides",
+			"states": [ "hearth", "arch" ]
+		},
+		{
+			"code": "side",
+			"loadFromProperties": "abstract/horizontalorientation"
+		}
+	],
+	"shapeByType": {
+		"*-north": {
+			"base": "block/largesmeltery/{sides}",
+			"rotateY": 0
+		},
+		"*-east": {
+			"base": "block/largesmeltery/{sides}",
+			"rotateY": 270
+		},
+		"*-south": {
+			"base": "block/largesmeltery/{sides}",
+			"rotateY": 180
+		},
+		"*-west": {
+			"base": "block/largesmeltery/{sides}",
+			"rotateY": 90
+		}
+	},
+	"drawtype": "json",
+	"creativeinventory": { "general": [ "*" ] },
+	"lightAbsorption": 0,
+	"sounds": {
+		"walk": "game:walk/stone",
+		"place": "game:block/ceramicplace",
+		"byTool": {
+			"Pickaxe": {
+				"hit": "game:block/rock-hit-pickaxe",
+				"break": "game:block/rock-break-pickaxe"
+			}
+		}
+	},
+	"sideopaque": {
+		"all": false
+	},
+	"sidesolid": {
+		"all": false
+	},
+	"collisionSelectionBoxesByType": {
+		"*-arch-south": [
+			{
+				"x1": 0,
+				"y1": 0,
+				"z1": 0,
+				"x2": 1,
+				"y2": 0.3125,
+				"z2": 0.625
+			}
+		],
+		"*-arch-north": [
+			{
+				"x1": 0,
+				"y1": 0,
+				"z1": 0.375,
+				"x2": 1,
+				"y2": 0.3125,
+				"z2": 1
+			}
+		],
+		"*-arch-west": [
+			{
+				"x1": 0.375,
+				"y1": 0,
+				"z1": 0,
+				"x2": 1,
+				"y2": 0.3125,
+				"z2": 1
+			}
+		],
+		"*-arch-east": [
+			{
+				"x1": 0,
+				"y1": 0,
+				"z1": 0,
+				"x2": 0.625,
+				"y2": 0.3125,
+				"z2": 1
+			}
+		]
+	}
+}

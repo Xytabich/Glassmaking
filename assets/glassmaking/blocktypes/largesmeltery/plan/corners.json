@@ -1,0 +1,41 @@
+{
+	"code": "smelteryplan",
+	"class": "glassmaking:structureplan",
+	"variantgroups": [
+		{
+			"code": "corners",
+			"states": [ "wall", "roof", "rooftop" ]
+		},
+		{
+			"code": "corner",
+			"states": [ "wn", "ne", "es", "sw" ]
+		}
+	],
+	"creativeinventory": {
+		"general": [ "*" ]
+	},
+	"attributes": {
+		"replacement": {
+			"block": {
+				"type": "block",
+				"code": "largesmeltery-{corners}-{corner}"
+			},
+			"requirement": {
+				"type": "item",
+				"code": "game:refractorybrick-fired-tier1"
+			}
+		}
+	},
+	"collisionboxes": [],
+	"lightAbsorption": 0,
+	"drawtype": "cube",
+	"textures": {
+		"all": { "base": "block/frame" }
+	},
+	"sideopaque": {
+		"all": false
+	},
+	"sidesolid": {
+		"all": false
+	}
+}

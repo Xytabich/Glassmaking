@@ -1,0 +1,98 @@
+{
+	"code": "largesmeltery",
+	"class": "glassmaking:larsmelmain",
+	"entityclass": "glassmaking:larsmelmain",
+	"variantgroups": [
+		{
+			"code": "main",
+			"states": [ "main" ]
+		}
+	],
+	"attributes": {
+		"structure": {
+			"codes": [
+				[
+					[
+						"smelteryplan-wall-wn",
+						null,
+						"smelteryplan-wall-sw"
+					],
+					[
+						"smelteryplan-roof-wn",
+						"smelteryplan-hearth-west",
+						"smelteryplan-roof-sw"
+					],
+					[
+						"smelteryplan-rooftop-wn",
+						"smelteryplan-arch-west",
+						"smelteryplan-rooftop-sw"
+					]
+				],
+				[
+					[
+						null,
+						"largesmeltery-main",
+						null
+					],
+					[
+						"smelteryplan-hearth-north",
+						null,
+						"smelteryplan-hearth-south"
+					],
+					[
+						"smelteryplan-arch-north",
+						"smelteryplan-chimney",
+						"smelteryplan-arch-south"
+					]
+				],
+				[
+					[
+						"smelteryplan-wall-ne",
+						null,
+						"smelteryplan-wall-es"
+					],
+					[
+						"smelteryplan-roof-ne",
+						"smelteryplan-hearth-east",
+						"smelteryplan-roof-es"
+					],
+					[
+						"smelteryplan-rooftop-ne",
+						"smelteryplan-arch-east",
+						"smelteryplan-rooftop-es"
+					]
+				]
+			]
+		}
+	},
+	"creativeinventory": {
+		"general": [ "*" ],
+		"glassmaking": [ "*" ]
+	},
+	"shape": { "base": "block/largesmeltery/main" },
+	"drawtype": "json",
+	"textures": {
+		"mix": { "base": "game:item/resource/ungraded/borax" },
+		"melt": { "base": "game:item/resource/ungraded/clearquartz" },
+		"inside": { "base": "game:block/clay/bloomery/inside" }
+	},
+	"resistance": 3.5,
+	"maxStackSize": 1,
+	"lightAbsorption": 0,
+	"sounds": {
+		"walk": "game:walk/stone",
+		"place": "game:block/ceramicplace",
+		"byTool": {
+			"Pickaxe": {
+				"hit": "game:block/rock-hit-pickaxe",
+				"break": "game:block/rock-break-pickaxe"
+			}
+		}
+	},
+	"sideopaque": {
+		"all": false
+	},
+	"sidesolid": {
+		"all": false
+	}
+}

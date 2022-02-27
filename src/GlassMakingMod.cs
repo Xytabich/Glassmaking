@@ -1,4 +1,5 @@
 ﻿using GlassMaking.Blocks;
+using GlassMaking.Blocks.Multiblock;
 using GlassMaking.Common;
 using GlassMaking.GlassblowingTools;
 using GlassMaking.Handbook;
@@ -73,7 +74,9 @@ namespace GlassMaking
 			api.RegisterBlockClass("glassmaking:workbench", typeof(BlockWorkbench));
 			api.RegisterBlockClass("Horizontal2BMultiblock", typeof(BlockHorizontal2BMultiblock));
 
-			api.RegisterBlockClass("glassmaking:blockmb", typeof(BlockHorizontalStructure));
+			api.RegisterBlockClass("glassmaking:horstruct", typeof(BlockHorizontalStructure));
+			api.RegisterBlockClass("glassmaking:larsmelmain", typeof(BlockLargeSmeltery));
+			api.RegisterBlockClass("glassmaking:larsmelhearth", typeof(BlockLargeSmelteryHearth));
 			api.RegisterBlockClass("glassmaking:structureplan", typeof(BlockHorizontalStructurePlan));
 
 			api.RegisterBlockEntityClass("glassmaking:firebox", typeof(BlockEntityFirebox));
@@ -81,6 +84,9 @@ namespace GlassMaking
 			api.RegisterBlockEntityClass("glassmaking:smeltery", typeof(BlockEntityGlassSmeltery));
 			api.RegisterBlockEntityClass("glassmaking:glassmold", typeof(BlockEntityGlassBlowingMold));
 			api.RegisterBlockEntityClass("glassmaking:workbench", typeof(BlockEntityWorkbench));
+
+			api.RegisterBlockEntityClass("glassmaking:larsmelmain", typeof(BlockEntityLargeSmelteryCore));
+			api.RegisterBlockEntityClass("glassmaking:larsmelhearth", typeof(BlockEntityLargeSmelteryHearth));
 
 			api.RegisterBlockBehaviorClass("glassmaking:horizontalmb", typeof(BlockBehaviorHorizontal2BMultiblock));
 

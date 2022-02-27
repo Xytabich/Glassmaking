@@ -1,0 +1,37 @@
+{
+	"code": "smelteryplan",
+	"class": "glassmaking:structureplan",
+	"variantgroups": [
+		{
+			"code": "chimney",
+			"states": [ "chimney" ]
+		}
+	],
+	"creativeinventory": {
+		"general": [ "*" ]
+	},
+	"attributes": {
+		"replacement": {
+			"block": {
+				"type": "block",
+				"code": "largesmeltery-chimney"
+			},
+			"requirement": {
+				"type": "item",
+				"code": "game:refractorybrick-fired-tier1"
+			}
+		}
+	},
+	"collisionboxes": [],
+	"lightAbsorption": 0,
+	"drawtype": "cube",
+	"textures": {
+		"all": { "base": "block/frame" }
+	},
+	"sideopaque": {
+		"all": false
+	},
+	"sidesolid": {
+		"all": false
+	}
+}

@@ -10,6 +10,9 @@ namespace GlassMaking.Blocks
 	{
 		public override int Count => slots.Count;
 
+		public override bool PutLocked { get { return true; } set { } }
+		public override bool TakeLocked { get { return true; } set { } }
+
 		private List<ItemSlot> slots = new List<ItemSlot>();
 
 		public GlassSmelteryInventory(string className, string instanceID, ICoreAPI api) : base(className, instanceID, api)
@@ -58,7 +61,7 @@ namespace GlassMaking.Blocks
 			slots.Clear();
 		}
 
-		public List<ItemStack> GetItems()
+		public List<ItemStack> CollectItems()
 		{
 			return slots.ConvertAll(s => s.Itemstack);
 		}

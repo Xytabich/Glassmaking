@@ -705,7 +705,7 @@ namespace GlassMaking.Items
 					var recipe = mod.GetGlassBlowingRecipe(code);
 					if(recipe != null)
 					{
-						var slot = player.Entity.RightHandItemSlot;
+						var slot = player.InventoryManager.ActiveHotbarSlot;
 						slot.Itemstack.Attributes.GetOrAddTreeAttribute("glassmaking:recipe").SetString("code", code);
 						slot.MarkDirty();
 						return true;

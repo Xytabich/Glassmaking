@@ -50,7 +50,7 @@ namespace GlassMaking.GenericItemAction
 
 		private void OnHeldAction(IServerPlayer fromPlayer, HeldItemActionMessage msg)
 		{
-			var itemstack = fromPlayer.Entity?.RightHandItemSlot?.Itemstack;
+			var itemstack = fromPlayer.InventoryManager.ActiveHotbarSlot.Itemstack;
 			if(itemstack != null && itemstack.Class == msg.itemClass && itemstack.Id == msg.itemId)
 			{
 				ITreeAttribute attributes = null;

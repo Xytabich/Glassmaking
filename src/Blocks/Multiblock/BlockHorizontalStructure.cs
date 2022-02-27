@@ -1,78 +1,14 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 
-namespace GlassMaking.Blocks
+namespace GlassMaking.Blocks.Multiblock
 {
 	public class BlockHorizontalStructure : Block
 	{
-		protected Vec3i structureOffset = null;
-		protected Block[,,] structure;
-
 		//These values are set by the main block
-		protected Vec3i mainOffset = null;
-		protected bool isSurrogate = false;
-
-		public override void OnLoaded(ICoreAPI api)
-		{
-			base.OnLoaded(api);
-			if(Attributes != null && Attributes.KeyExists("structure"))
-			{
-				mainOffset = Vec3i.Zero;
-				var codes = Attributes["structure"].AsObject<Structure>(null, Code.Domain).GetRotated();
-				int sx = codes.GetLength(0), sy = codes.GetLength(1), sz = codes.GetLength(2);
-				structure = new Block[sx, sy, sz];
-				for(int x = 0; x < sx; x++)
-				{
-					for(int y = 0; y < sy; y++)
-					{
-						for(int z = 0; z < sz; z++)
-						{
-							if(codes[x, y, z] != null)
-							{
-								if(string.IsNullOrWhiteSpace(codes[x, y, z].Path))
-								{
-									codes[x, y, z] = null;
-								}
-								else
-								{
-									structure[x, y, z] = api.World.GetBlock(codes[x, y, z]);
-									if(structure[x, y, z].Id == Id)
-									{
-										if(structureOffset != null)
-										{
-											throw new Exception("Structure must have only one main block");
-										}
-										structureOffset = new Vec3i(-x, -y, -z);
-									}
-								}
-							}
-						}
-					}
-				}
-				if(structureOffset == null)
-				{
-					throw new Exception(string.Format("The structure {0} must include the main block", Code));
-				}
-				for(int x = 0; x < sx; x++)
-				{
-					for(int y = 0; y < sy; y++)
-					{
-						for(int z = 0; z < sz; z++)
-						{
-							if(structure[x, y, z] != null && structure[x, y, z].Id != Id)
-							{
-								if(structure[x, y, z] is BlockHorizontalStructure sblock)
-								{
-									sblock.InitSurrogate(new Vec3i(-(x + structureOffset.X), -(y + structureOffset.Y), -(z + structureOffset.Z)));
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+		protected internal Vec3i mainOffset = null;
+		protected internal bool isSurrogate = false;
 
 		public override ItemStack OnPickBlock(IWorldAccessor world, BlockPos pos)
 		{
@@ -123,63 +59,7 @@ namespace GlassMaking.Blocks
 			return base.GetPlacedBlockInfo(world, pos, forPlayer);
 		}
 
-		public override bool CanPlaceBlock(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, ref string failureCode)
-		{
-			if(!base.CanPlaceBlock(world, byPlayer, blockSel, ref failureCode))
-			{
-				return false;
-			}
-			if(isSurrogate) return true;
-
-			int sx = structure.GetLength(0), sy = structure.GetLength(1), sz = structure.GetLength(2);
-			for(int x = 0; x < sx; x++)
-			{
-				for(int y = 0; y < sy; y++)
-				{
-					for(int z = 0; z < sz; z++)
-					{
-						if(structure[x, y, z] == null || structure[x, y, z].Id == Id) continue;
-
-						var sel = blockSel.Clone();
-						sel.Position = blockSel.Position.AddCopy(x + structureOffset.X, y + structureOffset.Y, z + structureOffset.Z);
-						if(!structure[x, y, z].CanPlaceBlock(world, byPlayer, sel, ref failureCode))
-						{
-							return false;
-						}
-					}
-				}
-			}
-			return true;
-		}
-
-		public override bool DoPlaceBlock(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, ItemStack byItemStack)
-		{
-			if(base.DoPlaceBlock(world, byPlayer, blockSel, byItemStack))
-			{
-				if(isSurrogate) return true;
-
-				int sx = structure.GetLength(0), sy = structure.GetLength(1), sz = structure.GetLength(2);
-				for(int x = 0; x < sx; x++)
-				{
-					for(int y = 0; y < sy; y++)
-					{
-						for(int z = 0; z < sz; z++)
-						{
-							if(structure[x, y, z] == null || structure[x, y, z].Id == Id) continue;
-
-							var sel = blockSel.Clone();
-							sel.Position = blockSel.Position.AddCopy(x + structureOffset.X, y + structureOffset.Y, z + structureOffset.Z);
-							structure[x, y, z].DoPlaceBlock(world, byPlayer, sel, byItemStack);
-						}
-					}
-				}
-
-				return true;
-			}
-			return false;
-		}
-
-		public override void OnBlockBroken(IWorldAccessor world, BlockPos pos, IPlayer byPlayer, float dropQuantityMultiplier = 1)
+		public override void OnBlockBroken(IWorldAccessor world, BlockPos pos, IPlayer byPlayer, float dropQuantityMultiplier = 1)//TODO: check claims
 		{
 			if(isSurrogate)
 			{
@@ -195,35 +75,14 @@ namespace GlassMaking.Blocks
 			}
 			else
 			{
-				var offset = new Vec3i();
-				int sx = structure.GetLength(0), sy = structure.GetLength(1), sz = structure.GetLength(2);
-				for(int x = 0; x < sx; x++)
-				{
-					for(int y = 0; y < sy; y++)
-					{
-						for(int z = 0; z < sz; z++)
-						{
-							if(structure[x, y, z] == null || structure[x, y, z].Id == Id) continue;
-
-							offset.Set(x + structureOffset.X, y + structureOffset.Y, z + structureOffset.Z);
-							var spos = pos.AddCopy(offset);
-							var block = world.BlockAccessor.GetBlock(spos);
-							if(block is BlockHorizontalStructure sblock && sblock.isSurrogate)
-							{
-								offset.X = -offset.X;
-								offset.Y = -offset.Y;
-								offset.Z = -offset.Z;
-								if(sblock.mainOffset.Equals(offset))
-								{
-									sblock.RemoveSurrogateBlock(world, spos);
-								}
-							}
-						}
-					}
-				}
-
 				base.OnBlockBroken(world, pos, byPlayer, dropQuantityMultiplier);
 			}
+		}
+
+		public BlockPos GetMainBlockPosition(BlockPos pos)
+		{
+			if(isSurrogate) return pos.AddCopy(mainOffset);
+			return pos;
 		}
 
 		protected internal virtual void InitSurrogate(Vec3i mainOffset)
@@ -232,25 +91,19 @@ namespace GlassMaking.Blocks
 			{
 				if(this.mainOffset.Equals(mainOffset)) return;
 
-				throw new Exception("Unable to initialize structure with different main block coordinates");
+				throw new Exception("Unable to initialize surrogate with different main block coordinates");
 			}
 			this.mainOffset = mainOffset;
 			isSurrogate = true;
 		}
 
-		protected virtual void RemoveSurrogateBlock(IWorldAccessor world, BlockPos pos)
+		protected internal virtual void RemoveSurrogateBlock(IWorldAccessor world, BlockPos pos)
 		{
 			if(EntityClass != null)
 			{
 				world.BlockAccessor.GetBlockEntity(pos)?.OnBlockBroken();
 			}
 			world.BlockAccessor.SetBlock(0, pos);
-		}
-
-		protected BlockPos GetMainBlockPosition(BlockPos pos)
-		{
-			if(isSurrogate) return pos.AddCopy(mainOffset);
-			return pos;
 		}
 
 		protected BlockSelection GetMainBlockSelection(BlockSelection blockSel)
@@ -263,75 +116,6 @@ namespace GlassMaking.Blocks
 				return sel;
 			}
 			return blockSel;
-		}
-
-		[JsonObject]
-		private class Structure
-		{
-			public AssetLocation[,,] codes;
-			public int rotateY;
-
-			public AssetLocation[,,] GetRotated()
-			{
-				switch(rotateY)
-				{
-					case 90:
-						{
-							int sx = codes.GetLength(0), sy = codes.GetLength(1), sz = codes.GetLength(2);
-							var arr = new AssetLocation[sz, sy, sx];
-							for(int x = 0; x < sx; x++)
-							{
-								for(int y = 0; y < sy; y++)
-								{
-									for(int z = 0; z < sz; z++)
-									{
-										arr[z, y, x] = codes[x, y, z];
-									}
-								}
-							}
-							return arr;
-						}
-					case 180:
-						{
-							int sx = codes.GetLength(0), sy = codes.GetLength(1), sz = codes.GetLength(2);
-							var arr = new AssetLocation[sx, sy, sz];
-							sx--;
-							sy--;
-							sz--;
-							for(int x = 0; x <= sx; x++)
-							{
-								for(int y = 0; y <= sy; y++)
-								{
-									for(int z = 0; z <= sz; z++)
-									{
-										arr[x, y, z] = codes[sx - x, y, sz - z];
-									}
-								}
-							}
-							return arr;
-						}
-					case 270:
-						{
-							int sx = codes.GetLength(0), sy = codes.GetLength(1), sz = codes.GetLength(2);
-							var arr = new AssetLocation[sz, sy, sx];
-							sx--;
-							sy--;
-							sz--;
-							for(int x = 0; x <= sx; x++)
-							{
-								for(int y = 0; y <= sy; y++)
-								{
-									for(int z = 0; z <= sz; z++)
-									{
-										arr[z, y, x] = codes[sx - x, y, sz - z];
-									}
-								}
-							}
-							return arr;
-						}
-					default: return codes;
-				}
-			}
 		}
 	}
 }

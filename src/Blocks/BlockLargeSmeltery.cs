@@ -1,19 +1,18 @@
-﻿using Vintagestory.API.Common;
-using Vintagestory.API.MathTools;
+﻿using GlassMaking.Blocks.Multiblock;
+using Vintagestory.API.Common;
 
 namespace GlassMaking.Blocks
 {
-	public class BlockLargeSmeltery : BlockHorizontalStructure
+	public class BlockLargeSmeltery : BlockHorizontalStructurePlanMain
 	{
-		public override void OnNeighbourBlockChange(IWorldAccessor world, BlockPos pos, BlockPos neibpos)
+		public ModelTransform smokeTransform;
+
+		public override void OnLoaded(ICoreAPI api)
 		{
-			base.OnNeighbourBlockChange(world, pos, neibpos);
-			if(world.BlockAccessor.GetBlockEntity(neibpos) is ITimeBasedHeatSourceContainer container)
+			base.OnLoaded(api);
+			if(api.Side == EnumAppSide.Client)
 			{
-				if(world.BlockAccessor.GetBlockEntity(pos) is ITimeBasedHeatReceiver receiver)
-				{
-					container.SetReceiver(receiver);
-				}
+				smokeTransform = Attributes?["smokeTransform"].AsObject<ModelTransform>() ?? ModelTransform.NoTransform;
 			}
 		}
 	}

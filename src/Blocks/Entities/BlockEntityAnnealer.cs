@@ -188,7 +188,9 @@ namespace GlassMaking.Blocks
 							{
 								if(Api.Side == EnumAppSide.Server)
 								{
-									var time = graph.CalcHeatingTime(temperature, 1000f, process.annealTemperature.max);
+									double? time;
+									if(temperature >= process.annealTemperature.max) time = 0;
+									else time = graph.ReachValue(temperature, process.annealTemperature.max, 1000f, 90f);
 									if(time.HasValue)
 									{
 										process.isHeated = true;
@@ -208,7 +210,7 @@ namespace GlassMaking.Blocks
 								}
 							}
 						}
-						temperature = graph.CalcFinalTemperature(temperature, 1000f, 90f);
+						temperature = (float)graph.CalculateFinalValue(temperature, 1000f, 90f);
 						slot.Itemstack.Collectible.SetTemperature(Api.World, slot.Itemstack, temperature);
 					}
 				}

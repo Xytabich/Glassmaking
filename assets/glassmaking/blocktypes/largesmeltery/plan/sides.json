@@ -3,15 +3,26 @@
 	"class": "glassmaking:structureplan",
 	"variantgroups": [
 		{
+			"code": "sides",
+			"states": [ "hearth", "arch" ]
+		},
+		{
 			"code": "side",
 			"loadFromProperties": "abstract/horizontalorientation"
 		}
 	],
+	"creativeinventory": {
+		"general": [ "*" ]
+	},
 	"attributes": {
 		"replacement": {
 			"block": {
 				"type": "block",
-				"code": "game:creativeblock-0"
+				"code": "largesmeltery-{sides}-{side}"
+			},
+			"requirement": {
+				"type": "item",
+				"code": "game:refractorybrick-fired-tier1"
 			}
 		}
 	},

@@ -1,12 +1,11 @@
-﻿using GlassMaking.Blocks.Multiblock;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Util;
 
-namespace GlassMaking.Blocks
+namespace GlassMaking.Blocks.Multiblock
 {
 	public class BlockHorizontalStructurePlan : BlockHorizontalStructure
 	{
@@ -21,16 +20,19 @@ namespace GlassMaking.Blocks
 			isLoaded = true;
 			replacement = Attributes["replacement"].AsObject<ReplacementInfo>(null, Code.Domain);
 			replacement.Resolve(api.World);
-			interactions = new WorldInteraction[] {
-				new WorldInteraction()
-				{
-					ActionLangCode = "glassmaking:blockhelp-plan-put",
-					HotKeyCode = null,
-					MouseButton = EnumMouseButton.Right,
-					Itemstacks = new ItemStack[] { (replacement.requirement ?? replacement.block).ResolvedItemstack }
-				}
-			};
 			InitReplacement();
+			if(api.Side == EnumAppSide.Client)
+			{
+				interactions = new WorldInteraction[] {
+					new WorldInteraction()
+					{
+						ActionLangCode = "glassmaking:blockhelp-plan-put",
+						HotKeyCode = null,
+						MouseButton = EnumMouseButton.Right,
+						Itemstacks = new ItemStack[] { (replacement.requirement ?? replacement.block).ResolvedItemstack }
+					}
+				};
+			}
 		}
 
 		public override WorldInteraction[] GetPlacedBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer)
@@ -40,13 +42,13 @@ namespace GlassMaking.Blocks
 
 		public override bool OnBlockInteractStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)
 		{
-			var itemStack = byPlayer.Entity.RightHandItemSlot.Itemstack;
+			var itemStack = byPlayer.InventoryManager.ActiveHotbarSlot.Itemstack;
 			if(itemStack != null)
 			{
 				var requirement = (replacement.requirement ?? replacement.block);
 				if(requirement.Matches(world, itemStack) && itemStack.StackSize >= requirement.ResolvedItemstack.StackSize)
 				{
-					var item = byPlayer.Entity.RightHandItemSlot.TakeOut(requirement.ResolvedItemstack.StackSize);
+					var item = byPlayer.InventoryManager.ActiveHotbarSlot.TakeOut(requirement.ResolvedItemstack.StackSize);
 					RemoveSurrogateBlock(world, blockSel.Position);
 
 					var block = replacement.block.ResolvedItemstack.Block;

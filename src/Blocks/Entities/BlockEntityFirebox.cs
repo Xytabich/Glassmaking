@@ -134,6 +134,7 @@ namespace GlassMaking.Blocks
 			if(this.receiver != receiver)
 			{
 				if(this.receiver != null) this.receiver.SetHeatSource(null);
+
 				this.receiver = receiver;
 				modifier = receiver as IBurnerModifier;
 				if(receiver != null) receiver.SetHeatSource(this);
@@ -226,17 +227,20 @@ namespace GlassMaking.Blocks
 			return lastTickTime > totalHours ? totalHours : lastTickTime;
 		}
 
-		public HeatGraph CalcHeatGraph(double totalHours = 0)
+		public ValueGraph CalcHeatGraph(double totalHours = 0)
 		{
-			HeatGraph graph = default;
-
 			float temp = temperature;
-			graph.StartTemperature = temp;
-			graph.WorkingTemperature = temp;
+			float startTemperature = temp;
+			float workingTemperature = temp;
 
 			if(totalHours <= 0) totalHours = Api.World.Calendar.TotalHours;
 			double hours = totalHours - lastTickTime;
-			graph.TotalTime = Math.Max(hours, 0);
+
+			double endTime = Math.Max(hours, 0);
+			double transitionTime = 0;
+			double holdTime = 0;
+			double coolingTime = 0;
+			int pointCount = 1;
 
 			if(burning && hours > 0)
 			{
@@ -247,29 +251,80 @@ namespace GlassMaking.Blocks
 					temp += (float)(time * TEMP_INCREASE_PER_HOUR);
 					hours -= time;
 					burnTime -= time;
-					graph.TransitionTime = time;
-					graph.WorkingTemperature = temp;
+					transitionTime = time;
+					workingTemperature = temp;
+					if(transitionTime > 0)
+					{
+						pointCount++;
+						endTime -= transitionTime;
+					}
 				}
 				else if(temp > fuelTemperature)
 				{
-					graph.TransitionTime = Math.Min((temp - fuelTemperature) / TEMP_DECREASE_PER_HOUR, hours);
-					temp -= (float)(graph.TransitionTime * TEMP_DECREASE_PER_HOUR);
-					graph.WorkingTemperature = temp;
+					transitionTime = Math.Min((temp - fuelTemperature) / TEMP_DECREASE_PER_HOUR, hours);
+					temp -= (float)(transitionTime * TEMP_DECREASE_PER_HOUR);
+					workingTemperature = temp;
+					if(transitionTime > 0)
+					{
+						pointCount++;
+						endTime -= transitionTime;
+					}
 				}
 				if(hours > 0)
 				{
-					graph.HoldTime = Math.Min(burnTime, hours);
-					hours -= graph.HoldTime;
+					holdTime = Math.Min(burnTime, hours);
+					hours -= holdTime;
+					if(holdTime > 0)
+					{
+						pointCount++;
+						endTime -= holdTime;
+					}
 				}
 			}
 			if(hours > 0)
 			{
-				graph.CoolingTime = Math.Min((temp - 20) / TEMP_DECREASE_PER_HOUR, hours);
-				temp -= (float)(graph.CoolingTime * TEMP_DECREASE_PER_HOUR);
+				coolingTime = Math.Min((temp - 20) / TEMP_DECREASE_PER_HOUR, hours);
+				temp -= (float)(coolingTime * TEMP_DECREASE_PER_HOUR);
+				if(coolingTime > 0)
+				{
+					pointCount++;
+					endTime -= coolingTime;
+				}
 			}
-			graph.EndTemperature = temp;
+			if(endTime > 0) pointCount++;
 
-			return graph.MultiplyTemperature(temperatureModifier);
+			var graphPoints = new ValueGraph.Point[pointCount];
+			int pointIndex = 0;
+			double t = 0;
+			graphPoints[pointIndex] = new ValueGraph.Point(t, startTemperature);
+			if(transitionTime > 0)
+			{
+				pointIndex++;
+				t += transitionTime;
+				graphPoints[pointIndex] = new ValueGraph.Point(t, workingTemperature);
+			}
+			if(holdTime > 0)
+			{
+				pointIndex++;
+				t += holdTime;
+				graphPoints[pointIndex] = new ValueGraph.Point(t, workingTemperature);
+			}
+			if(coolingTime > 0)
+			{
+				pointIndex++;
+				t += coolingTime;
+				graphPoints[pointIndex] = new ValueGraph.Point(t, temp);
+			}
+			if(endTime > 0)
+			{
+				pointIndex++;
+				t += endTime;
+				graphPoints[pointIndex] = new ValueGraph.Point(t, temp);
+			}
+
+			var graph = new ValueGraph(graphPoints);
+			graph.MultiplyValue(temperatureModifier);
+			return graph;
 		}
 
 		public float CalcCurrentTemperature(double totalHours = 0)

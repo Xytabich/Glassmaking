@@ -32,7 +32,7 @@ namespace GlassMaking.Blocks
 		/// <summary>
 		/// Calculates the graph of temperature changes for the interval between the previous tick and the calendarTotalHours (uses World.Calendar.TotalHours if the value is 0)
 		/// </summary>
-		HeatGraph CalcHeatGraph(double calendarTotalHours = 0);
+		ValueGraph CalcHeatGraph(double calendarTotalHours = 0);
 	}
 
 	public interface ITimeBasedHeatSourceContainer : ITimeBasedHeatSource
