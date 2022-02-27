@@ -1,5 +1,6 @@
 ﻿using OpenTK;
 using System;
+using System.Collections.Generic;
 
 namespace GlassMaking.Common
 {
@@ -8,11 +9,57 @@ namespace GlassMaking.Common
 	/// </summary>
 	public struct ValueGraph
 	{
+		private const double EPSILON = 1e-200;
+
 		public readonly Point[] points;
 
 		public ValueGraph(params Point[] points)
 		{
 			this.points = points;
+		}
+
+		/// <summary>
+		/// Calculates the interval during which the target value will be reached.
+		/// May return null if it is impossible to reach the value during this graph.
+		/// </summary>
+		public double? ReachValue(double start, double target, double gain, double loss)
+		{
+			bool isFound = false;
+			if(start > target)
+			{
+				for(int i = 0; i < points.Length; i++)
+				{
+					if(points[i].v >= target)
+					{
+						isFound = true;
+						break;
+					}
+				}
+			}
+			else
+			{
+				for(int i = 0; i < points.Length; i++)
+				{
+					if(points[i].v <= target)
+					{
+						isFound = true;
+						break;
+					}
+				}
+			}
+			if(isFound)
+			{
+				double t = 0;
+				for(int i = 0; i < points.Length - 1; i++)
+				{
+					if(CalcSegmentReachValue(points[i], points[i + 1], ref start, target, gain, loss, out var ti))
+					{
+						return t + ti;
+					}
+					t += ti;
+				}
+			}
+			return null;
 		}
 
 		/// <summary>
@@ -23,7 +70,7 @@ namespace GlassMaking.Common
 		{
 			for(int i = 0; i < points.Length - 1; i++)
 			{
-				start = CalcSegmentEndValue(points[i], points[i + 1], start, gain, loss);
+				start = CalcSegmentFinalValue(points[i], points[i + 1], start, gain, loss);
 			}
 			return start;
 		}
@@ -39,7 +86,7 @@ namespace GlassMaking.Common
 			{
 				for(int i = index; i < points.Length; i++)
 				{
-					start = CalcSegmentEndValue(prevPoint, points[i], start, gain, loss);
+					start = CalcSegmentFinalValue(prevPoint, points[i], start, gain, loss);
 					prevPoint = points[i];
 				}
 			}
@@ -77,6 +124,14 @@ namespace GlassMaking.Common
 			return t;
 		}
 
+		public void MultiplyValue(double multiplier)
+		{
+			for(int i = points.Length - 1; i >= 0; i--)
+			{
+				points[i].v *= multiplier;
+			}
+		}
+
 		private bool TryFindStartPoint(double tOffset, out int nextIndex, out Point point)
 		{
 			nextIndex = -1;
@@ -90,7 +145,7 @@ namespace GlassMaking.Common
 			}
 			if(nextIndex >= 0)
 			{
-				point = Interpolate(points[nextIndex - 1], points[nextIndex], tOffset);
+				point = new Point(Interpolate(points[nextIndex - 1], points[nextIndex], tOffset), tOffset);
 				return true;
 			}
 
@@ -98,13 +153,67 @@ namespace GlassMaking.Common
 			return false;
 		}
 
-		private static double CalcSegmentEndValue(Point a, Point b, double start, double gain, double loss)
+		/// <summary>
+		/// Calculates the average graph
+		/// </summary>
+		public static ValueGraph Avg(params ValueGraph[] graphs)
 		{
-			if(MathHelper.ApproximatelyEqualEpsilon(a.t, b.t, float.Epsilon)) return start;
-
-			if(MathHelper.ApproximatelyEqualEpsilon(a.v, start, float.Epsilon))
+			int[] indices = new int[graphs.Length];
+			var points = new List<Point>();
+			double tMin = 0;
+			double mul = 1.0 / graphs.Length;
+			while(true)
 			{
-				if(MathHelper.ApproximatelyEqualEpsilon(a.v, b.v, float.Epsilon))
+				double value = 0;
+				for(int i = graphs.Length - 1; i >= 0; i--)
+				{
+					int index = indices[i];
+					var graphPoints = graphs[i].points;
+					if(index < graphPoints.Length && MathHelper.ApproximatelyEqualEpsilon(graphPoints[index].t, tMin, EPSILON))
+					{
+						index++;
+						indices[i] = index;
+					}
+					if(index == 0)
+					{
+						value += graphPoints[index].v;
+					}
+					else if(index >= graphPoints.Length)
+					{
+						value += graphPoints[graphPoints.Length - 1].v;
+					}
+					else
+					{
+						value += Interpolate(graphPoints[index - 1], graphPoints[index], tMin);
+					}
+				}
+				value *= mul;
+				if(points.Count == 0 || !MathHelper.ApproximatelyEqualEpsilon(points[points.Count - 1].v, value, EPSILON))
+				{
+					points.Add(new Point(tMin, value));
+				}
+				tMin = double.PositiveInfinity;
+				for(int i = graphs.Length - 1; i >= 0; i--)
+				{
+					int index = indices[i];
+					var graphPoints = graphs[i].points;
+					if(index < graphPoints.Length)
+					{
+						tMin = Math.Min(tMin, graphPoints[index].t);
+					}
+				}
+				if(double.IsInfinity(tMin)) break;
+			}
+			return new ValueGraph(points.ToArray());
+		}
+
+		private static double CalcSegmentFinalValue(Point a, Point b, double start, double gain, double loss)
+		{
+			if(MathHelper.ApproximatelyEqualEpsilon(a.t, b.t, EPSILON)) return start;
+
+			if(MathHelper.ApproximatelyEqualEpsilon(a.v, start, EPSILON))
+			{
+				if(MathHelper.ApproximatelyEqualEpsilon(a.v, b.v, EPSILON))
 				{
 					return b.v;
 				}
@@ -124,28 +233,92 @@ namespace GlassMaking.Common
 			}
 			else
 			{
-				double v = b.v - a.v;
 				double t = b.t - a.t;
+				double vd = (b.v - a.v) / t;
 				double d = a.v > start ? gain : -loss;
 
-				if(MathHelper.ApproximatelyEqualEpsilon(v, d, float.Epsilon))
+				if(MathHelper.ApproximatelyEqualEpsilon(vd, d, EPSILON))
 				{
 					return start + d * t;
 				}
 
-				double it = (start - a.v) / (v - d);
+				double it = (start - a.v) / (vd - d);
 				if(it <= 0 || it > t)
 				{
 					return start + d * t;
 				}
-				double iv = v * it + a.v;
-				return CalcSegmentEndValue(new Point(it + a.t, iv), b, iv, gain, loss);
+				double iv = vd * it + a.v;
+				return CalcSegmentFinalValue(new Point(it + a.t, iv), b, iv, gain, loss);
 			}
 		}
 
-		private static Point Interpolate(Point a, Point b, double t)
+		private static bool CalcSegmentReachValue(Point a, Point b, ref double value, double target, double gain, double loss, out double ti)
 		{
-			return new Point(t, a.v + (t - a.t) / (b.t - a.t) * (b.v - a.v));
+			if(MathHelper.ApproximatelyEqualEpsilon(a.t, b.t, EPSILON))
+			{
+				ti = 0;
+				return MathHelper.ApproximatelyEqualEpsilon(value, target, EPSILON);
+			}
+
+			if(MathHelper.ApproximatelyEqualEpsilon(a.v, value, EPSILON))
+			{
+				if(MathHelper.ApproximatelyEqualEpsilon(a.v, b.v, EPSILON))
+				{
+					ti = b.t - a.t;
+					return false;
+				}
+				else
+				{
+					double t = b.t - a.t;
+					double vd = (b.v - a.v) / t;
+					double d = a.v > b.v ? -loss : gain;
+					if(Math.Abs(vd) < Math.Abs(d)) d = vd;
+					return TryReachValue(ref value, target, d, t, out ti);
+				}
+			}
+			else
+			{
+				double t = b.t - a.t;
+				double vd = (b.v - a.v) / t;
+				double d = a.v > value ? gain : -loss;
+
+				if(MathHelper.ApproximatelyEqualEpsilon(vd, d, EPSILON))
+				{
+					return TryReachValue(ref value, target, d, t, out ti);
+				}
+
+				double it = (value - a.v) / (vd - d);
+				if(it <= 0 || it > t)
+				{
+					return TryReachValue(ref value, target, d, t, out ti);
+				}
+				if(TryReachValue(ref value, target, d, it, out ti))
+				{
+					return true;
+				}
+				bool isReached = CalcSegmentReachValue(new Point(it + a.t, value), b, ref value, target, gain, loss, out it);
+				ti += it;
+				return isReached;
+			}
+		}
+
+		private static bool TryReachValue(ref double value, double target, double d, double t, out double ti)
+		{
+			double td = target - value;
+			if((d < 0) == (td < 0) && Math.Abs(td) <= Math.Abs(d * t))
+			{
+				value = target;
+				ti = td / d;
+				return true;
+			}
+			value += d * t;
+			ti = t;
+			return false;
+		}
+
+		private static double Interpolate(Point a, Point b, double t)
+		{
+			return a.v + (t - a.t) / (b.t - a.t) * (b.v - a.v);
 		}
 
 		private static double CalcRetention(Point a, Point b, double value)
