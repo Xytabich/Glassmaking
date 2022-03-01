@@ -25,6 +25,7 @@
 	"collisionboxes": [],
 	"lightAbsorption": 0,
 	"drawtype": "cube",
+	"zOffset": 3,
 	"textures": {
 		"all": { "base": "block/frame" }
 	},

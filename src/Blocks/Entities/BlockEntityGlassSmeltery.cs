@@ -68,8 +68,7 @@ namespace GlassMaking.Blocks
 					capi.Tesselator.TesselateShape("glassmaking:smeltery-shape", asset.ToObject<Shape>(), out var bath, bathSource, new Vec3f(0f, GetRotation(), 0f));
 					return capi.Render.UploadMesh(bath);
 				});
-				renderer = new BlockRendererGlassSmeltery(Pos, capi.Tesselator.GetTexSource(Block), capi, bathMesh, bathSource["inside"].atlasTextureId);
-				capi.Event.RegisterRenderer(renderer, EnumRenderStage.Opaque, "glassmaking:smeltery");
+				renderer = new BlockRendererGlassSmeltery(capi, Pos, EnumRenderStage.Opaque, bathMesh, capi.Tesselator.GetTexSource(Block), bathSource["inside"].atlasTextureId);
 				UpdateRendererFull();
 			}
 		}

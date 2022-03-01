@@ -98,6 +98,7 @@ namespace GlassMaking.Blocks
 		{
 			renderer?.Dispose();
 			ambientSound?.Dispose();
+			receiver?.SetHeatSource(null);
 			base.OnBlockRemoved();
 		}
 
@@ -112,6 +113,10 @@ namespace GlassMaking.Blocks
 			if(contents != null && Api?.World != null) ApplyFuelParameters();
 			UpdateRendererFull();
 			ToggleAmbientSounds(burning);
+			if(Api?.World != null && Api.Side == EnumAppSide.Client)
+			{
+				SetReceiver(Api.World.BlockAccessor.GetBlockEntity(Pos.UpCopy()) as ITimeBasedHeatReceiver);
+			}
 		}
 
 		public override void ToTreeAttributes(ITreeAttribute tree)
@@ -133,11 +138,16 @@ namespace GlassMaking.Blocks
 		{
 			if(this.receiver != receiver)
 			{
-				if(this.receiver != null) this.receiver.SetHeatSource(null);
+				if(this.receiver != null)
+				{
+					this.receiver.SetHeatSource(null);
+				}
 
 				this.receiver = receiver;
 				modifier = receiver as IBurnerModifier;
 				if(receiver != null) receiver.SetHeatSource(this);
+
+				MarkDirty(true);
 			}
 		}
 

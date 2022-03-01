@@ -25,14 +25,21 @@ namespace GlassMaking.Blocks
 		private MeshRef bathMesh;
 		private int bathTextureId;
 
-		public BlockRendererGlassSmeltery(BlockPos pos, ITexPositionSource tex, ICoreClientAPI api, MeshRef bathMesh, int bathTextureId)//TODO: add parameters: melt offset, melt max height, melt min width, melt max width (to create a cone)
+		private EnumRenderStage renderStage;
+		private float zOffset;
+
+		public BlockRendererGlassSmeltery(ICoreClientAPI api, BlockPos pos, EnumRenderStage renderStage,
+			MeshRef bathMesh, ITexPositionSource tex, int bathTextureId, float zOffset = 0)//TODO: add parameters: melt offset, melt max height, melt min width, melt max width (to create a cone)
 		{
-			this.pos = pos;
 			this.api = api;
+			this.pos = pos;
+			this.renderStage = renderStage;
 			this.bathMesh = bathMesh;
 			this.bathTextureId = bathTextureId;
+			this.zOffset = zOffset;
 			mixTexture = tex["mix"];
 			meltTexture = tex["melt"];
+			api.Event.RegisterRenderer(this, renderStage, "glassmaking:smeltery");
 		}
 
 		public void SetHeight(float percent)
@@ -63,7 +70,7 @@ namespace GlassMaking.Blocks
 		{
 			IStandardShaderProgram standardShaderProgram = api.Render.PreparedStandardShader(pos.X, pos.Y, pos.Z, new Vec4f(1f + glowLevel / 128f, 1f + glowLevel / 128f, 1f + glowLevel / 512f, 1f));
 			standardShaderProgram.ExtraGlow = glowLevel;
-			standardShaderProgram.ExtraZOffset = 0.0001f;
+			standardShaderProgram.ExtraZOffset = zOffset;
 			IRenderAPI render = api.Render;
 			Vec3d cameraPos = api.World.Player.Entity.CameraPos;
 			standardShaderProgram.ViewMatrix = render.CameraMatrixOriginf;
@@ -82,7 +89,7 @@ namespace GlassMaking.Blocks
 
 		public void Dispose()
 		{
-			api.Event.UnregisterRenderer(this, EnumRenderStage.Opaque);
+			api.Event.UnregisterRenderer(this, renderStage);
 			meshRef?.Dispose();
 		}
 

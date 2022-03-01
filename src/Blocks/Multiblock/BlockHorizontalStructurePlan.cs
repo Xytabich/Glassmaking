@@ -57,6 +57,7 @@ namespace GlassMaking.Blocks.Multiblock
 						blockSel.Position.X + 0.5, blockSel.Position.Y + 0.5, blockSel.Position.Z + 0.5, byPlayer, true, 16f);
 
 					block.DoPlaceBlock(world, byPlayer, blockSel, stack);
+					world.BlockAccessor.TriggerNeighbourBlockUpdate(blockSel.Position.Copy());
 
 					if(world.BlockAccessor.GetBlock(GetMainBlockPosition(blockSel.Position)) is IStructurePlanMainBlock mainBlock)
 					{

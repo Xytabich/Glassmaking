@@ -94,6 +94,7 @@ namespace GlassMaking.Blocks.Multiblock
 		{
 			if(base.DoPlaceBlock(world, byPlayer, blockSel, byItemStack))
 			{
+				var sel = blockSel.Clone();
 				int sx = structure.GetLength(0), sy = structure.GetLength(1), sz = structure.GetLength(2);
 				for(int x = 0; x < sx; x++)
 				{
@@ -103,9 +104,11 @@ namespace GlassMaking.Blocks.Multiblock
 						{
 							if(structure[x, y, z] == null || structure[x, y, z].Id == Id) continue;
 
-							var sel = blockSel.Clone();
-							sel.Position = blockSel.Position.AddCopy(x + structureOffset.X, y + structureOffset.Y, z + structureOffset.Z);
+							sel.Position.Set(blockSel.Position);
+							sel.Position.Add(x + structureOffset.X, y + structureOffset.Y, z + structureOffset.Z);
+							var pos = sel.Position.Copy();
 							structure[x, y, z].DoPlaceBlock(world, byPlayer, sel, byItemStack);
+							world.BlockAccessor.TriggerNeighbourBlockUpdate(pos);
 						}
 					}
 				}
@@ -144,6 +147,7 @@ namespace GlassMaking.Blocks.Multiblock
 				}
 			}
 
+			world.BlockAccessor.TriggerNeighbourBlockUpdate(pos.Copy());
 			base.OnBlockBroken(world, pos, byPlayer, dropQuantityMultiplier);
 		}
 

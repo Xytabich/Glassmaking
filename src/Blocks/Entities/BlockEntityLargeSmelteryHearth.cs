@@ -50,5 +50,21 @@ namespace GlassMaking.Blocks
 		{
 			smelteryCore?.OnHeatTick(heatSource, dt);
 		}
+
+		public override void OnBlockUnloaded()
+		{
+			base.OnBlockUnloaded();
+
+			heatSource = null;
+			smelteryCore?.SetHeater(BlockFacing.FromCode(Block.Variant["side"]).HorizontalAngleIndex, null);
+			smelteryCore = null;
+		}
+
+		// Used if Initialize is called at different times, or the core block is unloaded or loaded in a neighboring chunk
+		public void OnCoreUpdated(BlockEntityLargeSmelteryCore smelteryCore)
+		{
+			this.smelteryCore = smelteryCore;
+			smelteryCore?.SetHeater(BlockFacing.FromCode(Block.Variant["side"]).HorizontalAngleIndex, heatSource);
+		}
 	}
 }

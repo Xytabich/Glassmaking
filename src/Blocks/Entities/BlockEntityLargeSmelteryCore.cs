@@ -67,6 +67,11 @@ namespace GlassMaking.Blocks
 					meltingTemperature = mod.GetGlassTypeInfo(glassCode).meltingPoint;
 				}
 			}
+			var block = (BlockLargeSmeltery)Block;
+			for(int i = 0; i < heatersCount; i++)
+			{
+				(api.World.BlockAccessor.GetBlockEntity(Pos.AddCopy(block.hearthOffsets[i])) as BlockEntityLargeSmelteryHearth)?.OnCoreUpdated(this);
+			}
 			if(api.Side == EnumAppSide.Client)
 			{
 				ICoreClientAPI capi = (ICoreClientAPI)api;
@@ -76,14 +81,16 @@ namespace GlassMaking.Blocks
 					capi.Tesselator.TesselateShape("glassmaking:largesmeltery-shape", asset.ToObject<Shape>(), out var bath, bathSource);
 					return capi.Render.UploadMesh(bath);
 				});
-				renderer = new BlockRendererGlassSmeltery(Pos, capi.Tesselator.GetTexSource(Block), capi, bathMesh, bathSource["inside"].atlasTextureId);
-				capi.Event.RegisterRenderer(renderer, EnumRenderStage.AfterOIT, "glassmaking:largesmeltery");
+				renderer = new BlockRendererGlassSmeltery(capi, Pos, EnumRenderStage.AfterOIT, bathMesh,
+					capi.Tesselator.GetTexSource(Block), bathSource["inside"].atlasTextureId, 0.0001f);
 				UpdateRendererFull();
 			}
 		}
 
 		public void SetHeater(int index, ITimeBasedHeatSource heatSource)
 		{
+			if(heaters[index] == heatSource) return;
+
 			heaters[index] = heatSource;
 			if(tickSource == index)
 			{
@@ -101,6 +108,10 @@ namespace GlassMaking.Blocks
 						break;
 					}
 				}
+			}
+			if(Api.Side == EnumAppSide.Client)
+			{
+				UpdateRendererParameters();
 			}
 		}
 
@@ -195,6 +206,11 @@ namespace GlassMaking.Blocks
 		{
 			base.OnBlockUnloaded();
 			renderer?.Dispose();
+			var block = (BlockLargeSmeltery)Block;
+			for(int i = 0; i < heatersCount; i++)
+			{
+				(Api.World.BlockAccessor.GetBlockEntity(Pos.AddCopy(block.hearthOffsets[i])) as BlockEntityLargeSmelteryHearth)?.OnCoreUpdated(null);
+			}
 		}
 
 		public override void OnBlockRemoved()
@@ -463,7 +479,7 @@ namespace GlassMaking.Blocks
 
 		private void UpdateRendererParameters()
 		{
-			renderer.SetParameters(state == SmelteryState.ContainsMix, Math.Min(223, (int)((GetTemperature() / 1500f) * 223)));
+			renderer.SetParameters(state == SmelteryState.ContainsMix, Math.Min(223, (int)((GetTemperature() / 2500f) * 223)));
 		}
 
 		static BlockEntityLargeSmelteryCore()

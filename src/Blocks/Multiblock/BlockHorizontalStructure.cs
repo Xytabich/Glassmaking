@@ -104,6 +104,7 @@ namespace GlassMaking.Blocks.Multiblock
 				world.BlockAccessor.GetBlockEntity(pos)?.OnBlockBroken();
 			}
 			world.BlockAccessor.SetBlock(0, pos);
+			world.BlockAccessor.TriggerNeighbourBlockUpdate(pos.Copy());
 		}
 
 		protected BlockSelection GetMainBlockSelection(BlockSelection blockSel)
