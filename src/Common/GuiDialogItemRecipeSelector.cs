@@ -168,9 +168,13 @@ namespace GlassMaking
 
 		private void OnSlotClick(int index)
 		{
-			var attributes = new TreeAttribute();
-			attributes["key"] = recipeOutputs[index].Key;
-			DoItemAction(capi.World.Player, item, "recipe", attributes);
+			var itemstack = capi.World.Player?.InventoryManager?.ActiveHotbarSlot?.Itemstack;
+			if(itemstack != null && itemstack.Collectible.ItemClass == item.ItemClass && itemstack.Collectible.Id == item.Id)
+			{
+				var attributes = new TreeAttribute();
+				attributes["key"] = recipeOutputs[index].Key;
+				DoItemAction(capi.World.Player, item, "recipe", attributes);
+			}
 
 			TryClose();
 		}
