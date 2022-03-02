@@ -1,8 +1,9 @@
 ﻿namespace GlassMaking.Blocks
 {
-	public interface IBurnerModifier
+	public interface IHeatSourceModifier
 	{
-		float DurationModifier { get; }
+		float FuelRateModifier { get; }
+
 		float TemperatureModifier { get; }
 	}
 }

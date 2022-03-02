@@ -11,15 +11,15 @@ using Vintagestory.API.Util;
 
 namespace GlassMaking.Blocks
 {
-	public class BlockEntityGlassSmeltery : BlockEntity, IBlockEntityContainer, ITimeBasedHeatReceiver, IBurnerModifier
+	public class BlockEntityGlassSmeltery : BlockEntity, IBlockEntityContainer, ITimeBasedHeatReceiver, IHeatSourceModifier
 	{
 		private const double PROCESS_HOURS_PER_UNIT = 0.001;
 		private const double BUBBLING_PROCESS_MULTIPLIER = 3;
 
 		private static SimpleParticleProperties smokeParticles;
 
-		float IBurnerModifier.DurationModifier => 1f;
-		float IBurnerModifier.TemperatureModifier => 1.1f;
+		float IHeatSourceModifier.FuelRateModifier => 1f;
+		float IHeatSourceModifier.TemperatureModifier => 1.1f;
 
 		IInventory IBlockEntityContainer.Inventory => inventory;
 		string IBlockEntityContainer.InventoryClassName => inventory.ClassName;
@@ -68,7 +68,8 @@ namespace GlassMaking.Blocks
 					capi.Tesselator.TesselateShape("glassmaking:smeltery-shape", asset.ToObject<Shape>(), out var bath, bathSource, new Vec3f(0f, GetRotation(), 0f));
 					return capi.Render.UploadMesh(bath);
 				});
-				renderer = new BlockRendererGlassSmeltery(capi, Pos, EnumRenderStage.Opaque, bathMesh, capi.Tesselator.GetTexSource(Block), bathSource["inside"].atlasTextureId);
+				renderer = new BlockRendererGlassSmeltery(capi, Pos, EnumRenderStage.Opaque, bathMesh, capi.Tesselator.GetTexSource(Block),
+					bathSource["inside"].atlasTextureId, 0.1875f, -0.1875f, 0.625f, 0.625f);
 				UpdateRendererFull();
 			}
 		}
@@ -341,11 +342,10 @@ namespace GlassMaking.Blocks
 		{
 			if(state != SmelteryState.Empty && state != SmelteryState.ContainsGlass && heatSource.IsHeatedUp())
 			{
-				double timeOffset = 0;
 				var graph = heatSource.CalcHeatGraph();
 				if(state == SmelteryState.ContainsMix)
 				{
-					if(Api.Side == EnumAppSide.Server && graph.CalculateValueRetention(timeOffset, meltingTemperature) > 0)
+					if(Api.Side == EnumAppSide.Server && graph.CalculateValueRetention(meltingTemperature) > 0)
 					{
 						state = SmelteryState.Melting;
 						processProgress = 0;
@@ -354,6 +354,7 @@ namespace GlassMaking.Blocks
 						MarkDirty(true);
 					}
 				}
+				double timeOffset = 0;
 				if(state == SmelteryState.Melting)
 				{
 					double timeLeft = glassAmount * PROCESS_HOURS_PER_UNIT - processProgress;

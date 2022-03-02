@@ -3,9 +3,9 @@ using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Blocks
 {
-	public class BlockEntityLargeSmelteryHearth : BlockEntity, IBurnerModifier, ITimeBasedHeatReceiver
+	public class BlockEntityLargeSmelteryHearth : BlockEntity, IHeatSourceModifier, ITimeBasedHeatReceiver
 	{
-		public float DurationModifier => smelteryCore?.DurationModifier ?? 1;
+		public float FuelRateModifier => smelteryCore?.FuelRateModifier ?? 1;
 		public float TemperatureModifier => smelteryCore?.TemperatureModifier ?? 1;
 
 		private BlockEntityLargeSmelteryCore smelteryCore = null;

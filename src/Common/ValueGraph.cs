@@ -134,6 +134,12 @@ namespace GlassMaking.Common
 
 		private bool TryFindStartPoint(double tOffset, out int nextIndex, out Point point)
 		{
+			if(MathHelper.ApproximatelyEqualEpsilon(points[0].t, tOffset, EPSILON))
+			{
+				point = points[0];
+				nextIndex = 1;
+				return true;
+			}
 			nextIndex = -1;
 			for(int i = points.Length - 1; i > 0; i--)
 			{
@@ -160,7 +166,11 @@ namespace GlassMaking.Common
 		{
 			int[] indices = new int[graphs.Length];
 			var points = new List<Point>();
-			double tMin = 0;
+			double tMin = double.PositiveInfinity;
+			for(int i = graphs.Length - 1; i >= 0; i--)
+			{
+				tMin = Math.Min(graphs[i].points[0].t, tMin);
+			}
 			double mul = 1.0 / graphs.Length;
 			while(true)
 			{
@@ -188,10 +198,7 @@ namespace GlassMaking.Common
 					}
 				}
 				value *= mul;
-				if(points.Count == 0 || !MathHelper.ApproximatelyEqualEpsilon(points[points.Count - 1].v, value, EPSILON))
-				{
-					points.Add(new Point(tMin, value));
-				}
+				points.Add(new Point(tMin, value));
 				tMin = double.PositiveInfinity;
 				for(int i = graphs.Length - 1; i >= 0; i--)
 				{

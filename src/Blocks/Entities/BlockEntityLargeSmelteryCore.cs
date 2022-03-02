@@ -11,7 +11,7 @@ using Vintagestory.API.Util;
 
 namespace GlassMaking.Blocks
 {
-	public class BlockEntityLargeSmelteryCore : BlockEntity, IBurnerModifier//TODO: structure build stage
+	public class BlockEntityLargeSmelteryCore : BlockEntity, IHeatSourceModifier//TODO: structure build stage
 	{
 		private const double PROCESS_HOURS_PER_UNIT = 0.0005;
 		private const double BUBBLING_PROCESS_MULTIPLIER = 3;
@@ -19,7 +19,7 @@ namespace GlassMaking.Blocks
 		private static readonly ValueGraph defaultGraph = new ValueGraph(new ValueGraph.Point(0, 20));
 		private static SimpleParticleProperties smokeParticles;
 
-		public float DurationModifier => 0.9f;
+		public float FuelRateModifier => 0.9f;
 		public float TemperatureModifier => 1.5f;
 
 		protected virtual int maxGlassAmount => 10000;
@@ -81,8 +81,8 @@ namespace GlassMaking.Blocks
 					capi.Tesselator.TesselateShape("glassmaking:largesmeltery-shape", asset.ToObject<Shape>(), out var bath, bathSource);
 					return capi.Render.UploadMesh(bath);
 				});
-				renderer = new BlockRendererGlassSmeltery(capi, Pos, EnumRenderStage.AfterOIT, bathMesh,
-					capi.Tesselator.GetTexSource(Block), bathSource["inside"].atlasTextureId, 0.0001f);
+				renderer = new BlockRendererGlassSmeltery(capi, Pos, EnumRenderStage.AfterOIT, bathMesh, capi.Tesselator.GetTexSource(Block),
+					bathSource["inside"].atlasTextureId, 0.4375f, 0.6875f, 0.375f, 2f, 0.0001f);
 				UpdateRendererFull();
 			}
 		}
@@ -403,8 +403,8 @@ namespace GlassMaking.Blocks
 				}
 				if(hasActive)
 				{
-					double timeOffset = 0;
 					var graph = ValueGraph.Avg(heatGraphs);
+					double timeOffset = 0;
 					if(state == SmelteryState.ContainsMix)
 					{
 						if(Api.Side == EnumAppSide.Server && graph.CalculateValueRetention(timeOffset, meltingTemperature) > 0)
@@ -459,7 +459,7 @@ namespace GlassMaking.Blocks
 
 		private void EmitParticles()
 		{
-			if(Api.World.Rand.Next(5) > 0)
+			if(Api.World.Rand.Next(3) > 0)
 			{
 				var transform = ((BlockLargeSmeltery)Block).smokeTransform;
 				smokeParticles.MinPos.Set(Pos.X + transform.Translation.X, Pos.Y + transform.Translation.Y, Pos.Z + transform.Translation.Z);
@@ -479,12 +479,12 @@ namespace GlassMaking.Blocks
 
 		private void UpdateRendererParameters()
 		{
-			renderer.SetParameters(state == SmelteryState.ContainsMix, Math.Min(223, (int)((GetTemperature() / 2500f) * 223)));
+			renderer.SetParameters(state == SmelteryState.ContainsMix, Math.Min(223, (int)((GetTemperature() / 3000f) * 191)));
 		}
 
 		static BlockEntityLargeSmelteryCore()
 		{
-			smokeParticles = new SimpleParticleProperties(1f, 1f, ColorUtil.ToRgba(128, 110, 110, 110), new Vec3d(), new Vec3d(), new Vec3f(-0.2f, 0.3f, -0.2f), new Vec3f(0.2f, 0.3f, 0.2f), 2f, 0f, 0.5f, 1f, EnumParticleModel.Quad);
+			smokeParticles = new SimpleParticleProperties(1f, 3f, ColorUtil.ToRgba(128, 110, 110, 110), new Vec3d(), new Vec3d(), new Vec3f(-0.2f, 0.3f, -0.2f), new Vec3f(0.2f, 0.3f, 0.2f), 2f, 0f, 0.5f, 1f, EnumParticleModel.Quad);
 			smokeParticles.SelfPropelled = true;
 			smokeParticles.OpacityEvolve = new EvolvingNatFloat(EnumTransformFunction.LINEAR, -255f);
 			smokeParticles.SizeEvolve = new EvolvingNatFloat(EnumTransformFunction.LINEAR, 2f);

@@ -210,7 +210,7 @@ namespace GlassMaking.Blocks
 								}
 							}
 						}
-						temperature = (float)graph.CalculateFinalValue(temperature, 1000f, 90f);
+						temperature = Math.Max((float)graph.CalculateFinalValue(temperature, 1000f, 90f), 20f);
 						slot.Itemstack.Collectible.SetTemperature(Api.World, slot.Itemstack, temperature);
 					}
 				}

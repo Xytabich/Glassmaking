@@ -1,4 +1,5 @@
-﻿using Vintagestory.API.Client;
+﻿using System;
+using Vintagestory.API.Client;
 using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Blocks
@@ -18,6 +19,7 @@ namespace GlassMaking.Blocks
 		private MeshRef meshRef = null;
 
 		private float height = 0;
+		private float frustum = 0;
 
 		private bool isMix = false;
 		private int glowLevel = 0;
@@ -28,8 +30,11 @@ namespace GlassMaking.Blocks
 		private EnumRenderStage renderStage;
 		private float zOffset;
 
+		private float maxHeight, offset, frustumMin, frustumMax;
+
 		public BlockRendererGlassSmeltery(ICoreClientAPI api, BlockPos pos, EnumRenderStage renderStage,
-			MeshRef bathMesh, ITexPositionSource tex, int bathTextureId, float zOffset = 0)//TODO: add parameters: melt offset, melt max height, melt min width, melt max width (to create a cone)
+			MeshRef bathMesh, ITexPositionSource tex, int bathTextureId,
+			float maxHeight, float offset, float frustumMin, float frustumMax, float zOffset = 0)
 		{
 			this.api = api;
 			this.pos = pos;
@@ -37,6 +42,10 @@ namespace GlassMaking.Blocks
 			this.bathMesh = bathMesh;
 			this.bathTextureId = bathTextureId;
 			this.zOffset = zOffset;
+			this.maxHeight = maxHeight;
+			this.offset = offset;
+			this.frustumMin = frustumMin;
+			this.frustumMax = frustumMax;
 			mixTexture = tex["mix"];
 			meltTexture = tex["melt"];
 			api.Event.RegisterRenderer(this, renderStage, "glassmaking:smeltery");
@@ -44,9 +53,11 @@ namespace GlassMaking.Blocks
 
 		public void SetHeight(float percent)
 		{
+			percent = GameMath.Clamp(percent, 0, 1);
 			if(height != percent)
 			{
-				height = percent;
+				height = percent * maxHeight;
+				frustum = frustumMin + (frustumMax - frustumMin) * percent;
 				meshRef?.Dispose();
 				meshRef = null;
 				if(height != 0)
@@ -80,7 +91,7 @@ namespace GlassMaking.Blocks
 			render.RenderMesh(bathMesh);
 			if(height != 0)
 			{
-				standardShaderProgram.ModelMatrix = ModelMat.Identity().Translate((0.5f + pos.X) - cameraPos.X, pos.Y - cameraPos.Y + height / 16f, (0.5f + pos.Z) - cameraPos.Z).Values;
+				standardShaderProgram.ModelMatrix = ModelMat.Identity().Translate((0.5f + pos.X) - cameraPos.X, pos.Y - cameraPos.Y + offset + height, (0.5f + pos.Z) - cameraPos.Z).Values;
 				render.BindTexture2d(isMix ? mixTexture.atlasTextureId : meltTexture.atlasTextureId);
 				render.RenderMesh(meshRef);
 			}
@@ -95,7 +106,17 @@ namespace GlassMaking.Blocks
 
 		private MeshData GenerateMesh()
 		{
-			MeshData mesh = CubeMeshUtil.GetCubeFace(BlockFacing.UP, 0.3125f, 0.3125f, new Vec3f(0f, -2f / 32f - 0.3125f, 0f));
+			MeshData mesh = CubeMeshUtil.GetCubeFace(BlockFacing.UP);
+			float scale = frustum * 0.5f;
+			float uv = Math.Min(2f * scale, 1);
+			for(int i = 0; i < mesh.GetVerticesCount(); i++)
+			{
+				mesh.xyz[3 * i] *= scale;
+				mesh.xyz[3 * i + 2] *= scale;
+				mesh.xyz[3 * i + 1] = 0;
+				mesh.Uv[2 * i] *= uv;
+				mesh.Uv[2 * i + 1] *= uv;
+			}
 			mesh.Flags = new int[24];
 			mesh.SetTexPos(isMix ? mixTexture : meltTexture);
 			return mesh;

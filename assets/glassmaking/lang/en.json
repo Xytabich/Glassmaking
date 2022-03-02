@@ -73,7 +73,7 @@
     "item-parchoffi": "Parchoffi",
     "item-tweezers": "Tweezers",
     "item-parchoffipart": "Parchoffi part",
-    "blockdesc-smeltery-*": "Temperature modifier: x1.5\nFuel efficiency: x0.75",
+    "blockdesc-smeltery-*": "Temperature modifier: x1.1",
     "glassshards": "Glass shards ({0})",
     "glassblend": "Glass blend ({0})",
     "game:glassblend-plain": "Plain",

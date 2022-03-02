@@ -28,7 +28,7 @@ namespace GlassMaking.Blocks
 		private BlockRendererFirebox renderer = null;
 
 		private ITimeBasedHeatReceiver receiver = null;
-		private IBurnerModifier modifier = null;
+		private IHeatSourceModifier modifier = null;
 
 		private ILoadedSound ambientSound = null;
 
@@ -45,7 +45,7 @@ namespace GlassMaking.Blocks
 		private float fuelBurnDuration => _fuelBurnDuration * durationModifier;
 
 		private float temperatureModifier => modifier == null ? 1f : modifier.TemperatureModifier;
-		private float durationModifier => modifier == null ? 1f : modifier.DurationModifier;
+		private float durationModifier => modifier == null ? 1f : modifier.FuelRateModifier;
 
 		private double lastTickTime;
 
@@ -144,7 +144,7 @@ namespace GlassMaking.Blocks
 				}
 
 				this.receiver = receiver;
-				modifier = receiver as IBurnerModifier;
+				modifier = receiver as IHeatSourceModifier;
 				if(receiver != null) receiver.SetHeatSource(this);
 
 				MarkDirty(true);
@@ -509,7 +509,8 @@ namespace GlassMaking.Blocks
 						ShouldLoop = true,
 						Position = Pos.ToVec3f().Add(0.5f, 0.25f, 0.5f),
 						DisposeOnFinish = false,
-						Volume = 1f
+						Volume = 0.5f,
+						Range = 8
 					});
 					ambientSound.Start();
 				}
