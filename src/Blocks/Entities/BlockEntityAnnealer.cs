@@ -23,7 +23,7 @@ namespace GlassMaking.Blocks
 		private InventoryGeneric inventory;
 		private ItemStack lastRemoved = null;
 
-		private ITimeBasedHeatSource heatSource = null;
+		private ITimeBasedHeatSourceControl heatSource = null;
 		private ItemProcessInfo[] processes;
 
 		private int gridSize = 0;
@@ -53,6 +53,7 @@ namespace GlassMaking.Blocks
 			}
 			UpdateGrid();
 			if(Api.Side == EnumAppSide.Client) updateMeshes();
+			RegisterGameTickListener(OnCommonTick, 200);
 		}
 
 		public override void GetBlockInfo(IPlayer forPlayer, StringBuilder dsc)
@@ -163,65 +164,6 @@ namespace GlassMaking.Blocks
 			return false;
 		}
 
-		void ITimeBasedHeatReceiver.SetHeatSource(ITimeBasedHeatSource heatSource)
-		{
-			this.heatSource = heatSource;
-		}
-
-		void ITimeBasedHeatReceiver.OnHeatSourceTick(float dt)
-		{
-			if(gridSize != 0)
-			{
-				var totalHours = Api.World.Calendar.TotalHours;
-				var graph = heatSource.CalcHeatGraph();
-				for(int i = 0; i < itemCapacity; i++)
-				{
-					var slot = inventory[i];
-					if(!slot.Empty)
-					{
-						float temperature = (slot.Itemstack.Attributes["temperature"] as ITreeAttribute)?.GetFloat("temperature", 20f) ?? 20f;
-						var process = processes[i];
-						if(process != null)
-						{
-							double timeOffset = 0;
-							if(!process.isHeated)
-							{
-								if(Api.Side == EnumAppSide.Server)
-								{
-									double? time;
-									if(temperature >= process.annealTemperature.max) time = 0;
-									else time = graph.ReachValue(temperature, process.annealTemperature.max, 1000f, 90f);
-									if(time.HasValue)
-									{
-										process.isHeated = true;
-										timeOffset = time.Value;
-										MarkDirty(true);
-									}
-								}
-							}
-							if(process.isHeated)
-							{
-								process.time += Math.Max(0, Math.Min((temperature - process.annealTemperature.min) / 90f, totalHours - heatSource.GetLastTickTime()) - timeOffset);
-								if(process.time >= process.annealTime && Api.Side == EnumAppSide.Server)
-								{
-									processes[i] = null;
-									slot.Itemstack = process.output.Clone();
-									MarkDirty(true);
-								}
-							}
-						}
-						temperature = Math.Max((float)graph.CalculateFinalValue(temperature, 1000f, 90f), 20f);
-						slot.Itemstack.Collectible.SetTemperature(Api.World, slot.Itemstack, temperature);
-					}
-				}
-			}
-
-			if(Api.Side == EnumAppSide.Client)
-			{
-				if(heatSource.IsBurning()) EmitParticles();
-			}
-		}
-
 		public override void ToTreeAttributes(ITreeAttribute tree)
 		{
 			base.ToTreeAttributes(tree);
@@ -280,6 +222,69 @@ namespace GlassMaking.Blocks
 		{
 			if(preventMeshUpdate) return;
 			base.updateMeshes();
+		}
+
+		void ITimeBasedHeatReceiver.SetHeatSource(ITimeBasedHeatSourceControl heatSource)
+		{
+			this.heatSource = heatSource;
+		}
+
+		private void OnCommonTick(float dt)
+		{
+			if(heatSource == null) return;
+
+			if(gridSize != 0)
+			{
+				var totalHours = Api.World.Calendar.TotalHours;
+				var graph = heatSource.CalcHeatGraph();
+				for(int i = 0; i < itemCapacity; i++)
+				{
+					var slot = inventory[i];
+					if(!slot.Empty)
+					{
+						float temperature = (slot.Itemstack.Attributes["temperature"] as ITreeAttribute)?.GetFloat("temperature", 20f) ?? 20f;
+						var process = processes[i];
+						if(process != null)
+						{
+							double timeOffset = 0;
+							if(!process.isHeated)
+							{
+								if(Api.Side == EnumAppSide.Server)
+								{
+									double? time;
+									if(temperature >= process.annealTemperature.max) time = 0;
+									else time = graph.ReachValue(temperature, process.annealTemperature.max, 1000f, 90f);
+									if(time.HasValue)
+									{
+										process.isHeated = true;
+										timeOffset = time.Value;
+										MarkDirty(true);
+									}
+								}
+							}
+							if(process.isHeated)
+							{
+								process.time += Math.Max(0, Math.Min((temperature - process.annealTemperature.min) / 90f, totalHours - heatSource.GetLastTickTime()) - timeOffset);
+								if(process.time >= process.annealTime && Api.Side == EnumAppSide.Server)
+								{
+									processes[i] = null;
+									slot.Itemstack = process.output.Clone();
+									MarkDirty(true);
+								}
+							}
+						}
+						temperature = Math.Max((float)graph.CalculateFinalValue(temperature, 1000f, 90f), 20f);
+						slot.Itemstack.Collectible.SetTemperature(Api.World, slot.Itemstack, temperature);
+					}
+				}
+			}
+
+			if(Api.Side == EnumAppSide.Client)
+			{
+				if(heatSource.IsBurning()) EmitParticles();
+			}
+
+			heatSource.OnTick(dt);
 		}
 
 		private void ResolveProcessInfo(int index)

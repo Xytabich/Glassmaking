@@ -9,7 +9,7 @@ namespace GlassMaking.Blocks
 		public float TemperatureModifier => smelteryCore?.TemperatureModifier ?? 1;
 
 		private BlockEntityLargeSmelteryCore smelteryCore = null;
-		private ITimeBasedHeatSource heatSource = null;
+		private ITimeBasedHeatSourceControl heatSource = null;
 
 		public override void Initialize(ICoreAPI api)
 		{
@@ -40,17 +40,6 @@ namespace GlassMaking.Blocks
 			return smelteryCore?.GetDropItems() ?? new ItemStack[0];
 		}
 
-		public void SetHeatSource(ITimeBasedHeatSource heatSource)
-		{
-			this.heatSource = heatSource;
-			smelteryCore?.SetHeater(BlockFacing.FromCode(Block.Variant["side"]).HorizontalAngleIndex, heatSource);
-		}
-
-		public void OnHeatSourceTick(float dt)
-		{
-			smelteryCore?.OnHeatTick(heatSource, dt);
-		}
-
 		public override void OnBlockUnloaded()
 		{
 			base.OnBlockUnloaded();
@@ -64,6 +53,12 @@ namespace GlassMaking.Blocks
 		public void OnCoreUpdated(BlockEntityLargeSmelteryCore smelteryCore)
 		{
 			this.smelteryCore = smelteryCore;
+			smelteryCore?.SetHeater(BlockFacing.FromCode(Block.Variant["side"]).HorizontalAngleIndex, heatSource);
+		}
+
+		void ITimeBasedHeatReceiver.SetHeatSource(ITimeBasedHeatSourceControl heatSource)
+		{
+			this.heatSource = heatSource;
 			smelteryCore?.SetHeater(BlockFacing.FromCode(Block.Variant["side"]).HorizontalAngleIndex, heatSource);
 		}
 	}

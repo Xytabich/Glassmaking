@@ -4,7 +4,6 @@ using GlassMaking.Items;
 using System.Collections.Generic;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
-using Vintagestory.API.MathTools;
 using Vintagestory.API.Util;
 
 namespace GlassMaking.Blocks
@@ -80,15 +79,6 @@ namespace GlassMaking.Blocks
 				}
 			}
 			return false;
-		}
-
-		public override ItemStack[] GetDrops(IWorldAccessor world, BlockPos pos, IPlayer byPlayer, float dropQuantityMultiplier = 1)
-		{
-			var items = base.GetDrops(world, pos, byPlayer, dropQuantityMultiplier);
-			if(items == null) items = new ItemStack[0];
-			var be = world.BlockAccessor.GetBlockEntity(pos) as BlockEntityLargeSmelteryHearth;
-			if(be != null) items = items.Append(be.GetDropItems() ?? new ItemStack[0]);
-			return items;
 		}
 
 		public override void OnUnloaded(ICoreAPI api)

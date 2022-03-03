@@ -11,7 +11,7 @@ using Vintagestory.GameContent;
 
 namespace GlassMaking.Blocks
 {
-	public class BlockEntityFirebox : BlockEntity, ITimeBasedHeatSource, ITimeBasedHeatSourceContainer, IHeatSource
+	public class BlockEntityFirebox : BlockEntity, ITimeBasedHeatSource, ITimeBasedHeatSourceContainer, ITimeBasedHeatSourceControl, IHeatSource
 	{
 		private const float TEMP_INCREASE_PER_HOUR = 1500;
 		private const float TEMP_DECREASE_PER_HOUR = 2000;
@@ -48,6 +48,7 @@ namespace GlassMaking.Blocks
 		private float durationModifier => modifier == null ? 1f : modifier.FuelRateModifier;
 
 		private double lastTickTime;
+		private bool initTickTime = true;
 
 		public override void Initialize(ICoreAPI api)
 		{
@@ -109,7 +110,11 @@ namespace GlassMaking.Blocks
 			fuelLevel = tree.GetFloat("fuelLevel");
 			temperature = tree.GetFloat("temperature", 20);
 			burning = tree.GetBool("burning");
-			lastTickTime = tree.GetDouble("lastTickTotalHours");
+			if(initTickTime)
+			{
+				initTickTime = false;
+				lastTickTime = tree.GetDouble("lastTickTotalHours");
+			}
 			if(contents != null && Api?.World != null) ApplyFuelParameters();
 			UpdateRendererFull();
 			ToggleAmbientSounds(burning);
@@ -381,10 +386,19 @@ namespace GlassMaking.Blocks
 			contents?.Collectible.OnStoreCollectibleMappings(Api.World, contentsSlot, blockIdMapping, itemIdMapping);
 		}
 
+		void ITimeBasedHeatSourceControl.OnTick(float dt)
+		{
+			OnUpdate();
+		}
+
 		private void OnCommonTick(float dt)
 		{
+			if(receiver == null) OnUpdate();
+		}
+
+		private void OnUpdate()
+		{
 			double totalHours = Api.World.Calendar.TotalHours;
-			if(receiver != null) receiver.OnHeatSourceTick(dt);
 			if(totalHours < lastTickTime) lastTickTime = totalHours;
 			if(burning && totalHours > lastTickTime)
 			{

@@ -28,7 +28,7 @@ namespace GlassMaking.Blocks
 
 		private BlockRendererGlassSmeltery renderer = null;
 
-		private ITimeBasedHeatSource heatSource = null;
+		private ITimeBasedHeatSourceControl heatSource = null;
 
 		private SmelteryState state;
 		private int glassAmount;
@@ -72,6 +72,7 @@ namespace GlassMaking.Blocks
 					bathSource["inside"].atlasTextureId, 0.1875f, -0.1875f, 0.625f, 0.625f);
 				UpdateRendererFull();
 			}
+			RegisterGameTickListener(OnCommonTick, 200);
 		}
 
 		public override void GetBlockInfo(IPlayer forPlayer, StringBuilder dsc)
@@ -333,25 +334,30 @@ namespace GlassMaking.Blocks
 			}
 		}
 
-		void ITimeBasedHeatReceiver.SetHeatSource(ITimeBasedHeatSource heatSource)
+		void ITimeBasedHeatReceiver.SetHeatSource(ITimeBasedHeatSourceControl heatSource)
 		{
 			this.heatSource = heatSource;
 		}
 
-		void ITimeBasedHeatReceiver.OnHeatSourceTick(float dt)
+		private void OnCommonTick(float dt)
 		{
-			if(state != SmelteryState.Empty && state != SmelteryState.ContainsGlass && heatSource.IsHeatedUp())
+			if(heatSource == null) return;
+
+			if(state != SmelteryState.Empty && state != SmelteryState.ContainsGlass && (heatSource.GetTemperature() > 25 || heatSource.IsBurning()))
 			{
 				var graph = heatSource.CalcHeatGraph();
 				if(state == SmelteryState.ContainsMix)
 				{
-					if(Api.Side == EnumAppSide.Server && graph.CalculateValueRetention(meltingTemperature) > 0)
+					if(Api.Side == EnumAppSide.Server)
 					{
-						state = SmelteryState.Melting;
-						processProgress = 0;
-						inventory.Clear();
-						UpdateRendererFull();
-						MarkDirty(true);
+						if(graph.CalculateValueRetention(meltingTemperature) > 0)
+						{
+							state = SmelteryState.Melting;
+							processProgress = 0;
+							inventory.Clear();
+							UpdateRendererFull();
+							MarkDirty(true);
+						}
 					}
 				}
 				double timeOffset = 0;
@@ -386,6 +392,8 @@ namespace GlassMaking.Blocks
 				UpdateRendererParameters();
 				if(heatSource.IsBurning()) EmitParticles();
 			}
+
+			heatSource.OnTick(dt);
 		}
 
 		private void EmitParticles()

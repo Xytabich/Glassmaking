@@ -2,8 +2,6 @@
 {
 	public interface ITimeBasedHeatReceiver
 	{
-		void SetHeatSource(ITimeBasedHeatSource heatSource);
-
-		void OnHeatSourceTick(float dt);
+		void SetHeatSource(ITimeBasedHeatSourceControl heatSource);
 	}
 }

@@ -35,6 +35,11 @@ namespace GlassMaking.Blocks
 		ValueGraph CalcHeatGraph(double calendarTotalHours = 0);
 	}
 
+	public interface ITimeBasedHeatSourceControl : ITimeBasedHeatSource
+	{
+		void OnTick(float dt);
+	}
+
 	public interface ITimeBasedHeatSourceContainer : ITimeBasedHeatSource
 	{
 		void SetReceiver(ITimeBasedHeatReceiver receiver);

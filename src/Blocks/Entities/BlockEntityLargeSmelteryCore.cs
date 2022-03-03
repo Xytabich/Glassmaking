@@ -37,14 +37,14 @@ namespace GlassMaking.Blocks
 		private float meltingTemperature;
 
 		private int tickSource = -1;
-		private ITimeBasedHeatSource[] heaters;
+		private ITimeBasedHeatSourceControl[] heaters;
 		private ValueGraph[] heatGraphs;
 
 		private GlassSmelteryInventory inventory = new GlassSmelteryInventory(null, null);
 
 		public BlockEntityLargeSmelteryCore()
 		{
-			heaters = new ITimeBasedHeatSource[heatersCount];
+			heaters = new ITimeBasedHeatSourceControl[heatersCount];
 			heatGraphs = new ValueGraph[heatersCount];
 		}
 
@@ -67,11 +67,13 @@ namespace GlassMaking.Blocks
 					meltingTemperature = mod.GetGlassTypeInfo(glassCode).meltingPoint;
 				}
 			}
+
 			var block = (BlockLargeSmeltery)Block;
 			for(int i = 0; i < heatersCount; i++)
 			{
 				(api.World.BlockAccessor.GetBlockEntity(Pos.AddCopy(block.hearthOffsets[i])) as BlockEntityLargeSmelteryHearth)?.OnCoreUpdated(this);
 			}
+
 			if(api.Side == EnumAppSide.Client)
 			{
 				ICoreClientAPI capi = (ICoreClientAPI)api;
@@ -85,9 +87,11 @@ namespace GlassMaking.Blocks
 					bathSource["inside"].atlasTextureId, 0.4375f, 0.6875f, 0.375f, 2f, 0.0001f);
 				UpdateRendererFull();
 			}
+
+			RegisterGameTickListener(OnCommonTick, 200);
 		}
 
-		public void SetHeater(int index, ITimeBasedHeatSource heatSource)
+		public void SetHeater(int index, ITimeBasedHeatSourceControl heatSource)
 		{
 			if(heaters[index] == heatSource) return;
 
@@ -376,22 +380,14 @@ namespace GlassMaking.Blocks
 			}
 		}
 
-		public void OnHeatTick(ITimeBasedHeatSource source, float dt)
-		{
-			if(tickSource >= 0 && heaters[tickSource] == source)
-			{
-				OnHeatSourceTick(dt);
-			}
-		}
-
-		private void OnHeatSourceTick(float dt)
+		private void OnCommonTick(float dt)
 		{
 			if(state != SmelteryState.Empty && state != SmelteryState.ContainsGlass)
 			{
 				bool hasActive = false;
 				for(int i = 0; i < heaters.Length; i++)
 				{
-					if(heaters[i] != null && heaters[i].IsHeatedUp())
+					if(heaters[i] != null && (heaters[i].GetTemperature() > 25 || heaters[i].IsBurning()))
 					{
 						hasActive = true;
 						heatGraphs[i] = heaters[i].CalcHeatGraph();
@@ -454,6 +450,11 @@ namespace GlassMaking.Blocks
 						break;
 					}
 				}
+			}
+
+			for(int i = 0; i < heaters.Length; i++)
+			{
+				heaters[i]?.OnTick(dt);
 			}
 		}
 

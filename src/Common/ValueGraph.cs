@@ -151,7 +151,7 @@ namespace GlassMaking.Common
 			}
 			if(nextIndex >= 0)
 			{
-				point = new Point(Interpolate(points[nextIndex - 1], points[nextIndex], tOffset), tOffset);
+				point = new Point(tOffset, Interpolate(points[nextIndex - 1], points[nextIndex], tOffset));
 				return true;
 			}
 
