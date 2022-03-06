@@ -75,8 +75,8 @@
         "glassmaking": [ "*-north" ]
     },
     "textures": {
-        "mix": { "base": "game:item/resource/ungraded/borax" },
-        "melt": { "base": "game:item/resource/ungraded/clearquartz" }
+        "mix": { "base": "game:block/stone/quartz/full/plain1" },
+        "melt": { "base": "game:block/quartzglass" }
     },
     "replaceable": 400,
     "resistance": 3.5,

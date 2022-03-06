@@ -83,8 +83,8 @@
 	"shape": { "base": "block/largesmeltery/main" },
 	"drawtype": "json",
 	"textures": {
-		"mix": { "base": "game:item/resource/ungraded/borax" },
-		"melt": { "base": "game:item/resource/ungraded/clearquartz" },
+		"mix": { "base": "game:block/stone/quartz/full/plain1" },
+		"melt": { "base": "game:block/quartzglass" },
 		"inside": { "base": "game:block/clay/bloomery/inside" }
 	},
 	"resistance": 3.5,

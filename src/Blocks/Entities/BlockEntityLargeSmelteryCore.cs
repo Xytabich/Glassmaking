@@ -83,7 +83,7 @@ namespace GlassMaking.Blocks
 					capi.Tesselator.TesselateShape("glassmaking:largesmeltery-shape", asset.ToObject<Shape>(), out var bath, bathSource);
 					return capi.Render.UploadMesh(bath);
 				});
-				renderer = new BlockRendererGlassSmeltery(capi, Pos, EnumRenderStage.AfterOIT, bathMesh, capi.Tesselator.GetTexSource(Block),
+				renderer = new BlockRendererGlassSmeltery(capi, Pos, EnumRenderStage.Opaque, bathMesh, capi.Tesselator.GetTexSource(Block),
 					bathSource["inside"].atlasTextureId, 0.4375f, 0.6875f, 0.375f, 2f, 0.0001f);
 				UpdateRendererFull();
 			}
@@ -481,7 +481,7 @@ namespace GlassMaking.Blocks
 
 		private void UpdateRendererParameters()
 		{
-			renderer.SetParameters(state == SmelteryState.ContainsMix, Math.Min(223, (int)((GetTemperature() / 3000f) * 191)));
+			renderer?.SetParameters(state == SmelteryState.ContainsMix, Math.Min(223, (int)((GetTemperature() / 3000f) * 191)));
 		}
 
 		static BlockEntityLargeSmelteryCore()
