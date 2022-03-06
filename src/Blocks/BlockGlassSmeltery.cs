@@ -8,7 +8,7 @@ using Vintagestory.API.Util;
 
 namespace GlassMaking.Blocks
 {
-	public class BlockGlassSmeltery : HeatedBlockBase
+	public class BlockGlassSmeltery : HeatedBlockBase, IGlassmeltSourceBlock
 	{
 		public ModelTransform smokeTransform;
 

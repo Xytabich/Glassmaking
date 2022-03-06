@@ -40,7 +40,7 @@ namespace GlassMaking.ToolDescriptors
 				List<ItemStack> list = new List<ItemStack>();
 				foreach(var block in capi.World.Blocks)
 				{
-					if(block is BlockGlassSmeltery)
+					if(block is IGlassmeltSourceBlock)
 					{
 						List<ItemStack> stacks = block.GetHandBookStacks(capi);
 						if(stacks != null) list.AddRange(stacks);

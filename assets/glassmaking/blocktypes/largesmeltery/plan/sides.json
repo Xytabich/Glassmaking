@@ -11,9 +11,7 @@
 			"loadFromProperties": "abstract/horizontalorientation"
 		}
 	],
-	"creativeinventory": {
-		"general": [ "*" ]
-	},
+	"creativeinventory": {},
 	"attributes": {
 		"replacement": {
 			"block": {

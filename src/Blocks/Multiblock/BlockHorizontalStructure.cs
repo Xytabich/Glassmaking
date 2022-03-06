@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 
@@ -9,6 +11,38 @@ namespace GlassMaking.Blocks.Multiblock
 		//These values are set by the main block
 		protected internal Vec3i mainOffset = null;
 		protected internal bool isSurrogate = false;
+
+		protected JsonItemStack handbookStack = null;
+
+		public override void OnLoaded(ICoreAPI api)
+		{
+			base.OnLoaded(api);
+
+			if(api.Side == EnumAppSide.Client)
+			{
+				handbookStack = Attributes?["handbookStack"].AsObject<JsonItemStack>(null, Code.Domain);
+				if(handbookStack != null)
+				{
+					if(!handbookStack.Resolve(api.World, "structure handbook stack"))
+					{
+						handbookStack = null;
+					}
+				}
+			}
+		}
+
+		public override List<ItemStack> GetHandBookStacks(ICoreClientAPI capi)
+		{
+			if(isSurrogate)
+			{
+				if(handbookStack != null)
+				{
+					return new List<ItemStack>() { handbookStack.ResolvedItemstack };
+				}
+				return null;
+			}
+			return base.GetHandBookStacks(capi);
+		}
 
 		public override ItemStack OnPickBlock(IWorldAccessor world, BlockPos pos)
 		{

@@ -11,9 +11,7 @@
 			"states": [ "wn", "ne", "es", "sw" ]
 		}
 	],
-	"creativeinventory": {
-		"general": [ "*" ]
-	},
+	"creativeinventory": {},
 	"attributes": {
 		"replacement": {
 			"block": {

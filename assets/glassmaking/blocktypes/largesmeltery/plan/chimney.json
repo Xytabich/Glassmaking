@@ -7,9 +7,7 @@
 			"states": [ "chimney" ]
 		}
 	],
-	"creativeinventory": {
-		"general": [ "*" ]
-	},
+	"creativeinventory": {},
 	"attributes": {
 		"replacement": {
 			"block": {

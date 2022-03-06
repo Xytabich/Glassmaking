@@ -17,6 +17,14 @@
 			"loadFromProperties": "abstract/horizontalorientation"
 		}
 	],
+	"attributesByType": {
+		"*-hearth-*": {
+			"handbookStack": {
+				"type": "block",
+				"code": "largesmeltery-main"
+			}
+		}
+	},
 	"shapeByType": {
 		"*-north": {
 			"base": "block/largesmeltery/{sides}",
@@ -36,7 +44,7 @@
 		}
 	},
 	"drawtype": "json",
-	"creativeinventory": { "general": [ "*" ] },
+	"creativeinventory": {},
 	"lightAbsorption": 0,
 	"sounds": {
 		"walk": "game:walk/stone",

@@ -97,6 +97,7 @@
     <Compile Include="src\Blocks\Entities\BlockEntityWorkbench.cs" />
     <Compile Include="src\Blocks\BlockWorkbench.cs" />
     <Compile Include="src\Blocks\IGlassmeltSource.cs" />
+    <Compile Include="src\Blocks\IGlassmeltSourceBlock.cs" />
     <Compile Include="src\Blocks\IHeatSourceModifier.cs" />
     <Compile Include="src\Blocks\IGlassBlowingMold.cs" />
     <Compile Include="src\Blocks\ITimeBasedHeatReceiver.cs" />

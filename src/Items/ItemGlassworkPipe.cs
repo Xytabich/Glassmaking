@@ -33,7 +33,7 @@ namespace GlassMaking.Items
 					var capi = api as ICoreClientAPI;
 					foreach(Block block in api.World.Blocks)
 					{
-						if(block is BlockGlassSmeltery)
+						if(block is IGlassmeltSourceBlock)
 						{
 							List<ItemStack> stacks = block.GetHandBookStacks(capi);
 							if(stacks != null) list.AddRange(stacks);

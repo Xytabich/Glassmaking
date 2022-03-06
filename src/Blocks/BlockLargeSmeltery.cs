@@ -5,7 +5,7 @@ using Vintagestory.API.Util;
 
 namespace GlassMaking.Blocks
 {
-	public class BlockLargeSmeltery : BlockHorizontalStructurePlanMain
+	public class BlockLargeSmeltery : BlockHorizontalStructurePlanMain, IGlassmeltSourceBlock
 	{
 		public ModelTransform smokeTransform;
 		public Vec3i[] hearthOffsets;
