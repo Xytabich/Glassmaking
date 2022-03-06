@@ -1,0 +1,88 @@
+{
+    "code": "glasschunk",
+    "class": "glassmaking:glassblend",
+    "heldTpIdleAnimation": "holdbothhands",
+    "shape": { "base": "item/resource/glasschunk" },
+    "attributes": {
+        "displaycaseable": true,
+        "shelvable": true,
+        "handbook": {
+            "extraSections": [
+                {
+                    "title": "glassmaking:handbook-melting-glass",
+                    "text": "glassmaking:item-handbooktext-glassshards"
+                }
+            ]
+        }
+    },
+    "creativeinventory": {},
+    "maxstacksize": 64,
+    "materialDensity": 500,
+    "guiTransform": {
+        "translation": {
+            "x": 0,
+            "y": 0,
+            "z": -25
+        },
+        "rotation": {
+            "x": -1,
+            "y": 138,
+            "z": 131
+        },
+        "origin": {
+            "x": 0.46,
+            "y": 0.11,
+            "z": 0.5
+        },
+        "scale": 2.64
+    },
+    "fpHandTransform": {
+        "translation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "rotation": {
+            "x": 1,
+            "y": 90,
+            "z": 0
+        },
+        "scale": 2
+    },
+    "tpHandTransform": {
+        "translation": {
+            "x": -0.55,
+            "y": -0.1,
+            "z": -0.47
+        },
+        "rotation": {
+            "x": 25,
+            "y": -174,
+            "z": 95
+        },
+        "origin": {
+            "x": 0.5,
+            "y": 0.12,
+            "z": 0.5
+        },
+        "scale": 1
+    },
+    "groundTransform": {
+        "translation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "rotation": {
+            "x": 90,
+            "y": 0,
+            "z": 0
+        },
+        "origin": {
+            "x": 0.5,
+            "y": 0.22,
+            "z": 0.54
+        },
+        "scale": 4.5
+    }
+}

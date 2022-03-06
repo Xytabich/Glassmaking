@@ -295,11 +295,12 @@ namespace GlassMaking.Blocks
 		public ItemStack[] GetDropItems()
 		{
 			var items = inventory.CollectItems();
-			if(glassAmount >= 5)
+			if(glassAmount > 0 && glassCode != null)
 			{
-				var shards = new ItemStack(Api.World.GetItem(new AssetLocation("glassmaking", "glassshards")), glassAmount / 5);
-				new GlassBlend(glassCode, 5).ToTreeAttributes(shards.Attributes.GetOrAddTreeAttribute(GlassBlend.PROPERTY_NAME));
-				items.Add(shards);
+				foreach(var item in Utils.GetShardsList(Api.World, glassCode, glassAmount))
+				{
+					items.Add(item);
+				}
 			}
 			return items.ToArray();
 		}

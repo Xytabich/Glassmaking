@@ -108,19 +108,15 @@ namespace GlassMaking.Items
 				dsc.AppendLine(Lang.Get("Temperature: {0}°C", GetGlassTemperature(world, inSlot.Itemstack).ToString("0")));
 
 				bool showHeader = true;
-				foreach(var pair in amountByCode)
+				foreach(var item in Utils.GetShardsList(world, amountByCode))
 				{
-					int amount = pair.Value / 5;
-					if(amount > 0)
+					if(showHeader)
 					{
-						if(showHeader)
-						{
-							dsc.AppendLine();
-							dsc.AppendLine(Lang.Get("glassmaking:Break down to receive:"));
-							showHeader = false;
-						}
-						dsc.AppendFormat("• {0}x {1}", amount, Lang.Get("glassmaking:glassshards", Lang.Get(GlassBlend.GetBlendNameCode(new AssetLocation(pair.Key)))));
+						dsc.AppendLine();
+						dsc.AppendLine(Lang.Get("glassmaking:Break down to receive:"));
+						showHeader = false;
 					}
+					dsc.AppendFormat("• {0}x {1}", item.StackSize, item.GetName()).AppendLine();
 				}
 			}
 		}
@@ -181,19 +177,12 @@ namespace GlassMaking.Items
 							amountByCode[codes[i]] = amount + amounts[i];
 						}
 
-						var shardsItem = api.World.GetItem(new AssetLocation("glassmaking", "glassshards"));
 						var entity = byPlayer.Entity;
-						foreach(var pair in amountByCode)
+						foreach(var item in Utils.GetShardsList(api.World, amountByCode))
 						{
-							int count = pair.Value * quantity / 5;
-							if(count > 0)
+							if(!entity.TryGiveItemStack(item))
 							{
-								var item = new ItemStack(shardsItem, count);
-								new GlassBlend(new AssetLocation(pair.Key), 5).ToTreeAttributes(item.Attributes.GetOrAddTreeAttribute(GlassBlend.PROPERTY_NAME));
-								if(!entity.TryGiveItemStack(item))
-								{
-									entity.World.SpawnItemEntity(item, byPlayer.Entity.Pos.XYZ.Add(0.0, 0.5, 0.0));
-								}
+								entity.World.SpawnItemEntity(item, byPlayer.Entity.Pos.XYZ.Add(0.0, 0.5, 0.0));
 							}
 						}
 					}
@@ -375,18 +364,11 @@ namespace GlassMaking.Items
 									itemstack.Attributes.RemoveAttribute("glasslayers");
 									slot.MarkDirty();
 
-									var shardsItem = api.World.GetItem(new AssetLocation("glassmaking", "glassshards"));
-									foreach(var pair in shards)
+									foreach(var item in Utils.GetShardsList(api.World, shards))
 									{
-										int quantity = pair.Value / 5;
-										if(quantity > 0)
+										if(!byEntity.TryGiveItemStack(item))
 										{
-											var item = new ItemStack(shardsItem, quantity);
-											new GlassBlend(new AssetLocation(pair.Key), 5).ToTreeAttributes(item.Attributes.GetOrAddTreeAttribute(GlassBlend.PROPERTY_NAME));
-											if(!byEntity.TryGiveItemStack(item))
-											{
-												byEntity.World.SpawnItemEntity(item, byEntity.Pos.XYZ.Add(0.0, 0.5, 0.0));
-											}
+											byEntity.World.SpawnItemEntity(item, byEntity.Pos.XYZ.Add(0.0, 0.5, 0.0));
 										}
 									}
 									return false;

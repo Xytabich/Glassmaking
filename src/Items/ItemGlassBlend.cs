@@ -54,7 +54,7 @@ namespace GlassMaking.Items
 					texturePath = new AssetLocation(textureCode);
 				}
 
-				return getOrCreateTexPos(texturePath);
+				return GetOrCreateTexPos(texturePath);
 			}
 		}
 
@@ -88,14 +88,10 @@ namespace GlassMaking.Items
 		public override string GetHeldItemName(ItemStack itemStack)
 		{
 			GlassBlend blend = GlassBlend.FromJson(itemStack);
+			if(blend == null) blend = GlassBlend.FromTreeAttributes(itemStack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
 			if(blend != null)
 			{
-				return Lang.Get("glassmaking:glassblend", Lang.Get(GlassBlend.GetBlendNameCode(blend.Code)));
-			}
-			blend = GlassBlend.FromTreeAttributes(itemStack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
-			if(blend != null)
-			{
-				return Lang.Get("glassmaking:glassshards", Lang.Get(GlassBlend.GetBlendNameCode(blend.Code)));
+				return Lang.Get(GetItemBaseCode(Code), Lang.Get(GlassBlend.GetBlendNameCode(blend.Code)));
 			}
 			return base.GetHeldItemName(itemStack);
 		}
@@ -106,7 +102,7 @@ namespace GlassMaking.Items
 			if(blend == null) return;
 
 			Dictionary<string, MeshRef> blendMeshrefs = ObjectCacheUtil.GetOrCreate(capi, "glassmaking:blendMeshRefs", () => new Dictionary<string, MeshRef>());
-			string key = blend.Code.ToString();
+			string key = GetItemBaseCode(Code) + "|" + blend.Code.ToString();
 
 			MeshRef meshRef;
 			if(!blendMeshrefs.TryGetValue(key, out meshRef))
@@ -131,12 +127,12 @@ namespace GlassMaking.Items
 			GlassBlend blend = GlassBlend.FromTreeAttributes(itemstack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
 			if(blend != null)
 			{
-				return "glassmaking:shards|" + blend.Code.ToString();
+				return GetItemBaseCode(Code) + "|" + blend.Code.ToString();
 			}
 			return "glassmaking:blend|" + Code.ToString();
 		}
 
-		protected TextureAtlasPosition getOrCreateTexPos(AssetLocation texturePath)
+		protected TextureAtlasPosition GetOrCreateTexPos(AssetLocation texturePath)
 		{
 			var capi = api as ICoreClientAPI;
 			TextureAtlasPosition texpos = curAtlas[texturePath];
@@ -172,6 +168,12 @@ namespace GlassMaking.Items
 			nowTesselatingShape = null;
 
 			return meshdata;
+		}
+
+		private static string GetItemBaseCode(AssetLocation code)
+		{
+			int index = code.Path.IndexOf('-');
+			return "glassmaking:" + (index < 0 ? code.Path : code.Path.Remove(index));
 		}
 	}
 }

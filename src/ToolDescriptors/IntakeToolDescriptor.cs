@@ -114,16 +114,9 @@ namespace GlassMaking.ToolDescriptors
 			}
 			if(amountByCode.Count == 0) return;
 
-			var shardsItem = world.GetItem(new AssetLocation("glassmaking", "glassshards"));
-			foreach(var pair in amountByCode)
+			foreach(var item in Utils.GetShardsList(world, amountByCode))
 			{
-				int count = pair.Value / 5;
-				if(count > 0)
-				{
-					var item = new ItemStack(shardsItem, count);
-					new GlassBlend(new AssetLocation(pair.Key), 5).ToTreeAttributes(item.Attributes.GetOrAddTreeAttribute(GlassBlend.PROPERTY_NAME));
-					outList.Add(item);
-				}
+				outList.Add(item);
 			}
 		}
 	}

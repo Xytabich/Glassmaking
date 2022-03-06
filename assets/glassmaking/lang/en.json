@@ -75,6 +75,8 @@
     "item-parchoffipart": "Parchoffi part",
     "blockdesc-smeltery-*": "Temperature modifier: x1.1",
     "glassshards": "Glass shards ({0})",
+    "glasspiece": "Glass piece ({0})",
+    "glasschunk": "Glass chunk ({0})",
     "glassblend": "Glass blend ({0})",
     "game:glassblend-plain": "Plain",
     "game:glassblend-quartz": "Quartz",
