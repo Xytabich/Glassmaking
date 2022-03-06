@@ -269,8 +269,7 @@ namespace GlassMaking.Items
 								float temp = source.GetTemperature();
 								if(temp > temperature)
 								{
-									float minTemperature = GetWorkingTemperature(byEntity.World, slot.Itemstack) * 0.45f;
-									if(temperature >= minTemperature)
+									if(IsHeated(byEntity.World, slot.Itemstack))
 									{
 										slot.Itemstack.TempAttributes.SetFloat("glassmaking:lastHeatTime", 0f);
 									}
@@ -286,11 +285,16 @@ namespace GlassMaking.Items
 						else if(!hasRecipe)
 						{
 							int amount = source.GetGlassAmount();
-							if(amount > 0 && HasFreeSpace(slot.Itemstack))
+							bool isTooCold = false;
+							if(amount > 0 && CanTakeGlass(byEntity.World, slot.Itemstack, out isTooCold))
 							{
 								slot.Itemstack.TempAttributes.SetFloat("glassmaking:lastAddGlassTime", 0f);
 								handling = EnumHandHandling.PreventDefault;
 								return;
+							}
+							else if(isTooCold)
+							{
+								((ICoreClientAPI)api).TriggerIngameError(this, "toocold", Lang.Get("glassmaking:The workpiece is not hot enough to work"));
 							}
 						}
 					}
@@ -416,8 +420,7 @@ namespace GlassMaking.Items
 							float temp = source.GetTemperature();
 							if(temp > temperature)
 							{
-								float minTemperature = GetWorkingTemperature(byEntity.World, slot.Itemstack) * 0.45f;
-								if(temperature >= minTemperature)
+								if(IsHeated(byEntity.World, slot.Itemstack))
 								{
 									if(api.Side == EnumAppSide.Client)
 									{
@@ -448,7 +451,7 @@ namespace GlassMaking.Items
 						if(slot.Itemstack.TempAttributes.HasAttribute("glassmaking:lastAddGlassTime"))
 						{
 							int amount = source.GetGlassAmount();
-							if(amount > 0 && HasFreeSpace(slot.Itemstack))
+							if(amount > 0 && CanTakeGlass(byEntity.World, slot.Itemstack, out _))
 							{
 								const float speed = 1.5f;
 								if(api.Side == EnumAppSide.Client)
@@ -724,8 +727,14 @@ namespace GlassMaking.Items
 			return point / codesAttrib.value.Length * 0.8f;
 		}
 
-		private bool HasFreeSpace(ItemStack itemStack)
+		private bool IsHeated(IWorldAccessor world, ItemStack itemStack)
 		{
+			return GetGlassTemperature(world, itemStack) >= GetWorkingTemperature(world, itemStack) * 0.45f;
+		}
+
+		private bool CanTakeGlass(IWorldAccessor world, ItemStack itemStack, out bool isTooCold)
+		{
+			isTooCold = false;
 			var glasslayers = itemStack.Attributes.GetTreeAttribute("glasslayers");
 			if(glasslayers != null)
 			{
@@ -736,9 +745,20 @@ namespace GlassMaking.Items
 				{
 					count += amount;
 				}
-				if(count >= maxGlassAmount) return false;
+				if(count >= maxGlassAmount)
+				{
+					return false;
+				}
 			}
-			return true;
+			if(IsHeated(world, itemStack))
+			{
+				return true;
+			}
+			else
+			{
+				isTooCold = true;
+				return false;
+			}
 		}
 
 		private bool AddGlass(EntityAgent byEntity, ItemSlot slot, int amount, AssetLocation code, int multiplier, float temperature, out int consumed)

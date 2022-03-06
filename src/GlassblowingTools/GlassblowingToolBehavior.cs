@@ -47,10 +47,10 @@ namespace GlassMaking.GlassblowingTools
 			}
 			if(pipeSlot != null)
 			{
-				if(!workingTemperatureRequired || ((ItemGlassworkPipe)pipeSlot.Itemstack.Collectible).IsWorkingTemperature(byEntity.World, pipeSlot.Itemstack))
+				var recipeAttribute = pipeSlot.Itemstack.Attributes.GetTreeAttribute("glassmaking:recipe");
+				if(recipeAttribute != null)
 				{
-					var recipeAttribute = pipeSlot.Itemstack.Attributes.GetTreeAttribute("glassmaking:recipe");
-					if(recipeAttribute != null)
+					if(!workingTemperatureRequired || ((ItemGlassworkPipe)pipeSlot.Itemstack.Collectible).IsWorkingTemperature(byEntity.World, pipeSlot.Itemstack))
 					{
 						var recipe = mod.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
 						if(recipe != null)
@@ -63,10 +63,10 @@ namespace GlassMaking.GlassblowingTools
 							}
 						}
 					}
-				}
-				else if(showWarning && api.Side == EnumAppSide.Client)
-				{
-					((ICoreClientAPI)api).TriggerIngameError(this, "toocold", Lang.Get("glassmaking:The workpiece is not hot enough to work"));
+					else if(showWarning && api.Side == EnumAppSide.Client)
+					{
+						((ICoreClientAPI)api).TriggerIngameError(this, "toocold", Lang.Get("glassmaking:The workpiece is not hot enough to work"));
+					}
 				}
 			}
 			stepInfo = null;
