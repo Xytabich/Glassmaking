@@ -269,7 +269,7 @@ namespace GlassMaking.Items
 							}
 						}
 					}
-					var source = be as BlockEntityGlassSmeltery;
+					var source = be as IGlassmeltSource;
 					if(source != null && source.CanInteract(byEntity, blockSel))
 					{
 						if(byEntity.Controls.Sprint)
@@ -423,7 +423,7 @@ namespace GlassMaking.Items
 						}
 					}
 				}
-				var source = be as BlockEntityGlassSmeltery;
+				var source = be as IGlassmeltSource;
 				if(source != null && source.CanInteract(byEntity, blockSel))
 				{
 					if(byEntity.Controls.Sprint)
@@ -503,7 +503,7 @@ namespace GlassMaking.Items
 								{
 									IPlayer byPlayer = null;
 									if(byEntity is EntityPlayer) byPlayer = byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID);
-									source.SpawnGlassUseParticles(byEntity.World, blockSel, byPlayer);
+									source.SpawnMeltParticles(byEntity.World, blockSel, byPlayer);
 								}
 								return true;
 							}

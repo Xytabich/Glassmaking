@@ -11,7 +11,7 @@ using Vintagestory.API.Util;
 
 namespace GlassMaking.Blocks
 {
-	public class BlockEntityGlassSmeltery : BlockEntity, IBlockEntityContainer, ITimeBasedHeatReceiver, IHeatSourceModifier
+	public class BlockEntityGlassSmeltery : BlockEntity, IBlockEntityContainer, ITimeBasedHeatReceiver, IHeatSourceModifier, IGlassmeltSource
 	{
 		private const double PROCESS_HOURS_PER_UNIT = 0.001;
 		private const double BUBBLING_PROCESS_MULTIPLIER = 3;
@@ -297,7 +297,7 @@ namespace GlassMaking.Blocks
 			MarkDirty(true);
 		}
 
-		public void SpawnGlassUseParticles(IWorldAccessor world, BlockSelection blockSel, IPlayer byPlayer, float quantity = 1f)
+		public void SpawnMeltParticles(IWorldAccessor world, BlockSelection blockSel, IPlayer byPlayer, float quantity = 1f)
 		{
 			// Smoke on the mold
 			Vec3d blockpos = Pos.ToVec3d().Add(0.5, 0, 0.5);

@@ -13,8 +13,8 @@ namespace GlassMaking.Blocks
 {
 	public class BlockEntityLargeSmelteryCore : BlockEntity, IHeatSourceModifier//TODO: structure build stage
 	{
-		private const double PROCESS_HOURS_PER_UNIT = 0.0005;
-		private const double BUBBLING_PROCESS_MULTIPLIER = 3;
+		private const double PROCESS_HOURS_PER_UNIT = 0.00025;
+		private const double BUBBLING_PROCESS_MULTIPLIER = 2;
 
 		private static readonly ValueGraph defaultGraph = new ValueGraph(new ValueGraph.Point(0, 20));
 		private static SimpleParticleProperties smokeParticles;
@@ -343,10 +343,10 @@ namespace GlassMaking.Blocks
 			MarkDirty(true);
 		}
 
-		public void SpawnGlassUseParticles(IWorldAccessor world, BlockSelection blockSel, IPlayer byPlayer, float quantity = 1f)
+		public void SpawnMeltParticles(IWorldAccessor world, BlockSelection blockSel, IPlayer byPlayer, float quantity = 1f)
 		{
 			// Smoke on the mold
-			Vec3d blockpos = Pos.ToVec3d().Add(0.5, 0, 0.5);
+			Vec3d blockpos = Pos.ToVec3d().Add(0.5, 1, 0.5);
 			world.SpawnParticles(
 				quantity,
 				ColorUtil.ToRgba(50, 220, 220, 220),

@@ -3,7 +3,7 @@ using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Blocks
 {
-	public class BlockEntityLargeSmelteryHearth : BlockEntity, IHeatSourceModifier, ITimeBasedHeatReceiver
+	public class BlockEntityLargeSmelteryHearth : BlockEntity, IHeatSourceModifier, ITimeBasedHeatReceiver, IGlassmeltSource
 	{
 		public float FuelRateModifier => smelteryCore?.FuelRateModifier ?? 1;
 		public float TemperatureModifier => smelteryCore?.TemperatureModifier ?? 1;
@@ -60,6 +60,36 @@ namespace GlassMaking.Blocks
 		{
 			this.heatSource = heatSource;
 			smelteryCore?.SetHeater(BlockFacing.FromCode(Block.Variant["side"]).HorizontalAngleIndex, heatSource);
+		}
+
+		bool IGlassmeltSource.CanInteract(EntityAgent byEntity, BlockSelection blockSel)
+		{
+			return true;
+		}
+
+		float IGlassmeltSource.GetTemperature()
+		{
+			return smelteryCore?.GetTemperature() ?? 20;
+		}
+
+		int IGlassmeltSource.GetGlassAmount()
+		{
+			return smelteryCore?.GetGlassAmount() ?? 0;
+		}
+
+		AssetLocation IGlassmeltSource.GetGlassCode()
+		{
+			return smelteryCore?.GetGlassCode();
+		}
+
+		void IGlassmeltSource.RemoveGlass(int amount)
+		{
+			smelteryCore.RemoveGlass(amount);
+		}
+
+		void IGlassmeltSource.SpawnMeltParticles(IWorldAccessor world, BlockSelection blockSel, IPlayer byPlayer, float quantity)
+		{
+			smelteryCore.SpawnMeltParticles(world, blockSel, byPlayer, quantity);
 		}
 	}
 }

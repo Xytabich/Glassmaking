@@ -16,7 +16,7 @@ namespace GlassMaking.GlassblowingTools
 		{
 			if(firstEvent && blockSel != null && TryGetRecipeStep(slot, byEntity, out var step, true, true))
 			{
-				var source = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityGlassSmeltery;
+				var source = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position) as IGlassmeltSource;
 				if(source != null && source.CanInteract(byEntity, blockSel))
 				{
 					int sourceAmount = source.GetGlassAmount();
@@ -49,7 +49,7 @@ namespace GlassMaking.GlassblowingTools
 			{
 				if(slot.Itemstack.TempAttributes.GetBool("glassmaking:intakeStarted", false) && step.ContinueStep())
 				{
-					var source = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityGlassSmeltery;
+					var source = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position) as IGlassmeltSource;
 					if(source != null && source.CanInteract(byEntity, blockSel))
 					{
 						int sourceAmount = source.GetGlassAmount();
@@ -106,7 +106,7 @@ namespace GlassMaking.GlassblowingTools
 								{
 									IPlayer byPlayer = null;
 									if(byEntity is EntityPlayer) byPlayer = byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID);
-									source.SpawnGlassUseParticles(byEntity.World, blockSel, byPlayer);
+									source.SpawnMeltParticles(byEntity.World, blockSel, byPlayer);
 								}
 								handling = EnumHandling.PreventSubsequent;
 								return true;
