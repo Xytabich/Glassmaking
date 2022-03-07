@@ -1,64 +1,78 @@
 {
-    "code": "workbench",
-    "class": "glassmaking:workbench",
-    "entityclassByType": {
-        "*-right-*": "glassmaking:workbench"
-    },
-    "blockmaterial": "Wood",
-    "behaviorsByType": {
-        "*-right-*": [
-            { "name": "glassmaking:horizontalmb" }
-        ]
-    },
-    "variantgroups": [
-        {
-            "code": "block",
-            "states": [ "left", "right" ]
-        },
-        {
-            "code": "side",
-            "loadFromProperties": "abstract/horizontalorientation"
-        }
-    ],
-    "attributesByType": {
-        "*-right-*": {
-            "surrogate": "workbench-left-{side}"
-        }
-    },
-    "creativeinventory": {
-        "general": [ "*-right-north" ],
-        "glassmaking": [ "*-right-north" ]
-    },
-    "replaceable": 400,
-    "resistance": 3.5,
-    "maxStackSize": 1,
-    "lightAbsorption": 3,
-    "shapeInventory": { "base": "block/workbench/item" },
-    "renderer": "Shape",
-    "shapeByType": {
-        "*-north": {
-            "base": "block/workbench/{block}",
-            "rotateY": 0
-        },
-        "*-east": {
-            "base": "block/workbench/{block}",
-            "rotateY": 270
-        },
-        "*-south": {
-            "base": "block/workbench/{block}",
-            "rotateY": 180
-        },
-        "*-west": {
-            "base": "block/workbench/{block}",
-            "rotateY": 90
-        }
-    },
-    "sidesolid": {
-        "up": true,
-        "all": false
-    },
-    "sideopaque": {
-        "up": true,
-        "all": false
-    }
+	"code": "workbench",
+	"classByType": {
+		"*-right-*": "glassmaking:workbench",
+		"*-left-*": "glassmaking:workbenchs"
+	},
+	"entityclassByType": {
+		"*-right-*": "glassmaking:workbench"
+	},
+	"blockmaterial": "Wood",
+	"behaviorsByType": {
+		"*-right-*": [
+			{ "name": "glassmaking:placetable" }
+		]
+	},
+	"variantgroups": [
+		{
+			"code": "block",
+			"states": [ "left", "right" ]
+		},
+		{
+			"code": "side",
+			"loadFromProperties": "abstract/horizontalorientation"
+		}
+	],
+	"attributesByType": {
+		"*-right-*": {
+			"structure": {
+				"codes": [
+					[ [ "workbench-left-{side}" ] ],
+					[ [ "workbench-right-{side}" ] ]
+				],
+				"rotateYByType": {
+					"*-north": 0,
+					"*-east": 270,
+					"*-south": 180,
+					"*-west": 90
+				}
+			}
+		}
+	},
+	"creativeinventory": {
+		"general": [ "*-right-north" ],
+		"glassmaking": [ "*-right-north" ]
+	},
+	"replaceable": 400,
+	"resistance": 3.5,
+	"maxStackSize": 1,
+	"lightAbsorption": 3,
+	"shapeInventory": { "base": "block/workbench/item" },
+	"renderer": "Shape",
+	"shapeByType": {
+		"*-north": {
+			"base": "block/workbench/{block}",
+			"rotateY": 0
+		},
+		"*-east": {
+			"base": "block/workbench/{block}",
+			"rotateY": 270
+		},
+		"*-south": {
+			"base": "block/workbench/{block}",
+			"rotateY": 180
+		},
+		"*-west": {
+			"base": "block/workbench/{block}",
+			"rotateY": 90
+		}
+	},
+	"sidesolid": {
+		"up": true,
+		"all": false
+	},
+	"sideopaque": {
+		"up": true,
+		"all": false
+	}
 }

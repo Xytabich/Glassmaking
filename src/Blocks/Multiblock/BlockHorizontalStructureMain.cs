@@ -165,13 +165,16 @@ namespace GlassMaking.Blocks.Multiblock
 						{
 							int sx = codes.GetLength(0), sy = codes.GetLength(1), sz = codes.GetLength(2);
 							var arr = new AssetLocation[sz, sy, sx];
-							for(int x = 0; x < sx; x++)
+							sx--;
+							sy--;
+							sz--;
+							for(int x = 0; x <= sx; x++)
 							{
-								for(int y = 0; y < sy; y++)
+								for(int y = 0; y <= sy; y++)
 								{
-									for(int z = 0; z < sz; z++)
+									for(int z = 0; z <= sz; z++)
 									{
-										arr[z, y, x] = codes[x, y, z];
+										arr[z, y, x] = codes[sx - x, y, sz - z];
 									}
 								}
 							}
@@ -200,16 +203,13 @@ namespace GlassMaking.Blocks.Multiblock
 						{
 							int sx = codes.GetLength(0), sy = codes.GetLength(1), sz = codes.GetLength(2);
 							var arr = new AssetLocation[sz, sy, sx];
-							sx--;
-							sy--;
-							sz--;
-							for(int x = 0; x <= sx; x++)
+							for(int x = 0; x < sx; x++)
 							{
-								for(int y = 0; y <= sy; y++)
+								for(int y = 0; y < sy; y++)
 								{
-									for(int z = 0; z <= sz; z++)
+									for(int z = 0; z < sz; z++)
 									{
-										arr[z, y, x] = codes[sx - x, y, sz - z];
+										arr[z, y, x] = codes[x, y, z];
 									}
 								}
 							}

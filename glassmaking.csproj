@@ -91,6 +91,7 @@
     <Compile Include="src\Blocks\BlockAnnealer.cs" />
     <Compile Include="src\Blocks\BlockLargeSmeltery.cs" />
     <Compile Include="src\Blocks\BlockLargeSmelteryHearth.cs" />
+    <Compile Include="src\Blocks\BlockWorkbenchSurrogate.cs" />
     <Compile Include="src\Blocks\Entities\BlockEntityAnnealer.cs" />
     <Compile Include="src\Blocks\Entities\BlockEntityLargeSmelteryCore.cs" />
     <Compile Include="src\Blocks\Entities\BlockEntityLargeSmelteryHearth.cs" />
@@ -102,8 +103,7 @@
     <Compile Include="src\Blocks\IGlassBlowingMold.cs" />
     <Compile Include="src\Blocks\ITimeBasedHeatReceiver.cs" />
     <Compile Include="src\Blocks\ITimeBasedHeatSource.cs" />
-    <Compile Include="src\Blocks\Multiblock\BlockHorizontal2BMultiblock.cs" />
-    <Compile Include="src\Blocks\Multiblock\BlockBehaviorHorizontal2BMultiblock.cs" />
+    <Compile Include="src\Blocks\Multiblock\BlockBehaviorPlaceTable.cs" />
     <Compile Include="src\Blocks\Entities\BlockEntityFirebox.cs" />
     <Compile Include="src\Blocks\Entities\BlockEntityGlassSmeltery.cs" />
     <Compile Include="src\Blocks\BlockFirebox.cs" />

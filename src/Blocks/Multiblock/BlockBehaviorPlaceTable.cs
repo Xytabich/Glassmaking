@@ -4,11 +4,11 @@ using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Blocks
 {
-	public class BlockBehaviorHorizontal2BMultiblock : BlockBehavior
+	public class BlockBehaviorPlaceTable : BlockBehavior
 	{
 		private string variantCode = "horizontalorientation";
 
-		public BlockBehaviorHorizontal2BMultiblock(Block block)
+		public BlockBehaviorPlaceTable(Block block)
 			: base(block)
 		{
 			if(!block.Variant.ContainsKey("horizontalorientation"))
