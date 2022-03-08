@@ -5,7 +5,7 @@ using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Items
 {
-	internal static class GlasspipeRenderUtil
+	internal static partial class GlasspipeRenderUtil
 	{
 		private const int RADIAL_SECTIONS_COUNT = 8;
 		private const int RADIAL_SECTION_INDICES = (RADIAL_SECTIONS_COUNT + 1) * 2;

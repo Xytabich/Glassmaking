@@ -129,9 +129,13 @@
     <Compile Include="src\Common\IWettable.cs" />
     <Compile Include="src\Common\ValueGraph.cs" />
     <Compile Include="src\GlassblowingTools\DryableTool.cs" />
-    <Compile Include="src\Items\GlasspipeRenderCache.cs" />
+    <Compile Include="src\ItemRender\CachedItemRenderer.cs" />
+    <Compile Include="src\ItemRender\IItemRenderer.cs" />
+    <Compile Include="src\Items\GlasspipeRenderer.cs" />
     <Compile Include="src\Common\GlassTypeProperty.cs" />
     <Compile Include="src\Common\GuiDialogItemRecipeSelector.cs" />
+    <Compile Include="src\Items\ItemGlassContainer.cs" />
+    <Compile Include="src\Items\ItemGlassLadle.cs" />
     <Compile Include="src\ToolDescriptors\BlowingToolDescriptor.cs" />
     <Compile Include="src\ToolDescriptors\DryableToolDescriptor.cs" />
     <Compile Include="src\ToolDescriptors\IntakeToolDescriptor.cs" />

@@ -50,6 +50,19 @@ namespace GlassMaking
 			return step < 0 || step >= Steps.Length ? -1 : step;
 		}
 
+		public void GetStepAndProgress(ITreeAttribute recipeAttribute, out int step, out float progress)
+		{
+			step = recipeAttribute.GetInt("step", 0);
+			if(step < 0 || step >= Steps.Length)
+			{
+				step = -1;
+				progress = 0;
+				return;
+			}
+
+			progress = GameMath.Clamp(recipeAttribute.GetFloat("progress", 0), 0, 1);
+		}
+
 		public bool Resolve(IWorldAccessor world, string sourceForErrorLogging)
 		{
 			if(Steps == null || Steps.Length == 0 || Output == null)
@@ -188,21 +201,7 @@ namespace GlassMaking
 		public void UpdateMesh(ITreeAttribute recipeAttribute, ItemGlassworkPipe.IMeshContainer container, int glow)
 		{
 			string code = recipeAttribute.GetString("code");
-			int step = recipeAttribute.GetInt("step", 0);
-			float t = GameMath.Clamp(recipeAttribute.GetFloat("progress", 0), 0, 1);
-
-			if(container.Data == null || !(container.Data is MeshInfo data))
-			{
-				container.Data = new MeshInfo(code, step, t, glow);
-			}
-			else if(!data.Equals(code, step, t, glow))
-			{
-				data.Set(code, step, t, glow);
-			}
-			else
-			{
-				return;
-			}
+			GetStepAndProgress(recipeAttribute, out int step, out float t);
 
 			SmoothRadialShape prevShape = null;
 			for(int i = step - 1; i >= 0; i--)
@@ -271,35 +270,6 @@ namespace GlassMaking
 		private static GlassBlowingRecipeStep CloneStep(GlassBlowingRecipeStep other)
 		{
 			return other.Clone();
-		}
-
-		private class MeshInfo
-		{
-			internal string code;
-			internal int step;
-			internal float progress;
-			internal int glow;
-
-			public MeshInfo(string code, int step, float progress, int glow)
-			{
-				this.code = code;
-				this.step = step;
-				this.progress = progress;
-				this.glow = glow;
-			}
-
-			public void Set(string code, int step, float progress, int glow)
-			{
-				this.code = code;
-				this.step = step;
-				this.progress = progress;
-				this.glow = glow;
-			}
-
-			public bool Equals(string code, int step, float progress, int glow)
-			{
-				return this.code == code && this.step == step && this.progress == progress && this.glow == glow;
-			}
 		}
 	}
 

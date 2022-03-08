@@ -3,6 +3,7 @@ using GlassMaking.Blocks.Multiblock;
 using GlassMaking.Common;
 using GlassMaking.GlassblowingTools;
 using GlassMaking.Handbook;
+using GlassMaking.ItemRender;
 using GlassMaking.Items;
 using GlassMaking.TemporaryMetadata;
 using GlassMaking.ToolDescriptors;
@@ -21,7 +22,7 @@ namespace GlassMaking
 {
 	public class GlassMakingMod : ModSystem
 	{
-		internal GlasspipeCacheManager pipeRenderCache;
+		internal CachedItemRenderer itemsRenderer;
 
 		private ICoreServerAPI sapi = null;
 		private ICoreClientAPI capi = null;
@@ -123,8 +124,8 @@ namespace GlassMaking
 			api.Input.RegisterHotKey("itemrecipeselect", Lang.Get("Select Item Recipe"), GlKeys.F, HotkeyType.GUIOrOtherControls);
 			api.Gui.RegisterDialog(new GuiDialogItemRecipeSelector(api));
 
-			var pool = api.ModLoader.GetModSystem<TemporaryMetadataSystem>().CreatePool<GlasspipeRenderCache>(TimeSpan.FromSeconds(30));
-			pipeRenderCache = new GlasspipeCacheManager(pool);
+			var pool = api.ModLoader.GetModSystem<TemporaryMetadataSystem>().CreatePool<CachedItemRenderer.RendererContainer>(TimeSpan.FromSeconds(30));
+			itemsRenderer = new CachedItemRenderer(pool);
 
 			try
 			{
