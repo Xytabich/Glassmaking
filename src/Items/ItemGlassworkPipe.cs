@@ -260,6 +260,7 @@ namespace GlassMaking.Items
 							}
 						}
 					}
+
 					var source = be as IGlassmeltSource;
 					if(source != null && source.CanInteract(byEntity, blockSel))
 					{
@@ -411,6 +412,7 @@ namespace GlassMaking.Items
 						}
 					}
 				}
+
 				var source = be as IGlassmeltSource;
 				if(source != null && source.CanInteract(byEntity, blockSel))
 				{

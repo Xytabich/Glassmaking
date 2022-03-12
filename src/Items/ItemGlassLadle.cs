@@ -107,6 +107,43 @@ namespace GlassMaking.Items
 				{
 					var itemstack = slot.Itemstack;
 
+					var mold = be as IGlassmeltSink;
+					if(mold != null)
+					{
+						var glassmelt = itemstack.Attributes.GetTreeAttribute("glassmelt");
+						if(glassmelt != null)
+						{
+							if(IsWorkingTemperature(byEntity.World, itemstack))
+							{
+								if(mold.CanReceiveGlass(new AssetLocation(glassmelt.GetString("code")), glassmelt.GetInt("amount")))
+								{
+									itemstack.TempAttributes.SetFloat("glassmaking:prevTakeTime", 0);
+									byEntity.World.RegisterCallback((world, pos, dt) => {
+										if(byEntity.Controls.HandUse == EnumHandInteract.HeldItemInteract)
+										{
+											IPlayer dualCallByPlayer = null;
+											if(byEntity is EntityPlayer)
+											{
+												dualCallByPlayer = byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID);
+											}
+											world.PlaySoundAt(new AssetLocation("sounds/sizzle"), byEntity, dualCallByPlayer);
+										}
+									}, blockSel.Position, 666);
+									handling = EnumHandHandling.PreventDefault;
+									return;
+								}
+								else if(api.Side == EnumAppSide.Client && !mold.IsLiquid)
+								{
+									((ICoreClientAPI)api).TriggerIngameError(this, "toocold", Lang.Get("glassmaking:Glass in the mold has cooled down"));
+								}
+							}
+							else if(api.Side == EnumAppSide.Client)
+							{
+								((ICoreClientAPI)api).TriggerIngameError(this, "toocold", Lang.Get("glassmaking:The glass melt is not liquid enough"));
+							}
+						}
+					}
+
 					var source = be as IGlassmeltSource;
 					if(source != null && source.CanInteract(byEntity, blockSel))
 					{
@@ -117,11 +154,11 @@ namespace GlassMaking.Items
 							handling = EnumHandHandling.PreventDefault;
 							if(api.Side == EnumAppSide.Client)
 							{
-								slot.Itemstack.TempAttributes.SetBool("glassmaking:glassFlag", true);
+								itemstack.TempAttributes.SetBool("glassmaking:glassFlag", true);
 							}
 							else
 							{
-								slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:glassFlag");
+								itemstack.TempAttributes.RemoveAttribute("glassmaking:glassFlag");
 							}
 							return;
 						}
@@ -160,11 +197,92 @@ namespace GlassMaking.Items
 			{
 				var itemstack = slot.Itemstack;
 
+				var mold = be as IGlassmeltSink;
+				if(mold != null)
+				{
+					var glassmelt = itemstack.Attributes.GetTreeAttribute("glassmelt");
+					if(glassmelt != null)
+					{
+						if(IsWorkingTemperature(byEntity.World, itemstack))
+						{
+							int amount = glassmelt.GetInt("amount");
+							var code = new AssetLocation(glassmelt.GetString("code"));
+							if(mold.CanReceiveGlass(code, amount))
+							{
+								if(api.Side == EnumAppSide.Client)
+								{
+									ModelTransform modelTransform = new ModelTransform();
+									modelTransform.EnsureDefaultValues();
+									modelTransform.Origin.Set(0.5f, 0.2f, 0.5f);
+
+									float offset = AnimUtil.Reach(secondsUsed, 0.5f);
+									modelTransform.Translation.Set(offset * 2, offset, offset);
+
+									modelTransform.Scale = AnimUtil.Reach(secondsUsed / 5, 1, 0.9f);
+									modelTransform.Rotation.X = AnimUtil.Reach(secondsUsed * 45f, -10);
+									modelTransform.Rotation.Y = AnimUtil.Reach(secondsUsed * 45f, 15);
+									modelTransform.Rotation.Z = AnimUtil.Tri(0, -10, -90, 2f / 3f, Math.Min(secondsUsed * 1.5f, 1));
+									byEntity.Controls.UsingHeldItemTransformBefore = modelTransform;
+								}
+								if(secondsUsed > 0.5f)
+								{
+									float prevTime = itemstack.TempAttributes.GetFloat("glassmaking:prevTakeTime", 0f);
+									itemstack.TempAttributes.SetFloat("glassmaking:prevTakeTime", secondsUsed - 0.5f);
+
+									int takeAmount = Math.Max(1, Math.Min(amount, (int)((secondsUsed - 0.5f - prevTime) * 250)));
+									amount -= takeAmount;
+
+									mold.ReceiveGlass(byEntity, code, ref takeAmount, GetGlassTemperature(byEntity.World, itemstack));
+									amount += takeAmount;
+
+									if(amount <= 0)
+									{
+										itemstack.Attributes.RemoveAttribute("glassmelt");
+										slot.MarkDirty();
+										OnHeldInteractStop(secondsUsed, slot, byEntity, blockSel, entitySel);
+										return false;
+									}
+									else
+									{
+										glassmelt.SetInt("amount", amount);
+									}
+
+									IPlayer byPlayer = null;
+									if(byEntity is EntityPlayer) byPlayer = byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID);
+									// Smoke on the mold
+									Vec3d blockpos = blockSel.Position.ToVec3d().Add(0.5, 0.2, 0.5);
+									float y2 = 0;
+									Block block = byEntity.World.BlockAccessor.GetBlock(blockSel.Position);
+									Cuboidf[] collboxs = block.GetCollisionBoxes(byEntity.World.BlockAccessor, blockSel.Position);
+									for(int i = 0; collboxs != null && i < collboxs.Length; i++)
+									{
+										y2 = Math.Max(y2, collboxs[i].Y2);
+									}
+									byEntity.World.SpawnParticles(
+										Math.Max(1, 12 - (secondsUsed - 1) * 6),
+										ColorUtil.ToRgba(50, 220, 220, 220),
+										blockpos.AddCopy(-0.5, y2 - 2 / 16f, -0.5),
+										blockpos.Add(0.5, y2 - 2 / 16f + 0.15, 0.5),
+										new Vec3f(-0.5f, 0f, -0.5f),
+										new Vec3f(0.5f, 0f, 0.5f),
+										1.5f,
+										-0.05f,
+										0.75f,
+										EnumParticleModel.Quad,
+										byPlayer
+									);
+								}
+								return true;
+							}
+						}
+					}
+				}
+
 				var source = be as IGlassmeltSource;
 				if(source != null && source.CanInteract(byEntity, blockSel))
 				{
 					// On the client side it means that the animation is started, on the server side it means that the glass is taken
-					bool glassFlag = slot.Itemstack.TempAttributes.HasAttribute("glassmaking:glassFlag");
+					bool glassFlag = itemstack.TempAttributes.HasAttribute("glassmaking:glassFlag");
 
 					int amount = source.GetGlassAmount();
 					if(glassFlag || amount > amountThreshold && CanTakeGlass(byEntity.World, itemstack, source.GetGlassCode(), out _))
@@ -190,7 +308,7 @@ namespace GlassMaking.Items
 						{
 							if(!glassFlag)
 							{
-								slot.Itemstack.TempAttributes.SetBool("glassmaking:glassFlag", true);
+								itemstack.TempAttributes.SetBool("glassmaking:glassFlag", true);
 
 								AddGlass(byEntity, slot, amount - amountThreshold, source.GetGlassCode(), source.GetTemperature(), out int consumed);
 								source.RemoveGlass(consumed);
@@ -218,11 +336,20 @@ namespace GlassMaking.Items
 		{
 			base.OnHeldInteractStop(secondsUsed, slot, byEntity, blockSel, entitySel);
 			slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:glassFlag");
+			slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:prevTakeTime");
+
+			slot.MarkDirty();
+			if(blockSel != null)
+			{
+				var be = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position) as IGlassmeltSink;
+				if(be != null) be.OnPourOver();
+			}
 		}
 
 		public override bool OnHeldInteractCancel(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, EnumItemUseCancelReason cancelReason)
 		{
 			slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:glassFlag");
+			slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:prevTakeTime");
 			return true;
 		}
 

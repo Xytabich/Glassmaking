@@ -18,7 +18,7 @@
 	"variantgroups": [
 		{
 			"code": "size",
-			"states": [ "small" ]
+			"states": [ "small", "medium" ]
 		}
 	],
 	"maxstacksize": 1,
@@ -52,6 +52,24 @@
 					"x": 0.375,
 					"y": 0.25,
 					"z": 0.375
+				},
+				"rotation": { "y": 45 }
+			}
+		},
+		"*-medium": {
+			"maxGlass": 1000,
+			"glassThreshold": 500,
+			"glassTransform": {
+				"origin": {
+					"x": 0.5,
+					"y": 0,
+					"z": 0.5
+				},
+				"translation": { "y": 0.0625 },
+				"scaleXYZ": {
+					"x": 0.5,
+					"y": 0.3125,
+					"z": 0.5
 				},
 				"rotation": { "y": 45 }
 			}

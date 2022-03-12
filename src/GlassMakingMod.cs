@@ -73,6 +73,7 @@ namespace GlassMaking
 			api.RegisterBlockClass("glassmaking:annealer", typeof(BlockAnnealer));
 			api.RegisterBlockClass("glassmaking:smeltery", typeof(BlockGlassSmeltery));
 			api.RegisterBlockClass("glassmaking:glassmold", typeof(BlockGlassBlowingMold));
+			api.RegisterBlockClass("glassmaking:castingmold", typeof(BlockGlassCastingMold));
 			api.RegisterBlockClass("glassmaking:workbench", typeof(BlockWorkbench));
 			api.RegisterBlockClass("glassmaking:workbenchs", typeof(BlockWorkbenchSurrogate));
 
@@ -85,6 +86,7 @@ namespace GlassMaking
 			api.RegisterBlockEntityClass("glassmaking:annealer", typeof(BlockEntityAnnealer));
 			api.RegisterBlockEntityClass("glassmaking:smeltery", typeof(BlockEntityGlassSmeltery));
 			api.RegisterBlockEntityClass("glassmaking:glassmold", typeof(BlockEntityGlassBlowingMold));
+			api.RegisterBlockEntityClass("glassmaking:castingmold", typeof(BlockEntityGlassCastingMold));
 			api.RegisterBlockEntityClass("glassmaking:workbench", typeof(BlockEntityWorkbench));
 
 			api.RegisterBlockEntityClass("glassmaking:larsmelmain", typeof(BlockEntityLargeSmelteryCore));

@@ -2,6 +2,6 @@
 {
 	public interface IGlassBlowingMold
 	{
-		GlassMoldRecipe[] GetRecipes();
+		BlowingMoldRecipe[] GetRecipes();
 	}
 }

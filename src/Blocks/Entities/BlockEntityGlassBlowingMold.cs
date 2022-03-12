@@ -241,7 +241,7 @@ namespace GlassMaking.Blocks
 			return -1;
 		}
 
-		private bool IsSuitableRecipe(GlassMoldRecipe recipe, string[] layersCode, int[] layersAmount)
+		private bool IsSuitableRecipe(BlowingMoldRecipe recipe, string[] layersCode, int[] layersAmount)
 		{
 			var layers = recipe.Recipe;
 			if(layersCode.Length < layers.Length)

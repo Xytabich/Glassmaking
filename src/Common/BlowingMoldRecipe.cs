@@ -7,7 +7,7 @@ using Vintagestory.API.Util;
 namespace GlassMaking
 {
 	[JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-	public class GlassMoldRecipe : IRecipeBase<GlassMoldRecipe>
+	public class BlowingMoldRecipe : IRecipeBase<BlowingMoldRecipe>
 	{
 		[JsonProperty(Required = Required.DisallowNull)]
 		public CraftingRecipeIngredient Output;
@@ -21,7 +21,7 @@ namespace GlassMaking
 
 		public bool Enabled { get; set; } = true;
 		public IRecipeIngredient[] Ingredients => Recipe;
-		IRecipeOutput IRecipeBase<GlassMoldRecipe>.Output => Output.ReturnedStack;
+		IRecipeOutput IRecipeBase<BlowingMoldRecipe>.Output => Output.ReturnedStack;
 
 		public Dictionary<string, string[]> GetNameToCodeMapping(IWorldAccessor world)
 		{
@@ -63,9 +63,9 @@ namespace GlassMaking
 			return Output.Resolve(world, sourceForErrorLogging);
 		}
 
-		public GlassMoldRecipe Clone()
+		public BlowingMoldRecipe Clone()
 		{
-			return new GlassMoldRecipe() {
+			return new BlowingMoldRecipe() {
 				Output = Output.Clone(),
 				Recipe = Array.ConvertAll(Recipe, r => r.Clone()),
 				FillTime = FillTime,
@@ -100,7 +100,8 @@ namespace GlassMaking
 					Code = Code.Clone(),
 					Amount = Amount,
 					Var = Var,
-					Name = Name
+					Name = Name,
+					AllowedVariants = (string[])(AllowedVariants?.Clone())
 				};
 			}
 		}
