@@ -294,7 +294,7 @@ namespace GlassMaking.Items
 								handling = EnumHandHandling.PreventDefault;
 								return;
 							}
-							else if(isTooCold)
+							else if(isTooCold && api.Side == EnumAppSide.Client)
 							{
 								((ICoreClientAPI)api).TriggerIngameError(this, "toocold", Lang.Get("glassmaking:The workpiece is not hot enough to work"));
 							}
