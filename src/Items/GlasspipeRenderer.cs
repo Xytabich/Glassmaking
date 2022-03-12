@@ -39,10 +39,10 @@ namespace GlassMaking.Items
 			int prevVertices = mesh.VerticesCount;
 			int prevIndices = mesh.IndicesCount;
 
-			UpdateGlasslayersMesh(amounts, GlasspipeRenderUtil.StateToGlow(temperature));
+			UpdateGlasslayersMesh(amounts, GlassRenderUtil.StateToGlow(temperature));
 
 			bool reupload = prevVertices != mesh.VerticesCount || prevIndices != mesh.IndicesCount;
-			UpdateMeshRef(capi, itemStack.Item.Shape, capi.Tesselator.GetTextureSource(itemStack.Item), ((ItemGlassworkPipe)itemStack.Item).glassTransform, reupload);
+			UpdateMeshRef(capi, itemStack.Item, capi.Tesselator.GetTextureSource(itemStack.Item), ((ItemGlassworkPipe)itemStack.Item).glassTransform, reupload);
 		}
 
 		public void SetRenderInfo(ICoreClientAPI capi, ItemStack itemStack, ref ItemRenderInfo renderInfo)
@@ -51,10 +51,10 @@ namespace GlassMaking.Items
 			renderInfo.CullFaces = true;
 		}
 
-		public void UpdateMeshRef(ICoreClientAPI capi, CompositeShape shape, ITexPositionSource tex, ModelTransform meshTransform, bool reupload)
+		public void UpdateMeshRef(ICoreClientAPI capi, Item item, ITexPositionSource tex, ModelTransform meshTransform, bool reupload)
 		{
 			mesh.SetTexPos(tex["glass"]);
-			var baseMesh = GlasspipeRenderUtil.GetPipeMesh(capi, shape, tex);
+			var baseMesh = GlasspipeRenderUtil.GetPipeMesh(capi, item, tex);
 			var toUpload = new MeshData(baseMesh.VerticesCount + mesh.VerticesCount, baseMesh.IndicesCount + mesh.IndicesCount, false, true, true, true).WithColorMaps();
 			toUpload.AddMeshData(baseMesh);
 			mesh.ModelTransform(meshTransform);
@@ -155,10 +155,10 @@ namespace GlassMaking.Items
 			int prevVertices = mesh.VerticesCount;
 			int prevIndices = mesh.IndicesCount;
 
-			data.recipe.UpdateMesh(data.recipeAttribute, this, GlasspipeRenderUtil.StateToGlow(temperature));
+			data.recipe.UpdateMesh(data.recipeAttribute, this, GlassRenderUtil.StateToGlow(temperature));
 
 			bool reupload = prevVertices != mesh.VerticesCount || prevIndices != mesh.IndicesCount;
-			UpdateMeshRef(capi, itemStack.Item.Shape, capi.Tesselator.GetTextureSource(itemStack.Item), ((ItemGlassworkPipe)itemStack.Item).glassTransform, reupload);
+			UpdateMeshRef(capi, itemStack.Item, capi.Tesselator.GetTextureSource(itemStack.Item), ((ItemGlassworkPipe)itemStack.Item).glassTransform, reupload);
 		}
 
 		public void SetRenderInfo(ICoreClientAPI capi, ItemStack itemStack, ref ItemRenderInfo renderInfo)
@@ -167,10 +167,10 @@ namespace GlassMaking.Items
 			renderInfo.CullFaces = true;
 		}
 
-		public void UpdateMeshRef(ICoreClientAPI capi, CompositeShape shape, ITexPositionSource tex, ModelTransform meshTransform, bool reupload)
+		public void UpdateMeshRef(ICoreClientAPI capi, Item item, ITexPositionSource tex, ModelTransform meshTransform, bool reupload)
 		{
 			mesh.SetTexPos(tex["glass"]);
-			var baseMesh = GlasspipeRenderUtil.GetPipeMesh(capi, shape, tex);
+			var baseMesh = GlasspipeRenderUtil.GetPipeMesh(capi, item, tex);
 			var toUpload = new MeshData(baseMesh.VerticesCount + mesh.VerticesCount, baseMesh.IndicesCount + mesh.IndicesCount, false, true, true, true).WithColorMaps();
 			toUpload.AddMeshData(baseMesh);
 			mesh.ModelTransform(meshTransform);
@@ -222,38 +222,15 @@ namespace GlassMaking.Items
 
 	internal static partial class GlasspipeRenderUtil
 	{
-		public static TemperatureState TemperatureToState(float temperature, float workingTemperature)
+		internal static MeshData GetPipeMesh(ICoreClientAPI capi, Item item, ITexPositionSource tex)
 		{
-			if(temperature < workingTemperature * 0.45f) return TemperatureState.Cold;
-			if(temperature < workingTemperature) return TemperatureState.Heated;
-			return TemperatureState.Working;
-		}
-
-		public static int StateToGlow(TemperatureState state)
-		{
-			switch(state)
-			{
-				case TemperatureState.Heated: return 127;
-				case TemperatureState.Working: return 255;
-				default: return 0;
-			}
-		}
-
-		internal static MeshData GetPipeMesh(ICoreClientAPI capi, CompositeShape shape, ITexPositionSource tex)
-		{
-			return ObjectCacheUtil.GetOrCreate(capi, "glassmaking:glasspipemesh", () => {
+			var shape = item.Shape;
+			return ObjectCacheUtil.GetOrCreate(capi, "glassmaking:glasspipemesh|" + item.Code.ToString(), () => {
 				Shape shapeBase = capi.Assets.TryGet(new AssetLocation(shape.Base.Domain, "shapes/" + shape.Base.Path + ".json")).ToObject<Shape>();
 				MeshData mesh;
 				capi.Tesselator.TesselateShape("pipemesh", shapeBase, out mesh, tex, new Vec3f(shape.rotateX, shape.rotateY, shape.rotateZ), 0, 0, 0);
 				return mesh;
 			});
 		}
-	}
-
-	internal enum TemperatureState
-	{
-		Cold,
-		Heated,
-		Working
 	}
 }

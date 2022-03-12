@@ -27,6 +27,7 @@ namespace GlassMaking.Items
 			mod = api.ModLoader.GetModSystem<GlassMakingMod>();
 			maxGlassAmount = Attributes["maxGlass"].AsInt();
 			glassTransform = Attributes["glassTransform"].AsObject<ModelTransform>();
+			glassTransform.EnsureDefaultValues();
 			if(api.Side == EnumAppSide.Client)
 			{
 				interactions = ObjectCacheUtil.GetOrCreate(api, "glassmaking:heldhelp-glasspipe", () => {
@@ -521,7 +522,7 @@ namespace GlassMaking.Items
 			var glasslayers = itemstack.Attributes.GetTreeAttribute("glasslayers");
 			if(glasslayers != null)
 			{
-				var temperature = GlasspipeRenderUtil.TemperatureToState(GetGlassTemperature(capi.World, itemstack), GetWorkingTemperature(capi.World, itemstack));
+				var temperature = GlassRenderUtil.TemperatureToState(GetGlassTemperature(capi.World, itemstack), GetWorkingTemperature(capi.World, itemstack));
 				mod.itemsRenderer.RenderItem<PipeLayersRenderer, PipeLayersRenderer.Data>(capi, itemstack, new PipeLayersRenderer.Data(temperature, glasslayers), ref renderinfo);
 				return;
 			}
@@ -533,7 +534,7 @@ namespace GlassMaking.Items
 					var recipe = mod.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
 					if(recipe != null)
 					{
-						var temperature = GlasspipeRenderUtil.TemperatureToState(GetGlassTemperature(capi.World, itemstack), GetWorkingTemperature(capi.World, itemstack));
+						var temperature = GlassRenderUtil.TemperatureToState(GetGlassTemperature(capi.World, itemstack), GetWorkingTemperature(capi.World, itemstack));
 						mod.itemsRenderer.RenderItem<PipeRecipeRenderer, PipeRecipeRenderer.Data>(capi, itemstack,
 							new PipeRecipeRenderer.Data(temperature, recipe, recipeAttribute), ref renderinfo);
 						return;

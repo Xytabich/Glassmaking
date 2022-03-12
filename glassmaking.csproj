@@ -87,6 +87,7 @@
     <Content Include="modinfo.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\AnimUtil.cs" />
     <Compile Include="src\Blocks\BlockGlassBlowingMold.cs" />
     <Compile Include="src\Blocks\BlockAnnealer.cs" />
     <Compile Include="src\Blocks\BlockLargeSmeltery.cs" />
@@ -131,9 +132,11 @@
     <Compile Include="src\GlassblowingTools\DryableTool.cs" />
     <Compile Include="src\ItemRender\CachedItemRenderer.cs" />
     <Compile Include="src\ItemRender\IItemRenderer.cs" />
+    <Compile Include="src\Items\GlassLadleRenderer.cs" />
     <Compile Include="src\Items\GlasspipeRenderer.cs" />
     <Compile Include="src\Common\GlassTypeProperty.cs" />
     <Compile Include="src\Common\GuiDialogItemRecipeSelector.cs" />
+    <Compile Include="src\Items\GlassRenderUtil.cs" />
     <Compile Include="src\Items\ItemGlassContainer.cs" />
     <Compile Include="src\Items\ItemGlassLadle.cs" />
     <Compile Include="src\ToolDescriptors\BlowingToolDescriptor.cs" />

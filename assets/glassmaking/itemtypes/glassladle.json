@@ -1,0 +1,113 @@
+{
+	"code": "glassladle",
+	"class": "glassmaking:glassladle",
+	"behaviors": [
+		{
+			"name": "glassmaking:gbt-blowing",
+			"properties": {
+				"tool": "blowing"
+			}
+		},
+		{
+			"name": "glassmaking:gbt-glassintake",
+			"properties": {
+				"tool": "glassintake"
+			}
+		}
+	],
+	"variantgroups": [
+		{
+			"code": "size",
+			"states": [ "small" ]
+		}
+	],
+	"maxstacksize": 1,
+	"creativeinventory": {
+		"general": [ "*" ],
+		"tools": [ "*" ],
+		"glassmaking": [ "*" ]
+	},
+	"attributes": {
+		"handbook": {
+			"extraSections": [
+				{
+					"title": "glassmaking:handbook-glassblower-tools",
+					"text": "glassmaking:item-handbooktext-glassladle"
+				}
+			]
+		}
+	},
+	"attributesByType": {
+		"*-small": {
+			"maxGlass": 500,
+			"glassThreshold": 250,
+			"glassTransform": {
+				"origin": {
+					"x": 0.5,
+					"y": 0,
+					"z": 0.5
+				},
+				"translation": { "y": 0.0625 },
+				"scaleXYZ": {
+					"x": 0.375,
+					"y": 0.25,
+					"z": 0.375
+				},
+				"rotation": { "y": 45 }
+			}
+		}
+	},
+	"heldTpIdleAnimation": "holdunderarm",
+	"textures": {
+		"glass": { "base": "game:item/resource/ungraded/quartz" }
+	},
+	"shape": { "base": "item/glassladle/{size}" },
+	"tpHandTransform": {
+		"translation": {
+			"x": -2.75,
+			"y": -1.2,
+			"z": -1.2
+		},
+		"rotation": {
+			"x": 85,
+			"y": 120,
+			"z": 80
+		},
+		"origin": {
+			"x": 0.5,
+			"y": 0.2,
+			"z": 0.5
+		},
+		"scale": 0.4
+	},
+	"fpHandTransform": {
+		"translation": {
+			"x": -0.3,
+			"y": 0.4,
+			"z": -0.3
+		},
+		"rotation": {
+			"x": -170,
+			"y": -10,
+			"z": 170
+		},
+		"origin": {
+			"x": 0.5,
+			"y": 0.2,
+			"z": 0.5
+		}
+	},
+	"guiTransform": {
+		"rotation": {
+			"x": 160,
+			"y": -19,
+			"z": 0
+		},
+		"origin": {
+			"x": 0.5,
+			"y": 0.2,
+			"z": 0.15
+		},
+		"scale": 1.5
+	}
+}

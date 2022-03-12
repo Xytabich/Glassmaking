@@ -1,24 +1,51 @@
-{
-    "attributes": {
-        "breakglass": true
-    },
-    "width": 2,
-    "height": 1,
-    "ingredientPattern": "SW",
-    "ingredients": {
-        "S": {
-            "code": "game:hammer-*",
-            "type": "item",
-            "isTool": true
-        },
-        "W": {
-            "code": "glassworkpipe",
-            "type": "item"
-        }
-    },
-    "shapeless": true,
-    "output": {
-        "code": "glassworkpipe",
-        "type": "item"
-    }
-}
+[
+	{
+		"attributes": {
+			"breakglass": true
+		},
+		"width": 2,
+		"height": 1,
+		"ingredientPattern": "SW",
+		"ingredients": {
+			"S": {
+				"code": "game:hammer-*",
+				"type": "item",
+				"isTool": true
+			},
+			"W": {
+				"code": "glassworkpipe",
+				"type": "item"
+			}
+		},
+		"shapeless": true,
+		"output": {
+			"code": "glassworkpipe",
+			"type": "item"
+		}
+	},
+	{
+		"attributes": {
+			"breakglass": true
+		},
+		"width": 2,
+		"height": 1,
+		"ingredientPattern": "SW",
+		"ingredients": {
+			"S": {
+				"code": "game:hammer-*",
+				"type": "item",
+				"isTool": true
+			},
+			"W": {
+				"name": "size",
+				"code": "glassladle-*",
+				"type": "item"
+			}
+		},
+		"shapeless": true,
+		"output": {
+			"code": "glassladle-{size}",
+			"type": "item"
+		}
+	}
+]
