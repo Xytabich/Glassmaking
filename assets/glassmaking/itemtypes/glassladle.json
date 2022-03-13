@@ -208,10 +208,22 @@
 	},
 	"shape": { "base": "item/glassladle/{size}" },
 	"tpHandTransform": {
-		"translation": {
-			"x": -2.75,
-			"y": -1.2,
-			"z": -1.2
+		"translationByType": {
+			"*-small": {
+				"x": -2.75,
+				"y": -1.2,
+				"z": -1.2
+			},
+			"*-medium": {
+				"x": -2.75,
+				"y": -1.2,
+				"z": -1.2
+			},
+			"*-large": {
+				"x": -3.5,
+				"y": -1.75,
+				"z": -1.2
+			}
 		},
 		"rotation": {
 			"x": 85,
