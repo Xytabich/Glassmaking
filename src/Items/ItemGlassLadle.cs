@@ -228,7 +228,7 @@ namespace GlassMaking.Items
 									float offsetMult = Math.Min(1, secondsUsed * 2 * pourAnimationSpeed);
 									modelTransform.Translation.Mul(offsetMult);
 
-									modelTransform.Scale = AnimUtil.Reach(secondsUsed * pourAnimationSpeed, 1, pourTransform.ScaleXYZ.X);
+									modelTransform.Scale = AnimUtil.Reach(secondsUsed * 0.2f * pourAnimationSpeed, 1, pourTransform.ScaleXYZ.X);
 									modelTransform.Rotation.X = AnimUtil.Reach(secondsUsed * 45f * pourAnimationSpeed, pourTransform.Rotation.X);
 									modelTransform.Rotation.Y = AnimUtil.Reach(secondsUsed * 45f * pourAnimationSpeed, pourTransform.Rotation.Y);
 									modelTransform.Rotation.Z = AnimUtil.Tri(0, pourTransform.Rotation.Z, -90, 2f / 4f, Math.Min(secondsUsed * 1.5f * pourAnimationSpeed, 1));

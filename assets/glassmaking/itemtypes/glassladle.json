@@ -39,8 +39,8 @@
 	},
 	"attributesByType": {
 		"*-small": {
-			"maxGlass": 400,
-			"glassThreshold": 200,
+			"maxGlass": 250,
+			"glassThreshold": 100,
 			"glassTransform": {
 				"origin": {
 					"x": 0.5,
@@ -86,15 +86,15 @@
 				},
 				"rotation": {
 					"x": -10,
-					"y": 15,
+					"y": 0,
 					"z": -10
 				},
 				"scale": 0.9
 			}
 		},
 		"*-medium": {
-			"maxGlass": 600,
-			"glassThreshold": 300,
+			"maxGlass": 500,
+			"glassThreshold": 200,
 			"glassTransform": {
 				"origin": {
 					"x": 0.5,
@@ -134,13 +134,13 @@
 					"z": 0.5
 				},
 				"translation": {
-					"x": 0.4,
-					"y": 0.4,
+					"x": 0.3,
+					"y": 0.5,
 					"z": 0.5
 				},
 				"rotation": {
 					"x": -10,
-					"y": 15,
+					"y": -5,
 					"z": -10
 				},
 				"scale": 0.9
@@ -148,7 +148,7 @@
 		},
 		"*-large": {
 			"maxGlass": 1000,
-			"glassThreshold": 500,
+			"glassThreshold": 400,
 			"glassTransform": {
 				"origin": {
 					"x": 0.5,
@@ -188,16 +188,16 @@
 					"z": 0.5
 				},
 				"translation": {
-					"x": 0,
+					"x": -0.3,
 					"y": 0.4,
-					"z": 0.5
+					"z": 1
 				},
 				"rotation": {
 					"x": -10,
-					"y": 15,
+					"y": -10,
 					"z": -10
 				},
-				"scale": 0.9
+				"scale": 1.1
 			},
 			"pourAnimationSpeed": 0.75
 		}
@@ -292,6 +292,10 @@
 			"y": 0.2,
 			"z": 0.15
 		},
-		"scale": 1.5
+		"scaleByType": {
+			"*-small": 1.5,
+			"*-medium": 1.3,
+			"*-large": 1.2
+		}
 	}
 }
