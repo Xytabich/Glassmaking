@@ -18,7 +18,7 @@
 	"variantgroups": [
 		{
 			"code": "size",
-			"states": [ "small", "medium" ]
+			"states": [ "small", "medium", "large" ]
 		}
 	],
 	"maxstacksize": 1,
@@ -39,8 +39,8 @@
 	},
 	"attributesByType": {
 		"*-small": {
-			"maxGlass": 500,
-			"glassThreshold": 250,
+			"maxGlass": 400,
+			"glassThreshold": 200,
 			"glassTransform": {
 				"origin": {
 					"x": 0.5,
@@ -54,11 +54,47 @@
 					"z": 0.375
 				},
 				"rotation": { "y": 45 }
+			},
+			"takeTransform": {
+				"origin": {
+					"x": 0.5,
+					"y": 0.2,
+					"z": 0.5
+				},
+				"translation": {
+					"x": 0.75,
+					"y": 0.4,
+					"z": 0.5
+				},
+				"rotation": {
+					"x": -10,
+					"y": 10,
+					"z": -90
+				},
+				"scale": 0.9
+			},
+			"pourTransform": {
+				"origin": {
+					"x": 0.5,
+					"y": 0.2,
+					"z": 0.5
+				},
+				"translation": {
+					"x": 0.75,
+					"y": 0.4,
+					"z": 0.5
+				},
+				"rotation": {
+					"x": -10,
+					"y": 15,
+					"z": -10
+				},
+				"scale": 0.9
 			}
 		},
 		"*-medium": {
-			"maxGlass": 1000,
-			"glassThreshold": 500,
+			"maxGlass": 600,
+			"glassThreshold": 300,
 			"glassTransform": {
 				"origin": {
 					"x": 0.5,
@@ -72,7 +108,98 @@
 					"z": 0.5
 				},
 				"rotation": { "y": 45 }
+			},
+			"takeTransform": {
+				"origin": {
+					"x": 0.5,
+					"y": 0.2,
+					"z": 0.5
+				},
+				"translation": {
+					"x": 0.4,
+					"y": 0.4,
+					"z": 0.5
+				},
+				"rotation": {
+					"x": -10,
+					"y": 10,
+					"z": -90
+				},
+				"scale": 0.9
+			},
+			"pourTransform": {
+				"origin": {
+					"x": 0.5,
+					"y": 0.2,
+					"z": 0.5
+				},
+				"translation": {
+					"x": 0.4,
+					"y": 0.4,
+					"z": 0.5
+				},
+				"rotation": {
+					"x": -10,
+					"y": 15,
+					"z": -10
+				},
+				"scale": 0.9
 			}
+		},
+		"*-large": {
+			"maxGlass": 1000,
+			"glassThreshold": 500,
+			"glassTransform": {
+				"origin": {
+					"x": 0.5,
+					"y": 0,
+					"z": 0.5
+				},
+				"translation": { "y": 0.0625 },
+				"scaleXYZ": {
+					"x": 0.75,
+					"y": 0.4375,
+					"z": 0.75
+				},
+				"rotation": { "y": 45 }
+			},
+			"takeTransform": {
+				"origin": {
+					"x": 0.5,
+					"y": 0.2,
+					"z": 0.5
+				},
+				"translation": {
+					"x": 0,
+					"y": 0.4,
+					"z": 0.5
+				},
+				"rotation": {
+					"x": -10,
+					"y": 10,
+					"z": -90
+				},
+				"scale": 0.9
+			},
+			"pourTransform": {
+				"origin": {
+					"x": 0.5,
+					"y": 0.2,
+					"z": 0.5
+				},
+				"translation": {
+					"x": 0,
+					"y": 0.4,
+					"z": 0.5
+				},
+				"rotation": {
+					"x": -10,
+					"y": 15,
+					"z": -10
+				},
+				"scale": 0.9
+			},
+			"pourAnimationSpeed": 0.75
 		}
 	},
 	"heldTpIdleAnimation": "holdunderarm",
@@ -98,21 +225,60 @@
 		},
 		"scale": 0.4
 	},
-	"fpHandTransform": {
-		"translation": {
-			"x": -0.3,
-			"y": 0.4,
-			"z": -0.3
+	"fpHandTransformByType": {
+		"*-large": {
+			"translation": {
+				"x": -0.5,
+				"y": 0.1,
+				"z": -1.25
+			},
+			"rotation": {
+				"x": -170,
+				"y": -20,
+				"z": 170
+			},
+			"origin": {
+				"x": 0.5,
+				"y": 0.2,
+				"z": 0.5
+			},
+			"scale": 1.75
 		},
-		"rotation": {
-			"x": -170,
-			"y": -10,
-			"z": 170
+		"*-medium": {
+			"translation": {
+				"x": -0.45,
+				"y": 0.3,
+				"z": -0.4
+			},
+			"rotation": {
+				"x": -170,
+				"y": -22,
+				"z": 170
+			},
+			"origin": {
+				"x": 0.5,
+				"y": 0.2,
+				"z": 0.5
+			},
+			"scale": 1.4
 		},
-		"origin": {
-			"x": 0.5,
-			"y": 0.2,
-			"z": 0.5
+		"*-small": {
+			"translation": {
+				"x": -0.3,
+				"y": 0.4,
+				"z": -0.5
+			},
+			"rotation": {
+				"x": -170,
+				"y": -15,
+				"z": 170
+			},
+			"origin": {
+				"x": 0.5,
+				"y": 0.2,
+				"z": 0.5
+			},
+			"scale": 1.3
 		}
 	},
 	"guiTransform": {

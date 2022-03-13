@@ -110,7 +110,7 @@ namespace GlassMaking.Items
 				dsc.AppendLine(Lang.Get("Temperature: {0}°C", GetGlassTemperature(world, inSlot.Itemstack).ToString("0")));
 
 				bool showHeader = true;
-				foreach(var item in Utils.GetShardsList(world, amountByCode))
+				foreach(var item in GlassBlend.GetShardsList(world, amountByCode))
 				{
 					if(showHeader)
 					{
@@ -180,7 +180,7 @@ namespace GlassMaking.Items
 						}
 
 						var entity = byPlayer.Entity;
-						foreach(var item in Utils.GetShardsList(api.World, amountByCode))
+						foreach(var item in GlassBlend.GetShardsList(api.World, amountByCode))
 						{
 							if(!entity.TryGiveItemStack(item))
 							{
@@ -371,7 +371,7 @@ namespace GlassMaking.Items
 									itemstack.Attributes.RemoveAttribute("glasslayers");
 									slot.MarkDirty();
 
-									foreach(var item in Utils.GetShardsList(api.World, shards))
+									foreach(var item in GlassBlend.GetShardsList(api.World, shards))
 									{
 										if(!byEntity.TryGiveItemStack(item))
 										{

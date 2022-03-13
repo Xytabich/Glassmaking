@@ -297,7 +297,7 @@ namespace GlassMaking.Blocks
 			var items = inventory.CollectItems();
 			if(glassAmount > 0 && glassCode != null)
 			{
-				foreach(var item in Utils.GetShardsList(Api.World, glassCode, glassAmount))
+				foreach(var item in GlassBlend.GetShardsList(Api.World, glassCode, glassAmount))
 				{
 					items.Add(item);
 				}

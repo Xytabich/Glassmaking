@@ -190,11 +190,8 @@ namespace GlassMaking.Blocks
 
 			if(be != null)
 			{
-				ItemStack[] outstack = be.GetReadyMoldedStacks();
-				if(outstack != null)
-				{
-					stacks.AddRange(outstack);
-				}
+				var outstack = be.GetDrops();
+				if(outstack != null) stacks.AddRange(outstack);
 			}
 
 			return stacks.ToArray();

@@ -20,16 +20,28 @@ namespace GlassMaking.Items
 		private int amountThreshold;
 		private WorldInteraction[] interactions;
 
+		private ModelTransform pourTransform;
+		private ModelTransform takeTransform;
+		private float pourAnimationSpeed;
+
 		public override void OnLoaded(ICoreAPI api)
 		{
 			base.OnLoaded(api);
 			mod = api.ModLoader.GetModSystem<GlassMakingMod>();
 			maxGlassAmount = Attributes["maxGlass"].AsInt();
 			amountThreshold = Attributes["glassThreshold"].AsInt();
-			glassTransform = Attributes["glassTransform"].AsObject<ModelTransform>();
-			glassTransform.EnsureDefaultValues();
+			pourAnimationSpeed = Attributes["takeSpeed"].AsFloat(1f);
 			if(api.Side == EnumAppSide.Client)
 			{
+				glassTransform = Attributes["glassTransform"].AsObject<ModelTransform>();
+				glassTransform.EnsureDefaultValues();
+
+				pourTransform = Attributes["pourTransform"].AsObject<ModelTransform>();
+				pourTransform.EnsureDefaultValues();
+
+				takeTransform = Attributes["takeTransform"].AsObject<ModelTransform>();
+				takeTransform.EnsureDefaultValues();
+
 				interactions = ObjectCacheUtil.GetOrCreate(api, "glassmaking:heldhelp-ladle", () => {
 					List<ItemStack> list = new List<ItemStack>();
 					var capi = api as ICoreClientAPI;
@@ -71,7 +83,7 @@ namespace GlassMaking.Items
 				dsc.AppendLine(Lang.Get("Temperature: {0}°C", GetGlassTemperature(world, inSlot.Itemstack).ToString("0")));
 
 				bool showHeader = true;
-				foreach(var item in Utils.GetShardsList(world, code, amount))
+				foreach(var item in GlassBlend.GetShardsList(world, code, amount))
 				{
 					if(showHeader)
 					{
@@ -211,25 +223,24 @@ namespace GlassMaking.Items
 							{
 								if(api.Side == EnumAppSide.Client)
 								{
-									ModelTransform modelTransform = new ModelTransform();
-									modelTransform.EnsureDefaultValues();
-									modelTransform.Origin.Set(0.5f, 0.2f, 0.5f);
+									ModelTransform modelTransform = pourTransform.Clone();
 
-									float offset = AnimUtil.Reach(secondsUsed, 0.5f);
-									modelTransform.Translation.Set(offset * 2, offset, offset);
+									float offsetMult = Math.Min(1, secondsUsed * 2 * pourAnimationSpeed);
+									modelTransform.Translation.Mul(offsetMult);
 
-									modelTransform.Scale = AnimUtil.Reach(secondsUsed / 5, 1, 0.9f);
-									modelTransform.Rotation.X = AnimUtil.Reach(secondsUsed * 45f, -10);
-									modelTransform.Rotation.Y = AnimUtil.Reach(secondsUsed * 45f, 15);
-									modelTransform.Rotation.Z = AnimUtil.Tri(0, -10, -90, 2f / 3f, Math.Min(secondsUsed * 1.5f, 1));
+									modelTransform.Scale = AnimUtil.Reach(secondsUsed * pourAnimationSpeed, 1, pourTransform.ScaleXYZ.X);
+									modelTransform.Rotation.X = AnimUtil.Reach(secondsUsed * 45f * pourAnimationSpeed, pourTransform.Rotation.X);
+									modelTransform.Rotation.Y = AnimUtil.Reach(secondsUsed * 45f * pourAnimationSpeed, pourTransform.Rotation.Y);
+									modelTransform.Rotation.Z = AnimUtil.Tri(0, pourTransform.Rotation.Z, -90, 2f / 4f, Math.Min(secondsUsed * 1.5f * pourAnimationSpeed, 1));
 									byEntity.Controls.UsingHeldItemTransformBefore = modelTransform;
 								}
-								if(secondsUsed > 0.5f)
+								float prepareTime = 0.5f / pourAnimationSpeed;
+								if(secondsUsed > prepareTime)
 								{
 									float prevTime = itemstack.TempAttributes.GetFloat("glassmaking:prevTakeTime", 0f);
-									itemstack.TempAttributes.SetFloat("glassmaking:prevTakeTime", secondsUsed - 0.5f);
+									itemstack.TempAttributes.SetFloat("glassmaking:prevTakeTime", secondsUsed - prepareTime);
 
-									int takeAmount = Math.Max(1, Math.Min(amount, (int)((secondsUsed - 0.5f - prevTime) * 250)));
+									int takeAmount = Math.Max(1, Math.Min(amount, (int)((secondsUsed - prepareTime - prevTime) * 250)));
 									amount -= takeAmount;
 
 									mold.ReceiveGlass(byEntity, code, ref takeAmount, GetGlassTemperature(byEntity.World, itemstack));
@@ -290,17 +301,17 @@ namespace GlassMaking.Items
 						const float useTime = 3f;
 						if(api.Side == EnumAppSide.Client)
 						{
-							ModelTransform modelTransform = new ModelTransform();
-							modelTransform.EnsureDefaultValues();
-							modelTransform.Origin.Set(0.5f, 0.2f, 0.5f);
+							ModelTransform modelTransform = takeTransform.Clone();
 
-							float offset = AnimUtil.Quad(0, 0.5f, 0.5f, 0, 0.5f / useTime, 2.5f / useTime, Math.Min(secondsUsed / useTime, 1));
-							modelTransform.Translation.Set(offset * 2, offset, offset);
+							float offsetMult = AnimUtil.Quad(0, 1, 1, 0, 0.5f / useTime, 2.5f / useTime, Math.Min(secondsUsed / useTime, 1));
+							modelTransform.Translation.Mul(offsetMult);
 
-							modelTransform.Scale = AnimUtil.Quad(1, 0.9f, 0.9f, 1, 0.5f / useTime, 2.5f / useTime, Math.Min(secondsUsed / useTime, 1));
-							modelTransform.Rotation.X = AnimUtil.Tri(0, -10, 0, 1f / (useTime * 3f), Math.Min(secondsUsed / useTime, 1));
-							modelTransform.Rotation.Y = AnimUtil.Quad(0, 15, 10, 0, 2f / useTime, 2.5f / useTime, Math.Min(secondsUsed / useTime, 1));
-							modelTransform.Rotation.Z = AnimUtil.Tri(0, -90, 0, 0.2f, Math.Min(secondsUsed / 2, 1));
+							float scale = takeTransform.ScaleXYZ.X;
+							modelTransform.Scale = AnimUtil.Quad(1, scale, scale, 1, 0.5f / useTime, 2.5f / useTime, Math.Min(secondsUsed / useTime, 1));
+							modelTransform.Rotation.X = AnimUtil.Tri(0, takeTransform.Rotation.X, 0, 1f / (useTime * 3f), Math.Min(secondsUsed / useTime, 1));
+							modelTransform.Rotation.Y = AnimUtil.Quad(0, takeTransform.Rotation.Y + 5,
+								takeTransform.Rotation.Y, 0, 2f / useTime, 2.5f / useTime, Math.Min(secondsUsed / useTime, 1));
+							modelTransform.Rotation.Z = AnimUtil.Tri(0, takeTransform.Rotation.Z, 0, 0.2f, Math.Min(secondsUsed / 2, 1));
 							byEntity.Controls.UsingHeldItemTransformBefore = modelTransform;
 						}
 						const float addTime = 1.5f;
@@ -377,7 +388,7 @@ namespace GlassMaking.Items
 					if(glassmelt != null)
 					{
 						var entity = byPlayer.Entity;
-						foreach(var item in Utils.GetShardsList(api.World, new AssetLocation(glassmelt.GetString("code")), glassmelt.GetInt("amount")))
+						foreach(var item in GlassBlend.GetShardsList(api.World, new AssetLocation(glassmelt.GetString("code")), glassmelt.GetInt("amount")))
 						{
 							if(!entity.TryGiveItemStack(item))
 							{

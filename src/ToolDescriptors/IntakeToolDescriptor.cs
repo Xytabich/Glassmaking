@@ -114,7 +114,7 @@ namespace GlassMaking.ToolDescriptors
 			}
 			if(amountByCode.Count == 0) return;
 
-			foreach(var item in Utils.GetShardsList(world, amountByCode))
+			foreach(var item in GlassBlend.GetShardsList(world, amountByCode))
 			{
 				outList.Add(item);
 			}

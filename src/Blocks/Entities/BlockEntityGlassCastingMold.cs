@@ -1,5 +1,6 @@
 ﻿using GlassMaking.Common;
 using System;
+using System.Collections.Generic;
 using System.Text;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
@@ -159,6 +160,16 @@ namespace GlassMaking.Blocks
 			base.OnBlockUnloaded();
 			renderer?.Dispose();
 			renderer = null;
+		}
+
+		public IEnumerable<ItemStack> GetDrops()
+		{
+			if(glassCode == null) return null;
+			if(fillLevel < requiredUnits || !IsHardened)
+			{
+				return GlassBlend.GetShardsList(Api.World, glassCode, fillLevel);
+			}
+			return GetReadyMoldedStacks();
 		}
 
 		public ItemStack[] GetReadyMoldedStacks()
