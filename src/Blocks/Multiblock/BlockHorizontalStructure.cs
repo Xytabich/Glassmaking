@@ -131,6 +131,11 @@ namespace GlassMaking.Blocks.Multiblock
 			isSurrogate = true;
 		}
 
+		protected internal virtual ItemStack[] GetSurrogateDrops(IWorldAccessor world, BlockPos pos, IPlayer byPlayer, float dropQuantityMultiplier = 1)
+		{
+			return base.GetDrops(world, pos, byPlayer, dropQuantityMultiplier);
+		}
+
 		protected internal virtual void RemoveSurrogateBlock(IWorldAccessor world, BlockPos pos)
 		{
 			if(EntityClass != null)

@@ -108,6 +108,7 @@
     <Compile Include="src\Blocks\IGlassBlowingMold.cs" />
     <Compile Include="src\Blocks\ITimeBasedHeatReceiver.cs" />
     <Compile Include="src\Blocks\ITimeBasedHeatSource.cs" />
+    <Compile Include="src\Blocks\Multiblock\BEHorizontalStructurePlanMain.cs" />
     <Compile Include="src\Blocks\Multiblock\BlockBehaviorPlaceTable.cs" />
     <Compile Include="src\Blocks\Entities\BlockEntityFirebox.cs" />
     <Compile Include="src\Blocks\Entities\BlockEntityGlassSmeltery.cs" />

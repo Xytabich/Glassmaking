@@ -59,9 +59,13 @@ namespace GlassMaking.Blocks.Multiblock
 					block.DoPlaceBlock(world, byPlayer, blockSel, stack);
 					world.BlockAccessor.TriggerNeighbourBlockUpdate(blockSel.Position.Copy());
 
-					if(world.BlockAccessor.GetBlock(GetMainBlockPosition(blockSel.Position)) is IStructurePlanMainBlock mainBlock)
+					if(world.BlockAccessor.GetBlockEntity(GetMainBlockPosition(blockSel.Position)) is IStructurePlanMainBlock mainBlockEntity)
 					{
-						mainBlock.OnSurrogateReplaced(world, byPlayer, blockSel);
+						mainBlockEntity.OnSurrogateReplaced(world, byPlayer, blockSel, this, block);
+					}
+					else if(world.BlockAccessor.GetBlock(GetMainBlockPosition(blockSel.Position)) is IStructurePlanMainBlock mainBlock)
+					{
+						mainBlock.OnSurrogateReplaced(world, byPlayer, blockSel, this, block);
 					}
 					return true;
 				}

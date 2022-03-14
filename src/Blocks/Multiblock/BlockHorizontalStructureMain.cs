@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 
@@ -149,6 +150,39 @@ namespace GlassMaking.Blocks.Multiblock
 
 			world.BlockAccessor.TriggerNeighbourBlockUpdate(pos.Copy());
 			base.OnBlockBroken(world, pos, byPlayer, dropQuantityMultiplier);
+		}
+
+		public override ItemStack[] GetDrops(IWorldAccessor world, BlockPos pos, IPlayer byPlayer, float dropQuantityMultiplier = 1)
+		{
+			var items = new List<ItemStack>(base.GetDrops(world, pos, byPlayer, dropQuantityMultiplier));
+			var offset = new Vec3i();
+			int sx = structure.GetLength(0), sy = structure.GetLength(1), sz = structure.GetLength(2);
+			for(int x = 0; x < sx; x++)
+			{
+				for(int y = 0; y < sy; y++)
+				{
+					for(int z = 0; z < sz; z++)
+					{
+						if(structure[x, y, z] == null || structure[x, y, z].Id == Id) continue;
+
+						offset.Set(x + structureOffset.X, y + structureOffset.Y, z + structureOffset.Z);
+						var spos = pos.AddCopy(offset);
+						var block = world.BlockAccessor.GetBlock(spos);
+						if(block is BlockHorizontalStructure sblock && sblock.isSurrogate)
+						{
+							offset.X = -offset.X;
+							offset.Y = -offset.Y;
+							offset.Z = -offset.Z;
+							if(sblock.mainOffset.Equals(offset))
+							{
+								var drops = sblock.GetSurrogateDrops(world, pos, byPlayer, dropQuantityMultiplier);
+								if(drops != null) items.AddRange(drops);
+							}
+						}
+					}
+				}
+			}
+			return items.ToArray();
 		}
 
 		[JsonObject]

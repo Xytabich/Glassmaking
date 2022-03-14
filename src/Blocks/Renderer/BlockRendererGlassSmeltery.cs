@@ -18,6 +18,7 @@ namespace GlassMaking.Blocks
 
 		private MeshRef meshRef = null;
 
+		private float percent = 0;
 		private float height = 0;
 		private float frustum = 0;
 
@@ -54,10 +55,13 @@ namespace GlassMaking.Blocks
 		public void SetHeight(float percent)
 		{
 			percent = GameMath.Clamp(percent, 0, 1);
-			if(height != percent)
+			if(this.percent != percent)
 			{
-				height = percent * maxHeight;
-				frustum = frustumMin + (frustumMax - frustumMin) * percent;
+				this.percent = percent;
+
+				float level = GameMath.Lerp(percent, 1, percent * (1 - frustumMin / frustumMax));
+				height = level * maxHeight;
+				frustum = frustumMin + (frustumMax - frustumMin) * level;
 				meshRef?.Dispose();
 				meshRef = null;
 				if(height != 0)

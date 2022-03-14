@@ -1,4 +1,5 @@
-﻿using GlassMaking.Common;
+﻿using GlassMaking.Blocks.Multiblock;
+using GlassMaking.Common;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,7 +12,7 @@ using Vintagestory.API.Util;
 
 namespace GlassMaking.Blocks
 {
-	public class BlockEntityLargeSmelteryCore : BlockEntity, IHeatSourceModifier//TODO: structure build stage
+	public class BlockEntityLargeSmelteryCore : BEHorizontalStructurePlanMain, IHeatSourceModifier
 	{
 		private const double PROCESS_HOURS_PER_UNIT = 0.00025;
 		private const double BUBBLING_PROCESS_MULTIPLIER = 2;
@@ -19,8 +20,8 @@ namespace GlassMaking.Blocks
 		private static readonly ValueGraph defaultGraph = new ValueGraph(new ValueGraph.Point(0, 20));
 		private static SimpleParticleProperties smokeParticles;
 
-		public float FuelRateModifier => 0.9f;
-		public float TemperatureModifier => 1.5f;
+		public float FuelRateModifier => isStructureComplete ? 0.9f : 1;
+		public float TemperatureModifier => isStructureComplete ? 1.5f : 1;
 
 		protected virtual int maxGlassAmount => 10000;
 
@@ -76,15 +77,6 @@ namespace GlassMaking.Blocks
 
 			if(api.Side == EnumAppSide.Client)
 			{
-				ICoreClientAPI capi = (ICoreClientAPI)api;
-				var bathSource = capi.Tesselator.GetTexSource(Block);
-				var bathMesh = ObjectCacheUtil.GetOrCreate(capi, "glassmaking:largesmeltery-shape", () => {
-					var asset = capi.Assets.TryGet(new AssetLocation(Block.Code.Domain, "shapes/block/largesmeltery/bath.json"));
-					capi.Tesselator.TesselateShape("glassmaking:largesmeltery-shape", asset.ToObject<Shape>(), out var bath, bathSource);
-					return capi.Render.UploadMesh(bath);
-				});
-				renderer = new BlockRendererGlassSmeltery(capi, Pos, EnumRenderStage.Opaque, bathMesh, capi.Tesselator.GetTexSource(Block),
-					bathSource["inside"].atlasTextureId, 0.4375f, 0.6875f, 0.375f, 2f, 0.0001f);
 				UpdateRendererFull();
 			}
 
@@ -251,7 +243,8 @@ namespace GlassMaking.Blocks
 
 		public bool TryAdd(IPlayer byPlayer, ItemSlot slot, int multiplier)
 		{
-			if(glassAmount >= maxGlassAmount) return false;
+			if(!isStructureComplete || glassAmount >= maxGlassAmount) return false;
+
 			GlassBlend blend = GlassBlend.FromJson(slot.Itemstack);
 			if(blend == null) blend = GlassBlend.FromTreeAttributes(slot.Itemstack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
 			if(blend != null && blend.Amount > 0 && (blend.Amount + glassAmount) <= maxGlassAmount &&
@@ -308,14 +301,17 @@ namespace GlassMaking.Blocks
 		public float GetTemperature()
 		{
 			float avgTemperature = 20f;
-			for(int i = 0; i < heaters.Length; i++)
+			if(isStructureComplete)
 			{
-				if(heaters[i] != null)
+				for(int i = 0; i < heaters.Length; i++)
 				{
-					avgTemperature += heaters[i].CalcCurrentTemperature();
+					if(heaters[i] != null)
+					{
+						avgTemperature += heaters[i].CalcCurrentTemperature();
+					}
 				}
+				avgTemperature /= heatersCount;
 			}
-			avgTemperature /= heatersCount;
 			return avgTemperature;
 		}
 
@@ -383,72 +379,76 @@ namespace GlassMaking.Blocks
 
 		private void OnCommonTick(float dt)
 		{
-			if(state != SmelteryState.Empty && state != SmelteryState.ContainsGlass)
+			if(isStructureComplete)
 			{
-				bool hasActive = false;
-				for(int i = 0; i < heaters.Length; i++)
-				{
-					if(heaters[i] != null && (heaters[i].GetTemperature() > 25 || heaters[i].IsBurning()))
-					{
-						hasActive = true;
-						heatGraphs[i] = heaters[i].CalcHeatGraph();
-					}
-					else
-					{
-						heatGraphs[i] = defaultGraph;
-					}
-				}
-				if(hasActive)
-				{
-					var graph = ValueGraph.Avg(heatGraphs);
-					double timeOffset = 0;
-					if(state == SmelteryState.ContainsMix)
-					{
-						if(Api.Side == EnumAppSide.Server && graph.CalculateValueRetention(timeOffset, meltingTemperature) > 0)
-						{
-							state = SmelteryState.Melting;
-							processProgress = 0;
-							inventory.Clear();
-							UpdateRendererFull();
-							MarkDirty(true);
-						}
-					}
-					if(state == SmelteryState.Melting)
-					{
-						double timeLeft = glassAmount * PROCESS_HOURS_PER_UNIT - processProgress;
-						double time = graph.CalculateValueRetention(timeOffset, meltingTemperature);
-						processProgress += Math.Min(time, timeLeft);
-						if(Api.Side == EnumAppSide.Server && time >= timeLeft)
-						{
-							timeOffset += timeLeft;
-							processProgress = 0;
-							state = SmelteryState.Bubbling;
-							MarkDirty(true);
-						}
-					}
-					if(state == SmelteryState.Bubbling)
-					{
-						double timeLeft = glassAmount * PROCESS_HOURS_PER_UNIT * BUBBLING_PROCESS_MULTIPLIER - processProgress;
-						double time = graph.CalculateValueRetention(timeOffset, meltingTemperature * 1.11f);
-						processProgress += Math.Min(time, timeLeft);
-						if(Api.Side == EnumAppSide.Server && time >= timeLeft)
-						{
-							state = SmelteryState.ContainsGlass;
-							MarkDirty(true);
-						}
-					}
-				}
-			}
 
-			if(Api.Side == EnumAppSide.Client)
-			{
-				UpdateRendererParameters();
-				for(int i = 0; i < heaters.Length; i++)
+				if(state != SmelteryState.Empty && state != SmelteryState.ContainsGlass)
 				{
-					if(heaters[i] != null && heaters[i].IsBurning())
+					bool hasActive = false;
+					for(int i = 0; i < heaters.Length; i++)
 					{
-						EmitParticles();
-						break;
+						if(heaters[i] != null && (heaters[i].GetTemperature() > 25 || heaters[i].IsBurning()))
+						{
+							hasActive = true;
+							heatGraphs[i] = heaters[i].CalcHeatGraph();
+						}
+						else
+						{
+							heatGraphs[i] = defaultGraph;
+						}
+					}
+					if(hasActive)
+					{
+						var graph = ValueGraph.Avg(heatGraphs);
+						double timeOffset = 0;
+						if(state == SmelteryState.ContainsMix)
+						{
+							if(Api.Side == EnumAppSide.Server && graph.CalculateValueRetention(timeOffset, meltingTemperature) > 0)
+							{
+								state = SmelteryState.Melting;
+								processProgress = 0;
+								inventory.Clear();
+								UpdateRendererFull();
+								MarkDirty(true);
+							}
+						}
+						if(state == SmelteryState.Melting)
+						{
+							double timeLeft = glassAmount * PROCESS_HOURS_PER_UNIT - processProgress;
+							double time = graph.CalculateValueRetention(timeOffset, meltingTemperature);
+							processProgress += Math.Min(time, timeLeft);
+							if(Api.Side == EnumAppSide.Server && time >= timeLeft)
+							{
+								timeOffset += timeLeft;
+								processProgress = 0;
+								state = SmelteryState.Bubbling;
+								MarkDirty(true);
+							}
+						}
+						if(state == SmelteryState.Bubbling)
+						{
+							double timeLeft = glassAmount * PROCESS_HOURS_PER_UNIT * BUBBLING_PROCESS_MULTIPLIER - processProgress;
+							double time = graph.CalculateValueRetention(timeOffset, meltingTemperature * 1.11f);
+							processProgress += Math.Min(time, timeLeft);
+							if(Api.Side == EnumAppSide.Server && time >= timeLeft)
+							{
+								state = SmelteryState.ContainsGlass;
+								MarkDirty(true);
+							}
+						}
+					}
+				}
+
+				if(Api.Side == EnumAppSide.Client)
+				{
+					UpdateRendererParameters();
+					for(int i = 0; i < heaters.Length; i++)
+					{
+						if(heaters[i] != null && heaters[i].IsBurning())
+						{
+							EmitParticles();
+							break;
+						}
 					}
 				}
 			}
@@ -472,10 +472,25 @@ namespace GlassMaking.Blocks
 
 		private void UpdateRendererFull()
 		{
-			if(Api != null && Api.Side == EnumAppSide.Client && renderer != null)
+			if(Api != null && Api.Side == EnumAppSide.Client)
 			{
-				renderer.SetHeight((float)glassAmount / maxGlassAmount);
-				UpdateRendererParameters();
+				if(renderer == null && isStructureComplete)
+				{
+					ICoreClientAPI capi = (ICoreClientAPI)Api;
+					var bathSource = capi.Tesselator.GetTexSource(Block);
+					var bathMesh = ObjectCacheUtil.GetOrCreate(capi, "glassmaking:largesmeltery-shape", () => {
+						var asset = capi.Assets.TryGet(new AssetLocation(Block.Code.Domain, "shapes/block/largesmeltery/bath.json"));
+						capi.Tesselator.TesselateShape("glassmaking:largesmeltery-shape", asset.ToObject<Shape>(), out var bath, bathSource);
+						return capi.Render.UploadMesh(bath);
+					});
+					renderer = new BlockRendererGlassSmeltery(capi, Pos, EnumRenderStage.Opaque, bathMesh, capi.Tesselator.GetTexSource(Block),
+						bathSource["inside"].atlasTextureId, 0.4375f, 0.6875f, 0.375f, 2f, 0.0001f);
+				}
+				if(renderer != null)
+				{
+					renderer.SetHeight((float)glassAmount / maxGlassAmount);
+					UpdateRendererParameters();
+				}
 			}
 		}
 
