@@ -121,6 +121,9 @@ namespace GlassMaking.Blocks.Multiblock
 
 		public override void OnBlockBroken(IWorldAccessor world, BlockPos pos, IPlayer byPlayer, float dropQuantityMultiplier = 1)//TODO: check claims
 		{
+			base.OnBlockBroken(world, pos, byPlayer, dropQuantityMultiplier);
+
+			//TODO: use world.BulkBlockAccess instead of world.BlockAccessor
 			var offset = new Vec3i();
 			int sx = structure.GetLength(0), sy = structure.GetLength(1), sz = structure.GetLength(2);
 			for(int x = 0; x < sx; x++)
@@ -141,7 +144,7 @@ namespace GlassMaking.Blocks.Multiblock
 							offset.Z = -offset.Z;
 							if(sblock.mainOffset.Equals(offset))
 							{
-								sblock.RemoveSurrogateBlock(world, spos);
+								sblock.RemoveSurrogateBlock(world.BlockAccessor, spos);
 							}
 						}
 					}
@@ -149,7 +152,126 @@ namespace GlassMaking.Blocks.Multiblock
 			}
 
 			world.BlockAccessor.TriggerNeighbourBlockUpdate(pos.Copy());
-			base.OnBlockBroken(world, pos, byPlayer, dropQuantityMultiplier);
+		}
+
+		public override void OnBlockExploded(IWorldAccessor world, BlockPos pos, BlockPos explosionCenter, EnumBlastType blastType)
+		{
+			EnumHandling handling = EnumHandling.PassThrough;
+			BlockBehavior[] blockBehaviors = BlockBehaviors;
+			for(int i = 0; i < blockBehaviors.Length; i++)
+			{
+				blockBehaviors[i].OnBlockExploded(world, pos, explosionCenter, blastType, ref handling);
+				if(handling == EnumHandling.PreventSubsequent)
+				{
+					break;
+				}
+			}
+			if(handling == EnumHandling.PreventDefault)
+			{
+				return;
+			}
+
+			var handle = BulkAccessUtil.SetReadFromStagedByDefault(world.BulkBlockAccessor, true);
+
+			var offset = new Vec3i();
+			int sx = structure.GetLength(0), sy = structure.GetLength(1), sz = structure.GetLength(2);
+			for(int x = 0; x < sx; x++)
+			{
+				for(int y = 0; y < sy; y++)
+				{
+					for(int z = 0; z < sz; z++)
+					{
+						if(structure[x, y, z] == null || structure[x, y, z].Id == Id) continue;
+
+						offset.Set(x + structureOffset.X, y + structureOffset.Y, z + structureOffset.Z);
+						var spos = pos.AddCopy(offset);
+						var block = world.BulkBlockAccessor.GetBlock(spos);
+						if(block is BlockHorizontalStructure sblock && sblock.isSurrogate)
+						{
+							offset.X = -offset.X;
+							offset.Y = -offset.Y;
+							offset.Z = -offset.Z;
+							if(sblock.mainOffset.Equals(offset))
+							{
+								double dropChancce = sblock.ExplosionDropChance(world, spos, blastType);
+
+								if(world.Rand.NextDouble() < dropChancce)
+								{
+									ItemStack[] drops = sblock.GetSurrogateDrops(world, spos, null);
+
+									if(drops != null)
+									{
+										for(int i = 0; i < drops.Length; i++)
+										{
+											if(SplitDropStacks)
+											{
+												for(int k = 0; k < drops[i].StackSize; k++)
+												{
+													ItemStack stack = drops[i].Clone();
+													stack.StackSize = 1;
+													world.SpawnItemEntity(stack, new Vec3d(spos.X + 0.5, spos.Y + 0.5, spos.Z + 0.5), null);
+												}
+											}
+											else
+											{
+												world.SpawnItemEntity(drops[i].Clone(), new Vec3d(spos.X + 0.5, spos.Y + 0.5, spos.Z + 0.5), null);
+											}
+										}
+									}
+								}
+
+								sblock.RemoveSurrogateBlock(world.BulkBlockAccessor, spos);
+							}
+						}
+					}
+				}
+			}
+
+			world.BulkBlockAccessor.TriggerNeighbourBlockUpdate(pos.Copy());
+
+			{
+				// The explosion code uses the bulk block accessor for greater performance
+				world.BulkBlockAccessor.SetBlock(0, pos);
+
+				double dropChancce = ExplosionDropChance(world, pos, blastType);
+
+				if(world.Rand.NextDouble() < dropChancce)
+				{
+					// Dropping only this block
+					ItemStack[] drops = base.GetDrops(world, pos, null);
+
+					if(drops != null)
+					{
+						for(int i = 0; i < drops.Length; i++)
+						{
+							if(SplitDropStacks)
+							{
+								for(int k = 0; k < drops[i].StackSize; k++)
+								{
+									ItemStack stack = drops[i].Clone();
+									stack.StackSize = 1;
+									world.SpawnItemEntity(stack, new Vec3d(pos.X + 0.5, pos.Y + 0.5, pos.Z + 0.5), null);
+								}
+							}
+							else
+							{
+								world.SpawnItemEntity(drops[i].Clone(), new Vec3d(pos.X + 0.5, pos.Y + 0.5, pos.Z + 0.5), null);
+							}
+						}
+					}
+				}
+
+				if(EntityClass != null)
+				{
+					BlockEntity entity = world.BulkBlockAccessor.GetBlockEntity(pos);
+					if(entity != null)
+					{
+						entity.OnBlockBroken();
+					}
+				}
+			}
+
+			handle.RollbackValue();
 		}
 
 		public override ItemStack[] GetDrops(IWorldAccessor world, BlockPos pos, IPlayer byPlayer, float dropQuantityMultiplier = 1)

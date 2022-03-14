@@ -21,6 +21,16 @@
 			}
 		}
 	},
+	"drops": [
+		{
+			"type": "item",
+			"code": "game:burnedbrick-fire",
+			"quantity": {
+				"avg": 6,
+				"var": 2
+			}
+		}
+	],
 	"sideopaque": {
 		"all": false
 	},

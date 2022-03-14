@@ -104,12 +104,35 @@ namespace GlassMaking.Blocks.Multiblock
 				}
 				else
 				{
-					RemoveSurrogateBlock(world, pos);
+					RemoveSurrogateBlock(world.BlockAccessor, pos);
 				}
 			}
 			else
 			{
 				base.OnBlockBroken(world, pos, byPlayer, dropQuantityMultiplier);
+			}
+		}
+
+		public override void OnBlockExploded(IWorldAccessor world, BlockPos pos, BlockPos explosionCenter, EnumBlastType blastType)
+		{
+			if(isSurrogate)
+			{
+				var mainPos = GetMainBlockPosition(pos);
+				var handle = BulkAccessUtil.SetReadFromStagedByDefault(world.BulkBlockAccessor, true);
+				if(world.BulkBlockAccessor.GetBlock(mainPos) is BlockHorizontalStructure mainBlock)
+				{
+					handle.RollbackValue();
+					mainBlock.OnBlockExploded(world, mainPos, explosionCenter, blastType);
+				}
+				else
+				{
+					handle.RollbackValue();
+					RemoveSurrogateBlock(world.BulkBlockAccessor, pos);
+				}
+			}
+			else
+			{
+				base.OnBlockExploded(world, pos, explosionCenter, blastType);
 			}
 		}
 
@@ -136,14 +159,14 @@ namespace GlassMaking.Blocks.Multiblock
 			return base.GetDrops(world, pos, byPlayer, dropQuantityMultiplier);
 		}
 
-		protected internal virtual void RemoveSurrogateBlock(IWorldAccessor world, BlockPos pos)
+		protected internal virtual void RemoveSurrogateBlock(IBlockAccessor blockAccessor, BlockPos pos)
 		{
 			if(EntityClass != null)
 			{
-				world.BlockAccessor.GetBlockEntity(pos)?.OnBlockBroken();
+				blockAccessor.GetBlockEntity(pos)?.OnBlockBroken();
 			}
-			world.BlockAccessor.SetBlock(0, pos);
-			world.BlockAccessor.TriggerNeighbourBlockUpdate(pos.Copy());
+			blockAccessor.SetBlock(0, pos);
+			blockAccessor.TriggerNeighbourBlockUpdate(pos.Copy());
 		}
 
 		protected BlockSelection GetMainBlockSelection(BlockSelection blockSel)
@@ -156,6 +179,30 @@ namespace GlassMaking.Blocks.Multiblock
 				return sel;
 			}
 			return blockSel;
+		}
+
+		protected struct BulkAccessUtil
+		{
+			private IBulkBlockAccessor blockAccessor;
+			private bool readFromStagedByDefault;
+
+			private BulkAccessUtil(IBulkBlockAccessor blockAccessor, bool readFromStagedByDefault)
+			{
+				this.blockAccessor = blockAccessor;
+				this.readFromStagedByDefault = readFromStagedByDefault;
+			}
+
+			public void RollbackValue()
+			{
+				blockAccessor.ReadFromStagedByDefault = readFromStagedByDefault;
+			}
+
+			public static BulkAccessUtil SetReadFromStagedByDefault(IBulkBlockAccessor blockAccessor, bool value)
+			{
+				var handle = new BulkAccessUtil(blockAccessor, blockAccessor.ReadFromStagedByDefault);
+				blockAccessor.ReadFromStagedByDefault = value;
+				return handle;
+			}
 		}
 	}
 }

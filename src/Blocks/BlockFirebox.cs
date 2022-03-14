@@ -128,6 +128,14 @@ namespace GlassMaking.Blocks
 			base.OnBlockBroken(world, pos, byPlayer, dropQuantityMultiplier);
 		}
 
+		public override void OnBlockExploded(IWorldAccessor world, BlockPos pos, BlockPos explosionCenter, EnumBlastType blastType)
+		{
+			var upPos = pos.UpCopy();
+			var block = world.BlockAccessor.GetBlock(upPos);
+			if(block is IHeaterPlaceableBlock) block.OnBlockExploded(world, pos, explosionCenter, blastType);
+			base.OnBlockExploded(world, pos, explosionCenter, blastType);
+		}
+
 		public override ItemStack[] GetDrops(IWorldAccessor world, BlockPos pos, IPlayer byPlayer, float dropQuantityMultiplier = 1)
 		{
 			var items = base.GetDrops(world, pos, byPlayer, dropQuantityMultiplier);

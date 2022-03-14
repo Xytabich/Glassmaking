@@ -28,6 +28,7 @@
 	"vertexFlags": {
 		"glowLevel": 127
 	},
+	"drops": [],
 	"sideopaque": {
 		"all": false
 	},

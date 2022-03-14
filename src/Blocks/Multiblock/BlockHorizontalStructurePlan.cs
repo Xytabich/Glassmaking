@@ -49,7 +49,7 @@ namespace GlassMaking.Blocks.Multiblock
 				if(requirement.Matches(world, itemStack) && itemStack.StackSize >= requirement.ResolvedItemstack.StackSize)
 				{
 					var item = byPlayer.InventoryManager.ActiveHotbarSlot.TakeOut(requirement.ResolvedItemstack.StackSize);
-					RemoveSurrogateBlock(world, blockSel.Position);
+					RemoveSurrogateBlock(world.BlockAccessor, blockSel.Position);
 
 					var block = replacement.block.ResolvedItemstack.Block;
 					var stack = replacement.block == requirement ? item : replacement.block.ResolvedItemstack;
