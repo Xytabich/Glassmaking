@@ -61,9 +61,15 @@
 		{
 			"type": "item",
 			"code": "game:burnedbrick-fire",
-			"quantity": {
-				"avg": 6,
-				"var": 2
+			"quantityByType": {
+				"*-hearth-*": {
+					"avg": 7,
+					"var": 2
+				},
+				"*-arch-*": {
+					"avg": 2,
+					"var": 1
+				}
 			}
 		}
 	],

@@ -20,10 +20,15 @@
 			},
 			"requirement": {
 				"type": "item",
-				"code": "game:refractorybrick-fired-tier1"
+				"code": "game:refractorybrick-fired-tier1",
+				"quantityByType": {
+					"*-hearth-*": 9,
+					"*-arch-*": 3
+				}
 			}
 		}
 	},
+	"resistance": 0.5,
 	"collisionboxes": [],
 	"creativeinventory": {},
 	"lightAbsorption": 0,

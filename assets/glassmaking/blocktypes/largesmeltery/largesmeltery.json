@@ -88,6 +88,16 @@
 		"melt": { "base": "game:block/quartzglass" },
 		"inside": { "base": "game:block/clay/bloomery/inside" }
 	},
+	"drops": [
+		{
+			"type": "item",
+			"code": "game:burnedbrick-fire",
+			"quantity": {
+				"avg": 12,
+				"var": 2
+			}
+		}
+	],
 	"resistance": 3.5,
 	"maxStackSize": 1,
 	"lightAbsorption": 0,

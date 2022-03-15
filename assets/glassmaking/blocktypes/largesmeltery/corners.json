@@ -47,9 +47,19 @@
 		{
 			"type": "item",
 			"code": "game:burnedbrick-fire",
-			"quantity": {
-				"avg": 6,
-				"var": 2
+			"quantityByType": {
+				"*-wall-*": {
+					"avg": 11,
+					"var": 3
+				},
+				"*-roof-*": {
+					"avg": 8,
+					"var": 2
+				},
+				"*-rooftop-*": {
+					"avg": 3,
+					"var": 1
+				}
 			}
 		}
 	],

@@ -27,7 +27,7 @@
 			"type": "item",
 			"code": "game:burnedbrick-fire",
 			"quantity": {
-				"avg": 6,
+				"avg": 10,
 				"var": 2
 			}
 		}

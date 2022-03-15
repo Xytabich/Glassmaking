@@ -21,10 +21,16 @@
 			},
 			"requirement": {
 				"type": "item",
-				"code": "game:refractorybrick-fired-tier1"
+				"code": "game:refractorybrick-fired-tier1",
+				"quantityByType": {
+					"*-wall-*": 14,
+					"*-roof-*": 10,
+					"*-rooftop-*": 4
+				}
 			}
 		}
 	},
+	"resistance": 0.5,
 	"collisionboxes": [],
 	"lightAbsorption": 0,
 	"shape": { "base": "block/frame" },
