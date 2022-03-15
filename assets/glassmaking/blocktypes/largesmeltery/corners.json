@@ -11,6 +11,7 @@
 			"states": [ "wn", "ne", "es", "sw" ]
 		}
 	],
+	"blockmaterial": "Ceramic",
 	"shapeByType": {
 		"*-wn": {
 			"base": "block/largesmeltery/{corners}",

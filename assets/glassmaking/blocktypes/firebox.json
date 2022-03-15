@@ -2,7 +2,6 @@
     "code": "firebox",
     "class": "glassmaking:firebox",
     "entityclass": "glassmaking:firebox",
-    "blockmaterial": "Ceramic",
     "behaviors": [ { "name": "HorizontalOrientable" } ],
     "variantgroups": [
         {
@@ -28,6 +27,7 @@
         "lit": { "base": "game:block/coal/ember" },
         "unlit": { "base": "game:block/coal/orecoalmix" }
     },
+    "blockmaterial": "Ceramic",
     "replaceable": 400,
     "resistance": 3.5,
     "maxStackSize": 1,

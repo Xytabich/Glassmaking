@@ -131,8 +131,12 @@ namespace GlassMaking.Blocks
 		public override void OnBlockExploded(IWorldAccessor world, BlockPos pos, BlockPos explosionCenter, EnumBlastType blastType)
 		{
 			var upPos = pos.UpCopy();
-			var block = world.BlockAccessor.GetBlock(upPos);
+			var handle = BulkAccessUtil.SetReadFromStagedByDefault(world.BulkBlockAccessor, true);
+			var block = world.BulkBlockAccessor.GetBlock(upPos);
+			handle.RollbackValue();
+
 			if(block is IHeaterPlaceableBlock) block.OnBlockExploded(world, pos, explosionCenter, blastType);
+
 			base.OnBlockExploded(world, pos, explosionCenter, blastType);
 		}
 

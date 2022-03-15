@@ -1,4 +1,5 @@
 ﻿using Vintagestory.API.Common;
+using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Blocks
 {
@@ -11,6 +12,17 @@ namespace GlassMaking.Blocks
 				return world.GetBlock(CodeWithVariant("side", side)).DoPlaceBlock(world, byPlayer, blockSel, itemstack);
 			}
 			return false;
+		}
+
+		public override void OnBlockExploded(IWorldAccessor world, BlockPos pos, BlockPos explosionCenter, EnumBlastType blastType)
+		{
+			var handle = BulkAccessUtil.SetReadFromStagedByDefault(world.BulkBlockAccessor, true);
+			var id = world.BulkBlockAccessor.GetBlockId(pos);
+			handle.RollbackValue();
+			// Since the firebox can destroy this block during the explosion, it is necessary to first check if it was destroyed
+			if(id != Id) return;
+
+			base.OnBlockExploded(world, pos, explosionCenter, blastType);
 		}
 	}
 }

@@ -11,6 +11,7 @@
 			"states": [ "wn", "ne", "es", "sw" ]
 		}
 	],
+	"blockmaterial": "Air",
 	"creativeinventory": {},
 	"attributes": {
 		"replacement": {

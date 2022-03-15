@@ -11,7 +11,7 @@
 			"loadFromProperties": "abstract/horizontalorientation"
 		}
 	],
-	"creativeinventory": {},
+	"blockmaterial": "Air",
 	"attributes": {
 		"replacement": {
 			"block": {
@@ -25,6 +25,7 @@
 		}
 	},
 	"collisionboxes": [],
+	"creativeinventory": {},
 	"lightAbsorption": 0,
 	"shape": { "base": "block/frame" },
 	"renderPass": "Transparent",

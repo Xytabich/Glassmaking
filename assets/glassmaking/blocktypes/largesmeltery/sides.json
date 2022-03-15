@@ -25,6 +25,7 @@
 			}
 		}
 	},
+	"blockmaterial": "Ceramic",
 	"shapeByType": {
 		"*-north": {
 			"base": "block/largesmeltery/{sides}",
