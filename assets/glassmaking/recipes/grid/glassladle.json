@@ -1,0 +1,65 @@
+[
+	{
+		"width": 3,
+		"height": 2,
+		"ingredientPattern": "WHL,M__",
+		"ingredients": {
+			"W": {
+				"code": "game:plank-*",
+				"type": "item"
+			},
+			"H": {
+				"code": "glassladlepart-handle",
+				"type": "item"
+			},
+			"L": {
+				"name": "type",
+				"code": "glassladlepart-*",
+				"type": "item",
+				"allowedVariants": [ "small", "medium" ]
+			},
+			"M": {
+				"code": "game:hammer-*",
+				"type": "item",
+				"isTool": true
+			}
+		},
+		"shapeless": true,
+		"output": {
+			"code": "glassladle-{type}",
+			"type": "item"
+		}
+	},
+	{
+		"width": 3,
+		"height": 2,
+		"ingredientPattern": "WHL,M__",
+		"ingredients": {
+			"W": {
+				"code": "game:plank-*",
+				"type": "item"
+			},
+			"H": {
+				"code": "glassladlepart-handle",
+				"type": "item",
+				"quantity": 2
+			},
+			"L": {
+				"name": "type",
+				"code": "glassladlepart-*",
+				"type": "item",
+				"allowedVariants": [ "large" ]
+			},
+			"M": {
+				"code": "game:hammer-*",
+				"type": "item",
+				"isTool": true
+			}
+		},
+		"shapeless": true,
+		"output": {
+			"code": "glassladle-{type}",
+			"type": "item"
+		}
+	}
+]
