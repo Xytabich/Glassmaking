@@ -138,6 +138,8 @@
     <Compile Include="src\Common\IWettable.cs" />
     <Compile Include="src\Common\ValueGraph.cs" />
     <Compile Include="src\GlassblowingTools\DryableTool.cs" />
+    <Compile Include="src\Handbook\CastingMoldOutputInfo.cs" />
+    <Compile Include="src\Handbook\CastingMoldRecipeInfo.cs" />
     <Compile Include="src\ItemRender\CachedItemRenderer.cs" />
     <Compile Include="src\ItemRender\IItemRenderer.cs" />
     <Compile Include="src\Items\GlassLadleRenderer.cs" />

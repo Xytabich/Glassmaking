@@ -8,11 +8,11 @@ using Vintagestory.GameContent;
 
 namespace GlassMaking.Handbook
 {
-	public class BlowingMoldOutputInfo : IDisposable
+	public class CastingMoldOutputInfo : IDisposable
 	{
 		private GlassMakingMod mod;
 
-		public BlowingMoldOutputInfo(GlassMakingMod mod)
+		public CastingMoldOutputInfo(GlassMakingMod mod)
 		{
 			this.mod = mod;
 			HandbookItemInfoEvent.onGetHandbookInfo += GetHandbookInfo;
@@ -26,10 +26,10 @@ namespace GlassMaking.Handbook
 		private void GetHandbookInfo(ItemSlot inSlot, ICoreClientAPI capi, ItemStack[] allStacks, ActionConsumable<string> openDetailPageFor, HandbookItemInfoSection section, List<RichTextComponentBase> outComponents)
 		{
 			if(section != HandbookItemInfoSection.BeforeExtraSections) return;
-			if(mod.TryGetBlowingMoldsForItem(inSlot.Itemstack.Collectible, out var blocks))
+			if(mod.TryGetCastingMoldsForItem(inSlot.Itemstack.Collectible, out var blocks))
 			{
 				outComponents.Add(new ClearFloatTextComponent(capi, 7f));
-				outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:Blown in a glass mold") + "\n", CairoFont.WhiteSmallText().WithWeight(FontWeight.Bold)));
+				outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:Made by mold casting") + "\n", CairoFont.WhiteSmallText().WithWeight(FontWeight.Bold)));
 				foreach(var mold in blocks)
 				{
 					var handbook = mold.GetHandBookStacks(capi);

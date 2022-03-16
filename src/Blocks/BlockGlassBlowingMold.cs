@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using GlassMaking.Items;
+using System.Collections.Generic;
+using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Util;
@@ -8,6 +10,8 @@ namespace GlassMaking.Blocks
 	public class BlockGlassBlowingMold : Block, IGlassBlowingMold
 	{
 		public BlowingMoldRecipe[] Recipes = null;
+
+		private WorldInteraction[] interactions;
 
 		public override void OnLoaded(ICoreAPI api)
 		{
@@ -84,6 +88,46 @@ namespace GlassMaking.Blocks
 			{
 				Recipes = new BlowingMoldRecipe[0];
 			}
+
+			if(api.Side != EnumAppSide.Client) return;
+			interactions = ObjectCacheUtil.GetOrCreate(api, "glassmaking:blowingmoldinteractions", () => {
+				List<ItemStack> smeltedContainerStacks = new List<ItemStack>();
+
+				foreach(CollectibleObject obj in api.World.Items)
+				{
+					if(obj is ItemGlassworkPipe)
+					{
+						smeltedContainerStacks.Add(new ItemStack(obj));
+					}
+				}
+
+				return new WorldInteraction[] {
+					new WorldInteraction()
+					{
+						ActionLangCode = "glassmaking:blockhelp-blowingmold-fill",
+						HotKeyCode = null,
+						MouseButton = EnumMouseButton.Right,
+						Itemstacks = smeltedContainerStacks.ToArray(),
+						GetMatchingStacks = (wi, bs, es) =>
+						{
+							var be = api.World.BlockAccessor.GetBlockEntity(bs.Position) as BlockEntityGlassBlowingMold;
+							return (be != null && be.CanBeFilled) ? wi.Itemstacks : null;
+						}
+					},
+					new WorldInteraction()
+					{
+						ActionLangCode = "glassmaking:blockhelp-blowingmold-takeitem",
+						HotKeyCode = null,
+						RequireFreeHand = true,
+						MouseButton = EnumMouseButton.Right,
+						ShouldApply = (wi, bs, es) =>
+						{
+							var be = api.World.BlockAccessor.GetBlockEntity(bs.Position) as BlockEntityGlassBlowingMold;
+							return be != null && be.CanTakeItem;
+						}
+					}
+				};
+			});
 		}
 
 		public override bool OnBlockInteractStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)
@@ -114,6 +158,11 @@ namespace GlassMaking.Blocks
 		public BlowingMoldRecipe[] GetRecipes()
 		{
 			return Recipes;
+		}
+
+		public override WorldInteraction[] GetPlacedBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer)
+		{
+			return interactions.Append(base.GetPlacedBlockInteractionHelp(world, selection, forPlayer));
 		}
 	}
 }

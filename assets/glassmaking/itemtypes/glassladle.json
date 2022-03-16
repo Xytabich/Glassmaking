@@ -1,20 +1,6 @@
 {
 	"code": "glassladle",
 	"class": "glassmaking:glassladle",
-	"behaviors": [
-		{
-			"name": "glassmaking:gbt-blowing",
-			"properties": {
-				"tool": "blowing"
-			}
-		},
-		{
-			"name": "glassmaking:gbt-glassintake",
-			"properties": {
-				"tool": "glassintake"
-			}
-		}
-	],
 	"variantgroups": [
 		{
 			"code": "size",

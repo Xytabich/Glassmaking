@@ -31,8 +31,11 @@ namespace GlassMaking
 		private Dictionary<AssetLocation, GlassTypeVariant> glassTypes;
 		private Dictionary<string, IPipeBlowingToolDescriptor> pipeToolDescriptors;
 
-		private List<Block> molds = null;
-		private HashSet<AssetLocation> moldsOutput = null;
+		private List<Block> blowingMolds = null;
+		private HashSet<AssetLocation> blowingMoldsOutput = null;
+
+		private List<Block> castingMolds = null;
+		private HashSet<AssetLocation> castingMoldsOutput = null;
 
 		private Dictionary<Tuple<EnumItemClass, int>, ItemStack> annealRecipes = null;
 		private HashSet<AssetLocation> annealOutputs = null;
@@ -144,12 +147,16 @@ namespace GlassMaking
 			handbookInfoList.Add(new ItemMeltableInfo(this));
 			handbookInfoList.Add(new BlowingMoldRecipeInfo());
 			handbookInfoList.Add(new BlowingMoldOutputInfo(this));
+			handbookInfoList.Add(new CastingMoldRecipeInfo());
+			handbookInfoList.Add(new CastingMoldOutputInfo(this));
 			handbookInfoList.Add(new GlassblowingRecipeInfo(this));
 			handbookInfoList.Add(new AnnealRecipeInfo());
 			handbookInfoList.Add(new AnnealOutputInfo(this));
 
-			molds = new List<Block>();
-			moldsOutput = new HashSet<AssetLocation>();
+			blowingMolds = new List<Block>();
+			castingMolds = new List<Block>();
+			blowingMoldsOutput = new HashSet<AssetLocation>();
+			castingMoldsOutput = new HashSet<AssetLocation>();
 			annealRecipes = new Dictionary<Tuple<EnumItemClass, int>, ItemStack>();
 			annealOutputs = new HashSet<AssetLocation>();
 			api.Event.LevelFinalize += OnClientLevelFinallize;
@@ -239,14 +246,37 @@ namespace GlassMaking
 			return null;
 		}
 
-		public bool TryGetMoldsForItem(CollectibleObject item, out Block[] molds)
+		public bool TryGetBlowingMoldsForItem(CollectibleObject item, out Block[] molds)
 		{
-			if(moldsOutput.Contains(item.Code))
+			if(blowingMoldsOutput.Contains(item.Code))
 			{
 				List<Block> list = new List<Block>();
-				foreach(var block in this.molds)
+				foreach(var block in this.blowingMolds)
 				{
 					var mold = (IGlassBlowingMold)block;
+					foreach(var recipe in mold.GetRecipes())
+					{
+						if(recipe.Output.Code.Equals(item.Code))
+						{
+							list.Add(block);
+						}
+					}
+				}
+				molds = list.ToArray();
+				return true;
+			}
+			molds = null;
+			return false;
+		}
+
+		public bool TryGetCastingMoldsForItem(CollectibleObject item, out Block[] molds)
+		{
+			if(castingMoldsOutput.Contains(item.Code))
+			{
+				List<Block> list = new List<Block>();
+				foreach(var block in this.castingMolds)
+				{
+					var mold = (IGlassCastingMold)block;
 					foreach(var recipe in mold.GetRecipes())
 					{
 						if(recipe.Output.Code.Equals(item.Code))
@@ -285,15 +315,27 @@ namespace GlassMaking
 		{
 			foreach(var block in capi.World.Blocks)
 			{
-				if(block is IGlassBlowingMold mold)
+				if(block is IGlassBlowingMold bmold)
 				{
-					var recipes = mold.GetRecipes();
+					var recipes = bmold.GetRecipes();
 					if(recipes != null && recipes.Length > 0)
 					{
-						molds.Add(block);
+						blowingMolds.Add(block);
 						foreach(var recipe in recipes)
 						{
-							moldsOutput.Add(recipe.Output.Code);
+							blowingMoldsOutput.Add(recipe.Output.Code);
+						}
+					}
+				}
+				if(block is IGlassCastingMold cmold)
+				{
+					var recipes = cmold.GetRecipes();
+					if(recipes != null && recipes.Length > 0)
+					{
+						castingMolds.Add(block);
+						foreach(var recipe in recipes)
+						{
+							castingMoldsOutput.Add(recipe.Output.Code);
 						}
 					}
 				}

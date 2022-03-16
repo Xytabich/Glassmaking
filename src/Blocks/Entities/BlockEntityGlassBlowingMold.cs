@@ -18,6 +18,9 @@ namespace GlassMaking.Blocks
 		public Size2i AtlasSize => capi.BlockTextureAtlas.Size;
 		public string AttributeTransformCode => "onDisplayTransform";
 
+		public bool CanTakeItem => contents != null && (splittable ? (!hasContentsTransform || Block.Variant["state"] == "opened") : hasContentsTransform);
+		public bool CanBeFilled => contents == null && (!splittable || Block.Variant["state"] != "opened");
+
 		private CollectibleObject nowTesselatingObj;
 		private Shape nowTesselatingShape;
 		private ICoreClientAPI capi;
@@ -99,10 +102,10 @@ namespace GlassMaking.Blocks
 
 		public bool OnInteract(IWorldAccessor world, IPlayer byPlayer)
 		{
-			if(splittable && byPlayer.InventoryManager.ActiveHotbarSlot.Itemstack == null)
+			if(byPlayer.InventoryManager.ActiveHotbarSlot.Itemstack == null)
 			{
-				bool isOpened = Block.Variant["state"] == "opened";
-				if(hasContentsTransform && isOpened && contents != null)
+				bool isOpened = splittable && Block.Variant["state"] == "opened";
+				if(hasContentsTransform && (!splittable || isOpened) && contents != null)
 				{
 					if(!byPlayer.Entity.TryGiveItemStack(contents))
 					{
@@ -111,7 +114,7 @@ namespace GlassMaking.Blocks
 					contents = null;
 					MarkDirty(true);
 				}
-				else
+				else if(splittable)
 				{
 					world.BlockAccessor.ExchangeBlock(world.BlockAccessor.GetBlock(Block.CodeWithVariant("state", isOpened ? "closed" : "opened")).Id, Pos);
 					world.PlaySoundAt(isOpened ? closeSound : openSound, Pos.X + 0.5, Pos.Y + 0.5, Pos.Z + 0.5, byPlayer, true, 16f);

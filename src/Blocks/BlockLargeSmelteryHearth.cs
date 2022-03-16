@@ -1,6 +1,5 @@
 ﻿using GlassMaking.Blocks.Multiblock;
 using GlassMaking.Common;
-using GlassMaking.Items;
 using System.Collections.Generic;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
@@ -17,46 +16,7 @@ namespace GlassMaking.Blocks
 			base.OnLoaded(api);
 
 			if(api.Side != EnumAppSide.Client) return;
-			ICoreClientAPI capi = api as ICoreClientAPI;
-
-			interactions = ObjectCacheUtil.GetOrCreate(api, "glassmaking:blockhelp-smeltery", () => {
-				List<ItemStack> blends = new List<ItemStack>();
-
-				foreach(Item item in api.World.Items)
-				{
-					if(item is ItemGlassBlend && item.Attributes?.KeyExists(GlassBlend.PROPERTY_NAME) == true)
-					{
-						List<ItemStack> stacks = item.GetHandBookStacks(capi);
-						if(stacks != null) blends.AddRange(stacks);
-					}
-				}
-				return new WorldInteraction[] {
-					new WorldInteraction()
-					{
-						ActionLangCode = "glassmaking:blockhelp-smeltery-add",
-						HotKeyCode = null,
-						MouseButton = EnumMouseButton.Right,
-						Itemstacks = blends.ToArray(),
-						GetMatchingStacks = GetMatchingBlends
-					},
-					new WorldInteraction()
-					{
-						ActionLangCode = "glassmaking:blockhelp-smeltery-add",
-						HotKeyCode = "sneak",
-						MouseButton = EnumMouseButton.Right,
-						Itemstacks = blends.ConvertAll(s => { s = s.Clone(); s.StackSize = 5; return s; }).ToArray(),
-						GetMatchingStacks = GetMatchingBlends
-					},
-					new WorldInteraction()
-					{
-						ActionLangCode = "glassmaking:blockhelp-smeltery-add",
-						HotKeyCodes = new string[] { "sneak", "sprint" },
-						MouseButton = EnumMouseButton.Right,
-						Itemstacks = blends.ConvertAll(s => { s = s.Clone(); s.StackSize = 20; return s; }).ToArray(),
-						GetMatchingStacks = GetMatchingBlends
-					}
-				};
-			});
+			interactions = BlockGlassSmeltery.GetSmelteryInteractions(api as ICoreClientAPI, "glassmaking:blockhelp-largesmeltery", GetMatchingBlends);
 		}
 
 		public override bool OnBlockInteractStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)

@@ -9,6 +9,14 @@
 		}
 	],
 	"attributes": {
+		"handbook": {
+			"extraSections": [
+				{
+					"title": "glassmaking:handbook-melting-glass",
+					"text": "glassmaking:block-handbooktext-smeltery"
+				}
+			]
+		},
 		"smokeTransform": {
 			"translation": {
 				"x": 0.25,

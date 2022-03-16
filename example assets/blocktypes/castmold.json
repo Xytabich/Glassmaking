@@ -1,0 +1,49 @@
+{
+	"code": "castmold",
+	"class": "glassmaking:castingmold",
+	"entityclass": "glassmaking:castingmold",
+	"attributes": {
+		"glassmaking:castingmold": {
+			"recipe": {
+				"code": "game:*",
+				"amount": 1000,
+				"allowedVariants": [ "green", "yellow" ]
+			},
+			"output": {
+				"type": "block",
+				"code": "game:glass-*"
+			}
+		},
+		"fillHeight": 11,
+		"fillQuadsByLevel": [
+			{
+				"x1": 2.5,
+				"z1": 2.5,
+				"x2": 13.5,
+				"z2": 13.5
+			}
+		]
+	},
+	"shape": { "base": "block/clay/castmold" },
+	"blockmaterial": "Ceramic",
+	"creativeinventory": {
+		"general": [ "*" ]
+	},
+	"sideopaque": {
+		"all": false
+	},
+	"sidesolid": {
+		"all": false
+	},
+	"collisionSelectionBox": {
+		"x1": 0.09375,
+		"y1": 0,
+		"z1": 0.09375,
+		"x2": 0.90625,
+		"y2": 0.75,
+		"z2": 0.90625
+	},
+	"lightAbsorption": 0,
+	"heldTpIdleAnimation": "holdbothhands",
+	"heldTpUseAnimation": "twohandplaceblock"
+}

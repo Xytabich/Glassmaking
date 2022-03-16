@@ -40,7 +40,7 @@ namespace GlassMaking
 						var mod = world.Api.ModLoader.GetModSystem<GlassMakingMod>();
 						foreach(var pair in mod.GetGlassTypes())
 						{
-							if(WildcardUtil.Match(Output.Code, pair.Key))
+							if(WildcardUtil.Match(part.Code, pair.Key))
 							{
 								string code = pair.Key.Path.Substring(wildcardStartLen);
 								string codepart = code.Substring(0, code.Length - wildcardEndLen);
