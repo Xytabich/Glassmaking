@@ -63,7 +63,7 @@ namespace GlassMaking.Blocks
 			}
 
 			if(api.Side != EnumAppSide.Client) return;
-			interactions = ObjectCacheUtil.GetOrCreate(api, "glassmaking:toolmoldBlockInteractions", () => {
+			interactions = ObjectCacheUtil.GetOrCreate(api, "glassmaking:castingmoldinteractions", () => {
 				List<ItemStack> smeltedContainerStacks = new List<ItemStack>();
 
 				foreach(CollectibleObject obj in api.World.Items)
@@ -96,18 +96,6 @@ namespace GlassMaking.Blocks
 						{
 							var be = api.World.BlockAccessor.GetBlockEntity(bs.Position) as BlockEntityGlassCastingMold;
 							return be != null && be.IsFull && be.IsHardened;
-						}
-					},
-					new WorldInteraction()
-					{
-						ActionLangCode = "glassmaking:blockhelp-castingmold-pickup",
-						HotKeyCode = null,
-						RequireFreeHand = true,
-						MouseButton = EnumMouseButton.Right,
-						ShouldApply = (wi, bs, es) =>
-						{
-							var be = api.World.BlockAccessor.GetBlockEntity(bs.Position) as BlockEntityGlassCastingMold;
-							return be != null && be.IsEmpty;
 						}
 					}
 				};
