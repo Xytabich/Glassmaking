@@ -1,0 +1,31 @@
+{
+	"code": "largesmeltery",
+	"class": "glassmaking:horstruct",
+	"variantgroups": [
+		{
+			"code": "light",
+			"states": [ "light" ]
+		},
+		{
+			"code": "level",
+			"states": [ "0", "1", "2" ]
+		}
+	],
+	"blockmaterial": "Air",
+	"shape": { "base": "game:block/basic/nothing" },
+	"drawtype": "json",
+	"creativeinventory": {},
+	"lightAbsorption": 0,
+	"drops": [],
+	"sideopaque": {
+		"all": false
+	},
+	"sidesolid": {
+		"all": false
+	},
+	"lightHsvByType": {
+		"*-1": [ 7, 7, 7 ],
+		"*-2": [ 7, 7, 11 ]
+	},
+	"collisionboxes": []
+}

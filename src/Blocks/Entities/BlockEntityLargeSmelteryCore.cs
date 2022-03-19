@@ -37,9 +37,10 @@ namespace GlassMaking.Blocks
 		private GlassMakingMod mod;
 		private float meltingTemperature;
 
-		private int tickSource = -1;
 		private ITimeBasedHeatSourceControl[] heaters;
 		private ValueGraph[] heatGraphs;
+
+		private int prevLightLevel = 0;
 
 		private GlassSmelteryInventory inventory = new GlassSmelteryInventory(null, null);
 
@@ -86,25 +87,8 @@ namespace GlassMaking.Blocks
 		public void SetHeater(int index, ITimeBasedHeatSourceControl heatSource)
 		{
 			if(heaters[index] == heatSource) return;
-
 			heaters[index] = heatSource;
-			if(tickSource == index)
-			{
-				if(heatSource != null) return;
 
-				tickSource = -1;
-			}
-			if(tickSource < 0)
-			{
-				for(int i = 0; i < heaters.Length; i++)
-				{
-					if(heaters[i] != null)
-					{
-						tickSource = i;
-						break;
-					}
-				}
-			}
 			if(Api.Side == EnumAppSide.Client)
 			{
 				UpdateRendererParameters();
@@ -145,6 +129,7 @@ namespace GlassMaking.Blocks
 		{
 			base.ToTreeAttributes(tree);
 			tree.SetInt("state", (int)state);
+			tree.SetInt("lightLevel", prevLightLevel);
 			if(state != SmelteryState.Empty)
 			{
 				tree.SetInt("glassamount", glassAmount);
@@ -164,6 +149,7 @@ namespace GlassMaking.Blocks
 		{
 			base.FromTreeAttributes(tree, worldAccessForResolve);
 			state = (SmelteryState)tree.GetInt("state");
+			prevLightLevel = tree.GetInt("lightLevel");
 			if(state != SmelteryState.Empty)
 			{
 				glassAmount = tree.GetInt("glassamount");
@@ -381,7 +367,6 @@ namespace GlassMaking.Blocks
 		{
 			if(isStructureComplete)
 			{
-
 				if(state != SmelteryState.Empty && state != SmelteryState.ContainsGlass)
 				{
 					bool hasActive = false;
@@ -451,6 +436,10 @@ namespace GlassMaking.Blocks
 						}
 					}
 				}
+				else
+				{
+					UpdateLight(Api.World, (int)GameMath.Clamp(Math.Floor(GetTemperature() / 600f), 0, 2));
+				}
 			}
 
 			for(int i = 0; i < heaters.Length; i++)
@@ -467,6 +456,18 @@ namespace GlassMaking.Blocks
 				smokeParticles.MinPos.Set(Pos.X + transform.Translation.X, Pos.Y + transform.Translation.Y, Pos.Z + transform.Translation.Z);
 				smokeParticles.AddPos.Set(transform.ScaleXYZ.X, 0.0, transform.ScaleXYZ.Z);
 				Api.World.SpawnParticles(smokeParticles);
+			}
+		}
+
+		private void UpdateLight(IWorldAccessor world, int newLightLevel)
+		{
+			if(newLightLevel != prevLightLevel)
+			{
+				prevLightLevel = newLightLevel;
+
+				var block = (BlockLargeSmeltery)Block;
+				int newId = world.GetBlock(block.GetStructureBlock(block.lightOffset).CodeWithVariant("level", newLightLevel.ToString())).Id;
+				world.BlockAccessor.ExchangeBlock(newId, Pos.AddCopy(block.lightOffset));
 			}
 		}
 

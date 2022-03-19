@@ -9,6 +9,7 @@ namespace GlassMaking.Blocks
 	{
 		public ModelTransform smokeTransform;
 		public Vec3i[] hearthOffsets;
+		public Vec3i lightOffset;
 
 		public override void OnLoaded(ICoreAPI api)
 		{
@@ -30,6 +31,10 @@ namespace GlassMaking.Blocks
 						{
 							hearthOffsets[index] = -plan.mainOffset;
 							index++;
+						}
+						else if(structure[x, y, z] is BlockHorizontalStructure block && block.Variant.ContainsKey("light"))
+						{
+							lightOffset = -block.mainOffset;
 						}
 					}
 				}

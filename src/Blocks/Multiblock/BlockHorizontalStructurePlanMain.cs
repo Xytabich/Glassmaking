@@ -17,7 +17,7 @@ namespace GlassMaking.Blocks.Multiblock
 				{
 					for(int z = 0; z < sz; z++)
 					{
-						if(structure[x, y, z] != null && structure[x, y, z].Id != Id)
+						if(structure[x, y, z] is BlockHorizontalStructurePlan)
 						{
 							if(!(structure[x, y, z] is IStructurePlanOptionalBlock))
 							{

@@ -307,6 +307,17 @@ namespace GlassMaking.Blocks.Multiblock
 			return items.ToArray();
 		}
 
+		public Block GetStructureBlock(Vec3i offset)
+		{
+			int x = offset.X - structureOffset.X;
+			if(x < 0 || x >= structure.GetLength(0)) return null;
+			int y = offset.Y - structureOffset.Y;
+			if(y < 0 || y >= structure.GetLength(1)) return null;
+			int z = offset.Z - structureOffset.Z;
+			if(z < 0 || z >= structure.GetLength(2)) return null;
+			return structure[x, y, z];
+		}
+
 		[JsonObject]
 		private class Structure
 		{
