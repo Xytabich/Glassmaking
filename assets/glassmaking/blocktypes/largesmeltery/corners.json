@@ -11,6 +11,11 @@
 			"states": [ "wn", "ne", "es", "sw" ]
 		}
 	],
+	"attributes": {
+		"handbook": {
+			"exclude": true
+		}
+	},
 	"blockmaterial": "Ceramic",
 	"shapeByType": {
 		"*-wn": {
@@ -46,7 +51,7 @@
 	"drops": [
 		{
 			"type": "item",
-			"code": "game:burnedbrick-fire",
+			"code": "game:refractorybrick-fired-tier1",
 			"quantityByType": {
 				"*-wall-*": {
 					"avg": 11,

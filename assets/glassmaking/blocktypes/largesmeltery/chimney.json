@@ -7,6 +7,11 @@
 			"states": [ "chimney" ]
 		}
 	],
+	"attributes": {
+		"handbook": {
+			"exclude": true
+		}
+	},
 	"blockmaterial": "Ceramic",
 	"shape": { "base": "block/largesmeltery/chimney" },
 	"drawtype": "json",
@@ -25,7 +30,7 @@
 	"drops": [
 		{
 			"type": "item",
-			"code": "game:burnedbrick-fire",
+			"code": "game:refractorybrick-fired-tier1",
 			"quantity": {
 				"avg": 10,
 				"var": 2

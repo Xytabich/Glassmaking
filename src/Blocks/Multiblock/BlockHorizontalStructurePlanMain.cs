@@ -1,4 +1,6 @@
 ﻿using Vintagestory.API.Common;
+using Vintagestory.API.Config;
+using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Blocks.Multiblock
 {
@@ -27,6 +29,16 @@ namespace GlassMaking.Blocks.Multiblock
 					}
 				}
 			}
+		}
+
+		public override string GetPlacedBlockName(IWorldAccessor world, BlockPos pos)
+		{
+			return base.GetHeldItemName(OnPickBlock(world, pos));
+		}
+
+		public override string GetHeldItemName(ItemStack itemStack)
+		{
+			return Lang.Get("glassmaking:{0} (Plan)", base.GetHeldItemName(itemStack));
 		}
 	}
 }

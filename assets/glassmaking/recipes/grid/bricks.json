@@ -79,5 +79,27 @@
             "type": "block",
             "code": "annealer-north"
         }
+    },
+    {
+        "name": "largesmeltery",
+        "ingredientPattern": "O_O,DOD,DDD",
+        "ingredients": {
+            "O": {
+                "type": "item",
+                "code": "game:refractorybrick-fired-tier1",
+                "quantity": 1
+            },
+            "D": {
+                "type": "item",
+                "code": "game:refractorybrick-fired-tier1",
+                "quantity": 2
+            }
+        },
+        "width": 3,
+        "height": 3,
+        "output": {
+            "type": "block",
+            "code": "largesmeltery-main"
+        }
     }
 ]

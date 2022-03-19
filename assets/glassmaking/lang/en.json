@@ -8,6 +8,7 @@
     "Glass in the mold has cooled down": "Glass in the mold has cooled down",
     "Step {0}/{1}": "Step {0}/{1}",
     "{0} (Wet)": "{0} (Wet)",
+    "{0} (Plan)": "{0} (Plan)",
     "Humidity: {0}": "Humidity: {0:0.0#}L",
     "Mold for": "<a href=\"glassmaking:craftinginfo\">Mold</a> for",
     "Blown in a glass mold": "Blown in a glass mold",

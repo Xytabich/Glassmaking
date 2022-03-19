@@ -11,6 +11,11 @@
 			"states": [ "0", "1", "2" ]
 		}
 	],
+	"attributes": {
+		"handbook": {
+			"exclude": true
+		}
+	},
 	"blockmaterial": "Air",
 	"shape": { "base": "game:block/basic/nothing" },
 	"drawtype": "json",

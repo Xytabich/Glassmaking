@@ -23,6 +23,9 @@
 				"type": "block",
 				"code": "largesmeltery-main"
 			}
+		},
+		"handbook": {
+			"exclude": true
 		}
 	},
 	"blockmaterial": "Ceramic",
@@ -60,7 +63,7 @@
 	"drops": [
 		{
 			"type": "item",
-			"code": "game:burnedbrick-fire",
+			"code": "game:refractorybrick-fired-tier1",
 			"quantityByType": {
 				"*-hearth-*": {
 					"avg": 7,

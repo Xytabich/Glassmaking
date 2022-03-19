@@ -15,7 +15,8 @@
 					"title": "glassmaking:handbook-melting-glass",
 					"text": "glassmaking:block-handbooktext-smeltery"
 				}
-			]
+			],
+			"groupBy": [ "largesmeltery-*" ]
 		},
 		"smokeTransform": {
 			"translation": {
@@ -89,6 +90,7 @@
 		"general": [ "*" ],
 		"glassmaking": [ "*" ]
 	},
+	"shapeInventory": { "base": "block/largesmeltery/item" },
 	"shape": { "base": "block/largesmeltery/main" },
 	"drawtype": "json",
 	"textures": {
@@ -99,9 +101,9 @@
 	"drops": [
 		{
 			"type": "item",
-			"code": "game:burnedbrick-fire",
+			"code": "game:refractorybrick-fired-tier1",
 			"quantity": {
-				"avg": 12,
+				"avg": 11,
 				"var": 2
 			}
 		}
@@ -124,5 +126,36 @@
 	},
 	"sidesolid": {
 		"all": false
+	},
+	"heldTpIdleAnimation": "holdbothhandslarge",
+	"heldTpUseAnimation": "twohandplaceblock",
+	"guiTransform": {
+		"rotation": {
+			"x": -30,
+			"y": -30,
+			"z": 0
+		},
+		"origin": {
+			"x": 0.5,
+			"y": 0.4,
+			"z": 0.5
+		},
+		"scale": 1.1
+	},
+	"tpHandTransform": {
+		"translation": {
+			"x": -1.5,
+			"y": -1.1,
+			"z": -0.725
+		},
+		"rotation": {
+			"x": 13,
+			"y": 13,
+			"z": -70
+		},
+		"scale": 0.37
+	},
+	"groundTransform": {
+		"scale": 2
 	}
 }
