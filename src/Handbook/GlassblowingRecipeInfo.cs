@@ -38,7 +38,7 @@ namespace GlassMaking.Handbook
 			if(recipes != null)
 			{
 				outComponents.Add(new ClearFloatTextComponent(capi, 7f));
-				outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:Blown via pipe") + "\n", CairoFont.WhiteSmallText().WithWeight(FontWeight.Bold)));
+				outComponents.AddHandbookBoldRichText(capi, Lang.Get("glassmaking:Blown via pipe") + "\n", openDetailPageFor);
 				for(int i = 0; i < recipes.Count; i++)
 				{
 					if(recipes.Count > 1)

@@ -33,7 +33,7 @@ namespace GlassMaking.Handbook
 				if(output.Resolve(capi.World, "handbook recipe"))
 				{
 					outComponents.Add(new ClearFloatTextComponent(capi, 7f));
-					outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:Turns out when annealing") + "\n", CairoFont.WhiteSmallText().WithWeight(FontWeight.Bold)));
+					outComponents.AddHandbookBoldRichText(capi, Lang.Get("glassmaking:Turns out when annealing") + "\n", openDetailPageFor);
 					var element = new ItemstackTextComponent(capi, output.ResolvedItemstack, 40.0, 10.0,
 						EnumFloat.Inline, cs => openDetailPageFor(GuiHandbookItemStackPage.PageCodeForStack(cs)));
 					element.offY = GuiElement.scaled(7.0);

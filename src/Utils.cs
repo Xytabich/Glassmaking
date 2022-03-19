@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Cairo;
+using System.Collections.Generic;
 using System.IO;
+using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
@@ -122,6 +124,11 @@ namespace GlassMaking
 			self.Rotation = self.Rotation.LerpDelta(delta.Rotation, t);
 			self.ScaleXYZ = self.ScaleXYZ.LerpDelta(delta.ScaleXYZ, t);
 			return self;
+		}
+
+		public static void AddHandbookBoldRichText(this List<RichTextComponentBase> components, ICoreClientAPI capi, string text, ActionConsumable<string> openDetailPageFor = null)
+		{
+			components.AddRange(VtmlUtil.Richtextify(capi, text, CairoFont.WhiteSmallText().WithWeight(FontWeight.Bold), r => openDetailPageFor?.Invoke(r.Href)));
 		}
 	}
 }

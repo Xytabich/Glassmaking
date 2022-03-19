@@ -72,6 +72,9 @@ namespace GlassMaking.Items
 		public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
 		{
 			base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
+
+			dsc.AppendLine(Lang.Get("glassmaking:glassladle", maxGlassAmount, amountThreshold));
+
 			var itemstack = inSlot.Itemstack;
 			var glassmelt = itemstack.Attributes.GetTreeAttribute("glassmelt");
 			if(glassmelt != null)

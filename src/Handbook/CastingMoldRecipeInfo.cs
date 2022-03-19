@@ -31,7 +31,7 @@ namespace GlassMaking.Handbook
 				if(recipes != null && recipes.Length > 0)
 				{
 					outComponents.Add(new ClearFloatTextComponent(capi, 7f));
-					outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:Mold for") + "\n", CairoFont.WhiteSmallText().WithWeight(FontWeight.Bold)));
+					outComponents.AddHandbookBoldRichText(capi, Lang.Get("glassmaking:Mold for") + "\n", openDetailPageFor);
 					foreach(var recipe in recipes)
 					{
 						if(recipe.Output.ResolvedItemstack != null)
