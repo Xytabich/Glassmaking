@@ -8,6 +8,7 @@ namespace GlassMaking.Blocks
 	public class WorkbenchToolsInventory : InventoryBase
 	{
 		public override int Count => slots.Length;
+		public override bool TakeLocked { get => true; set { } }
 
 		public FastList<int> modifiedSlots = new FastList<int>();
 
@@ -66,7 +67,7 @@ namespace GlassMaking.Blocks
 				behaviors[slotId] = null;
 			}
 			slots[slotId].Itemstack = itemStack;
-			if(itemStack.Collectible is IWorkbenchTool tool)
+			if(itemStack?.Collectible is IWorkbenchTool tool)
 			{
 				behaviors[slotId] = tool.CreateToolBehavior(Api.World, itemStack, blockentity);
 				behaviors[slotId].OnLoaded(Api, slots[slotId]);

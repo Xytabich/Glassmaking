@@ -35,9 +35,16 @@ namespace GlassMaking
 
 		public IRecipeIngredient[] Ingredients { get; } = new IRecipeIngredient[0];
 
-		IRecipeOutput IRecipeBase<GlassBlowingRecipe>.Output => Output;
+		IRecipeOutput IRecipeBase<GlassBlowingRecipe>.Output => filler;
 
 		AssetLocation IRecipeBase.Code => Code;
+
+		private PlaceholderFiller filler;
+
+		public GlassBlowingRecipe()
+		{
+			filler = new PlaceholderFiller(this);
+		}
 
 		public Dictionary<string, string[]> GetNameToCodeMapping(IWorldAccessor world)
 		{
@@ -65,6 +72,11 @@ namespace GlassMaking
 
 		public bool Resolve(IWorldAccessor world, string sourceForErrorLogging)
 		{
+			if(Code == null || string.IsNullOrEmpty(Code.ToShortString()))
+			{
+				world.Logger.Error("Glassblowing recipe with output {0} has no recipe code. Ignoring recipe.", Output?.Code);
+				return false;
+			}
 			if(Steps == null || Steps.Length == 0 || Output == null)
 			{
 				world.Logger.Error("Glassblowing recipe with output {0} has no steps or missing output. Ignoring recipe.", Output);
@@ -232,6 +244,7 @@ namespace GlassMaking
 
 		public void ToBytes(BinaryWriter writer)
 		{
+			writer.Write(RecipeId);
 			writer.Write(Code);
 			writer.Write(Steps.Length);
 			for(int i = 0; i < Steps.Length; i++)
@@ -243,6 +256,7 @@ namespace GlassMaking
 
 		public void FromBytes(BinaryReader reader, IWorldAccessor resolver)
 		{
+			RecipeId = reader.ReadInt32();
 			Code = reader.ReadAssetLocation();
 			Steps = new GlassBlowingRecipeStep[reader.ReadInt32()];
 			for(int i = 0; i < Steps.Length; i++)
@@ -270,6 +284,22 @@ namespace GlassMaking
 		private static GlassBlowingRecipeStep CloneStep(GlassBlowingRecipeStep other)
 		{
 			return other.Clone();
+		}
+
+		private class PlaceholderFiller : IRecipeOutput
+		{
+			private GlassBlowingRecipe recipe;
+
+			public PlaceholderFiller(GlassBlowingRecipe recipe)
+			{
+				this.recipe = recipe;
+			}
+
+			public void FillPlaceHolder(string key, string value)
+			{
+				recipe.Output.FillPlaceHolder(key, value);
+				recipe.Code = recipe.Code.CopyWithPath(recipe.Code.Path.Replace("{" + key + "}", value));
+			}
 		}
 	}
 

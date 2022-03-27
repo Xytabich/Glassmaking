@@ -41,30 +41,39 @@ namespace GlassMaking.Workbench
 
 		}
 
-		public virtual bool OnBlockInteractStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, ref EnumHandling handling)
+		/// <summary>
+		/// Called when the use of a tool in a recipe begins.
+		/// </summary>
+		/// <returns>False if the use should be canceled</returns>
+		public virtual bool OnUseStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, WorkbenchRecipe recipe, int step)
 		{
-			handling = EnumHandling.PassThrough;
-			return false;
+			return true;
 		}
 
-		public virtual void OnBlockInteractStop(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, ref EnumHandling handling)
+		/// <summary>
+		/// Called every frame while the player is crafting using this tool.
+		/// </summary>
+		/// <returns>False if the use should be canceled</returns>
+		public virtual bool OnUseStep(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, WorkbenchRecipe recipe, int step)
 		{
-			handling = EnumHandling.PassThrough;
+			return true;
 		}
 
-		public virtual bool OnBlockInteractStep(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, ref EnumHandling handling)
+		/// <summary>
+		/// Called when a recipe step has been completed. Here it is possible to consume items used in crafting, etc.
+		/// </summary>
+		public virtual void OnUseComplete(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, WorkbenchRecipe recipe, int step)
 		{
-			handling = EnumHandling.PassThrough;
-			return false;
 		}
 
-		public virtual bool OnBlockInteractCancel(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, ref EnumHandling handling)
+		/// <summary>
+		/// Called when a craft was cancelled. But at the same time, <see cref="OnUseStart"/> may not be called on this behavior.
+		/// </summary>
+		public virtual void OnUseCancel(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, WorkbenchRecipe recipe, int step)
 		{
-			handling = EnumHandling.PassThrough;
-			return false;
 		}
 
-		public virtual WorldInteraction[] GetBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer)
+		public virtual WorldInteraction[] GetBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer, WorkbenchRecipe recipe = null, int step = 0)
 		{
 			return null;
 		}
@@ -74,7 +83,7 @@ namespace GlassMaking.Workbench
 			return null;
 		}
 
-		public virtual void FromAttribute(IAttribute tree, IWorldAccessor worldAccessForResolve)
+		public virtual void FromAttribute(IAttribute attribute, IWorldAccessor worldAccessForResolve)
 		{
 		}
 

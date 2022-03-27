@@ -130,5 +130,14 @@ namespace GlassMaking
 		{
 			components.AddRange(VtmlUtil.Richtextify(capi, text, CairoFont.WhiteSmallText().WithWeight(FontWeight.Bold), r => openDetailPageFor?.Invoke(r.Href)));
 		}
+
+		public static void CopyFrom(this BlockSelection self, BlockSelection other)
+		{
+			self.Position.Set(other.Position);
+			self.HitPosition.Set(other.HitPosition);
+			self.Face = other.Face;
+			self.SelectionBoxIndex = other.SelectionBoxIndex;
+			self.DidOffset = other.DidOffset;
+		}
 	}
 }

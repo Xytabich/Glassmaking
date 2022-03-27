@@ -177,7 +177,6 @@
     <Compile Include="src\Common\RecipeRegistryDictionary.cs" />
     <Compile Include="src\Common\SimpleTextureSource.cs" />
     <Compile Include="src\Common\SmoothRadialShape.cs" />
-    <Compile Include="src\Common\WorkbenchToolInfo.cs" />
     <Compile Include="src\GenericItemAction\GenericItemActionSystem.cs" />
     <Compile Include="src\GenericItemAction\GuiHeldItemActionDialog.cs" />
     <Compile Include="src\GenericItemAction\HeldItemActionMessage.cs" />

@@ -16,6 +16,7 @@ using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Server;
+using Vintagestory.GameContent;
 using Vintagestory.ServerMods;
 
 namespace GlassMaking
@@ -105,7 +106,7 @@ namespace GlassMaking
 			api.RegisterCollectibleBehaviorClass("glassmaking:glassblend", typeof(BehaviorGlassBlend));
 
 			glassblowingRecipes = api.RegisterRecipeRegistry<RecipeRegistryDictionary<GlassBlowingRecipe>>("glassblowing");
-			//workbenchRecipes = api.RegisterRecipeRegistry<RecipeRegistryDictionary<WorkbenchRecipe>>("glassworkbench");
+			workbenchRecipes = api.RegisterRecipeRegistry<RecipeRegistryDictionary<WorkbenchRecipe>>("glassworkbench");
 			workbenchRecipes = new RecipeRegistryDictionary<WorkbenchRecipe>();
 
 			descriptors = new List<ToolBehaviorDescriptor>();
@@ -213,6 +214,26 @@ namespace GlassMaking
 				return recipe;
 			}
 			return null;
+		}
+
+		public bool TryFindWorkbenchRecipes(ItemStack ingredient, out WorkbenchRecipe[] recipes)
+		{
+			List<WorkbenchRecipe> list = null;
+			foreach(var recipe in workbenchRecipes.Recipes)
+			{
+				if(recipe.Input.SatisfiesAsIngredient(ingredient))
+				{
+					if(list == null) list = new List<WorkbenchRecipe>();
+					list.Add(recipe);
+				}
+			}
+			if(list == null)
+			{
+				recipes = null;
+				return false;
+			}
+			recipes = list.ToArray();
+			return true;
 		}
 
 		public IReadOnlyDictionary<string, GlassBlowingRecipe> GetGlassBlowingRecipes()
@@ -363,7 +384,7 @@ namespace GlassMaking
 		private void OnSaveGameLoadedServer()
 		{
 			sapi.ModLoader.GetModSystem<RecipeLoader>().LoadRecipes<GlassBlowingRecipe>("glassblowing recipe", "recipes/glassblowing", RegisterGlassblowingRecipe);
-			//sapi.ModLoader.GetModSystem<RecipeLoader>().LoadRecipes<WorkbenchRecipe>("glassworkbench recipe", "recipes/glassworkbench", RegisterWorkbenchRecipe);
+			sapi.ModLoader.GetModSystem<RecipeLoader>().LoadRecipes<WorkbenchRecipe>("glassworkbench recipe", "recipes/glassworkbench", RegisterWorkbenchRecipe);
 			foreach(var descriptor in descriptors)
 			{
 				descriptor.OnLoaded(sapi);
@@ -373,13 +394,19 @@ namespace GlassMaking
 		private void RegisterGlassblowingRecipe(GlassBlowingRecipe r)
 		{
 			r.RecipeId = glassblowingRecipes.Recipes.Count;
-			glassblowingRecipes.AddRecipe(r);
+			if(!glassblowingRecipes.AddRecipe(r))
+			{
+				sapi.Logger.Error("Unable to add glassblowing recipe {0} with output {1} as a similar recipe has already been added", r.Code, r.Output.Code);
+			}
 		}
 
 		private void RegisterWorkbenchRecipe(WorkbenchRecipe r)
 		{
 			r.RecipeId = workbenchRecipes.Recipes.Count;
-			workbenchRecipes.AddRecipe(r);
+			if(!workbenchRecipes.AddRecipe(r))
+			{
+				sapi.Logger.Error("Unable to add workbench recipe {0} with output {1} as a similar recipe has already been added", r.Code, r.Output.Code);
+			}
 		}
 	}
 }

@@ -4,8 +4,10 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
+using Vintagestory.API.Util;
 
 namespace GlassMaking
 {
@@ -18,7 +20,7 @@ namespace GlassMaking
 		public AssetLocation Code;
 
 		[JsonProperty]
-		public JsonItemStack Input;
+		public CraftingRecipeIngredient Input;
 
 		[JsonProperty]
 		public JsonItemStack Output;
@@ -30,27 +32,82 @@ namespace GlassMaking
 
 		public bool Enabled { get; set; } = true;
 
-		public IRecipeIngredient[] Ingredients { get; } = new IRecipeIngredient[0];
+		public CraftingRecipeIngredient[] Ingredients => ingredients ?? (ingredients = new CraftingRecipeIngredient[] { Input });
 
-		IRecipeOutput IRecipeBase<WorkbenchRecipe>.Output => Output;
+		IRecipeIngredient[] IRecipeBase<WorkbenchRecipe>.Ingredients => Ingredients;
+
+		IRecipeOutput IRecipeBase<WorkbenchRecipe>.Output => filler;
 
 		AssetLocation IRecipeBase.Code => Code;
 
+		private CraftingRecipeIngredient[] ingredients = null;
+
+		private PlaceholderFiller filler;
+
+		public WorkbenchRecipe()
+		{
+			filler = new PlaceholderFiller(this);
+		}
+
 		public Dictionary<string, string[]> GetNameToCodeMapping(IWorldAccessor world)
 		{
-			return new Dictionary<string, string[]>();
+			Dictionary<string, string[]> mappings = new Dictionary<string, string[]>();
+
+			foreach(var item in Ingredients)
+			{
+				if(string.IsNullOrEmpty(item.Name)) continue;
+				if(!item.Code.Path.Contains("*")) continue;
+
+				int wildcardStartLen = item.Code.Path.IndexOf("*");
+				int wildcardEndLen = item.Code.Path.Length - wildcardStartLen - 1;
+
+				List<string> codes = new List<string>();
+				if(item.Type == EnumItemClass.Block)
+				{
+					for(int i = 0; i < world.Blocks.Count; i++)
+					{
+						if(world.Blocks[i] == null || world.Blocks[i].IsMissing) continue;
+
+						if(WildcardUtil.Match(item.Code, world.Blocks[i].Code, item.AllowedVariants))
+						{
+							string code = world.Blocks[i].Code.Path.Substring(wildcardStartLen);
+							string codepart = code.Substring(0, code.Length - wildcardEndLen);
+							codes.Add(codepart);
+						}
+					}
+				}
+				else
+				{
+					for(int i = 0; i < world.Items.Count; i++)
+					{
+						if(world.Items[i] == null || world.Items[i].IsMissing) continue;
+
+						if(WildcardUtil.Match(item.Code, world.Items[i].Code, item.AllowedVariants))
+						{
+							string code = world.Items[i].Code.Path.Substring(wildcardStartLen);
+							string codepart = code.Substring(0, code.Length - wildcardEndLen);
+							codes.Add(codepart);
+						}
+					}
+				}
+
+				mappings[item.Name] = codes.ToArray();
+			}
+
+			return mappings;
 		}
 
 		public bool Resolve(IWorldAccessor world, string sourceForErrorLogging)
 		{
+			if(Code == null || string.IsNullOrEmpty(Code.ToShortString()))
+			{
+				world.Logger.Error("Workbench recipe with output {0} has no recipe code. Ignoring recipe.", Output?.Code);
+				return false;
+			}
 			if(Steps == null || Steps.Length == 0 || Input == null || Output == null)
 			{
 				world.Logger.Error("Workbench recipe {0} has no steps or missing output. Ignoring recipe.", Code);
 				return false;
-			}
-			foreach(var step in Steps)
-			{
-				step.Tool = step.Tool.ToLowerInvariant();
 			}
 			if(!Input.Resolve(world, sourceForErrorLogging))
 			{
@@ -60,11 +117,17 @@ namespace GlassMaking
 			{
 				return false;
 			}
+			foreach(var step in Steps)
+			{
+				step.Tools = step.Tools.Select(pair => new KeyValuePair<string, JsonObject>(pair.Key.ToLowerInvariant(), pair.Value))
+					.ToDictionary(pair => pair.Key, pair => pair.Value);
+			}
 			return true;
 		}
 
 		public void ToBytes(BinaryWriter writer)
 		{
+			writer.Write(RecipeId);
 			writer.Write(Code);
 			writer.Write(Steps.Length);
 			for(int i = 0; i < Steps.Length; i++)
@@ -77,6 +140,7 @@ namespace GlassMaking
 
 		public void FromBytes(BinaryReader reader, IWorldAccessor resolver)
 		{
+			RecipeId = reader.ReadInt32();
 			Code = reader.ReadAssetLocation();
 			Steps = new WorkbenchRecipeStep[reader.ReadInt32()];
 			for(int i = 0; i < Steps.Length; i++)
@@ -84,8 +148,8 @@ namespace GlassMaking
 				Steps[i] = new WorkbenchRecipeStep();
 				Steps[i].FromBytes(reader);
 			}
-			Input = new JsonItemStack();
-			Input.FromBytes(reader, resolver.ClassRegistry);
+			Input = new CraftingRecipeIngredient();
+			Input.FromBytes(reader, resolver);
 			Input.Resolve(resolver, "[FromBytes]");
 			Output = new JsonItemStack();
 			Output.FromBytes(reader, resolver.ClassRegistry);
@@ -94,10 +158,11 @@ namespace GlassMaking
 
 		public WorkbenchRecipe Clone()
 		{
+			var input = Input.Clone();
 			return new WorkbenchRecipe() {
 				RecipeId = RecipeId,
 				Code = Code.Clone(),
-				Input = Input.Clone(),
+				Input = input,
 				Output = Output.Clone(),
 				Steps = Array.ConvertAll(Steps, CloneStep),
 				Name = Name.Clone(),
@@ -109,24 +174,40 @@ namespace GlassMaking
 		{
 			return other.Clone();
 		}
+
+		private class PlaceholderFiller : IRecipeOutput
+		{
+			private WorkbenchRecipe recipe;
+
+			public PlaceholderFiller(WorkbenchRecipe recipe)
+			{
+				this.recipe = recipe;
+			}
+
+			public void FillPlaceHolder(string key, string value)
+			{
+				recipe.Output.FillPlaceHolder(key, value);
+				recipe.Code = recipe.Code.CopyWithPath(recipe.Code.Path.Replace("{" + key + "}", value));
+			}
+		}
 	}
 
 	[JsonObject]
 	public sealed class WorkbenchRecipeStep
 	{
-		[JsonProperty(Required = Required.Always)]
-		public string Tool;
-
 		[JsonProperty]
 		public CompositeShape Shape;
 
+		//TODO: textures with wildcard
+
+		[JsonProperty(Required = Required.Always, ItemConverterType = typeof(JsonAttributesConverter))]
+		public Dictionary<string, JsonObject> Tools;
+
 		[JsonProperty]
-		[JsonConverter(typeof(JsonAttributesConverter))]
-		public JsonObject Attributes;
+		public float? UseTime = null;
 
 		public void ToBytes(BinaryWriter writer)
 		{
-			writer.Write(Tool);
 			writer.Write(Shape != null);
 			if(Shape != null)
 			{
@@ -143,13 +224,21 @@ namespace GlassMaking
 				writer.Write(Shape.VoxelizeTexture);
 				writer.Write(Shape.QuantityElements ?? 0);
 			}
-			writer.Write(Attributes != null);
-			if(Attributes != null) writer.Write(Attributes.Token.ToString());
+
+			writer.Write(Tools.Count);
+			foreach(var pair in Tools)
+			{
+				writer.Write(pair.Key);
+				writer.Write(pair.Value != null);
+				if(pair.Value != null) writer.Write(pair.Value.Token.ToString());
+			}
+
+			writer.Write(UseTime.HasValue);
+			if(UseTime.HasValue) writer.Write(UseTime.Value);
 		}
 
 		public void FromBytes(BinaryReader reader)
 		{
-			Tool = reader.ReadString().ToLowerInvariant();
 			if(reader.ReadBoolean())
 			{
 				Shape = new CompositeShape();
@@ -166,18 +255,34 @@ namespace GlassMaking
 				Shape.VoxelizeTexture = reader.ReadBoolean();
 				Shape.QuantityElements = reader.ReadInt32();
 			}
+			int count = reader.ReadInt32();
+			Tools = new Dictionary<string, JsonObject>(count);
+			for(int i = 0; i < count; i++)
+			{
+				var tool = reader.ReadString().ToLowerInvariant();
+				JsonObject attribs = null;
+				if(reader.ReadBoolean())
+				{
+					attribs = new JsonObject(JToken.Parse(reader.ReadString()));
+				}
+				Tools[tool] = attribs;
+			}
 			if(reader.ReadBoolean())
 			{
-				Attributes = new JsonObject(JToken.Parse(reader.ReadString()));
+				UseTime = reader.ReadSingle();
+			}
+			else
+			{
+				UseTime = null;
 			}
 		}
 
 		public WorkbenchRecipeStep Clone()
 		{
 			return new WorkbenchRecipeStep() {
-				Tool = Tool,
 				Shape = Shape.Clone(),
-				Attributes = Attributes?.Clone()
+				Tools = Tools.Select(pair => new KeyValuePair<string, JsonObject>(pair.Key, pair.Value?.Clone())).ToDictionary(pair => pair.Key, pair => pair.Value),
+				UseTime = UseTime
 			};
 		}
 	}

@@ -53,10 +53,14 @@ namespace GlassMaking.Common
 			}
 		}
 
-		public void AddRecipe(T rec)
+		public bool AddRecipe(T rec)
 		{
+			var code = rec.Code.ToShortString();
+			if(Pairs.ContainsKey(code)) return false;
+
 			Recipes.Add(rec);
-			Pairs[rec.Code.ToShortString()] = rec;
+			Pairs[code] = rec;
+			return true;
 		}
 	}
 
