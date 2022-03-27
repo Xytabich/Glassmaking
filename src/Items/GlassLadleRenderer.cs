@@ -14,10 +14,6 @@ namespace GlassMaking.Items
 
 		private MeshRef meshRef = null;
 
-		public GlassLadleRenderer()
-		{
-		}
-
 		public void UpdateIfChanged(ICoreClientAPI capi, ItemStack itemStack, Data data)
 		{
 			var amount = data.glassmelt.GetInt("amount");

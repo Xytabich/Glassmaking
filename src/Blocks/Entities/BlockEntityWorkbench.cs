@@ -1,4 +1,5 @@
-﻿using GlassMaking.Workbench;
+﻿using GlassMaking.Items;
+using GlassMaking.Workbench;
 using System;
 using System.Collections.Generic;
 using Vintagestory.API.Client;
@@ -85,16 +86,59 @@ namespace GlassMaking.Blocks
 			ItemStack itemstack = slot.Itemstack;
 			if(byPlayer.Entity.Controls.Sneak)
 			{
-				if(selection.SelectionBoxIndex < blockBoxesCount && slot.Itemstack == null && workpiece != null)
+				if(selection.SelectionBoxIndex < blockBoxesCount)
 				{
-					CancelStartedStep(0, world, byPlayer, selection);
+					if(itemstack == null)
+					{
+						if(workpiece != null)
+						{
+							CancelStartedStep(0, world, byPlayer, selection);
 
-					slot.Itemstack = workpiece.Clone();
-					workpiece = null;
-					recipe = null;
-					MarkDirty(true);
-					handling = EnumHandling.PreventSubsequent;
-					return true;
+							slot.Itemstack = workpiece.Clone();
+							workpiece = null;
+							recipe = null;
+							recipeStep = -1;
+
+							MarkDirty(true);
+							slot.MarkDirty();
+							handling = EnumHandling.PreventSubsequent;
+							return true;
+						}
+					}
+					else
+					{
+						if(workpiece == null)
+						{
+							if(itemstack.Collectible is ItemGlassWorkpiece)
+							{
+								if(Api.Side == EnumAppSide.Server)
+								{
+									var recipeInfo = itemstack.Attributes.GetTreeAttribute("glassmaking:recipe");
+									if(recipeInfo != null)
+									{
+										var recipe = mod.GetWorkbenchRecipe(recipeInfo.GetString("code"));
+										if(recipe != null)
+										{
+											this.recipe = recipe;
+											this.recipeStep = recipeInfo.GetInt("step", 0);
+											this.workpiece = slot.TakeOut(1);
+
+											MarkDirty(true);
+											slot.MarkDirty();
+											handling = EnumHandling.PreventSubsequent;
+											return true;
+										}
+									}
+								}
+							}
+							else if(Api.Side == EnumAppSide.Client)
+							{
+								OpenDialog(itemstack);
+								handling = EnumHandling.PreventSubsequent;
+								return false;
+							}
+						}
+					}
 				}
 				return false;
 			}
@@ -113,48 +157,42 @@ namespace GlassMaking.Blocks
 						return true;
 					}
 				}
-				else if(itemstack == null)
+				else
 				{
-					for(int i = 0; i < toolsSelection.Length; i++)
+					if(itemstack == null)
 					{
-						if(toolsSelection[i] != null && toolsSelection[i].index >= selection.SelectionBoxIndex &&
-							selection.SelectionBoxIndex < (toolsSelection[i].index + toolsSelection[i].boxes.Length))
+						for(int i = 0; i < toolsSelection.Length; i++)
 						{
-							var behavior = inventory.GetBehavior(i);
-							if(recipe != null && startedStep >= 0 && startedStep == recipeStep && recipe.Steps[recipeStep].Tools.ContainsKey(behavior.ToolCode))
+							if(toolsSelection[i] != null && toolsSelection[i].index >= selection.SelectionBoxIndex &&
+								selection.SelectionBoxIndex < (toolsSelection[i].index + toolsSelection[i].boxes.Length))
 							{
-								CancelCurrentStep(0, world, byPlayer, selection);
+								var behavior = inventory.GetBehavior(i);
+								if(recipe != null && startedStep >= 0 && startedStep == recipeStep && recipe.Steps[recipeStep].Tools.ContainsKey(behavior.ToolCode))
+								{
+									CancelCurrentStep(0, world, byPlayer, selection);
+								}
+
+								slot.Itemstack = inventory[i].Itemstack.Clone();
+
+								inventory.SetItem(i, null);
+
+								toolsSelection[i] = null;
+								if(behavior != null) toolSlots.Remove(behavior.ToolCode);
+
+								RebuildSelectionBoxes();
+								updateMesh(i);
+
+								slot.MarkDirty();
+								handling = EnumHandling.PreventSubsequent;
+								return true;
 							}
-
-							slot.Itemstack = inventory[i].Itemstack.Clone();
-
-							inventory.SetItem(i, null);
-
-							toolsSelection[i] = null;
-							if(behavior != null) toolSlots.Remove(behavior.ToolCode);
-
-							RebuildSelectionBoxes();
-							updateMesh(i);
-
-							slot.MarkDirty();
-							handling = EnumHandling.PreventSubsequent;
-							return true;
 						}
 					}
 				}
 				return false;
 			}
 
-			if(recipe == null)
-			{
-				if(itemstack != null && Api.Side == EnumAppSide.Client)
-				{
-					OpenDialog(itemstack);
-					handling = EnumHandling.PreventSubsequent;
-					return false;
-				}
-			}
-			else
+			if(recipe != null)
 			{
 				startedStep = recipeStep;
 				var sel = new BlockSelection();
@@ -249,7 +287,12 @@ namespace GlassMaking.Blocks
 		public override void FromTreeAttributes(ITreeAttribute tree, IWorldAccessor worldForResolving)
 		{
 			var code = tree.GetString("recipe");
-			if(!string.IsNullOrEmpty(code))
+			if(string.IsNullOrEmpty(code))
+			{
+				recipe = null;
+				recipeStep = -1;
+			}
+			else
 			{
 				recipe = mod.GetWorkbenchRecipe(code);
 				recipeStep = tree.GetInt("step");
@@ -509,7 +552,13 @@ namespace GlassMaking.Blocks
 				}
 				else
 				{
-					//TODO: replace to workpiece or update workpiece recipe step
+					if(!(workpiece.Collectible is ItemGlassWorkpiece))
+					{
+						workpiece = new ItemStack(world.GetItem(new AssetLocation("glassmaking:workpiece")));
+					}
+					var recipeInfo = workpiece.Attributes.GetOrAddTreeAttribute("glassmaking:recipe");
+					recipeInfo.SetString("code", recipe.Code.ToShortString());
+					recipeInfo.SetInt("step", recipeStep);
 				}
 				MarkDirty(true);
 				return true;
