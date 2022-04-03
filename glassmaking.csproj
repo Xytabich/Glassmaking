@@ -147,8 +147,11 @@
     <Compile Include="src\Common\GlassTypeProperty.cs" />
     <Compile Include="src\Common\GuiDialogItemRecipeSelector.cs" />
     <Compile Include="src\Items\GlassRenderUtil.cs" />
+    <Compile Include="src\Items\GlassWorkpieceRenderer.cs" />
+    <Compile Include="src\Items\ItemBlowtorch.cs" />
     <Compile Include="src\Items\ItemGlassContainer.cs" />
     <Compile Include="src\Items\ItemGlassLadle.cs" />
+    <Compile Include="src\Items\ItemGlassWorkpiece.cs" />
     <Compile Include="src\ToolDescriptors\BlowingToolDescriptor.cs" />
     <Compile Include="src\ToolDescriptors\DryableToolDescriptor.cs" />
     <Compile Include="src\ToolDescriptors\IntakeToolDescriptor.cs" />
@@ -190,6 +193,7 @@
     <Compile Include="src\GlassblowingTools\GlassIntakeTool.cs" />
     <Compile Include="src\Items\ItemWorkbenchTool.cs" />
     <Compile Include="src\Utils.cs" />
+    <Compile Include="src\Workbench\ToolBehaviors\BlowtorchToolBehavior.cs" />
     <Compile Include="src\Workbench\WorkbenchToolBehavior.cs" />
   </ItemGroup>
   <ItemGroup>

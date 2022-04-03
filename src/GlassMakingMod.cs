@@ -16,7 +16,6 @@ using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Server;
-using Vintagestory.GameContent;
 using Vintagestory.ServerMods;
 
 namespace GlassMaking
@@ -73,6 +72,7 @@ namespace GlassMaking
 			api.RegisterItemClass("glassmaking:wettable", typeof(ItemWettable));
 			api.RegisterItemClass("glassmaking:glassladle", typeof(ItemGlassLadle));
 			api.RegisterItemClass("glassmaking:workpiece", typeof(ItemGlassWorkpiece));
+			api.RegisterItemClass("glassmaking:blowtorch", typeof(ItemBlowtorch));
 
 			api.RegisterBlockClass("glassmaking:firebox", typeof(BlockFirebox));
 			api.RegisterBlockClass("glassmaking:annealer", typeof(BlockAnnealer));

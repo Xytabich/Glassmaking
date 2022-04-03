@@ -1,3 +1,4 @@
 /glassmaking.dll
 /glassmaking.pdb
 *.csproj.user
+/bin/
