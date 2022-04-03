@@ -2,17 +2,21 @@
 	"code": "workbench",
 	"class": "glassmaking:workbench",
 	"entityclassByType": {
-		"*-right-*": "glassmaking:workbench"
+		"*-bottom-right-*": "glassmaking:workbench"
 	},
 	"blockmaterial": "Wood",
 	"behaviorsByType": {
-		"*-right-*": [
+		"*-bottom-right-*": [
 			{ "name": "glassmaking:placetable" }
 		]
 	},
 	"variantgroups": [
 		{
-			"code": "block",
+			"code": "ver",
+			"states": [ "bottom", "top" ]
+		},
+		{
+			"code": "hor",
 			"states": [ "left", "right" ]
 		},
 		{
@@ -21,11 +25,17 @@
 		}
 	],
 	"attributesByType": {
-		"*-right-*": {
+		"*-bottom-right-*": {
 			"structure": {
 				"codes": [
-					[ [ "workbench-left-{side}" ] ],
-					[ [ "workbench-right-{side}" ] ]
+					[
+						[ "workbench-bottom-left-{side}" ],
+						[ "workbench-top-left-{side}" ]
+					],
+					[
+						[ "workbench-bottom-right-{side}" ],
+						[ "workbench-top-right-{side}" ]
+					]
 				],
 				"rotateYByType": {
 					"*-north": 0,
@@ -37,8 +47,8 @@
 		}
 	},
 	"creativeinventory": {
-		"general": [ "*-right-north" ],
-		"glassmaking": [ "*-right-north" ]
+		"general": [ "*-bottom-right-north" ],
+		"glassmaking": [ "*-bottom-right-north" ]
 	},
 	"replaceable": 400,
 	"resistance": 3.5,
@@ -47,107 +57,121 @@
 	"shapeInventory": { "base": "block/workbench/item" },
 	"renderer": "Shape",
 	"shapeByType": {
-		"*-north": {
-			"base": "block/workbench/{block}",
+		"*-top-*": { "base": "game:block/basic/nothing" },
+		"*-bottom-*-north": {
+			"base": "block/workbench/{hor}",
 			"rotateY": 0
 		},
-		"*-east": {
-			"base": "block/workbench/{block}",
+		"*-bottom-*-east": {
+			"base": "block/workbench/{hor}",
 			"rotateY": 270
 		},
-		"*-south": {
-			"base": "block/workbench/{block}",
+		"*-bottom-*-south": {
+			"base": "block/workbench/{hor}",
 			"rotateY": 180
 		},
-		"*-west": {
-			"base": "block/workbench/{block}",
+		"*-bottom-*-west": {
+			"base": "block/workbench/{hor}",
 			"rotateY": 90
 		}
 	},
-	"collisionSelectionBoxes": [
-		{
-			"x1": 0,
-			"y1": 0.875,
-			"z1": 0,
-			"x2": 1,
-			"y2": 1,
-			"z2": 1
-		},
-		{
-			"x1": 0.6875,
-			"y1": 0,
-			"z1": 0.125,
-			"x2": 0.875,
-			"y2": 0.875,
-			"z2": 0.25,
-			"rotateYByType": {
-				"*-north": 0,
-				"*-east": 270,
-				"*-south": 180,
-				"*-west": 90
-			}
-		},
-		{
-			"x1": 0.6875,
-			"y1": 0,
-			"z1": 0.75,
-			"x2": 0.875,
-			"y2": 0.875,
-			"z2": 0.875,
-			"rotateYByType": {
-				"*-north": 0,
-				"*-east": 270,
-				"*-south": 180,
-				"*-west": 90
-			}
-		},
-		{
-			"y1": 0.125,
-			"z1": 0.0625,
-			"y2": 0.3125,
-			"z2": 0.125,
-			"x1ByType": {
-				"*-right-*": 0,
-				"*-left-*": 0.0625
+	"collisionSelectionBoxesByType": {
+		"*-top-*": [],
+		"*-bottom-*": [
+			{
+				"x1": 0,
+				"y1": 0.875,
+				"z1": 0,
+				"x2": 1,
+				"y2": 1,
+				"z2": 1
 			},
-			"x2ByType": {
-				"*-right-*": 0.9375,
-				"*-left-*": 1
+			{
+				"y1": 0,
+				"z1": 0.125,
+				"y2": 0.875,
+				"z2": 0.25,
+				"x1ByType": {
+					"*-right-*": 0.6875,
+					"*-left-*": 0.125
+				},
+				"x2ByType": {
+					"*-right-*": 0.875,
+					"*-left-*": 0.3125
+				},
+				"rotateYByType": {
+					"*-north": 0,
+					"*-east": 270,
+					"*-south": 180,
+					"*-west": 90
+				}
 			},
-			"rotateYByType": {
-				"*-north": 0,
-				"*-east": 270,
-				"*-south": 180,
-				"*-west": 90
+			{
+				"y1": 0,
+				"z1": 0.75,
+				"y2": 0.875,
+				"z2": 0.875,
+				"x1ByType": {
+					"*-right-*": 0.6875,
+					"*-left-*": 0.125
+				},
+				"x2ByType": {
+					"*-right-*": 0.875,
+					"*-left-*": 0.3125
+				},
+				"rotateYByType": {
+					"*-north": 0,
+					"*-east": 270,
+					"*-south": 180,
+					"*-west": 90
+				}
+			},
+			{
+				"y1": 0.125,
+				"z1": 0.0625,
+				"y2": 0.3125,
+				"z2": 0.125,
+				"x1ByType": {
+					"*-right-*": 0,
+					"*-left-*": 0.0625
+				},
+				"x2ByType": {
+					"*-right-*": 0.9375,
+					"*-left-*": 1
+				},
+				"rotateYByType": {
+					"*-north": 0,
+					"*-east": 270,
+					"*-south": 180,
+					"*-west": 90
+				}
+			},
+			{
+				"y1": 0.125,
+				"z1": 0.125,
+				"y2": 0.3125,
+				"z2": 0.875,
+				"x1ByType": {
+					"*-right-*": 0.875,
+					"*-left-*": 0.0625
+				},
+				"x2ByType": {
+					"*-right-*": 0.9375,
+					"*-left-*": 0.125
+				},
+				"rotateYByType": {
+					"*-north": 0,
+					"*-east": 270,
+					"*-south": 180,
+					"*-west": 90
+				}
 			}
-		},
-		{
-			"y1": 0.125,
-			"z1": 0.125,
-			"y2": 0.3125,
-			"z2": 0.875,
-			"x1ByType": {
-				"*-right-*": 0.875,
-				"*-left-*": 0.0625
-			},
-			"x2ByType": {
-				"*-right-*": 0.9375,
-				"*-left-*": 0.125
-			},
-			"rotateYByType": {
-				"*-north": 0,
-				"*-east": 270,
-				"*-south": 180,
-				"*-west": 90
-			}
-		}
-	],
+		]
+	},
 	"sidesolid": {
-		"up": true,
 		"all": false
 	},
 	"sideopaque": {
-		"up": true,
 		"all": false
 	}
 }

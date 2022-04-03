@@ -73,7 +73,7 @@ namespace GlassMaking.Blocks
 				{
 					var boxes = new Cuboidf[blockBoxes.Length + toolBoxes.Length];
 					blockBoxes.CopyTo(boxes, 0);
-					for(int i = 1; i < toolBoxes.Length; i++)
+					for(int i = 0; i < toolBoxes.Length; i++)
 					{
 						boxes[blockBoxes.Length + i] = toolBoxes[i].OffsetCopy(mainOffset.X, mainOffset.Y, mainOffset.Z);
 					}
