@@ -1,5 +1,7 @@
 ﻿using GlassMaking.Workbench;
+using System;
 using Vintagestory.API.Common;
+using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Items
@@ -11,7 +13,7 @@ namespace GlassMaking.Items
 		public override void OnLoaded(ICoreAPI api)
 		{
 			base.OnLoaded(api);
-			toolBoundingBoxes = Attributes?["workbenchToolBounds"].AsObject<Cuboidf[]>();
+			toolBoundingBoxes = Array.ConvertAll(Attributes?["workbenchToolBounds"].AsObject<RotatableCube[]>(), c => c.RotatedCopy());
 		}
 
 		public abstract string GetToolCode(IWorldAccessor world, ItemStack itemStack);

@@ -49,6 +49,7 @@ namespace GlassMaking
 		public override void Start(ICoreAPI api)
 		{
 			base.Start(api);
+
 			glassTypes = new Dictionary<AssetLocation, GlassTypeVariant>();
 			var glassTypeProperties = api.Assets.GetMany<JToken>(api.Logger, "worldproperties/abstract/glasstype.json");
 			foreach(var pair in glassTypeProperties)

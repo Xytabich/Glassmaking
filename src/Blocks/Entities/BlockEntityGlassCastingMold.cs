@@ -55,7 +55,7 @@ namespace GlassMaking.Blocks
 
 				if(Block.Attributes["fillQuadsByLevel"].Exists)
 				{
-					fillQuadsByLevel = Block.Attributes["fillQuadsByLevel"].AsObject<Cuboidf[]>();
+					fillQuadsByLevel = Array.ConvertAll(Block.Attributes["fillQuadsByLevel"].AsObject<RotatableCube[]>(), c => c.RotatedCopy());
 				}
 
 				if(fillQuadsByLevel == null)

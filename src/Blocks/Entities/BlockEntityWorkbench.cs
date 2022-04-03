@@ -26,7 +26,6 @@ namespace GlassMaking.Blocks
 		private int recipeStep = 0;
 		private int startedStep = -1;
 
-		private int blockBoxesCount = 0;
 		private SelectionInfo[] toolsSelection;
 		private WorkbenchToolsInventory inventory;
 
@@ -63,7 +62,7 @@ namespace GlassMaking.Blocks
 
 		public WorldInteraction[] GetBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer)
 		{
-			if(selection.SelectionBoxIndex >= blockBoxesCount)
+			if(selection.SelectionBoxIndex >= 0)
 			{
 				for(int i = 0; i < toolsSelection.Length; i++)
 				{
@@ -86,7 +85,7 @@ namespace GlassMaking.Blocks
 			ItemStack itemstack = slot.Itemstack;
 			if(byPlayer.Entity.Controls.Sneak)
 			{
-				if(selection.SelectionBoxIndex < blockBoxesCount)
+				if(selection.SelectionBoxIndex < 0)
 				{
 					if(itemstack == null)
 					{
@@ -145,7 +144,7 @@ namespace GlassMaking.Blocks
 
 			if(byPlayer.Entity.Controls.Sprint)
 			{
-				if(selection.SelectionBoxIndex < blockBoxesCount)
+				if(selection.SelectionBoxIndex < 0)
 				{
 					if(itemstack != null && TryAddTool(byPlayer, slot))
 					{
@@ -182,6 +181,7 @@ namespace GlassMaking.Blocks
 								RebuildSelectionBoxes();
 								updateMesh(i);
 
+								MarkDirty(true);
 								slot.MarkDirty();
 								handling = EnumHandling.PreventSubsequent;
 								return true;
@@ -228,7 +228,7 @@ namespace GlassMaking.Blocks
 		public bool OnBlockInteractStep(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection selection, ref EnumHandling handling)
 		{
 			handling = EnumHandling.PassThrough;
-			if(selection.SelectionBoxIndex < blockBoxesCount || byPlayer.Entity.Controls.Sneak || byPlayer.Entity.Controls.Sprint || recipe == null)
+			if(selection.SelectionBoxIndex < 0 || byPlayer.Entity.Controls.Sneak || byPlayer.Entity.Controls.Sprint || recipe == null)
 			{
 				CancelStartedStep(secondsUsed, world, byPlayer, selection);
 				return false;
@@ -279,7 +279,7 @@ namespace GlassMaking.Blocks
 			return false;
 		}
 
-		public Cuboidf[] GetSelectionBoxes()
+		public Cuboidf[] GetToolSelectionBoxes()
 		{
 			return selectionBoxes;
 		}
@@ -491,7 +491,7 @@ namespace GlassMaking.Blocks
 		private void UpdateToolBounds(int slotId)
 		{
 			var tool = inventory.GetBehavior(slotId);
-			if(tool == null) selectionBoxes[slotId] = null;
+			if(tool == null) toolsSelection[slotId] = null;
 			else
 			{
 				toolsSelection[slotId] = new SelectionInfo() {
@@ -584,9 +584,6 @@ namespace GlassMaking.Blocks
 		private void RebuildSelectionBoxes()
 		{
 			var boxes = new List<Cuboidf>();
-			if(Block.SelectionBoxes != null) boxes.AddRange(Block.SelectionBoxes);
-			else boxes.Add(Block.DefaultCollisionBox);
-			blockBoxesCount = boxes.Count;
 			for(int i = itemCapacity - 1; i >= 0; i--)
 			{
 				var tool = inventory.GetBehavior(i);
