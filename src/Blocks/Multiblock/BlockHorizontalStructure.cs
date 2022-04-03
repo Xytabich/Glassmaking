@@ -13,6 +13,8 @@ namespace GlassMaking.Blocks.Multiblock
 		public Vec3i mainOffset = null;
 		public bool isSurrogate = false;
 
+		private int loadStep = 0;
+
 		protected Vec3i structureOffset = null;
 		protected Block[,,] structure = null;
 
@@ -74,12 +76,32 @@ namespace GlassMaking.Blocks.Multiblock
 
 									throw new Exception(string.Join("Unable to initialize surrogate {0} with different main block coordinates", sblock.Code));
 								}
-								sblock.OnStructureLoaded(sblock.Id != sblock.Id, new Vec3i(-(x + structureOffset.X), -(y + structureOffset.Y), -(z + structureOffset.Z)));
+								if(this is BlockLargeSmeltery)
+								{
+									System.Diagnostics.Debug.WriteLine(sblock + ":" + (sblock.Id != Id) + ":" + sblock.Code);
+								}
+								sblock.isSurrogate = sblock.Id != Id;
+								sblock.mainOffset = new Vec3i(-(x + structureOffset.X), -(y + structureOffset.Y), -(z + structureOffset.Z));
+							}
+						}
+					}
+				}
+				for(int x = 0; x < sx; x++)
+				{
+					for(int y = 0; y < sy; y++)
+					{
+						for(int z = 0; z < sz; z++)
+						{
+							if(structure[x, y, z] is BlockHorizontalStructure sblock)
+							{
+								sblock.OnStepLoaded();
 							}
 						}
 					}
 				}
 			}
+
+			OnStepLoaded();
 		}
 
 		public override List<ItemStack> GetHandBookStacks(ICoreClientAPI capi)
@@ -433,11 +455,14 @@ namespace GlassMaking.Blocks.Multiblock
 			return structure[x, y, z];
 		}
 
-		protected internal virtual void OnStructureLoaded(bool isSurrogate, Vec3i mainOffset)
+		internal void OnStepLoaded()
 		{
-			this.mainOffset = mainOffset;
-			this.isSurrogate = isSurrogate;
+			loadStep++;
+			if(loadStep == 2) OnStructureLoaded();
+		}
 
+		protected virtual void OnStructureLoaded()
+		{
 			if(api.Side == EnumAppSide.Client)
 			{
 				handbookStack = Attributes?["handbookStack"].AsObject<JsonItemStack>(null, Code.Domain);

@@ -11,9 +11,9 @@ namespace GlassMaking.Blocks
 		public Vec3i[] hearthOffsets;
 		public Vec3i lightOffset;
 
-		protected internal override void OnStructureLoaded(bool isSurrogate, Vec3i mainOffset)
+		protected override void OnStructureLoaded()
 		{
-			base.OnStructureLoaded(isSurrogate, mainOffset);
+			base.OnStructureLoaded();
 
 			if(api.Side == EnumAppSide.Client)
 			{

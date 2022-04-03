@@ -2,7 +2,6 @@
 using System;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
-using Vintagestory.API.MathTools;
 using Vintagestory.API.Util;
 
 namespace GlassMaking.Blocks.Multiblock
@@ -13,9 +12,9 @@ namespace GlassMaking.Blocks.Multiblock
 
 		private WorldInteraction[] interactions;
 
-		protected internal override void OnStructureLoaded(bool isSurrogate, Vec3i mainOffset)
+		protected override void OnStructureLoaded()
 		{
-			base.OnStructureLoaded(isSurrogate, mainOffset);
+			base.OnStructureLoaded();
 
 			if(isSurrogate)
 			{
@@ -25,13 +24,11 @@ namespace GlassMaking.Blocks.Multiblock
 				{
 					throw new Exception("The replacement must be a block");
 				}
-				if(replacement.requirement != null)
-				{
-					replacement.requirement.Resolve(api.World, "structure plan requirement");
-				}
 				if(replacement.block.ResolvedItemstack.Block is BlockHorizontalStructure structure)
 				{
-					structure.OnStructureLoaded(isSurrogate, mainOffset);
+					structure.isSurrogate = isSurrogate;
+					structure.mainOffset = mainOffset;
+					structure.OnStepLoaded();
 				}
 				if(api.Side == EnumAppSide.Client)
 				{
@@ -96,7 +93,7 @@ namespace GlassMaking.Blocks.Multiblock
 			public void Resolve(IWorldAccessor world)
 			{
 				block.Resolve(world, "structure plan");
-				requirement?.Resolve(world, "structure plan");
+				requirement?.Resolve(world, "structure plan requirement");
 			}
 		}
 	}

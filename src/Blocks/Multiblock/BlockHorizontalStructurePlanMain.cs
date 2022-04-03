@@ -8,9 +8,9 @@ namespace GlassMaking.Blocks.Multiblock
 	{
 		public int requiredSurrogates = 0;
 
-		protected internal override void OnStructureLoaded(bool isSurrogate, Vec3i mainOffset)
+		protected override void OnStructureLoaded()
 		{
-			base.OnStructureLoaded(isSurrogate, mainOffset);
+			base.OnStructureLoaded();
 
 			int sx = structure.GetLength(0), sy = structure.GetLength(1), sz = structure.GetLength(2);
 			for(int x = 0; x < sx; x++)
