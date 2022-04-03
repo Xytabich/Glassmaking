@@ -11,9 +11,10 @@ namespace GlassMaking.Blocks
 		public Vec3i[] hearthOffsets;
 		public Vec3i lightOffset;
 
-		public override void OnLoaded(ICoreAPI api)
+		protected internal override void OnStructureLoaded(bool isSurrogate, Vec3i mainOffset)
 		{
-			base.OnLoaded(api);
+			base.OnStructureLoaded(isSurrogate, mainOffset);
+
 			if(api.Side == EnumAppSide.Client)
 			{
 				smokeTransform = Attributes?["smokeTransform"].AsObject<ModelTransform>() ?? ModelTransform.NoTransform;

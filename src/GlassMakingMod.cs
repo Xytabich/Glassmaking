@@ -81,7 +81,6 @@ namespace GlassMaking
 			api.RegisterBlockClass("glassmaking:glassmold", typeof(BlockGlassBlowingMold));
 			api.RegisterBlockClass("glassmaking:castingmold", typeof(BlockGlassCastingMold));
 			api.RegisterBlockClass("glassmaking:workbench", typeof(BlockWorkbench));
-			api.RegisterBlockClass("glassmaking:workbenchs", typeof(BlockWorkbenchSurrogate));
 
 			api.RegisterBlockClass("glassmaking:horstruct", typeof(BlockHorizontalStructure));
 			api.RegisterBlockClass("glassmaking:larsmelmain", typeof(BlockLargeSmeltery));

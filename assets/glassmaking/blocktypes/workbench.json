@@ -1,9 +1,6 @@
 {
 	"code": "workbench",
-	"classByType": {
-		"*-right-*": "glassmaking:workbench",
-		"*-left-*": "glassmaking:workbenchs"
-	},
+	"class": "glassmaking:workbench",
 	"entityclassByType": {
 		"*-right-*": "glassmaking:workbench"
 	},

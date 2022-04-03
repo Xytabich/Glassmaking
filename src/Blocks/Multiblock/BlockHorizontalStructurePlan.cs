@@ -11,27 +11,40 @@ namespace GlassMaking.Blocks.Multiblock
 	{
 		protected ReplacementInfo replacement;
 
-		private bool isLoaded = false;
 		private WorldInteraction[] interactions;
 
-		public override void OnLoaded(ICoreAPI api)
+		protected internal override void OnStructureLoaded(bool isSurrogate, Vec3i mainOffset)
 		{
-			base.OnLoaded(api);
-			isLoaded = true;
-			replacement = Attributes["replacement"].AsObject<ReplacementInfo>(null, Code.Domain);
-			replacement.Resolve(api.World);
-			InitReplacement();
-			if(api.Side == EnumAppSide.Client)
+			base.OnStructureLoaded(isSurrogate, mainOffset);
+
+			if(isSurrogate)
 			{
-				interactions = new WorldInteraction[] {
-					new WorldInteraction()
-					{
-						ActionLangCode = "glassmaking:blockhelp-plan-put",
-						HotKeyCode = null,
-						MouseButton = EnumMouseButton.Right,
-						Itemstacks = new ItemStack[] { (replacement.requirement ?? replacement.block).ResolvedItemstack }
-					}
-				};
+				replacement = Attributes["replacement"].AsObject<ReplacementInfo>(null, Code.Domain);
+				replacement.Resolve(api.World);
+				if(replacement.block.Type != EnumItemClass.Block)
+				{
+					throw new Exception("The replacement must be a block");
+				}
+				if(replacement.requirement != null)
+				{
+					replacement.requirement.Resolve(api.World, "structure plan requirement");
+				}
+				if(replacement.block.ResolvedItemstack.Block is BlockHorizontalStructure structure)
+				{
+					structure.OnStructureLoaded(isSurrogate, mainOffset);
+				}
+				if(api.Side == EnumAppSide.Client)
+				{
+					interactions = new WorldInteraction[] {
+						new WorldInteraction()
+						{
+							ActionLangCode = "glassmaking:blockhelp-plan-put",
+							HotKeyCode = null,
+							MouseButton = EnumMouseButton.Right,
+							Itemstacks = new ItemStack[] { (replacement.requirement ?? replacement.block).ResolvedItemstack }
+						}
+					};
+				}
 			}
 		}
 
@@ -71,31 +84,6 @@ namespace GlassMaking.Blocks.Multiblock
 				}
 			}
 			return base.OnBlockInteractStart(world, byPlayer, blockSel);
-		}
-
-		protected internal override void InitSurrogate(Vec3i mainOffset)
-		{
-			base.InitSurrogate(mainOffset);
-			InitReplacement();
-		}
-
-		private void InitReplacement()
-		{
-			if(isLoaded && isSurrogate)
-			{
-				if(replacement.block.Type != EnumItemClass.Block)
-				{
-					throw new Exception("The replacement must be a block");
-				}
-				if(replacement.requirement != null)
-				{
-					replacement.requirement.Resolve(api.World, "structure plan requirement");
-				}
-				if(replacement.block.ResolvedItemstack.Block is BlockHorizontalStructure structure)
-				{
-					structure.InitSurrogate(mainOffset);
-				}
-			}
 		}
 
 		[JsonObject]

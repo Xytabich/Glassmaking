@@ -6,10 +6,11 @@ using Vintagestory.API.Util;
 
 namespace GlassMaking.Blocks
 {
-	public class BlockWorkbench : BlockHorizontalStructureMain
+	public class BlockWorkbench : BlockHorizontalStructure
 	{
 		public override bool OnBlockInteractStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)
 		{
+			blockSel = GetMainBlockSelection(blockSel);
 			var be = world.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityWorkbench;
 			if(be != null)
 			{
@@ -22,6 +23,7 @@ namespace GlassMaking.Blocks
 
 		public override bool OnBlockInteractStep(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)
 		{
+			blockSel = GetMainBlockSelection(blockSel);
 			var be = world.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityWorkbench;
 			if(be != null)
 			{
@@ -34,6 +36,7 @@ namespace GlassMaking.Blocks
 
 		public override void OnBlockInteractStop(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)
 		{
+			blockSel = GetMainBlockSelection(blockSel);
 			var be = world.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityWorkbench;
 			if(be != null)
 			{
@@ -46,6 +49,7 @@ namespace GlassMaking.Blocks
 
 		public override bool OnBlockInteractCancel(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, EnumItemUseCancelReason cancelReason)
 		{
+			blockSel = GetMainBlockSelection(blockSel);
 			var be = world.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityWorkbench;
 			if(be != null)
 			{
@@ -62,13 +66,28 @@ namespace GlassMaking.Blocks
 
 			pos = GetMainBlockPosition(pos);
 			var be = blockAccessor.GetBlockEntity(pos) as BlockEntityWorkbench;
-			if(be != null) return blockBoxes.Append(be.GetToolSelectionBoxes());
+			if(be != null)
+			{
+				var toolBoxes = be.GetToolSelectionBoxes();
+				if(isSurrogate)
+				{
+					var boxes = new Cuboidf[blockBoxes.Length + toolBoxes.Length];
+					blockBoxes.CopyTo(boxes, 0);
+					for(int i = 1; i < toolBoxes.Length; i++)
+					{
+						boxes[blockBoxes.Length + i] = toolBoxes[i].OffsetCopy(mainOffset.X, mainOffset.Y, mainOffset.Z);
+					}
+
+					return boxes;
+				}
+				return blockBoxes.Append(be.GetToolSelectionBoxes());
+			}
 
 			return blockBoxes;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal static BlockSelection GetToolSelection(Block block, BlockSelection blockSel)
+		private static BlockSelection GetToolSelection(Block block, BlockSelection blockSel)
 		{
 			blockSel = blockSel.Clone();
 			blockSel.SelectionBoxIndex -= block.SelectionBoxes == null ? 1 : block.SelectionBoxes.Length;

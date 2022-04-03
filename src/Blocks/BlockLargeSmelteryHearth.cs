@@ -11,9 +11,9 @@ namespace GlassMaking.Blocks
 	{
 		private WorldInteraction[] interactions;
 
-		public override void OnLoaded(ICoreAPI api)
+		protected override void OnStructureLoaded()
 		{
-			base.OnLoaded(api);
+			base.OnStructureLoaded();
 
 			if(api.Side != EnumAppSide.Client) return;
 			interactions = BlockGlassSmeltery.GetSmelteryInteractions(api as ICoreClientAPI, "glassmaking:blockhelp-largesmeltery", GetMatchingBlends);

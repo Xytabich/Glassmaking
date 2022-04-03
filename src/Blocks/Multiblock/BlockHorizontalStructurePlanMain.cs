@@ -4,13 +4,13 @@ using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Blocks.Multiblock
 {
-	public class BlockHorizontalStructurePlanMain : BlockHorizontalStructureMain
+	public class BlockHorizontalStructurePlanMain : BlockHorizontalStructure
 	{
 		public int requiredSurrogates = 0;
 
-		public override void OnLoaded(ICoreAPI api)
+		protected internal override void OnStructureLoaded(bool isSurrogate, Vec3i mainOffset)
 		{
-			base.OnLoaded(api);
+			base.OnStructureLoaded(isSurrogate, mainOffset);
 
 			int sx = structure.GetLength(0), sy = structure.GetLength(1), sz = structure.GetLength(2);
 			for(int x = 0; x < sx; x++)

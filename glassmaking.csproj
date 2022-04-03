@@ -93,7 +93,6 @@
     <Compile Include="src\Blocks\BlockGlassCastingMold.cs" />
     <Compile Include="src\Blocks\BlockLargeSmeltery.cs" />
     <Compile Include="src\Blocks\BlockLargeSmelteryHearth.cs" />
-    <Compile Include="src\Blocks\BlockWorkbenchSurrogate.cs" />
     <Compile Include="src\Blocks\Entities\BlockEntityAnnealer.cs" />
     <Compile Include="src\Blocks\Entities\BlockEntityGlassCastingMold.cs" />
     <Compile Include="src\Blocks\Entities\BlockEntityLargeSmelteryCore.cs" />
@@ -120,7 +119,6 @@
     <Compile Include="src\Blocks\IHeaterPlaceableBlock.cs" />
     <Compile Include="src\Blocks\GlassSmelteryInventory.cs" />
     <Compile Include="src\Blocks\Multiblock\BlockHorizontalStructure.cs" />
-    <Compile Include="src\Blocks\Multiblock\BlockHorizontalStructureMain.cs" />
     <Compile Include="src\Blocks\Multiblock\BlockHorizontalStructurePlan.cs" />
     <Compile Include="src\Blocks\Multiblock\BlockHorizontalStructurePlanMain.cs" />
     <Compile Include="src\Blocks\Multiblock\IStructurePlanMainBlock.cs" />
