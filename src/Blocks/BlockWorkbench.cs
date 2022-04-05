@@ -1,5 +1,6 @@
 ﻿using GlassMaking.Blocks.Multiblock;
 using System.Runtime.CompilerServices;
+using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Util;
@@ -8,6 +9,25 @@ namespace GlassMaking.Blocks
 {
 	public class BlockWorkbench : BlockHorizontalStructure
 	{
+		public ModelTransform defaultWorkpieceTransform;
+
+		protected override void OnStructureLoaded()
+		{
+			base.OnStructureLoaded();
+			if(!isSurrogate && api.Side == EnumAppSide.Client)
+			{
+				defaultWorkpieceTransform = Attributes["workpieceTransform"].AsObject<ModelTransform>().EnsureDefaultValues();
+			}
+		}
+
+		public override WorldInteraction[] GetPlacedBlockInteractionHelp(IWorldAccessor world, BlockSelection blockSel, IPlayer forPlayer)
+		{
+			blockSel = GetMainBlockSelection(blockSel);
+			var be = world.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityWorkbench;
+			if(be != null) return be.GetBlockInteractionHelp(world, GetToolSelection(this, blockSel), forPlayer);
+			return base.GetPlacedBlockInteractionHelp(world, blockSel, forPlayer);
+		}
+
 		public override bool OnBlockInteractStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)
 		{
 			blockSel = GetMainBlockSelection(blockSel);
@@ -58,6 +78,36 @@ namespace GlassMaking.Blocks
 				if(handling != EnumHandling.PassThrough) return result;
 			}
 			return base.OnBlockInteractCancel(secondsUsed, world, byPlayer, blockSel, cancelReason);
+		}
+
+		public override int GetColor(ICoreClientAPI capi, BlockPos pos)
+		{
+			if(isSurrogate)
+			{
+				pos = GetMainBlockPosition(pos);
+				return capi.World.BlockAccessor.GetBlock(pos).GetColor(capi, pos);
+			}
+			return base.GetColor(capi, pos);
+		}
+
+		public override int GetColorWithoutTint(ICoreClientAPI capi, BlockPos pos)
+		{
+			if(isSurrogate)
+			{
+				pos = GetMainBlockPosition(pos);
+				return capi.World.BlockAccessor.GetBlock(pos).GetColorWithoutTint(capi, pos);
+			}
+			return base.GetColorWithoutTint(capi, pos);
+		}
+
+		public override int GetRandomColor(ICoreClientAPI capi, BlockPos pos, BlockFacing facing, int rndIndex = -1)
+		{
+			if(isSurrogate)
+			{
+				pos = GetMainBlockPosition(pos);
+				return capi.World.BlockAccessor.GetBlock(pos).GetRandomColor(capi, pos, facing, rndIndex);
+			}
+			return base.GetRandomColor(capi, pos, facing, rndIndex);
 		}
 
 		public override Cuboidf[] GetSelectionBoxes(IBlockAccessor blockAccessor, BlockPos pos)

@@ -97,6 +97,11 @@ namespace GlassMaking
 			return mappings;
 		}
 
+		public ModelTransform GetWorkpieceTransform()
+		{
+			throw new NotImplementedException();
+		}
+
 		public bool Resolve(IWorldAccessor world, string sourceForErrorLogging)
 		{
 			if(Code == null || string.IsNullOrEmpty(Code.ToShortString()))

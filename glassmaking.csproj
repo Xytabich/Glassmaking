@@ -126,6 +126,7 @@
     <Compile Include="src\Blocks\Renderer\BlockRendererFirebox.cs" />
     <Compile Include="src\Blocks\Renderer\BlockRendererGlassSmeltery.cs" />
     <Compile Include="src\Blocks\Renderer\CastingMoldRenderer.cs" />
+    <Compile Include="src\Blocks\Renderer\WorkbenchWorkpieceRenderer.cs" />
     <Compile Include="src\Blocks\WorkbenchToolsInventory.cs" />
     <Compile Include="src\Common\CastingMoldRecipe.cs" />
     <Compile Include="src\Common\BulkAccessUtil.cs" />

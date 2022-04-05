@@ -112,12 +112,12 @@ namespace GlassMaking.Blocks
 
 		public void Dispose()
 		{
-			api.Event.UnregisterRenderer(this, EnumRenderStage.Opaque);
-
 			for(int i = 0; i < quadModelRefs.Length; i++)
 			{
 				quadModelRefs[i]?.Dispose();
 			}
+
+			api.Event.UnregisterRenderer(this, EnumRenderStage.Opaque);
 		}
 	}
 }

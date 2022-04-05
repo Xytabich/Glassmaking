@@ -73,8 +73,9 @@ namespace GlassMaking.Blocks
 
 		public void Dispose()
 		{
-			api.Event.UnregisterRenderer(this, EnumRenderStage.Opaque);
 			meshRef?.Dispose();
+			meshRef = null;
+			api.Event.UnregisterRenderer(this, EnumRenderStage.Opaque);
 		}
 
 		private MeshData GenerateMesh()

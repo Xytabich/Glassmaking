@@ -4,7 +4,7 @@ using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Blocks
 {
-	public class BlockRendererGlassSmeltery : IRenderer, IDisposable
+	public class BlockRendererGlassSmeltery : IRenderer
 	{
 		public double RenderOrder => 0.5;
 
@@ -104,9 +104,9 @@ namespace GlassMaking.Blocks
 
 		public void Dispose()
 		{
-			api.Event.UnregisterRenderer(this, renderStage);
 			meshRef?.Dispose();
 			meshRef = null;
+			api.Event.UnregisterRenderer(this, renderStage);
 		}
 
 		private MeshData GenerateMesh()

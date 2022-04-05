@@ -1,7 +1,9 @@
-﻿using GlassMaking.Items;
+﻿using GlassMaking.Blocks.Renderer;
+using GlassMaking.Items;
 using GlassMaking.Workbench;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
@@ -30,6 +32,7 @@ namespace GlassMaking.Blocks
 		private WorkbenchToolsInventory inventory;
 
 		private ItemStack workpiece = null;
+		private WorkbenchWorkpieceRenderer renderer = null;
 
 		private Cuboidf[] selectionBoxes;
 		private Dictionary<string, int> toolSlots = new Dictionary<string, int>();
@@ -58,10 +61,40 @@ namespace GlassMaking.Blocks
 				}
 			}
 			RebuildSelectionBoxes();
+			if(api.Side == EnumAppSide.Client)
+			{
+				renderer = new WorkbenchWorkpieceRenderer((ICoreClientAPI)api, Pos, Block.Shape.rotateY);
+				UpdateWorkpieceRenderer();
+			}
 		}
 
 		public WorldInteraction[] GetBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer)
 		{
+			List<WorldInteraction> list = new List<WorldInteraction>();
+			if(workpiece != null)
+			{
+				list.Add(new WorldInteraction() {
+					ActionLangCode = "glassmaking:blockhelp-workbench-takeitem",
+					HotKeyCode = "sneak",
+					MouseButton = EnumMouseButton.Right,
+					Itemstacks = new ItemStack[] { workpiece.Clone() }
+				});
+				if(recipe != null)
+				{
+					list.Add(new WorldInteraction() {
+						ActionLangCode = "glassmaking:blockhelp-workbench-craft",
+						MouseButton = EnumMouseButton.Right
+					});
+				}
+			}
+			else
+			{
+				list.Add(new WorldInteraction() {
+					ActionLangCode = "glassmaking:blockhelp-workbench-recipe",
+					HotKeyCode = "sneak",
+					MouseButton = EnumMouseButton.Right
+				});
+			}
 			if(selection.SelectionBoxIndex >= 0)
 			{
 				for(int i = 0; i < toolsSelection.Length; i++)
@@ -71,11 +104,30 @@ namespace GlassMaking.Blocks
 					{
 						selection = selection.Clone();
 						selection.SelectionBoxIndex -= toolsSelection[i].index;
-						return inventory.GetBehavior(i).GetBlockInteractionHelp(world, selection, forPlayer, recipe, recipeStep);
+						var arr = inventory.GetBehavior(i).GetBlockInteractionHelp(world, selection, forPlayer, recipe, recipeStep);
+						list.Add(new WorldInteraction() {
+							ActionLangCode = "glassmaking:blockhelp-workbench-taketool",
+							HotKeyCode = "sprint",
+							MouseButton = EnumMouseButton.Right,
+							Itemstacks = new ItemStack[] { inventory[i].Itemstack.Clone() }
+						});
+						if(arr != null && arr.Length > 0)
+						{
+							list.AddRange(arr);
+						}
+						break;
 					}
 				}
 			}
-			return null;
+			return list.ToArray();
+		}
+
+		public override void GetBlockInfo(IPlayer forPlayer, StringBuilder dsc)
+		{
+			foreach(BlockEntityBehavior behavior in Behaviors)
+			{
+				behavior.GetBlockInfo(forPlayer, dsc);
+			}
 		}
 
 		public bool OnBlockInteractStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection selection, ref EnumHandling handling)
@@ -101,6 +153,7 @@ namespace GlassMaking.Blocks
 							MarkDirty(true);
 							slot.MarkDirty();
 							handling = EnumHandling.PreventSubsequent;
+							UpdateWorkpieceRenderer();
 							return true;
 						}
 					}
@@ -125,6 +178,7 @@ namespace GlassMaking.Blocks
 											MarkDirty(true);
 											slot.MarkDirty();
 											handling = EnumHandling.PreventSubsequent;
+											UpdateWorkpieceRenderer();
 											return true;
 										}
 									}
@@ -316,6 +370,7 @@ namespace GlassMaking.Blocks
 					}
 					RebuildSelectionBoxes();
 				}
+				UpdateWorkpieceRenderer();
 			}
 		}
 
@@ -352,6 +407,7 @@ namespace GlassMaking.Blocks
 		{
 			dlg?.TryClose();
 			dlg?.Dispose();
+			renderer?.Dispose();
 			base.OnBlockRemoved();
 			for(int i = itemCapacity - 1; i >= 0; i--)
 			{
@@ -364,6 +420,7 @@ namespace GlassMaking.Blocks
 		{
 			dlg?.TryClose();
 			dlg?.Dispose();
+			renderer?.Dispose();
 			base.OnBlockUnloaded();
 			for(int i = itemCapacity - 1; i >= 0; i--)
 			{
@@ -396,6 +453,29 @@ namespace GlassMaking.Blocks
 
 		protected override MeshData genMesh(ItemStack stack)
 		{
+			MeshData mesh = GenItemMesh(stack);
+
+			if(stack.Collectible.Attributes?[AttributeTransformCode].Exists == true)
+			{
+				ModelTransform transform = stack.Collectible.Attributes?[AttributeTransformCode].AsObject<ModelTransform>();
+				transform.EnsureDefaultValues();
+				mesh.ModelTransform(transform);
+
+				mesh.Rotate(new Vec3f(0.5f, 0f, 0.5f), 0f, Block.Shape.rotateY * GameMath.DEG2RAD, 0f);
+			}
+
+			if(stack.Class == EnumItemClass.Item && (stack.Item.Shape == null || stack.Item.Shape.VoxelizeTexture))
+			{
+				mesh.Rotate(new Vec3f(0.5f, 0.5f, 0.5f), GameMath.PIHALF, 0, 0);
+				mesh.Scale(new Vec3f(0.5f, 0.5f, 0.5f), 0.33f, 0.5f, 0.33f);
+				mesh.Translate(0, -7.5f / 16f, 0f);
+			}
+
+			return mesh;
+		}
+
+		private MeshData GenItemMesh(ItemStack stack)
+		{
 			MeshData mesh;
 			var dynBlock = stack.Collectible as IContainedMeshSource;
 
@@ -424,23 +504,6 @@ namespace GlassMaking.Blocks
 					mesh.RenderPassesAndExtraBits.Fill((short)EnumChunkRenderPass.BlendNoCull);
 				}
 			}
-
-			if(stack.Collectible.Attributes?[AttributeTransformCode].Exists == true)
-			{
-				ModelTransform transform = stack.Collectible.Attributes?[AttributeTransformCode].AsObject<ModelTransform>();
-				transform.EnsureDefaultValues();
-				mesh.ModelTransform(transform);
-
-				mesh.Rotate(new Vec3f(0.5f, 0f, 0.5f), 0f, Block.Shape.rotateY * GameMath.DEG2RAD, 0f);
-			}
-
-			if(stack.Class == EnumItemClass.Item && (stack.Item.Shape == null || stack.Item.Shape.VoxelizeTexture))
-			{
-				mesh.Rotate(new Vec3f(0.5f, 0.5f, 0.5f), GameMath.PIHALF, 0, 0);
-				mesh.Scale(new Vec3f(0.5f, 0.5f, 0.5f), 0.33f, 0.5f, 0.33f);
-				mesh.Translate(0, -7.5f / 16f, 0f);
-			}
-
 			return mesh;
 		}
 
@@ -488,6 +551,22 @@ namespace GlassMaking.Blocks
 			return false;
 		}
 
+		private void UpdateWorkpieceRenderer()
+		{
+			if(renderer != null)
+			{
+				renderer.SetItemMesh(workpiece == null ? null : GenItemMesh(workpiece));
+				if(workpiece != null)
+				{
+					var mat = (recipe?.GetWorkpieceTransform() ??
+						workpiece.ItemAttributes?["workbenchItemTransform"].AsObject<ModelTransform>().EnsureDefaultValues() ??
+						((BlockWorkbench)Block).defaultWorkpieceTransform
+					).AsMatrix;
+					mat.CopyTo(renderer.itemTransform.Values, 0);
+				}
+			}
+		}
+
 		private void UpdateToolBounds(int slotId)
 		{
 			var tool = inventory.GetBehavior(slotId);
@@ -528,6 +607,8 @@ namespace GlassMaking.Blocks
 
 		private bool TryCompleteStep(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection selection)
 		{
+			if(Api.Side == EnumAppSide.Client) return false;
+
 			var time = recipe.Steps[recipeStep].UseTime;
 			if(!time.HasValue || time.Value >= secondsUsed)
 			{
