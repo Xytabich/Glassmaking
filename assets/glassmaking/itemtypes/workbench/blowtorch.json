@@ -28,145 +28,11 @@
 		},
 		"workbenchParticles": [
 			{
-				"__comment": "Ember cubicles",
-				"hsvaColor": [
-					{
-						"avg": 20,
-						"var": 20
-					},
-					{
-						"avg": 255,
-						"var": 50
-					},
-					{
-						"avg": 255,
-						"var": 50
-					},
-					{
-						"avg": 255,
-						"var": 0
-					}
-				],
-				"gravityEffect": {
-					"dist": "invexp",
-					"avg": -0.07,
-					"var": 0.4
-				},
-				"posOffset": [
-					{
-						"avg": 0,
-						"var": 0.1
-					},
-					{
-						"avg": 0,
-						"var": 0
-					},
-					{
-						"avg": 0,
-						"var": 0.1
-					}
-				],
-				"velocity": [
-					{
-						"avg": 0,
-						"var": 0.15
-					},
-					{
-						"avg": 0.5,
-						"var": 0.1
-					},
-					{
-						"avg": 0,
-						"var": 0.15
-					}
-				],
-				"quantity": { "avg": 0.015 },
-				"size": {
-					"avg": 0.4,
-					"var": 0
-				},
-				"sizeEvolve": {
-					"transform": "quadratic",
-					"factor": -0.7
-				},
-				"lifeLength": { "avg": 1.5 },
-				"vertexFlags": 128,
-				"windAffectednes": 0.2
-			},
-			{
-				"__comment": "Smoke quads",
-				"hsvaColor": [
-					{
-						"avg": 0,
-						"var": 0
-					},
-					{
-						"avg": 0,
-						"var": 0
-					},
-					{
-						"avg": 40,
-						"var": 30
-					},
-					{
-						"avg": 220,
-						"var": 50
-					}
-				],
-				"opacityEvolve": {
-					"transform": "quadratic",
-					"factor": -16
-				},
-				"gravityEffect": {
-					"avg": 0,
-					"var": 0
-				},
-				"posOffset": [
-					{
-						"avg": 0,
-						"var": 0.1
-					},
-					{
-						"avg": 0,
-						"var": 0
-					},
-					{
-						"avg": 0,
-						"var": 0.1
-					}
-				],
-				"velocity": [
-					{
-						"avg": 0,
-						"var": 0.025
-					},
-					{
-						"avg": 0.15,
-						"var": 0.1
-					},
-					{
-						"avg": 0,
-						"var": 0.025
-					}
-				],
-				"quantity": { "avg": 0.05 },
-				"size": {
-					"avg": 0.25,
-					"var": 0.05
-				},
-				"sizeEvolve": {
-					"transform": "linear",
-					"factor": 0.5
-				},
-				"particleModel": "Quad",
-				"windAffectednes": 0.7
-			},
-			{
 				"__comment": "Fire quads",
 				"hsvaColor": [
 					{
-						"avg": 20,
-						"var": 20
+						"avg": 142,
+						"var": 15
 					},
 					{
 						"avg": 255,
@@ -191,41 +57,41 @@
 				},
 				"posOffset": [
 					{
-						"avg": 0,
-						"var": 0.1
-					},
-					{
-						"avg": 0,
+						"avg": 0.13,
 						"var": 0
 					},
 					{
-						"avg": 0,
-						"var": 0.1
+						"avg": 0.625,
+						"var": 0
+					},
+					{
+						"avg": 0.15,
+						"var": 0
 					}
 				],
 				"velocity": [
 					{
-						"avg": 0,
+						"avg": -0.09,
 						"var": 0.025
 					},
 					{
-						"avg": 0.18,
-						"var": 0.07
+						"avg": 0,
+						"var": 0.001
 					},
 					{
-						"avg": 0,
+						"avg": -0.08,
 						"var": 0.025
 					}
 				],
-				"quantity": { "avg": 0.4 },
+				"quantity": { "avg": 4 },
 				"size": {
-					"avg": 0.25,
-					"var": 0.05
+					"avg": 0.04,
+					"var": 0.005
 				},
 				"lifeLength": { "avg": 0.5 },
 				"sizeEvolve": {
 					"transform": "linear",
-					"factor": 0.5
+					"factor": 0.075
 				},
 				"particleModel": "Quad",
 				"vertexFlags": 128,

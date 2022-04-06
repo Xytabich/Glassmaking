@@ -1,6 +1,8 @@
 ﻿using Cairo;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
@@ -10,11 +12,13 @@ namespace GlassMaking
 {
 	public static class Utils
 	{
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void Write(this BinaryWriter writer, AssetLocation location)
 		{
 			writer.Write(location.ToShortString());
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static AssetLocation ReadAssetLocation(this BinaryReader reader)
 		{
 			return new AssetLocation(reader.ReadString());
@@ -36,11 +40,13 @@ namespace GlassMaking
 			}
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool Intersects(this Cuboidf self, Cuboidf other)
 		{
 			return self.X2 > other.X1 && self.X1 < other.X2 && self.Y2 > other.Y1 && self.Y1 < other.Y2 && self.Z2 > other.Z1 && self.Z1 < other.Z2;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IntersectsOrTouches(this Cuboidf self, Cuboidf other)
 		{
 			return self.X2 >= other.X1 && self.X1 <= other.X2 && self.Y2 >= other.Y1 && self.Y1 <= other.Y2 && self.Z2 >= other.Z1 && self.Z1 <= other.Z2;
@@ -126,6 +132,7 @@ namespace GlassMaking
 			return self;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void AddHandbookBoldRichText(this List<RichTextComponentBase> components, ICoreClientAPI capi, string text, ActionConsumable<string> openDetailPageFor = null)
 		{
 			components.AddRange(VtmlUtil.Richtextify(capi, text, CairoFont.WhiteSmallText().WithWeight(FontWeight.Bold), r => openDetailPageFor?.Invoke(r.Href)));
@@ -138,6 +145,45 @@ namespace GlassMaking
 			self.Face = other.Face;
 			self.SelectionBoxIndex = other.SelectionBoxIndex;
 			self.DidOffset = other.DidOffset;
+		}
+
+		public static NatFloat[] RotateHorizontal(BlockFacing face, NatFloat[] northVector)
+		{
+			if(face == BlockFacing.NORTH) return northVector;
+			var vector = Array.ConvertAll(northVector, f => f.Clone());
+			switch(face.Code)
+			{
+				case "east":
+					{
+						var tmp = vector[0];
+						vector[0] = vector[2];
+						vector[2] = tmp;
+						Invert(vector[0]);
+					}
+					break;
+				case "west":
+					{
+						var tmp = vector[0];
+						vector[0] = vector[2];
+						vector[2] = tmp;
+						Invert(vector[2]);
+					}
+					break;
+				case "south":
+					{
+						Invert(vector[0]);
+						Invert(vector[2]);
+					}
+					break;
+			}
+			return vector;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static void Invert(NatFloat value)
+		{
+			value.offset = -value.offset;
+			value.avg = -value.avg;
 		}
 	}
 }

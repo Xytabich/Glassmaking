@@ -8,6 +8,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 		public const string CODE = "blowtorch";
 
 		private AdvancedParticleProperties[] workParticles = null;
+		private long tickerId;
 
 		public BlowtorchToolBehavior(BlockEntity blockentity, Cuboidf[] boundingBoxes) : base(CODE, blockentity, boundingBoxes)
 		{
@@ -19,7 +20,24 @@ namespace GlassMaking.Workbench.ToolBehaviors
 			if(api.Side == EnumAppSide.Client)
 			{
 				workParticles = slot.Itemstack.Collectible.Attributes?["workbenchParticles"].AsObject<AdvancedParticleProperties[]>(null, slot.Itemstack.Collectible.Code.Domain);
-				Blockentity.RegisterGameTickListener(SpawnParticles, 100);
+
+				var pos = Blockentity.Pos.ToVec3d().Add(0.5, 0.5, 0.5);
+				var face = BlockFacing.FromCode(Blockentity.Block.Variant["side"]);
+				foreach(var p in workParticles)
+				{
+					p.basePos = pos;
+					p.PosOffset = Utils.RotateHorizontal(face, p.PosOffset);
+					p.Velocity = Utils.RotateHorizontal(face, p.Velocity);
+				}
+				tickerId = Blockentity.RegisterGameTickListener(SpawnParticles, 100);
+			}
+		}
+
+		public override void OnUnloaded()
+		{
+			if(Api.Side == EnumAppSide.Client)
+			{
+				Blockentity.UnregisterGameTickListener(tickerId);
 			}
 		}
 
