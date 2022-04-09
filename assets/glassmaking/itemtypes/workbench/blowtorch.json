@@ -9,6 +9,16 @@
 			}
 		],
 		"capacityLitres": 0.5,
+		"consumptionPerSecond": 0.01,
+		"temperature": 1300,
+		"handbook": {
+			"extraSections": [
+				{
+					"title": "glassmaking:handbook-glassmaker-tools",
+					"text": "glassmaking:item-handbooktext-blowtorch"
+				}
+			]
+		},
 		"workbenchToolBounds": [
 			{
 				"x1": 0.6,

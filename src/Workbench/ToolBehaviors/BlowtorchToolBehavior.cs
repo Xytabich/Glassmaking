@@ -48,10 +48,14 @@ namespace GlassMaking.Workbench.ToolBehaviors
 			var useTime = recipe.Steps[step].UseTime;
 			if(useTime.HasValue)
 			{
-				isUsing = true;
 				var item = (ItemBlowtorch)Slot.Itemstack.Item;
-				var useLitres = item.useLitresPerSecond;
-				return item.GetCurrentLitres(Slot.Itemstack) >= useLitres * useTime.Value;
+				if(recipe.Steps[step].Tools[CODE]["temperature"].AsFloat() <= item.flameTemperature)
+				{
+					isUsing = true;
+					var useLitres = item.consumptionPerSecond;
+					return item.GetCurrentLitres(Slot.Itemstack) >= useLitres * useTime.Value;
+				}
+				else return false;
 			}
 			return base.OnUseStart(world, byPlayer, blockSel, recipe, step);
 		}
@@ -62,8 +66,12 @@ namespace GlassMaking.Workbench.ToolBehaviors
 			if(useTime.HasValue)
 			{
 				var item = (ItemBlowtorch)Slot.Itemstack.Item;
-				var useLitres = item.useLitresPerSecond;
-				return item.GetCurrentLitres(Slot.Itemstack) >= useLitres * useTime.Value;
+				if(recipe.Steps[step].Tools[CODE]["temperature"].AsFloat() <= item.flameTemperature)
+				{
+					var useLitres = item.consumptionPerSecond;
+					return item.GetCurrentLitres(Slot.Itemstack) >= useLitres * useTime.Value;
+				}
+				else return false;
 			}
 			return base.OnUseStep(secondsUsed, world, byPlayer, blockSel, recipe, step);
 		}
@@ -75,7 +83,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 			if(useTime.HasValue)
 			{
 				var item = (ItemBlowtorch)Slot.Itemstack.Item;
-				var useLitres = item.useLitresPerSecond;
+				var useLitres = item.consumptionPerSecond;
 				item.TryTakeLiquid(Slot.Itemstack, useLitres * useTime.Value);
 				Slot.MarkDirty();
 			}

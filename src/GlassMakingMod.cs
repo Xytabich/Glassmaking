@@ -154,6 +154,7 @@ namespace GlassMaking
 			handbookInfoList.Add(new GlassblowingRecipeInfo(this));
 			handbookInfoList.Add(new AnnealRecipeInfo());
 			handbookInfoList.Add(new AnnealOutputInfo(this));
+			handbookInfoList.Add(new AllowedLiquidsList());
 
 			blowingMolds = new List<Block>();
 			castingMolds = new List<Block>();

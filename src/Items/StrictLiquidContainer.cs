@@ -9,7 +9,7 @@ namespace GlassMaking.Items
 {
 	public class StrictLiquidContainer : ItemLiquidContainer
 	{
-		protected ItemStack[] allowedLiquids;
+		public ItemStack[] allowedLiquids;
 
 		public override void OnLoaded(ICoreAPI api)
 		{

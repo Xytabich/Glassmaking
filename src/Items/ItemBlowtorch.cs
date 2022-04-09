@@ -8,7 +8,8 @@ namespace GlassMaking.Items
 {
 	public class ItemBlowtorch : StrictLiquidContainer, IWorkbenchTool
 	{
-		public float useLitresPerSecond;
+		public float consumptionPerSecond;
+		public float flameTemperature;
 
 		public override bool IsTopOpened => false;
 		public override bool CanDrinkFrom => false;
@@ -19,7 +20,8 @@ namespace GlassMaking.Items
 		public override void OnLoaded(ICoreAPI api)
 		{
 			base.OnLoaded(api);
-			useLitresPerSecond = Attributes["litresPerSecond"].AsFloat(CapacityLitres);
+			consumptionPerSecond = Attributes["consumptionPerSecond"].AsFloat(CapacityLitres);
+			flameTemperature = Attributes["temperature"].AsFloat();
 		}
 
 		public Cuboidf[] GetToolBoundingBoxes(IWorldAccessor world, ItemStack itemStack)
