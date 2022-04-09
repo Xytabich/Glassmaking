@@ -8,11 +8,19 @@ namespace GlassMaking.Items
 {
 	public class ItemBlowtorch : StrictLiquidContainer, IWorkbenchTool
 	{
+		public float useLitresPerSecond;
+
 		public override bool IsTopOpened => false;
 		public override bool CanDrinkFrom => false;
 		public override bool AllowHeldLiquidTransfer => true;
 
 		protected Cuboidf[] toolBoundingBoxes = null;
+
+		public override void OnLoaded(ICoreAPI api)
+		{
+			base.OnLoaded(api);
+			useLitresPerSecond = Attributes["litresPerSecond"].AsFloat(CapacityLitres);
+		}
 
 		public Cuboidf[] GetToolBoundingBoxes(IWorldAccessor world, ItemStack itemStack)
 		{

@@ -147,6 +147,12 @@ namespace GlassMaking.Blocks
 			}
 		}
 
+		public override void OnItemSlotModified(ItemSlot slot)
+		{
+			base.OnItemSlotModified(slot);
+			blockentity.MarkDirty(true);
+		}
+
 		protected override ItemSlot NewSlot(int i)
 		{
 			var slot = base.NewSlot(i);

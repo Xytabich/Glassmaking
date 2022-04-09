@@ -1,4 +1,5 @@
-﻿using Vintagestory.API.Common;
+﻿using GlassMaking.Items;
+using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Workbench.ToolBehaviors
@@ -9,6 +10,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 
 		private AdvancedParticleProperties[] workParticles = null;
 		private long tickerId;
+		private bool isUsing = false;
 
 		public BlowtorchToolBehavior(BlockEntity blockentity, Cuboidf[] boundingBoxes) : base(CODE, blockentity, boundingBoxes)
 		{
@@ -41,9 +43,54 @@ namespace GlassMaking.Workbench.ToolBehaviors
 			}
 		}
 
+		public override bool OnUseStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, WorkbenchRecipe recipe, int step)
+		{
+			var useTime = recipe.Steps[step].UseTime;
+			if(useTime.HasValue)
+			{
+				isUsing = true;
+				var item = (ItemBlowtorch)Slot.Itemstack.Item;
+				var useLitres = item.useLitresPerSecond;
+				return item.GetCurrentLitres(Slot.Itemstack) >= useLitres * useTime.Value;
+			}
+			return base.OnUseStart(world, byPlayer, blockSel, recipe, step);
+		}
+
+		public override bool OnUseStep(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, WorkbenchRecipe recipe, int step)
+		{
+			var useTime = recipe.Steps[step].UseTime;
+			if(useTime.HasValue)
+			{
+				var item = (ItemBlowtorch)Slot.Itemstack.Item;
+				var useLitres = item.useLitresPerSecond;
+				return item.GetCurrentLitres(Slot.Itemstack) >= useLitres * useTime.Value;
+			}
+			return base.OnUseStep(secondsUsed, world, byPlayer, blockSel, recipe, step);
+		}
+
+		public override void OnUseComplete(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, WorkbenchRecipe recipe, int step)
+		{
+			isUsing = false;
+			var useTime = recipe.Steps[step].UseTime;
+			if(useTime.HasValue)
+			{
+				var item = (ItemBlowtorch)Slot.Itemstack.Item;
+				var useLitres = item.useLitresPerSecond;
+				item.TryTakeLiquid(Slot.Itemstack, useLitres * useTime.Value);
+				Slot.MarkDirty();
+			}
+			base.OnUseComplete(secondsUsed, world, byPlayer, blockSel, recipe, step);
+		}
+
+		public override void OnUseCancel(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, WorkbenchRecipe recipe, int step)
+		{
+			isUsing = false;
+			base.OnUseCancel(secondsUsed, world, byPlayer, blockSel, recipe, step);
+		}
+
 		private void SpawnParticles(float dt)
 		{
-			if(workParticles != null)
+			if(workParticles != null && isUsing)
 			{
 				foreach(var particle in workParticles)
 				{

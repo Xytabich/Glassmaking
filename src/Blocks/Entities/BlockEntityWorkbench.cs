@@ -119,6 +119,14 @@ namespace GlassMaking.Blocks
 					}
 				}
 			}
+			else
+			{
+				list.Add(new WorldInteraction() {
+					ActionLangCode = "glassmaking:blockhelp-workbench-addtool",
+					HotKeyCode = "sprint",
+					MouseButton = EnumMouseButton.Right
+				});
+			}
 			return list.ToArray();
 		}
 
