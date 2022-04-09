@@ -2,6 +2,13 @@
 	"code": "blowtorch",
 	"class": "glassmaking:blowtorch",
 	"attributes": {
+		"allowedLiquids": [
+			{
+				"code": "game:alcoholportion",
+				"type": "item"
+			}
+		],
+		"capacityLitres": 0.5,
 		"workbenchToolBounds": [
 			{
 				"x1": 0.6,

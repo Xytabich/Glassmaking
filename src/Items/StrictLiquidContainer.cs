@@ -29,7 +29,7 @@ namespace GlassMaking.Items
 			allowedLiquids = list?.ToArray() ?? new ItemStack[0];
 			if(allowedLiquids.Length == 0)
 			{
-				api.Logger.Log(EnumLogType.Warning, "The list of allowed liquids of the item {0} is empty, the item will not be able to take any liquids");
+				api.Logger.Log(EnumLogType.Warning, "The list of allowed liquids of the item {0} is empty, the item will not be able to take any liquids", Code);
 			}
 		}
 

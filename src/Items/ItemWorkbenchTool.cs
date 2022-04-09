@@ -1,26 +1,18 @@
 ﻿using GlassMaking.Workbench;
-using System;
 using Vintagestory.API.Common;
-using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Items
 {
 	public abstract class ItemWorkbenchTool : Item, IWorkbenchTool
 	{
-		protected Cuboidf[] toolBoundingBoxes;
-
-		public override void OnLoaded(ICoreAPI api)
-		{
-			base.OnLoaded(api);
-			toolBoundingBoxes = Array.ConvertAll(Attributes?["workbenchToolBounds"].AsObject<Cuboidf[]>(), c => c.RotatedCopy());
-		}
+		protected Cuboidf[] toolBoundingBoxes = null;
 
 		public abstract string GetToolCode(IWorldAccessor world, ItemStack itemStack);
 
 		public virtual Cuboidf[] GetToolBoundingBoxes(IWorldAccessor world, ItemStack itemStack)
 		{
-			return toolBoundingBoxes;
+			return toolBoundingBoxes ?? (toolBoundingBoxes = Attributes?["workbenchToolBounds"].AsObject<Cuboidf[]>());
 		}
 
 		public abstract WorkbenchToolBehavior CreateToolBehavior(IWorldAccessor world, ItemStack itemStack, BlockEntity blockentity);

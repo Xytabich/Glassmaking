@@ -109,7 +109,7 @@ namespace GlassMaking.Items
 
 			if(Attributes?["capacityLitres"].Exists == true)
 			{
-				capacityLitresFromAttributes = Attributes["capacityLitres"].AsInt(10);
+				capacityLitresFromAttributes = Attributes["capacityLitres"].AsFloat(10);
 			}
 			else
 			{
@@ -140,15 +140,6 @@ namespace GlassMaking.Items
 					MouseButton = EnumMouseButton.Right,
 					ShouldApply = (wi, bs, es) => {
 						return GetCurrentLitres(inSlot.Itemstack) > 0;
-					}
-				},
-				new WorldInteraction()
-				{
-					ActionLangCode = "heldhelp-place",
-					HotKeyCode = "sneak",
-					MouseButton = EnumMouseButton.Right,
-					ShouldApply = (wi, bs, es) => {
-						return true;
 					}
 				}
 			};
@@ -354,7 +345,14 @@ namespace GlassMaking.Items
 		{
 			if(blockSel == null || byEntity.Controls.Sneak)
 			{
-				base.OnHeldInteractStart(itemslot, byEntity, blockSel, entitySel, firstEvent, ref handHandling);
+				if(CanDrinkFrom && GetNutritionProperties(byEntity.World, itemslot.Itemstack, byEntity) != null)
+				{
+					tryEatBegin(itemslot, byEntity, ref handHandling, "drink", 4);
+				}
+				else
+				{
+					base.OnHeldInteractStart(itemslot, byEntity, blockSel, entitySel, firstEvent, ref handHandling);
+				}
 				return;
 			}
 
@@ -459,7 +457,6 @@ namespace GlassMaking.Items
 			}
 		}
 
-
 		public override FoodNutritionProperties GetNutritionProperties(IWorldAccessor world, ItemStack itemstack, Entity forEntity)
 		{
 			ItemStack contentStack = GetContent(itemstack);
@@ -474,7 +471,7 @@ namespace GlassMaking.Items
 				nutriProps.EatenStack = new JsonItemStack();
 				nutriProps.EatenStack.ResolvedItemstack = itemstack.Clone();
 				nutriProps.EatenStack.ResolvedItemstack.StackSize = 1;
-				(nutriProps.EatenStack.ResolvedItemstack.Collectible as BlockLiquidContainerBase).SetContent(nutriProps.EatenStack.ResolvedItemstack, null);
+				(nutriProps.EatenStack.ResolvedItemstack.Collectible as ILiquidSink).SetContent(nutriProps.EatenStack.ResolvedItemstack, null);
 
 				return nutriProps;
 			}
@@ -643,8 +640,8 @@ namespace GlassMaking.Items
 						int mergableq = slot.Itemstack.Collectible.GetMergableQuantity(slot.Itemstack, pslot.Itemstack, EnumMergePriority.DirectMerge);
 						if(mergableq == 0) return true;
 
-						var selfLiqBlock = slot.Itemstack.Collectible as BlockLiquidContainerBase;
-						var invLiqBlock = pslot.Itemstack.Collectible as BlockLiquidContainerBase;
+						var selfLiqBlock = slot.Itemstack.Collectible as ILiquidInterface;
+						var invLiqBlock = pslot.Itemstack.Collectible as ILiquidInterface;
 
 						if((selfLiqBlock?.GetContent(slot.Itemstack)?.StackSize ?? 0) != (invLiqBlock?.GetContent(pslot.Itemstack)?.StackSize ?? 0)) return true;
 
@@ -761,8 +758,8 @@ namespace GlassMaking.Items
 			float sourceLitres = GetCurrentLitres(op.SourceSlot.Itemstack);
 			float sinkLitres = GetCurrentLitres(op.SourceSlot.Itemstack);
 
-			float sourceCapLitres = (op.SourceSlot.Itemstack.Collectible as BlockLiquidContainerBase)?.CapacityLitres ?? 0;
-			float sinkCapLitres = (op.SinkSlot.Itemstack.Collectible as BlockLiquidContainerBase)?.CapacityLitres ?? 0;
+			float sourceCapLitres = (op.SourceSlot.Itemstack.Collectible as ILiquidInterface)?.CapacityLitres ?? 0;
+			float sinkCapLitres = (op.SinkSlot.Itemstack.Collectible as ILiquidInterface)?.CapacityLitres ?? 0;
 
 			if(sourceCapLitres == 0 || sinkCapLitres == 0)
 			{
