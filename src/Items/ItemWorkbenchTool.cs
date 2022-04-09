@@ -13,7 +13,7 @@ namespace GlassMaking.Items
 		public override void OnLoaded(ICoreAPI api)
 		{
 			base.OnLoaded(api);
-			toolBoundingBoxes = Array.ConvertAll(Attributes?["workbenchToolBounds"].AsObject<RotatableCube[]>(), c => c.RotatedCopy());
+			toolBoundingBoxes = Array.ConvertAll(Attributes?["workbenchToolBounds"].AsObject<Cuboidf[]>(), c => c.RotatedCopy());
 		}
 
 		public abstract string GetToolCode(IWorldAccessor world, ItemStack itemStack);
