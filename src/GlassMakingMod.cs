@@ -108,7 +108,6 @@ namespace GlassMaking
 
 			glassblowingRecipes = api.RegisterRecipeRegistry<RecipeRegistryDictionary<GlassBlowingRecipe>>("glassblowing");
 			workbenchRecipes = api.RegisterRecipeRegistry<RecipeRegistryDictionary<WorkbenchRecipe>>("glassworkbench");
-			workbenchRecipes = new RecipeRegistryDictionary<WorkbenchRecipe>();
 
 			descriptors = new List<ToolBehaviorDescriptor>();
 			descriptors.Add(new ToolUseDescriptor(this));

@@ -3,13 +3,13 @@ using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Blocks.Renderer
 {
-	public class WorkbenchWorkpieceRenderer : IRenderer
+	public class WorkbenchWorkpieceRenderer : IRenderer, IWorkpieceRenderer
 	{
 		public double RenderOrder => 0.5;
 
 		public int RenderRange => 16;
 
-		public Matrixf itemTransform = new Matrixf();
+		float[] IWorkpieceRenderer.itemTransform => itemTransform.Values;
 
 		private ICoreClientAPI api;
 
@@ -18,6 +18,7 @@ namespace GlassMaking.Blocks.Renderer
 
 		private MeshRef meshRef = null;
 		private Matrixf modelMat = new Matrixf();
+		private Matrixf itemTransform = new Matrixf();
 
 		public WorkbenchWorkpieceRenderer(ICoreClientAPI api, BlockPos pos, float rotation)
 		{
@@ -42,8 +43,8 @@ namespace GlassMaking.Blocks.Renderer
 			if(meshRef != null)
 			{
 				var rapi = api.Render;
-				rapi.GlDisableCullFace();
-				rapi.GlToggleBlend(blend: true);
+				rapi.GlDisableCullFace();//TODO: invalid params, particles are broken
+				rapi.GlToggleBlend(true);
 				var shader = rapi.StandardShader;
 				shader.Use();
 				shader.Tex2D = api.ItemTextureAtlas.AtlasTextureIds[0];//TODO: probably need to use item atlases

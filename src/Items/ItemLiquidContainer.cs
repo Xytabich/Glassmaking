@@ -168,7 +168,7 @@ namespace GlassMaking.Items
 			WaterTightContainableProps props = GetContentProps(containerStack);
 			if(props == null) return 0;
 
-			return GetContent(containerStack).StackSize / props.ItemsPerLitre;
+			return (float)GetContent(containerStack).StackSize / props.ItemsPerLitre;
 		}
 
 		public bool IsFull(ItemStack containerStack)

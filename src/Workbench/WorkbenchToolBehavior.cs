@@ -1,4 +1,5 @@
-﻿using Vintagestory.API.Client;
+﻿using System;
+using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
@@ -98,6 +99,12 @@ namespace GlassMaking.Workbench
 
 		public virtual void OnBlockUnloaded()
 		{
+		}
+
+		public virtual bool TryGetWorkpieceTransform(out ModelTransform recipeTransform)
+		{
+			recipeTransform = null;
+			return false;
 		}
 	}
 }
