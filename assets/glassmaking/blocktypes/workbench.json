@@ -44,7 +44,13 @@
 					"*-west": 90
 				}
 			},
-			"workpieceTransform": {}
+			"workpieceTransform": {
+				"translation": {
+					"x": -0.5,
+					"y": 1,
+					"z": 0.2
+				}
+			}
 		}
 	},
 	"creativeinventory": {

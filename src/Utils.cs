@@ -147,6 +147,15 @@ namespace GlassMaking
 			self.DidOffset = other.DidOffset;
 		}
 
+		public static void CopyTo(this ModelTransform self, ModelTransform other)
+		{
+			other.Translation.Set(self.Translation);
+			other.Rotation.Set(self.Rotation);
+			other.ScaleXYZ.Set(self.ScaleXYZ);
+			other.Origin.Set(self.Origin);
+			other.Rotate = self.Rotate;
+		}
+
 		public static NatFloat[] RotateHorizontal(BlockFacing face, NatFloat[] northVector)
 		{
 			if(face == BlockFacing.NORTH) return northVector;

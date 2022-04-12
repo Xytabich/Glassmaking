@@ -1,4 +1,6 @@
-﻿namespace GlassMaking.Blocks
+﻿using Vintagestory.API.Common;
+
+namespace GlassMaking.Blocks
 {
 	public interface IWorkbenchRenderInfo
 	{
@@ -7,6 +9,6 @@
 
 	public interface IWorkpieceRenderer
 	{
-		float[] itemTransform { get; }
+		ModelTransform itemTransform { get; }
 	}
 }

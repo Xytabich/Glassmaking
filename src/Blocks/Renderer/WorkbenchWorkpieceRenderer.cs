@@ -1,85 +1,117 @@
 ﻿using Vintagestory.API.Client;
+using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Blocks.Renderer
 {
 	public class WorkbenchWorkpieceRenderer : IRenderer, IWorkpieceRenderer
 	{
-		public double RenderOrder => 0.5;
+		public double RenderOrder => 0.38;
 
 		public int RenderRange => 16;
 
-		float[] IWorkpieceRenderer.itemTransform => itemTransform.Values;
+		ModelTransform IWorkpieceRenderer.itemTransform => itemTransform;
 
 		private ICoreClientAPI api;
 
 		private BlockPos pos;
 		private float rotation;
 
-		private MeshRef meshRef = null;
+		private ItemRenderInfo renderInfo = null;
 		private Matrixf modelMat = new Matrixf();
-		private Matrixf itemTransform = new Matrixf();
+		private Matrixf blockMat = new Matrixf();
+		private ModelTransform itemTransform = new ModelTransform().EnsureDefaultValues();
 
 		public WorkbenchWorkpieceRenderer(ICoreClientAPI api, BlockPos pos, float rotation)
 		{
 			this.api = api;
 			this.pos = pos;
 			this.rotation = rotation;
-			api.Event.RegisterRenderer(this, EnumRenderStage.OIT, "glassmaking:workpiece");
+			api.Event.RegisterRenderer(this, EnumRenderStage.Opaque, "glassmaking:workpiece");
 		}
 
-		public void SetItemMesh(MeshData mesh)
+		public void SetItemRenderInfo(ItemRenderInfo renderInfo)
 		{
-			meshRef?.Dispose();
-			meshRef = null;
-			if(mesh != null)
-			{
-				meshRef = api.Render.UploadMesh(mesh);
-			}
+			this.renderInfo = renderInfo;
 		}
 
 		public void OnRenderFrame(float deltaTime, EnumRenderStage stage)
 		{
-			if(meshRef != null)
+			if(renderInfo != null && renderInfo.ModelRef != null)
 			{
-				var rapi = api.Render;
-				rapi.GlDisableCullFace();//TODO: invalid params, particles are broken
+				IRenderAPI rapi = api.Render;
 				rapi.GlToggleBlend(true);
-				var shader = rapi.StandardShader;
-				shader.Use();
-				shader.Tex2D = api.ItemTextureAtlas.AtlasTextureIds[0];//TODO: probably need to use item atlases
-				shader.DontWarpVertices = 0;
-				shader.AddRenderFlags = 0;
-				shader.RgbaAmbientIn = rapi.AmbientColor;
-				shader.RgbaFogIn = rapi.FogColor;
-				shader.FogMinIn = rapi.FogMin;
-				shader.FogDensityIn = rapi.FogDensity;
-				shader.RgbaTint = ColorUtil.WhiteArgbVec;
-				shader.NormalShaded = 1;
-				shader.ExtraGodray = 0f;
-				shader.SsaoAttn = 0f;
-				shader.AlphaTest = 0.05f;
-				shader.OverlayOpacity = 0f;
-				shader.RgbaLightIn = api.World.BlockAccessor.GetLightRGBs(pos.X, pos.Y, pos.Z);
-				shader.ExtraGlow = 0;
-				var cameraPos = api.World.Player.Entity.CameraPos;
+
+				IShaderProgram prevProg = rapi.CurrentActiveShader;
+				prevProg?.Stop();
+
+				IStandardShaderProgram prog = rapi.StandardShader;
+				prog.Use();
+				prog.Tex2D = renderInfo.TextureId;
+				prog.RgbaTint = ColorUtil.WhiteArgbVec;
+				prog.DontWarpVertices = 0;
+				prog.NormalShaded = 1;
+				prog.AlphaTest = renderInfo.AlphaTest;
+				prog.AddRenderFlags = 0;
+
+				prog.OverlayOpacity = renderInfo.OverlayOpacity;
+				if(renderInfo.OverlayTexture != null && renderInfo.OverlayOpacity > 0)
+				{
+					prog.Tex2dOverlay2D = renderInfo.OverlayTexture.TextureId;
+					prog.OverlayTextureSize = new Vec2f(renderInfo.OverlayTexture.Width, renderInfo.OverlayTexture.Height);
+					prog.BaseTextureSize = new Vec2f(renderInfo.TextureSize.Width, renderInfo.TextureSize.Height);
+					//TextureAtlasPosition texPos = rapi.GetTextureAtlasPosition(entityitem.Itemstack);//TODO: how to get..?
+					//prog.BaseUvOrigin = new Vec2f(texPos.x1, texPos.y1);
+				}
+
+				prog.ExtraGlow = 0;
+				prog.RgbaAmbientIn = rapi.AmbientColor;
+				prog.RgbaLightIn = api.World.BlockAccessor.GetLightRGBs(pos.X, pos.Y, pos.Z);
+				prog.RgbaFogIn = rapi.FogColor;
+				prog.FogMinIn = rapi.FogMin;
+				prog.FogDensityIn = rapi.FogDensity;
+				prog.ExtraGodray = 0;
+				prog.NormalShaded = renderInfo.NormalShaded ? 1 : 0;
+
+				prog.ProjectionMatrix = rapi.CurrentProjectionMatrix;
+				prog.ViewMatrix = rapi.CameraMatrixOriginf;
+
 				modelMat.Identity();
-				modelMat.Translate(pos.X - cameraPos.X, pos.Y - cameraPos.Y, pos.Z - cameraPos.Z);
-				modelMat.RotateYDeg(rotation);
-				modelMat.ReverseMul(itemTransform.Values);
-				shader.ModelMatrix = modelMat.Values;
-				shader.ViewMatrix = rapi.CameraMatrixOriginf;
-				shader.ProjectionMatrix = rapi.CurrentProjectionMatrix;
-				rapi.RenderMesh(meshRef);
-				shader.Stop();
+				modelMat.Translate(itemTransform.Translation.X, itemTransform.Translation.Y, itemTransform.Translation.Z);
+				modelMat.Scale(itemTransform.ScaleXYZ.X, itemTransform.ScaleXYZ.Y, itemTransform.ScaleXYZ.Z);
+				modelMat.RotateXDeg(itemTransform.Rotation.X);
+				modelMat.RotateYDeg(itemTransform.Rotation.Y);
+				modelMat.RotateZDeg(itemTransform.Rotation.Z);
+				modelMat.Translate(-itemTransform.Origin.X, -itemTransform.Origin.Y, -itemTransform.Origin.Z);
+
+				var cameraPos = api.World.Player.Entity.CameraPos;
+				blockMat.Identity();
+				blockMat.Translate(pos.X + 0.5 - cameraPos.X, pos.Y + 0.5 - cameraPos.Y, pos.Z + 0.5 - cameraPos.Z);
+				blockMat.RotateYDeg(rotation);
+
+				modelMat.ReverseMul(blockMat.Values);
+				prog.ModelMatrix = modelMat.Values;
+
+				if(!renderInfo.CullFaces)
+				{
+					rapi.GlDisableCullFace();
+				}
+
+				rapi.RenderMesh(renderInfo.ModelRef);
+
+				if(!renderInfo.CullFaces)
+				{
+					rapi.GlEnableCullFace();
+				}
+
+				prog.Stop();
+				prevProg?.Use();
 			}
 		}
 
 		public void Dispose()
 		{
-			meshRef?.Dispose();
-			meshRef = null;
-			api.Event.UnregisterRenderer(this, EnumRenderStage.OIT);
+			api.Event.UnregisterRenderer(this, EnumRenderStage.Opaque);
 		}
 	}
 }
