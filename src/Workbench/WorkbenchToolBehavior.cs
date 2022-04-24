@@ -37,6 +37,9 @@ namespace GlassMaking.Workbench
 			Slot = slot;
 		}
 
+		/// <summary>
+		/// Called when a tool has been removed from a workbench
+		/// </summary>
 		public virtual void OnUnloaded()
 		{
 

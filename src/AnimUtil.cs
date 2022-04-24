@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using Vintagestory.API.Client;
+using Vintagestory.API.Common;
+using Vintagestory.API.Util;
 
 namespace GlassMaking
 {
@@ -31,6 +35,64 @@ namespace GlassMaking
 			if(t < p2Time) return p1 + t / p2Time * (p2 - p1);
 			if(t < p3Time) return p2 + (t - p2Time) / (p3Time - p2Time) * (p3 - p2);
 			return p3 + (t - p3Time) / (1 - p3Time) * (p4 - p3);
+		}
+
+		/// <summary>
+		/// Returns a reference to a mesh and shape that can be used for animation.
+		/// Should only be called in main thread.
+		/// </summary>
+		public static void GetAnimatableMesh(ICoreClientAPI capi, CollectibleObject collectible, ITexPositionSource texSource, out MeshRef meshRef, out Shape shape)
+		{
+			var cache = ObjectCacheUtil.GetOrCreate(capi, "glassmaking:animmeshcache", () => new Dictionary<string, MeshInfo>());
+			var cacheKey = collectible.Code.ToString();
+
+			if(!cache.TryGetValue(cacheKey, out var meshInfo))
+			{
+				var collShape = collectible.ItemClass == EnumItemClass.Item ? (collectible as Item).Shape : (collectible as Block).Shape;
+				shape = capi.Assets.TryGet(collShape.Base.Clone().WithPathPrefixOnce("shapes/").WithPathAppendixOnce(".json")).ToObject<Shape>();
+
+				shape.ResolveReferences(capi.World.Logger, cacheKey);
+				CacheInvTransforms(shape.Elements);
+				shape.ResolveAndLoadJoints();
+				capi.Tesselator.TesselateShapeWithJointIds("blockanim", shape, out var modeldata, texSource, null, collShape.QuantityElements, collShape.SelectiveElements);
+				meshRef = capi.Render.UploadMesh(modeldata);
+
+				meshInfo = new MeshInfo() { shape = shape, meshRef = meshRef };
+				cache[cacheKey] = meshInfo;
+			}
+			meshRef = meshInfo.meshRef;
+			shape = meshInfo.shape;
+		}
+
+		public static void CacheInvTransforms(ShapeElement[] elements)
+		{
+			if(elements != null)
+			{
+				for(int i = 0; i < elements.Length; i++)
+				{
+					elements[i].CacheInverseTransformMatrix();
+					CacheInvTransforms(elements[i].Children);
+				}
+			}
+		}
+
+		internal static void ReleaseResources(ICoreClientAPI capi)
+		{
+			var meshCache = ObjectCacheUtil.TryGet<Dictionary<string, MeshInfo>>(capi, "glassmaking:animmeshcache");
+			if(meshCache != null)
+			{
+				ObjectCacheUtil.Delete(capi, "glassmaking:animmeshcache");
+				foreach(var pair in meshCache)
+				{
+					pair.Value.meshRef?.Dispose();
+				}
+			}
+		}
+
+		private struct MeshInfo
+		{
+			public MeshRef meshRef;
+			public Shape shape;
 		}
 	}
 }

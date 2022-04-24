@@ -496,10 +496,11 @@ namespace GlassMaking.Blocks
 		protected override MeshData genMesh(ItemStack stack)
 		{
 			MeshData mesh = GenItemMesh(stack);
+			if(mesh == null) return null;
 
 			if(stack.Collectible.Attributes?[AttributeTransformCode].Exists == true)
 			{
-				ModelTransform transform = stack.Collectible.Attributes?[AttributeTransformCode].AsObject<ModelTransform>();
+				ModelTransform transform = stack.Collectible.Attributes[AttributeTransformCode].AsObject<ModelTransform>();
 				transform.EnsureDefaultValues();
 				mesh.ModelTransform(transform);
 
@@ -524,7 +525,7 @@ namespace GlassMaking.Blocks
 			if(dynBlock != null)
 			{
 				mesh = dynBlock.GenMesh(stack, capi.BlockTextureAtlas, Pos);
-				mesh.Rotate(new Vec3f(0.5f, 0.5f, 0.5f), 0, Block.Shape.rotateY * GameMath.DEG2RAD, 0);
+				if(mesh != null) mesh.Rotate(new Vec3f(0.5f, 0.5f, 0.5f), 0, Block.Shape.rotateY * GameMath.DEG2RAD, 0);
 			}
 			else
 			{

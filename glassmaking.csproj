@@ -124,6 +124,7 @@
     <Compile Include="src\Blocks\Multiblock\BlockHorizontalStructurePlanMain.cs" />
     <Compile Include="src\Blocks\Multiblock\IStructurePlanMainBlock.cs" />
     <Compile Include="src\Blocks\Multiblock\IStructurePlanOptionalBlock.cs" />
+    <Compile Include="src\Blocks\Renderer\BlockAnimatableRenderer.cs" />
     <Compile Include="src\Blocks\Renderer\BlockRendererFirebox.cs" />
     <Compile Include="src\Blocks\Renderer\BlockRendererGlassSmeltery.cs" />
     <Compile Include="src\Blocks\Renderer\CastingMoldRenderer.cs" />
@@ -154,6 +155,7 @@
     <Compile Include="src\Items\ItemGlassContainer.cs" />
     <Compile Include="src\Items\ItemGlassLadle.cs" />
     <Compile Include="src\Items\ItemGlassWorkpiece.cs" />
+    <Compile Include="src\Items\ItemLathe.cs" />
     <Compile Include="src\Items\ItemLiquidContainer.cs" />
     <Compile Include="src\Items\StrictLiquidContainer.cs" />
     <Compile Include="src\ToolDescriptors\BlowingToolDescriptor.cs" />
@@ -198,6 +200,7 @@
     <Compile Include="src\Items\ItemWorkbenchTool.cs" />
     <Compile Include="src\Utils.cs" />
     <Compile Include="src\Workbench\ToolBehaviors\BlowtorchToolBehavior.cs" />
+    <Compile Include="src\Workbench\ToolBehaviors\LatheToolBehavior.cs" />
     <Compile Include="src\Workbench\WorkbenchToolBehavior.cs" />
   </ItemGroup>
   <ItemGroup>

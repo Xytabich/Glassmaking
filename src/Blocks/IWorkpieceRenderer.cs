@@ -1,4 +1,4 @@
-﻿using Vintagestory.API.Common;
+﻿using Vintagestory.API.Client;
 
 namespace GlassMaking.Blocks
 {
@@ -9,6 +9,6 @@ namespace GlassMaking.Blocks
 
 	public interface IWorkpieceRenderer
 	{
-		ModelTransform itemTransform { get; }
+		Matrixf itemTransform { get; }
 	}
 }

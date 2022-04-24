@@ -47,9 +47,10 @@
 			"workpieceTransform": {
 				"translation": {
 					"x": -0.5,
-					"y": 1,
+					"y": 0.6251,
 					"z": 0.2
-				}
+				},
+				"scale": 0.25
 			}
 		}
 	},

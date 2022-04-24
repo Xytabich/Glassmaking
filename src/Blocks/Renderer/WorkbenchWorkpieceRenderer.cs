@@ -10,7 +10,7 @@ namespace GlassMaking.Blocks.Renderer
 
 		public int RenderRange => 16;
 
-		ModelTransform IWorkpieceRenderer.itemTransform => itemTransform;
+		Matrixf IWorkpieceRenderer.itemTransform => itemMat;
 
 		private ICoreClientAPI api;
 
@@ -19,8 +19,7 @@ namespace GlassMaking.Blocks.Renderer
 
 		private ItemRenderInfo renderInfo = null;
 		private Matrixf modelMat = new Matrixf();
-		private Matrixf blockMat = new Matrixf();
-		private ModelTransform itemTransform = new ModelTransform().EnsureDefaultValues();
+		private Matrixf itemMat = new Matrixf().Identity();
 
 		public WorkbenchWorkpieceRenderer(ICoreClientAPI api, BlockPos pos, float rotation)
 		{
@@ -76,20 +75,11 @@ namespace GlassMaking.Blocks.Renderer
 				prog.ProjectionMatrix = rapi.CurrentProjectionMatrix;
 				prog.ViewMatrix = rapi.CameraMatrixOriginf;
 
-				modelMat.Identity();
-				modelMat.Translate(itemTransform.Translation.X, itemTransform.Translation.Y, itemTransform.Translation.Z);
-				modelMat.Scale(itemTransform.ScaleXYZ.X, itemTransform.ScaleXYZ.Y, itemTransform.ScaleXYZ.Z);
-				modelMat.RotateXDeg(itemTransform.Rotation.X);
-				modelMat.RotateYDeg(itemTransform.Rotation.Y);
-				modelMat.RotateZDeg(itemTransform.Rotation.Z);
-				modelMat.Translate(-itemTransform.Origin.X, -itemTransform.Origin.Y, -itemTransform.Origin.Z);
-
 				var cameraPos = api.World.Player.Entity.CameraPos;
-				blockMat.Identity();
-				blockMat.Translate(pos.X + 0.5 - cameraPos.X, pos.Y + 0.5 - cameraPos.Y, pos.Z + 0.5 - cameraPos.Z);
-				blockMat.RotateYDeg(rotation);
-
-				modelMat.ReverseMul(blockMat.Values);
+				modelMat.Identity();
+				modelMat.Translate(pos.X + 0.5 - cameraPos.X, pos.Y + 0.5 - cameraPos.Y, pos.Z + 0.5 - cameraPos.Z);
+				modelMat.RotateYDeg(rotation);
+				modelMat.Mul(itemMat.Values);
 				prog.ModelMatrix = modelMat.Values;
 
 				if(!renderInfo.CullFaces)

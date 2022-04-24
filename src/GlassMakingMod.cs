@@ -172,6 +172,7 @@ namespace GlassMaking
 			}
 			if(capi != null)
 			{
+				AnimUtil.ReleaseResources(capi);
 				foreach(var info in handbookInfoList)
 				{
 					info.Dispose();

@@ -156,6 +156,17 @@ namespace GlassMaking
 			other.Rotate = self.Rotate;
 		}
 
+		public static void CopyTo(this ModelTransform self, Matrixf other)
+		{
+			other.Identity();
+			other.Translate(self.Translation.X, self.Translation.Y, self.Translation.Z);
+			other.Scale(self.ScaleXYZ.X, self.ScaleXYZ.Y, self.ScaleXYZ.Z);
+			other.RotateXDeg(self.Rotation.X);
+			other.RotateYDeg(self.Rotation.Y);
+			other.RotateZDeg(self.Rotation.Z);
+			other.Translate(-self.Origin.X, -self.Origin.Y, -self.Origin.Z);
+		}
+
 		public static NatFloat[] RotateHorizontal(BlockFacing face, NatFloat[] northVector)
 		{
 			if(face == BlockFacing.NORTH) return northVector;
