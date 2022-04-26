@@ -123,7 +123,7 @@ namespace GlassMaking.Blocks
 
 				slots[i].Itemstack = newstack;
 
-				if(isModified && newstack.Collectible is IWorkbenchTool tool)
+				if(isModified && newstack != null && newstack.Collectible is IWorkbenchTool tool)
 				{
 					behaviors[i] = tool.CreateToolBehavior(Api.World, newstack, blockentity);
 					behaviors[i].OnLoaded(Api, slots[i]);

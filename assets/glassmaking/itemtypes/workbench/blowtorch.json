@@ -123,7 +123,6 @@
 		"items": [ "*" ],
 		"glassmaking": [ "*" ]
 	},
-	"lightHsv": [ 33, 6, 6 ],
 	"maxstacksize": 1,
 	"guiTransform": {
 		"rotation": {

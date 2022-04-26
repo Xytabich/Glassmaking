@@ -12,7 +12,7 @@ namespace GlassMaking.Blocks.Renderer
 
 		public float[] ModelMat = Mat4f.Create();
 
-		public bool ShouldRender;
+		public bool ShouldRender = true;
 
 		private ICoreClientAPI capi;
 		private AnimatorBase animator;
@@ -24,6 +24,7 @@ namespace GlassMaking.Blocks.Renderer
 		private BlockPos blockPos;
 		private Vec3f blockRot;
 		private ModelTransform transform;
+		private Matrixf transformMat = new Matrixf();
 
 		public BlockAnimatableRenderer(ICoreClientAPI capi, BlockPos blockPos, Vec3f blockRot, ModelTransform transform, AnimatorBase animator, MeshRef meshref, bool disposeMesh = true)
 		{
@@ -37,6 +38,8 @@ namespace GlassMaking.Blocks.Renderer
 
 			if(blockRot == null) this.blockRot = new Vec3f();
 			if(transform == null) this.transform = ModelTransform.NoTransform;
+
+			transform.CopyTo(transformMat);
 
 			textureId = capi.BlockTextureAtlas.AtlasTextureIds[0];
 
@@ -65,7 +68,11 @@ namespace GlassMaking.Blocks.Renderer
 			Vec4f lightrgbs = capi.World.BlockAccessor.GetLightRGBs((int)blockPos.X, (int)blockPos.Y, (int)blockPos.Z);
 			rpi.GlToggleBlend(true, EnumBlendMode.Standard);
 
-			if(!shadowPass)
+			if(shadowPass)
+			{
+				prog.UniformMatrix("modelViewMatrix", Mat4f.Mul(new float[16], capi.Render.CurrentModelviewMatrix, ModelMat));
+			}
+			else
 			{
 				prog.Uniform("rgbaAmbientIn", rpi.AmbientColor);
 				prog.Uniform("rgbaFogIn", rpi.FogColor);
@@ -80,10 +87,6 @@ namespace GlassMaking.Blocks.Renderer
 				prog.Uniform("skipRenderJointId", -2);
 				prog.Uniform("skipRenderJointId2", -2);
 				prog.Uniform("glitchEffectStrength", 0f);
-			}
-			else
-			{
-				prog.UniformMatrix("modelViewMatrix", Mat4f.Mul(new float[16], capi.Render.CurrentModelviewMatrix, ModelMat));
 			}
 
 			prog.BindTexture2D("entityTex", textureId, 0);
@@ -109,17 +112,15 @@ namespace GlassMaking.Blocks.Renderer
 
 			Mat4f.Identity(ModelMat);
 			Mat4f.Translate(ModelMat, ModelMat,
-				(float)(blockPos.X - entityPlayer.CameraPos.X),
-				(float)(blockPos.Y - entityPlayer.CameraPos.Y),
-				(float)(blockPos.Z - entityPlayer.CameraPos.Z)
+				(float)(blockPos.X + 0.5 - entityPlayer.CameraPos.X),
+				(float)(blockPos.Y + 0.5 - entityPlayer.CameraPos.Y),
+				(float)(blockPos.Z + 0.5 - entityPlayer.CameraPos.Z)
 			);
+			Mat4f.RotateY(ModelMat, ModelMat, GameMath.DEG2RAD * blockRot.Y);
+			Mat4f.RotateZ(ModelMat, ModelMat, GameMath.DEG2RAD * blockRot.Z);
+			Mat4f.RotateX(ModelMat, ModelMat, GameMath.DEG2RAD * blockRot.X);
 
-			Mat4f.Translate(ModelMat, ModelMat, transform.Translation.X, transform.Translation.Y, transform.Translation.Z);
-			Mat4f.Scale(ModelMat, ModelMat, transform.ScaleXYZ.X, transform.ScaleXYZ.Y, transform.ScaleXYZ.Z);
-			Mat4f.RotateY(ModelMat, ModelMat, GameMath.DEG2RAD * (transform.Rotation.Y + blockRot.Y));
-			Mat4f.RotateZ(ModelMat, ModelMat, GameMath.DEG2RAD * (transform.Rotation.Z + blockRot.Z));
-			Mat4f.RotateX(ModelMat, ModelMat, GameMath.DEG2RAD * (transform.Rotation.X + blockRot.X));
-			Mat4f.Translate(ModelMat, ModelMat, -transform.Origin.X, -transform.Origin.Y, -transform.Origin.Z);
+			Mat4f.Mul(ModelMat, ModelMat, transformMat.Values);
 		}
 
 		public void Dispose()

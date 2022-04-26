@@ -76,10 +76,6 @@ namespace GlassMaking.Blocks.Multiblock
 
 									throw new Exception(string.Join("Unable to initialize surrogate {0} with different main block coordinates", sblock.Code));
 								}
-								if(this is BlockLargeSmeltery)
-								{
-									System.Diagnostics.Debug.WriteLine(sblock + ":" + (sblock.Id != Id) + ":" + sblock.Code);
-								}
 								sblock.isSurrogate = sblock.Id != Id;
 								sblock.mainOffset = new Vec3i(-(x + structureOffset.X), -(y + structureOffset.Y), -(z + structureOffset.Z));
 							}

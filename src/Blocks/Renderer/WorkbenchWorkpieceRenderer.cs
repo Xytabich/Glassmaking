@@ -1,5 +1,4 @@
 ﻿using Vintagestory.API.Client;
-using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Blocks.Renderer
