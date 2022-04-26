@@ -40,6 +40,13 @@
                 },
                 "speed": 6
             }
+        },
+        {
+            "name": "GroundStorable",
+            "properties": {
+                "layout": "Halves",
+                "collisionBox": { "x1": 0, "y1": 0, "z1": 0, "x2": 1, "y2": 0.125, "z2": 1 }
+            }
         }
     ],
     "damagedby": [ "attacking" ],
@@ -58,7 +65,11 @@
             ]
         },
         "maxHumidity": 0.25,
-        "evaporation": 0.03
+        "evaporation": 0.03,
+        "groundStorageTransform": {
+            "rotation": { "x": 0, "y": 90, "z": 0 },
+            "origin": { "x": 0.5, "y": 0, "z": 0.5 }
+        }
     },
     "shape": { "base": "item/tool/paddle" },
     "heldTpHitAnimation": "shears",

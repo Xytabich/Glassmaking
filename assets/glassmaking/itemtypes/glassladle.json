@@ -13,6 +13,9 @@
 		"tools": [ "*" ],
 		"glassmaking": [ "*" ]
 	},
+	"behaviors": [
+		
+	],
 	"attributes": {
 		"handbook": {
 			"extraSections": [

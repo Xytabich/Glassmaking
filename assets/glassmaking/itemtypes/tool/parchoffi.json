@@ -40,6 +40,13 @@
                 },
                 "speed": 6
             }
+        },
+        {
+            "name": "GroundStorable",
+            "properties": {
+                "layout": "Halves",
+                "collisionBox": { "x1": 0, "y1": 0, "z1": 0, "x2": 1, "y2": 0.125, "z2": 1 }
+            }
         }
     ],
     "attributes": {
@@ -57,7 +64,12 @@
             ]
         },
         "maxHumidity": 0.1,
-        "evaporation": 0.01
+        "evaporation": 0.01,
+        "groundStorageTransform": {
+            "translation": { "x": 0, "y": -0.005, "z": 0.05 },
+            "rotation": { "x": -1, "y": 90, "z": 0 },
+            "origin": { "x": 0.5, "y": 0, "z": 0.5 }
+        }
     },
     "shape": { "base": "item/tool/parchoffi" },
     "durability": 300,
