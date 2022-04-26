@@ -17,22 +17,12 @@
 		}
 	},
 	"blockmaterial": "Ceramic",
-	"shapeByType": {
-		"*-wn": {
-			"base": "block/largesmeltery/{corners}",
-			"rotateY": 0
-		},
-		"*-ne": {
-			"base": "block/largesmeltery/{corners}",
-			"rotateY": 270
-		},
-		"*-es": {
-			"base": "block/largesmeltery/{corners}",
-			"rotateY": 180
-		},
-		"*-sw": {
-			"base": "block/largesmeltery/{corners}",
-			"rotateY": 90
+	"shape": {
+		"base": "block/largesmeltery/{corners}",
+		"rotateYByType": {
+			"*-ne": 270,
+			"*-es": 180,
+			"*-sw": 90
 		}
 	},
 	"drawtype": "json",

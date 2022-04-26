@@ -89,15 +89,12 @@
             "other": { "base": "game:block/clay/ceramic" }
         }
     },
-    "shapeByType": {
-        "*-opened": {
-            "base": "block/clay/glassmold/{outtype}-opened",
-            "rotateY": 90
+    "shape": {
+        "baseByType": {
+            "*-opened": "block/clay/glassmold/{outtype}-opened",
+            "*": "block/clay/glassmold/{outtype}"
         },
-        "*": {
-            "base": "block/clay/glassmold/{outtype}",
-            "rotateY": 90
-        }
+        "rotateY": 90
     },
     "sounds": {
         "walk": "game:walk/stone"

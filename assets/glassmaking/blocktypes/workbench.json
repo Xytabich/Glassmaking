@@ -66,21 +66,13 @@
 	"renderer": "Shape",
 	"shapeByType": {
 		"*-top-*": { "base": "game:block/basic/nothing" },
-		"*-bottom-*-north": {
+		"@.*-bottom-.*-(north|south|west|east)": {
 			"base": "block/workbench/{hor}",
-			"rotateY": 0
-		},
-		"*-bottom-*-east": {
-			"base": "block/workbench/{hor}",
-			"rotateY": 270
-		},
-		"*-bottom-*-south": {
-			"base": "block/workbench/{hor}",
-			"rotateY": 180
-		},
-		"*-bottom-*-west": {
-			"base": "block/workbench/{hor}",
-			"rotateY": 90
+			"rotateYByType": {
+				"*-east": 270,
+				"*-south": 180,
+				"*-west": 90
+			}
 		}
 	},
 	"collisionSelectionBoxesByType": {

@@ -83,22 +83,12 @@
     "maxStackSize": 1,
     "lightAbsorption": 3,
     "shapeInventory": { "base": "block/smeltery/item" },
-    "shapeByType": {
-        "*-north": {
-            "base": "block/smeltery/cover",
-            "rotateY": 0
-        },
-        "*-east": {
-            "base": "block/smeltery/cover",
-            "rotateY": 270
-        },
-        "*-south": {
-            "base": "block/smeltery/cover",
-            "rotateY": 180
-        },
-        "*-west": {
-            "base": "block/smeltery/cover",
-            "rotateY": 90
+    "shape": {
+        "base": "block/smeltery/cover",
+        "rotateYByType": {
+            "*-east": 270,
+            "*-south": 180,
+            "*-west": 90
         }
     },
     "sounds": {

@@ -32,22 +32,12 @@
     "resistance": 3.5,
     "maxStackSize": 1,
     "lightAbsorption": 3,
-    "shapeByType": {
-        "*-north": {
-            "base": "block/firebox",
-            "rotateY": 0
-        },
-        "*-east": {
-            "base": "block/firebox",
-            "rotateY": 270
-        },
-        "*-south": {
-            "base": "block/firebox",
-            "rotateY": 180
-        },
-        "*-west": {
-            "base": "block/firebox",
-            "rotateY": 90
+    "shape": {
+        "base": "block/firebox",
+        "rotateYByType": {
+            "*-east": 270,
+            "*-south": 180,
+            "*-west": 90
         }
     },
     "sounds": {

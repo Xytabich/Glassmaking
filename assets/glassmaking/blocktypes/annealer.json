@@ -86,22 +86,12 @@
     "resistance": 3.5,
     "maxStackSize": 1,
     "lightAbsorption": 3,
-    "shapeByType": {
-        "*-north": {
-            "base": "block/annealer",
-            "rotateY": 0
-        },
-        "*-east": {
-            "base": "block/annealer",
-            "rotateY": 270
-        },
-        "*-south": {
-            "base": "block/annealer",
-            "rotateY": 180
-        },
-        "*-west": {
-            "base": "block/annealer",
-            "rotateY": 90
+    "shape": {
+        "base": "block/annealer",
+        "rotateYByType": {
+            "*-east": 270,
+            "*-south": 180,
+            "*-west": 90
         }
     },
     "sounds": {
