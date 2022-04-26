@@ -41,7 +41,7 @@
     "variantgroups": [
         {
             "code": "glasstype",
-            "loadFromProperties": "game:abstract/glasstype"
+            "loadFromProperties": "glassmaking:abstract/glasstype"
         }
     ],
     "creativeinventory": {
