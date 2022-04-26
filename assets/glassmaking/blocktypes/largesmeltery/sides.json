@@ -17,15 +17,17 @@
 			"loadFromProperties": "abstract/horizontalorientation"
 		}
 	],
-	"attributesByType": {
-		"*-hearth-*": {
-			"handbookStack": {
+	"attributes": {
+		"handbookStackByType": {
+			"*-hearth-*": {
 				"type": "block",
 				"code": "largesmeltery-main"
 			}
 		},
 		"handbook": {
-			"exclude": true
+			"excludeByType": {
+				"*-hearth-*": true
+			}
 		}
 	},
 	"blockmaterial": "Ceramic",

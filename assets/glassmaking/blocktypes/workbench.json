@@ -24,9 +24,9 @@
 			"loadFromProperties": "abstract/horizontalorientation"
 		}
 	],
-	"attributesByType": {
-		"*-bottom-right-*": {
-			"structure": {
+	"attributes": {
+		"structureByType": {
+			"*-bottom-right-*": {
 				"codes": [
 					[
 						[ "workbench-bottom-left-{side}" ],
@@ -43,8 +43,10 @@
 					"*-south": 180,
 					"*-west": 90
 				}
-			},
-			"workpieceTransform": {
+			}
+		},
+		"workpieceTransformByType": {
+			"*-bottom-right-*": {
 				"translation": {
 					"x": -0.5,
 					"y": 0.6251,
