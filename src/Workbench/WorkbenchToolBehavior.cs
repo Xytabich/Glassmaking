@@ -104,9 +104,9 @@ namespace GlassMaking.Workbench
 		{
 		}
 
-		public virtual bool TryGetWorkpieceTransform(out ModelTransform recipeTransform)
+		public virtual bool TryGetWorkpieceTransform(WorkbenchRecipe recipe, int recipeStep, out float[] itemTransform)
 		{
-			recipeTransform = null;
+			itemTransform = null;
 			return false;
 		}
 	}

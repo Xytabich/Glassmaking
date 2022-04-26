@@ -609,26 +609,35 @@ namespace GlassMaking.Blocks
 			{
 				if(workpiece != null)
 				{
-					ModelTransform recipeTransform = null;
+					float[] recipeTransform = null;
 					if(recipe != null)
 					{
 						foreach(var tool in recipe.Steps[recipeStep].Tools)
 						{
 							if(toolSlots.TryGetValue(tool.Key, out var slotId))
 							{
-								if(!inventory.GetBehavior(slotId).TryGetWorkpieceTransform(out recipeTransform))
+								if(!inventory.GetBehavior(slotId).TryGetWorkpieceTransform(recipe, recipeStep, out recipeTransform))
 								{
 									recipeTransform = null;
 								}
 							}
 						}
 					}
-					if(recipeTransform == null && workpiece.ItemAttributes?["workbenchItemTransform"].Exists == true)
+					if(recipeTransform == null)
 					{
-						recipeTransform = workpiece.ItemAttributes["workbenchItemTransform"].AsObject<ModelTransform>().EnsureDefaultValues();
+						recipeTransform = Mat4f.Create();
+
+						if(workpiece.ItemAttributes?["workbenchItemTransform"].Exists == true)
+						{
+							var mat = workpiece.ItemAttributes["workbenchItemTransform"].AsObject<ModelTransform>().EnsureDefaultValues();
+							mat.CopyTo(recipeTransform);
+						}
+						else
+						{
+							((BlockWorkbench)Block).defaultWorkpieceTransform.CopyTo(recipeTransform);
+						}
 					}
-					var mat = recipeTransform ?? ((BlockWorkbench)Block).defaultWorkpieceTransform;
-					mat.CopyTo(workpieceRenderer.itemTransform);
+					recipeTransform.CopyTo(workpieceRenderer.itemTransform.Values, 0);
 				}
 			}
 		}
@@ -670,6 +679,7 @@ namespace GlassMaking.Blocks
 				}
 			}
 			MarkDirty(true);
+			UpdateWorkpieceMatrix();
 		}
 
 		private bool TryCompleteStep(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection selection)

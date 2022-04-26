@@ -31,7 +31,8 @@
 				"y": 0.5,
 				"z": 0
 			}
-		}
+		},
+		"latheViseMaxSize": 0.1875
 	},
 	"shape": { "base": "item/workbench/lathe" },
 	"heldTpIdleAnimation": "holdinglanternrighthand",

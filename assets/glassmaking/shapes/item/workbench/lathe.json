@@ -886,6 +886,13 @@
 								}
 							]
 						}
+					],
+					"attachmentpoints": [
+						{
+							"code": "item",
+							"posX": "6.5","posY": "0.0","posZ": "0.0",
+							"rotationX": "0.0","rotationY": "0.0","rotationZ": "0.0"
+						}
 					]
 				}
 			]
