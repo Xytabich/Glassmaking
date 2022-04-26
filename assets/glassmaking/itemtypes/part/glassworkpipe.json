@@ -4,7 +4,8 @@
 	"shape": { "base": "item/part/glassworkpipe" },
 	"creativeinventory": {
 		"general": [ "*" ],
-		"items": [ "*" ]
+		"items": [ "*" ],
+    "glassmaking": ["*"]
 	},
 	"fpHandTransform": {
 		"translation": {

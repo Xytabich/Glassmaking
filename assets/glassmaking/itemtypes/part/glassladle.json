@@ -9,7 +9,8 @@
 	"maxstacksize": 8,
 	"creativeinventory": {
 		"general": [ "*" ],
-		"items": [ "*" ]
+		"items": [ "*" ],
+    "glassmaking": ["*"]
 	},
 	"shape": { "base": "item/glassladle/parts/{part}" },
 	"fpHandTransformByType": {

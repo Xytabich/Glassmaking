@@ -4,7 +4,8 @@
     "shape": { "base": "item/part/parchoffi" },
     "creativeinventory": {
         "general": [ "*" ],
-        "items": [ "*" ]
+        "items": [ "*" ],
+        "glassmaking": ["*"]
     },
     "guiTransform": {
         "translation": {
