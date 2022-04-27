@@ -125,7 +125,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 			if(latheInfo.KeyExists("transform"))
 			{
 				var mat = latheInfo["transform"].AsObject<ModelTransform>().EnsureDefaultValues();
-				mat.CopyTo(updater.itemTransform);
+				updater.SetItemTransform(mat);
 
 				updater.targetItemTransform = workbenchRender.workpieceRenderer.itemTransform.Values;
 				updater.ForceUpdate();
@@ -149,7 +149,6 @@ namespace GlassMaking.Workbench.ToolBehaviors
 
 			public float[] targetItemTransform = null;
 			public float[] localTransform;
-			public float[] itemTransform = Mat4f.Create();
 
 			private AnimatorBase animator;
 
@@ -158,16 +157,34 @@ namespace GlassMaking.Workbench.ToolBehaviors
 			private RunningAnimation viseState = null;
 			private float viseFrame;
 
+			private float[] itemTransform = Mat4f.Create();
+			private AttachmentPointAndPose itemAttachmentPoint;
+
 			private Dictionary<string, AnimationMetaData> activeAnimationsByAnimCode = new Dictionary<string, AnimationMetaData>();
 
 			public LatheAnimatorUpdater(AnimatorBase animator)
 			{
 				this.animator = animator;
+				itemAttachmentPoint = animator.AttachmentPointByCode["item"];
 			}
 
 			public void ForceUpdate()
 			{
 				animator.OnFrame(activeAnimationsByAnimCode, 0f);
+			}
+
+			public void SetItemTransform(ModelTransform mat)
+			{
+				mat.CopyTo(itemTransform);
+
+				var attachTransform = Mat4f.Create();
+				var attachPoint = itemAttachmentPoint.AttachPoint;
+				Mat4f.Translate(attachTransform, attachTransform, (float)attachPoint.PosX / 16f, (float)attachPoint.PosY / 16f, (float)attachPoint.PosZ / 16f);
+				Mat4f.RotateX(attachTransform, attachTransform, (float)(attachPoint.RotationX * GameMath.DEG2RAD));
+				Mat4f.RotateY(attachTransform, attachTransform, (float)(attachPoint.RotationY * GameMath.DEG2RAD));
+				Mat4f.RotateZ(attachTransform, attachTransform, (float)(attachPoint.RotationZ * GameMath.DEG2RAD));
+
+				Mat4f.Mul(itemTransform, attachTransform, itemTransform);
 			}
 
 			public void SetRotationSpeed(float? rpm)
@@ -228,7 +245,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 					{
 						itemTransform.CopyTo(targetItemTransform, 0);
 
-						Mat4f.Mul(targetItemTransform, animator.AttachmentPointByCode["item"].AnimModelMatrix, targetItemTransform);
+						Mat4f.Mul(targetItemTransform, itemAttachmentPoint.AnimModelMatrix, targetItemTransform);
 
 						Mat4f.Mul(targetItemTransform, localTransform, targetItemTransform);
 					}
