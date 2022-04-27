@@ -5,7 +5,7 @@ namespace GlassMaking.Blocks.Renderer
 {
 	public class WorkbenchWorkpieceRenderer : IRenderer, IWorkpieceRenderer
 	{
-		public double RenderOrder => 0.38;
+		public double RenderOrder => 1.01;// Render after all opaque elements
 
 		public int RenderRange => 16;
 

@@ -43,6 +43,9 @@ namespace GlassMaking.Blocks
 		private Action waitForComplete = null;
 		private GuiDialog dlg = null;
 
+		private WorkbenchRecipe toolsIdleCachedRecipe = null;
+		private int toolsIdleCachedRecipeStep;
+
 		public BlockEntityWorkbench()
 		{
 			inventory = new WorkbenchToolsInventory(itemCapacity, InventoryClassName + "-" + Pos, null, this);
@@ -73,6 +76,7 @@ namespace GlassMaking.Blocks
 			{
 				renderer = new WorkbenchWorkpieceRenderer((ICoreClientAPI)api, Pos, Block.Shape.rotateY);
 				UpdateWorkpieceRenderer();
+				UpdateIdleState();
 			}
 		}
 
@@ -227,7 +231,6 @@ namespace GlassMaking.Blocks
 										MarkDirty(true);
 										slot.MarkDirty();
 										handling = EnumHandling.PreventSubsequent;
-										UpdateWorkpieceRenderer();
 										return true;
 									}
 								}
@@ -271,6 +274,8 @@ namespace GlassMaking.Blocks
 				if(recipe != null)
 				{
 					startedStep = recipeStep;
+					UpdateIdleState();
+
 					var sel = selection.Clone();
 					bool isStarted = true;
 					foreach(var pair in recipe.Steps[recipeStep].Tools)
@@ -341,7 +346,6 @@ namespace GlassMaking.Blocks
 		{
 			if(CancelStartedStep(secondsUsed, world, byPlayer, selection))
 			{
-				UpdateWorkpieceMatrix();
 				handling = EnumHandling.PreventSubsequent;
 			}
 		}
@@ -350,7 +354,6 @@ namespace GlassMaking.Blocks
 		{
 			if(CancelStartedStep(secondsUsed, world, byPlayer, selection))
 			{
-				UpdateWorkpieceMatrix();
 				handling = EnumHandling.PreventSubsequent;
 				return true;
 			}
@@ -412,6 +415,7 @@ namespace GlassMaking.Blocks
 					RebuildSelectionBoxes();
 				}
 				UpdateWorkpieceRenderer();
+				UpdateIdleState();
 			}
 		}
 
@@ -599,45 +603,57 @@ namespace GlassMaking.Blocks
 			if(renderer != null)
 			{
 				renderer.SetItemRenderInfo(workpiece == null ? null : capi.Render.GetItemStackRenderInfo(new DummySlot(workpiece), EnumItemRenderTarget.Ground));
+			}
+		}
+
+		private void UpdateIdleState()
+		{
+			if(Api.Side == EnumAppSide.Client)
+			{
 				UpdateWorkpieceMatrix();
+
+				var world = Api.World;
+				if(recipe == null || startedStep >= 0 && recipeStep == startedStep)
+				{
+					if(toolsIdleCachedRecipe != null)
+					{
+						foreach(var pair in toolsIdleCachedRecipe.Steps[toolsIdleCachedRecipeStep].Tools)
+						{
+							if(toolSlots.TryGetValue(pair.Key, out var slotId))
+							{
+								inventory.GetBehavior(slotId).OnIdleStop(world, toolsIdleCachedRecipe, toolsIdleCachedRecipeStep);
+							}
+						}
+						toolsIdleCachedRecipe = null;
+					}
+				}
+				else
+				{
+					toolsIdleCachedRecipe = recipe;
+					toolsIdleCachedRecipeStep = recipeStep;
+					foreach(var pair in toolsIdleCachedRecipe.Steps[toolsIdleCachedRecipeStep].Tools)
+					{
+						if(toolSlots.TryGetValue(pair.Key, out var slotId))
+						{
+							inventory.GetBehavior(slotId).OnIdleStart(world, toolsIdleCachedRecipe, toolsIdleCachedRecipeStep);
+						}
+					}
+				}
 			}
 		}
 
 		private void UpdateWorkpieceMatrix()
 		{
-			if(renderer != null)
+			if(renderer != null && workpiece != null)
 			{
-				if(workpiece != null)
+				if(workpiece.ItemAttributes?["workbenchItemTransform"].Exists == true)
 				{
-					float[] recipeTransform = null;
-					if(recipe != null)
-					{
-						foreach(var tool in recipe.Steps[recipeStep].Tools)
-						{
-							if(toolSlots.TryGetValue(tool.Key, out var slotId))
-							{
-								if(!inventory.GetBehavior(slotId).TryGetWorkpieceTransform(recipe, recipeStep, out recipeTransform))
-								{
-									recipeTransform = null;
-								}
-							}
-						}
-					}
-					if(recipeTransform == null)
-					{
-						recipeTransform = Mat4f.Create();
-
-						if(workpiece.ItemAttributes?["workbenchItemTransform"].Exists == true)
-						{
-							var mat = workpiece.ItemAttributes["workbenchItemTransform"].AsObject<ModelTransform>().EnsureDefaultValues();
-							mat.CopyTo(recipeTransform);
-						}
-						else
-						{
-							((BlockWorkbench)Block).defaultWorkpieceTransform.CopyTo(recipeTransform);
-						}
-					}
-					recipeTransform.CopyTo(workpieceRenderer.itemTransform.Values, 0);
+					var mat = workpiece.ItemAttributes["workbenchItemTransform"].AsObject<ModelTransform>().EnsureDefaultValues();
+					mat.CopyTo(workpieceRenderer.itemTransform);
+				}
+				else
+				{
+					((BlockWorkbench)Block).defaultWorkpieceTransform.CopyTo(workpieceRenderer.itemTransform);
 				}
 			}
 		}
@@ -679,7 +695,7 @@ namespace GlassMaking.Blocks
 				}
 			}
 			MarkDirty(true);
-			UpdateWorkpieceMatrix();
+			UpdateIdleState();
 		}
 
 		private bool TryCompleteStep(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection selection)

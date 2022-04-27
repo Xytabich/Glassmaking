@@ -77,6 +77,22 @@ namespace GlassMaking.Workbench
 		{
 		}
 
+		/// <summary>
+		/// Called if this tool is being used in the current step of the recipe, but crafting is idle (i.e. the player is not interacting with the workbench).
+		/// Called when a craft is canceled, when a tool is placed, or when a recipe is selected. Only on client-side.
+		/// </summary>
+		public virtual void OnIdleStart(IWorldAccessor world, WorkbenchRecipe recipe, int step)
+		{
+		}
+
+		/// <summary>
+		/// Called if crafting has been started or the recipe step has changed.
+		/// </summary>
+		/// <param name="step">Old step number</param>
+		public virtual void OnIdleStop(IWorldAccessor world, WorkbenchRecipe recipe, int step)
+		{
+		}
+
 		public virtual WorldInteraction[] GetBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer, WorkbenchRecipe recipe = null, int step = 0)
 		{
 			return null;
@@ -102,12 +118,6 @@ namespace GlassMaking.Workbench
 
 		public virtual void OnBlockUnloaded()
 		{
-		}
-
-		public virtual bool TryGetWorkpieceTransform(WorkbenchRecipe recipe, int recipeStep, out float[] itemTransform)
-		{
-			itemTransform = null;
-			return false;
 		}
 	}
 }
