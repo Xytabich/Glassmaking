@@ -86,9 +86,10 @@ namespace GlassMaking.Workbench
 		}
 
 		/// <summary>
-		/// Called if crafting has been started or the recipe step has changed.
+		/// Called if crafting has been started or the recipe has changed.
 		/// </summary>
-		/// <param name="step">Old step number</param>
+		/// <param name="recipe">Current recipe value, may be null</param>
+		/// <param name="step">Current recipe step</param>
 		public virtual void OnIdleStop(IWorldAccessor world, WorkbenchRecipe recipe, int step)
 		{
 		}

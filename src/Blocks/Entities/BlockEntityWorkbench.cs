@@ -43,8 +43,7 @@ namespace GlassMaking.Blocks
 		private Action waitForComplete = null;
 		private GuiDialog dlg = null;
 
-		private WorkbenchRecipe toolsIdleCachedRecipe = null;
-		private int toolsIdleCachedRecipeStep;
+		private WorkbenchRecipeStep cachedIdleToolsStep = null;
 
 		public BlockEntityWorkbench()
 		{
@@ -615,27 +614,26 @@ namespace GlassMaking.Blocks
 				var world = Api.World;
 				if(recipe == null || startedStep >= 0 && recipeStep == startedStep)
 				{
-					if(toolsIdleCachedRecipe != null)
+					if(cachedIdleToolsStep != null)
 					{
-						foreach(var pair in toolsIdleCachedRecipe.Steps[toolsIdleCachedRecipeStep].Tools)
+						foreach(var pair in cachedIdleToolsStep.Tools)
 						{
 							if(toolSlots.TryGetValue(pair.Key, out var slotId))
 							{
-								inventory.GetBehavior(slotId).OnIdleStop(world, toolsIdleCachedRecipe, toolsIdleCachedRecipeStep);
+								inventory.GetBehavior(slotId).OnIdleStop(world, recipe, recipeStep);
 							}
 						}
-						toolsIdleCachedRecipe = null;
+						cachedIdleToolsStep = null;
 					}
 				}
 				else
 				{
-					toolsIdleCachedRecipe = recipe;
-					toolsIdleCachedRecipeStep = recipeStep;
-					foreach(var pair in toolsIdleCachedRecipe.Steps[toolsIdleCachedRecipeStep].Tools)
+					cachedIdleToolsStep = recipe.Steps[recipeStep];
+					foreach(var pair in cachedIdleToolsStep.Tools)
 					{
 						if(toolSlots.TryGetValue(pair.Key, out var slotId))
 						{
-							inventory.GetBehavior(slotId).OnIdleStart(world, toolsIdleCachedRecipe, toolsIdleCachedRecipeStep);
+							inventory.GetBehavior(slotId).OnIdleStart(world, recipe, recipeStep);
 						}
 					}
 				}

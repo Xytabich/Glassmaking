@@ -55,6 +55,13 @@ namespace GlassMaking.Workbench.ToolBehaviors
 			SetupRenderer(recipe.Steps[step].Tools[CODE]);
 		}
 
+		public override void OnIdleStop(IWorldAccessor world, WorkbenchRecipe recipe, int step)
+		{
+			updater.SetVise(null);
+
+			updater.targetItemTransform = null;
+		}
+
 		public override bool OnUseStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, WorkbenchRecipe recipe, int step)
 		{
 			if(Api.Side == EnumAppSide.Client)
@@ -87,6 +94,9 @@ namespace GlassMaking.Workbench.ToolBehaviors
 			if(Api.Side == EnumAppSide.Client)
 			{
 				updater.SetRotationSpeed(null);
+				updater.SetVise(null);
+
+				updater.targetItemTransform = null;
 			}
 			base.OnUseCancel(secondsUsed, world, byPlayer, blockSel, recipe, step);
 		}
@@ -144,6 +154,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 			private AnimatorBase animator;
 
 			private float? viseValue = null;
+			private float? prevViseValue = null;
 			private RunningAnimation viseState = null;
 			private float viseFrame;
 
@@ -178,29 +189,32 @@ namespace GlassMaking.Workbench.ToolBehaviors
 
 			public void SetVise(float? value)
 			{
-				if(viseValue == value) return;
 				this.viseValue = value;
-
-				if(value.HasValue)
-				{
-					if(!activeAnimationsByAnimCode.ContainsKey("vise"))
-					{
-						activeAnimationsByAnimCode["vise"] = new AnimationMetaData() { AnimationSpeed = 0f, BlendMode = EnumAnimationBlendMode.Add };
-					}
-					var state = animator.GetAnimationState("vise");
-					viseFrame = (1f - value.Value) * (state.Animation.QuantityFrames - 1);
-					viseState = animator.GetAnimationState("vise");
-					viseState.EasingFactor = 0;
-				}
-				else
-				{
-					activeAnimationsByAnimCode.Remove("vise");
-					viseState = null;
-				}
 			}
 
 			public void OnRenderFrame(float deltaTime, EnumRenderStage stage)
 			{
+				if(viseValue != prevViseValue)
+				{
+					prevViseValue = viseValue;
+					if(viseValue.HasValue)
+					{
+						if(!activeAnimationsByAnimCode.ContainsKey("vise"))
+						{
+							activeAnimationsByAnimCode["vise"] = new AnimationMetaData() { AnimationSpeed = 0f, BlendMode = EnumAnimationBlendMode.Add };
+						}
+						var state = animator.GetAnimationState("vise");
+						viseFrame = (1f - viseValue.Value) * (state.Animation.QuantityFrames - 1);
+						viseState = animator.GetAnimationState("vise");
+						viseState.EasingFactor = 0;
+					}
+					else
+					{
+						activeAnimationsByAnimCode["vise"].AnimationSpeed = 1f;
+						activeAnimationsByAnimCode.Remove("vise");
+						viseState = null;
+					}
+				}
 				if(activeAnimationsByAnimCode.Count > 0 || animator.ActiveAnimationCount > 0)
 				{
 					animator.OnFrame(activeAnimationsByAnimCode, deltaTime);
