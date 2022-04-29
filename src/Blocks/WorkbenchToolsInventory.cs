@@ -16,6 +16,7 @@ namespace GlassMaking.Blocks
 		protected WorkbenchToolBehavior[] behaviors;
 		protected BlockEntity blockentity;
 
+		private int toolsCount;
 		private IAttribute[] cachedAttributes;
 
 		public WorkbenchToolsInventory(int quantitySlots, string className, string instanceID, ICoreAPI api, BlockEntity blockentity) : base(className, instanceID, api)
@@ -23,7 +24,8 @@ namespace GlassMaking.Blocks
 			this.blockentity = blockentity;
 			slots = GenEmptySlots(quantitySlots);
 			cachedAttributes = new IAttribute[quantitySlots];
-			behaviors = new WorkbenchToolBehavior[quantitySlots];
+			toolsCount = quantitySlots - 1;
+			behaviors = new WorkbenchToolBehavior[toolsCount];
 		}
 
 		public WorkbenchToolsInventory(int quantitySlots, string inventoryID, ICoreAPI api, BlockEntity blockentity) : base(inventoryID, api)
@@ -31,7 +33,8 @@ namespace GlassMaking.Blocks
 			this.blockentity = blockentity;
 			slots = GenEmptySlots(quantitySlots);
 			cachedAttributes = new IAttribute[quantitySlots];
-			behaviors = new WorkbenchToolBehavior[quantitySlots];
+			toolsCount = quantitySlots - 1;
+			behaviors = new WorkbenchToolBehavior[toolsCount];
 		}
 
 		public override ItemSlot this[int slotId]
@@ -77,7 +80,7 @@ namespace GlassMaking.Blocks
 		public override void LateInitialize(string inventoryID, ICoreAPI api)
 		{
 			base.LateInitialize(inventoryID, api);
-			for(int i = 0; i < slots.Length; i++)
+			for(int i = 0; i < toolsCount; i++)
 			{
 				if(!slots[i].Empty && slots[i].Itemstack.Collectible is IWorkbenchTool tool)
 				{
@@ -103,32 +106,42 @@ namespace GlassMaking.Blocks
 				if(Api?.World == null)
 				{
 					slots[i].Itemstack = newstack;
-					cachedAttributes[i] = toolsAttrib?[i.ToString()];
+					if(i < toolsCount)
+					{
+						cachedAttributes[i] = toolsAttrib?[i.ToString()];
+					}
 					continue;
 				}
 
 				newstack?.ResolveBlockOrItem(Api.World);
 
-				bool isModified = (newstack != null && !newstack.Equals(Api.World, oldstack)) || (oldstack != null && !oldstack.Equals(Api.World, newstack));
-
-				if(isModified)
+				if(i < toolsCount)
 				{
-					modifiedSlots.Add(i);
-					if(behaviors[i] != null)
+					bool isModified = (newstack != null && !newstack.Equals(Api.World, oldstack)) || (oldstack != null && !oldstack.Equals(Api.World, newstack));
+
+					if(isModified)
 					{
-						behaviors[i].OnUnloaded();
-						behaviors[i] = null;
+						modifiedSlots.Add(i);
+						if(behaviors[i] != null)
+						{
+							behaviors[i].OnUnloaded();
+							behaviors[i] = null;
+						}
 					}
+
+					slots[i].Itemstack = newstack;
+
+					if(isModified && newstack != null && newstack.Collectible is IWorkbenchTool tool)
+					{
+						behaviors[i] = tool.CreateToolBehavior(Api.World, newstack, blockentity);
+						behaviors[i].OnLoaded(Api, slots[i]);
+					}
+					behaviors[i]?.FromAttribute(toolsAttrib?[i.ToString()], Api.World);
 				}
-
-				slots[i].Itemstack = newstack;
-
-				if(isModified && newstack != null && newstack.Collectible is IWorkbenchTool tool)
+				else
 				{
-					behaviors[i] = tool.CreateToolBehavior(Api.World, newstack, blockentity);
-					behaviors[i].OnLoaded(Api, slots[i]);
+					slots[i].Itemstack = newstack;
 				}
-				behaviors[i]?.FromAttribute(toolsAttrib?[i.ToString()], Api.World);
 			}
 		}
 
@@ -136,7 +149,7 @@ namespace GlassMaking.Blocks
 		{
 			SlotsToTreeAttributes(slots, tree);
 			ITreeAttribute toolsAttrib = null;
-			for(int i = 0; i < behaviors.Length; i++)
+			for(int i = 0; i < toolsCount; i++)
 			{
 				var attr = behaviors[i]?.ToAttribute();
 				if(attr != null)
