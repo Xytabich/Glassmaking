@@ -1,5 +1,4 @@
-﻿using Cairo;
-using GlassMaking.Common;
+﻿using GlassMaking.Common;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

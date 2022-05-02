@@ -143,6 +143,7 @@
     <Compile Include="src\Handbook\AllowedLiquidsList.cs" />
     <Compile Include="src\Handbook\CastingMoldOutputInfo.cs" />
     <Compile Include="src\Handbook\CastingMoldRecipeInfo.cs" />
+    <Compile Include="src\Handbook\WorkbenchRecipeInfo.cs" />
     <Compile Include="src\ItemRender\CachedItemRenderer.cs" />
     <Compile Include="src\ItemRender\IItemRenderer.cs" />
     <Compile Include="src\Items\GlassLadleRenderer.cs" />
@@ -202,6 +203,7 @@
     <Compile Include="src\Utils.cs" />
     <Compile Include="src\Workbench\ToolBehaviors\BlowtorchToolBehavior.cs" />
     <Compile Include="src\Workbench\ToolBehaviors\LatheToolBehavior.cs" />
+    <Compile Include="src\Workbench\ToolDescriptors\IWorkbenchToolDescriptor.cs" />
     <Compile Include="src\Workbench\WorkbenchToolBehavior.cs" />
   </ItemGroup>
   <ItemGroup>

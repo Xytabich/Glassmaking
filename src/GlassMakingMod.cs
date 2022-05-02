@@ -7,6 +7,7 @@ using GlassMaking.ItemRender;
 using GlassMaking.Items;
 using GlassMaking.TemporaryMetadata;
 using GlassMaking.ToolDescriptors;
+using GlassMaking.Workbench.ToolDescriptors;
 using HarmonyLib;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -30,6 +31,7 @@ namespace GlassMaking
 		private RecipeRegistryDictionary<WorkbenchRecipe> workbenchRecipes;
 		private Dictionary<AssetLocation, GlassTypeVariant> glassTypes;
 		private Dictionary<string, IPipeBlowingToolDescriptor> pipeToolDescriptors;
+		private Dictionary<string, IWorkbenchToolDescriptor> workbenchToolDescriptors;
 
 		private List<Block> blowingMolds = null;
 		private HashSet<AssetLocation> blowingMoldsOutput = null;
@@ -155,6 +157,7 @@ namespace GlassMaking
 			handbookInfoList.Add(new AnnealRecipeInfo());
 			handbookInfoList.Add(new AnnealOutputInfo(this));
 			handbookInfoList.Add(new AllowedLiquidsList());
+			handbookInfoList.Add(new WorkbenchRecipeInfo(this));
 
 			blowingMolds = new List<Block>();
 			castingMolds = new List<Block>();
@@ -244,6 +247,11 @@ namespace GlassMaking
 			return glassblowingRecipes.Pairs;
 		}
 
+		public IReadOnlyDictionary<string, WorkbenchRecipe> GetWorkbenchRecipes()
+		{
+			return workbenchRecipes.Pairs;
+		}
+
 		public GlassTypeVariant GetGlassTypeInfo(AssetLocation code)
 		{
 			if(glassTypes.TryGetValue(code, out var info)) return info;
@@ -264,6 +272,21 @@ namespace GlassMaking
 		public IPipeBlowingToolDescriptor GetPipeToolDescriptor(string tool)
 		{
 			if(pipeToolDescriptors != null && pipeToolDescriptors.TryGetValue(tool.ToLowerInvariant(), out var descriptor))
+			{
+				return descriptor;
+			}
+			return null;
+		}
+
+		public void AddWorkbenchToolDescriptor(string tool, IWorkbenchToolDescriptor descriptor)
+		{
+			if(workbenchToolDescriptors == null) workbenchToolDescriptors = new Dictionary<string, IWorkbenchToolDescriptor>();
+			workbenchToolDescriptors[tool.ToLowerInvariant()] = descriptor;
+		}
+
+		public IWorkbenchToolDescriptor GetWorkbenchToolDescriptor(string tool)
+		{
+			if(workbenchToolDescriptors != null && workbenchToolDescriptors.TryGetValue(tool.ToLowerInvariant(), out var descriptor))
 			{
 				return descriptor;
 			}
