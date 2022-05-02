@@ -16,7 +16,7 @@ namespace GlassMaking.Blocks.Multiblock
 		private int loadStep = 0;
 
 		protected Vec3i structureOffset = null;
-		protected Block[,,] structure = null;
+		protected internal Block[,,] structure = null;
 
 		protected JsonItemStack handbookStack = null;
 

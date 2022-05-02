@@ -143,6 +143,7 @@
     <Compile Include="src\Handbook\AllowedLiquidsList.cs" />
     <Compile Include="src\Handbook\CastingMoldOutputInfo.cs" />
     <Compile Include="src\Handbook\CastingMoldRecipeInfo.cs" />
+    <Compile Include="src\Handbook\MultiblockPlanMaterials.cs" />
     <Compile Include="src\Handbook\WorkbenchRecipeInfo.cs" />
     <Compile Include="src\ItemRender\CachedItemRenderer.cs" />
     <Compile Include="src\ItemRender\IItemRenderer.cs" />

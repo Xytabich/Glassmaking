@@ -65,7 +65,6 @@ namespace GlassMaking.Handbook
 						{
 							outComponents.Add(new RichTextComponent(capi, "• " + Lang.Get("glassmaking:Step {0}", j + 1) + "\n", CairoFont.WhiteSmallText()));
 						}
-						outComponents.Add(new ClearFloatTextComponent(capi));
 
 						foreach(var pair in steps[j].Tools)
 						{

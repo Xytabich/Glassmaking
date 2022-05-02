@@ -8,7 +8,7 @@ namespace GlassMaking.Blocks.Multiblock
 {
 	public class BlockHorizontalStructurePlan : BlockHorizontalStructure
 	{
-		protected ReplacementInfo replacement;
+		protected internal ReplacementInfo replacement;
 
 		private WorldInteraction[] interactions;
 
@@ -84,7 +84,7 @@ namespace GlassMaking.Blocks.Multiblock
 		}
 
 		[JsonObject]
-		protected class ReplacementInfo
+		protected internal class ReplacementInfo
 		{
 			[JsonProperty(Required = Required.Always)]
 			public JsonItemStack block;

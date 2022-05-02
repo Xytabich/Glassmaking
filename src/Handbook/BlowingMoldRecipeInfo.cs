@@ -35,10 +35,12 @@ namespace GlassMaking.Handbook
 					{
 						if(recipe.Output.ResolvedItemstack != null)
 						{
-							var element = new ItemstackTextComponent(capi, recipe.Output.ResolvedItemstack, 40.0, 10.0,
+							var element = new SlideshowItemstackTextComponent(capi, new ItemStack[] { recipe.Output.ResolvedItemstack }, 40.0,
 								EnumFloat.Inline, cs => openDetailPageFor(GuiHandbookItemStackPage.PageCodeForStack(cs)));
-							element.offY = GuiElement.scaled(7.0);
+							element.ShowStackSize = recipe.Output.ResolvedItemstack.StackSize > 1;
+							element.PaddingRight = GuiElement.scaled(10.0);
 							outComponents.Add(element);
+
 							outComponents.Add(new ClearFloatTextComponent(capi));
 							outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:Mold layers:") + "\n", CairoFont.WhiteSmallText()));
 							foreach(var layer in recipe.Recipe)

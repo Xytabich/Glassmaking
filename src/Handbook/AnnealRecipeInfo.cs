@@ -35,7 +35,6 @@ namespace GlassMaking.Handbook
 					outComponents.AddHandbookBoldRichText(capi, Lang.Get("glassmaking:Turns out when annealing") + "\n", openDetailPageFor);
 					var element = new ItemstackTextComponent(capi, output.ResolvedItemstack, 40.0, 10.0,
 						EnumFloat.Inline, cs => openDetailPageFor(GuiHandbookItemStackPage.PageCodeForStack(cs)));
-					element.offY = GuiElement.scaled(7.0);
 					outComponents.Add(element);
 
 					outComponents.Add(new ClearFloatTextComponent(capi));

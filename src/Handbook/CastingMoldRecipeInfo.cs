@@ -35,10 +35,12 @@ namespace GlassMaking.Handbook
 					{
 						if(recipe.Output.ResolvedItemstack != null)
 						{
-							var element = new ItemstackTextComponent(capi, recipe.Output.ResolvedItemstack, 40.0, 10.0,
+							var element = new SlideshowItemstackTextComponent(capi, new ItemStack[] { recipe.Output.ResolvedItemstack }, 40.0,
 								EnumFloat.Inline, cs => openDetailPageFor(GuiHandbookItemStackPage.PageCodeForStack(cs)));
-							element.offY = GuiElement.scaled(7.0);
+							element.ShowStackSize = recipe.Output.ResolvedItemstack.StackSize > 1;
+							element.PaddingRight = GuiElement.scaled(10.0);
 							outComponents.Add(element);
+
 							outComponents.Add(new ClearFloatTextComponent(capi, 3f));
 							outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:Cast from {1} units of {0} glass",
 								Lang.Get(GlassBlend.GetBlendNameCode(recipe.Recipe.Code)), recipe.Recipe.Amount) + "\n", CairoFont.WhiteSmallText()));

@@ -25,6 +25,7 @@
     "Turns out when annealing": "Turns out when <a href=\"glassmaking:craftinginfo\">annealing</a>",
     "Heat up to {0}, then keep the temperature above {1} for {2} hours": "Heat up to {0}°C, then keep the temperature above {1}°C for {2} hours.",
     "Crafted at the glassmaker's workbench": "Crafted at the glassmaker's workbench",
+    "Required materials according to plan": "Required materials according to plan",
     "heldhelp-glasspipe-recipe": "Select recipe",
     "heldhelp-glasspipe-intake": "Take glass from the smeltery",
     "heldhelp-glasspipe-heatup": "Heat up in smeltery",
