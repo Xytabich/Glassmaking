@@ -118,11 +118,12 @@ namespace GlassMaking.Blocks
 			{
 				for(int i = 0; i < toolsSelection.Length; i++)
 				{
-					if(toolsSelection[i] != null && toolsSelection[i].index >= selection.SelectionBoxIndex &&
-						selection.SelectionBoxIndex < (toolsSelection[i].index + toolsSelection[i].boxes.Length))
+					var toolSelection = toolsSelection[i];
+					if(toolSelection != null && selection.SelectionBoxIndex >= toolSelection.index &&
+						selection.SelectionBoxIndex < (toolSelection.index + toolSelection.boxes.Length))
 					{
 						selection = selection.Clone();
-						selection.SelectionBoxIndex -= toolsSelection[i].index;
+						selection.SelectionBoxIndex -= toolSelection.index;
 						var arr = inventory.GetBehavior(i).GetBlockInteractionHelp(world, selection, forPlayer, recipe, recipeStep);
 						list.Add(new WorldInteraction() {
 							ActionLangCode = "glassmaking:blockhelp-workbench-taketool",
@@ -166,6 +167,10 @@ namespace GlassMaking.Blocks
 						{
 							((IClientPlayer)byPlayer).TriggerFpAnimation(EnumHandInteract.HeldItemInteract);
 						}
+
+						AssetLocation assetLocation = itemstack.Block?.Sounds?.Place;
+						Api.World.PlaySoundAt(assetLocation ?? new AssetLocation("sounds/player/build"), byPlayer.Entity, byPlayer, true, 16f);
+
 						handling = EnumHandling.PreventSubsequent;
 						return true;
 					}
@@ -176,8 +181,9 @@ namespace GlassMaking.Blocks
 					{
 						for(int i = 0; i < toolsSelection.Length; i++)
 						{
-							if(toolsSelection[i] != null && toolsSelection[i].index >= selection.SelectionBoxIndex &&
-								selection.SelectionBoxIndex < (toolsSelection[i].index + toolsSelection[i].boxes.Length))
+							var toolSelection = toolsSelection[i];
+							if(toolSelection != null && selection.SelectionBoxIndex >= toolSelection.index &&
+								selection.SelectionBoxIndex < (toolSelection.index + toolSelection.boxes.Length))
 							{
 								var behavior = inventory.GetBehavior(i);
 								if(recipe != null && startedStep >= 0 && startedStep == recipeStep && recipe.Steps[recipeStep].Tools.ContainsKey(behavior.ToolCode))
@@ -224,6 +230,9 @@ namespace GlassMaking.Blocks
 									{
 										if(slot.TryPutInto(world, workpieceSlot, 1) != 0)
 										{
+											AssetLocation assetLocation = itemstack.Block?.Sounds?.Place;
+											Api.World.PlaySoundAt(assetLocation ?? new AssetLocation("sounds/player/build"), byPlayer.Entity, null, true, 16f);
+
 											this.recipe = recipe;
 											this.recipeStep = recipeInfo.GetInt("step", 0);
 
