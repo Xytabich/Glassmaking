@@ -92,13 +92,6 @@ namespace GlassMaking.Blocks
 						MouseButton = EnumMouseButton.Right,
 						Itemstacks = new ItemStack[] { workpieceSlot.Itemstack.Clone() }
 					});
-					if(recipe != null)
-					{
-						list.Add(new WorldInteraction() {
-							ActionLangCode = "glassmaking:blockhelp-workbench-craft",
-							MouseButton = EnumMouseButton.Right
-						});
-					}
 				}
 				else
 				{
@@ -139,6 +132,13 @@ namespace GlassMaking.Blocks
 						break;
 					}
 				}
+			}
+			if(recipe != null)
+			{
+				list.Add(new WorldInteraction() {
+					ActionLangCode = "glassmaking:blockhelp-workbench-craft",
+					MouseButton = EnumMouseButton.Right
+				});
 			}
 			return list.ToArray();
 		}
@@ -318,7 +318,7 @@ namespace GlassMaking.Blocks
 		public bool OnBlockInteractStep(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection selection, ref EnumHandling handling)
 		{
 			handling = EnumHandling.PassThrough;
-			if(selection.SelectionBoxIndex >= 0 || byPlayer.Entity.Controls.Sneak || byPlayer.Entity.Controls.Sprint || recipe == null)
+			if(byPlayer.Entity.Controls.Sneak || byPlayer.Entity.Controls.Sprint || recipe == null)
 			{
 				CancelStartedStep(secondsUsed, world, byPlayer, selection);
 				return false;
