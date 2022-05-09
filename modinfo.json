@@ -2,10 +2,10 @@
     "type": "code",
     "modid": "glassmaking",
     "name": "Glassmaking",
-    "author": "Xytabich",
+    "authors": ["Xytabich"],
     "description": "Core system for melting and processing glass",
     "version": "1.2.0",
-    "dependency": {
+    "dependencies": {
         "game": "1.16.0",
         "survival": "1.16.0"
     },

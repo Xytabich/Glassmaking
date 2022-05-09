@@ -21,172 +21,119 @@
 					"text": "glassmaking:item-handbooktext-glassladle"
 				}
 			]
-		}
-	},
-	"attributesByType": {
-		"*-small": {
-			"maxGlass": 250,
-			"glassThreshold": 100,
-			"glassTransform": {
-				"origin": {
-					"x": 0.5,
-					"y": 0,
-					"z": 0.5
-				},
-				"translation": { "y": 0.0625 },
-				"scaleXYZ": {
+		},
+		"maxGlassByType": {
+			"*-small": 250,
+			"*-medium": 500,
+			"*-large": 1000
+		},
+		"glassThresholdByType": {
+			"*-small": 100,
+			"*-medium": 200,
+			"*-large": 400
+		},
+		"glassTransform": {
+			"origin": {
+				"x": 0.5,
+				"y": 0,
+				"z": 0.5
+			},
+			"translation": { "y": 0.0625 },
+			"scaleXYZByType": {
+				"*-small": {
 					"x": 0.375,
 					"y": 0.25,
 					"z": 0.375
 				},
-				"rotation": { "y": 45 }
-			},
-			"takeTransform": {
-				"origin": {
-					"x": 0.5,
-					"y": 0.2,
-					"z": 0.5
-				},
-				"translation": {
-					"x": 0.75,
-					"y": 0.4,
-					"z": 0.5
-				},
-				"rotation": {
-					"x": -10,
-					"y": 10,
-					"z": -90
-				},
-				"scale": 0.9
-			},
-			"pourTransform": {
-				"origin": {
-					"x": 0.5,
-					"y": 0.2,
-					"z": 0.5
-				},
-				"translation": {
-					"x": 0.75,
-					"y": 0.4,
-					"z": 0.5
-				},
-				"rotation": {
-					"x": -10,
-					"y": 0,
-					"z": -10
-				},
-				"scale": 0.9
-			}
-		},
-		"*-medium": {
-			"maxGlass": 500,
-			"glassThreshold": 200,
-			"glassTransform": {
-				"origin": {
-					"x": 0.5,
-					"y": 0,
-					"z": 0.5
-				},
-				"translation": { "y": 0.0625 },
-				"scaleXYZ": {
+				"*-medium": {
 					"x": 0.5,
 					"y": 0.3125,
 					"z": 0.5
 				},
-				"rotation": { "y": 45 }
+				"*-large": {
+					"x": 0.75,
+					"y": 0.4375,
+					"z": 0.75
+				}
 			},
-			"takeTransform": {
-				"origin": {
-					"x": 0.5,
-					"y": 0.2,
+			"rotation": { "y": 45 }
+		},
+		"takeTransform": {
+			"origin": {
+				"x": 0.5,
+				"y": 0.2,
+				"z": 0.5
+			},
+			"translationByType": {
+				"*-small": {
+					"x": 0.75,
+					"y": 0.4,
 					"z": 0.5
 				},
-				"translation": {
+				"*-medium": {
 					"x": 0.4,
 					"y": 0.4,
 					"z": 0.5
 				},
-				"rotation": {
-					"x": -10,
-					"y": 10,
-					"z": -90
-				},
-				"scale": 0.9
+				"*-large": {
+					"x": 0,
+					"y": 0.4,
+					"z": 0.5
+				}
 			},
-			"pourTransform": {
-				"origin": {
-					"x": 0.5,
-					"y": 0.2,
+			"rotation": {
+				"x": -10,
+				"y": 10,
+				"z": -90
+			},
+			"scale": 0.9
+		},
+		"pourTransform": {
+			"origin": {
+				"x": 0.5,
+				"y": 0.2,
+				"z": 0.5
+			},
+			"translationByType": {
+				"*-small": {
+					"x": 0.75,
+					"y": 0.4,
 					"z": 0.5
 				},
-				"translation": {
+				"*-medium": {
 					"x": 0.3,
 					"y": 0.5,
 					"z": 0.5
 				},
-				"rotation": {
+				"*-large": {
+					"x": -0.3,
+					"y": 0.4,
+					"z": 1
+				}
+			},
+			"rotationByType": {
+				"*-small": {
+					"x": -10,
+					"y": 0,
+					"z": -10
+				},
+				"*-medium": {
 					"x": -10,
 					"y": -5,
 					"z": -10
 				},
-				"scale": 0.9
-			}
-		},
-		"*-large": {
-			"maxGlass": 1000,
-			"glassThreshold": 400,
-			"glassTransform": {
-				"origin": {
-					"x": 0.5,
-					"y": 0,
-					"z": 0.5
-				},
-				"translation": { "y": 0.0625 },
-				"scaleXYZ": {
-					"x": 0.75,
-					"y": 0.4375,
-					"z": 0.75
-				},
-				"rotation": { "y": 45 }
-			},
-			"takeTransform": {
-				"origin": {
-					"x": 0.5,
-					"y": 0.2,
-					"z": 0.5
-				},
-				"translation": {
-					"x": 0,
-					"y": 0.4,
-					"z": 0.5
-				},
-				"rotation": {
-					"x": -10,
-					"y": 10,
-					"z": -90
-				},
-				"scale": 0.9
-			},
-			"pourTransform": {
-				"origin": {
-					"x": 0.5,
-					"y": 0.2,
-					"z": 0.5
-				},
-				"translation": {
-					"x": -0.3,
-					"y": 0.4,
-					"z": 1
-				},
-				"rotation": {
+				"*-large": {
 					"x": -10,
 					"y": -10,
 					"z": -10
-				},
-				"scale": 1.1
+				}
 			},
-			"pourAnimationSpeed": 0.75
-		}
+			"scaleByType": {
+				"@.*-(small|medium)": 0.9,
+				"*-large": 1.1
+			}
+		},
+		"pourAnimationSpeedByType": { "*-large": 0.75 }
 	},
 	"heldTpIdleAnimation": "holdunderarm",
 	"textures": {

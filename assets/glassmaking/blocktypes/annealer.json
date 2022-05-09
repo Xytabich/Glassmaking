@@ -1,233 +1,223 @@
 {
-    "code": "annealer",
-    "class": "glassmaking:annealer",
-    "entityclass": "glassmaking:annealer",
-    "blockmaterial": "Ceramic",
-    "behaviors": [
-        { "name": "HorizontalOrientable" },
-        { "name": "UnstableFalling" },
-        { "name": "Unplaceable" }
-    ],
-    "variantgroups": [
-        {
-            "code": "side",
-            "loadFromProperties": "abstract/horizontalorientation"
-        }
-    ],
-    "attributes": {
-        "contentTransform": {
-            "translation": {
-                "x": -0.375,
-                "y": 0.0625,
-                "z": -0.375
-            },
-            "scale": 0.75
-        },
-        "handbook": {
-            "extraSections": [
-                {
-                    "title": "glassmaking:block-handbooktitle-annealer",
-                    "text": "glassmaking:block-handbooktext-annealer"
-                }
-            ]
-        },
-        "smokeTransformByType": {
-            "*-north": {
-                "translation": {
-                    "x": 0.125,
-                    "y": 0.75,
-                    "z": 0.1875
-                },
-                "scaleXYZ": {
-                    "x": 0.75,
-                    "z": 0.125
-                }
-            },
-            "*-east": {
-                "translation": {
-                    "x": 0.6875,
-                    "y": 0.75,
-                    "z": 0.125
-                },
-                "scaleXYZ": {
-                    "x": 0.125,
-                    "z": 0.75
-                }
-            },
-            "*-south": {
-                "translation": {
-                    "x": 0.125,
-                    "y": 0.75,
-                    "z": 0.6875
-                },
-                "scaleXYZ": {
-                    "x": 0.75,
-                    "z": 0.125
-                }
-            },
-            "*-west": {
-                "translation": {
-                    "x": 0.1875,
-                    "y": 0.75,
-                    "z": 0.125
-                },
-                "scaleXYZ": {
-                    "x": 0.125,
-                    "z": 0.75
-                }
-            }
-        }
-    },
-    "creativeinventory": {
-        "general": [ "*-north" ],
-        "glassmaking": [ "*-north" ]
-    },
-    "replaceable": 400,
-    "resistance": 3.5,
-    "maxStackSize": 1,
-    "lightAbsorption": 3,
-    "shapeByType": {
-        "*-north": {
-            "base": "block/annealer",
-            "rotateY": 0
-        },
-        "*-east": {
-            "base": "block/annealer",
-            "rotateY": 270
-        },
-        "*-south": {
-            "base": "block/annealer",
-            "rotateY": 180
-        },
-        "*-west": {
-            "base": "block/annealer",
-            "rotateY": 90
-        }
-    },
-    "sounds": {
-        "walk": "game:walk/stone",
-        "place": "game:block/ceramicplace",
-        "byTool": {
-            "Pickaxe": {
-                "hit": "game:block/rock-hit-pickaxe",
-                "break": "game:block/rock-break-pickaxe"
-            }
-        }
-    },
-    "collisionboxes": [
-        {
-            "x1": 0,
-            "y1": 0.25,
-            "z1": 0,
-            "x2": 1,
-            "y2": 1,
-            "z2": 1
-        },
-        {
-            "x1": 0,
-            "y1": 0,
-            "z1": 0.25,
-            "x2": 1,
-            "y2": 0.25,
-            "z2": 1,
-            "rotateYByType": {
-                "*-north": 180,
-                "*-east": 90,
-                "*-west": 270
-            }
-        },
-        {
-            "x1": 0,
-            "y1": 0,
-            "z1": 0,
-            "x2": 0.375,
-            "y2": 0.25,
-            "z2": 0.25,
-            "rotateYByType": {
-                "*-north": 180,
-                "*-east": 90,
-                "*-west": 270
-            }
-        },
-        {
-            "x1": 0.625,
-            "y1": 0,
-            "z1": 0,
-            "x2": 1,
-            "y2": 0.25,
-            "z2": 0.25,
-            "rotateYByType": {
-                "*-north": 180,
-                "*-east": 90,
-                "*-west": 270
-            }
-        }
-    ],
-    "selectionbox": {
-        "x1": 0,
-        "y1": 0,
-        "z1": 0,
-        "x2": 1,
-        "y2": 1,
-        "z2": 1
-    },
-    "sideopaqueByType": {
-        "*-north": {
-            "down": false,
-            "up": false,
-            "horizontals": true,
-            "north": false
-        },
-        "*-east": {
-            "down": false,
-            "up": false,
-            "horizontals": true,
-            "east": false
-        },
-        "*-south": {
-            "down": false,
-            "up": false,
-            "horizontals": true,
-            "south": false
-        },
-        "*-west": {
-            "down": false,
-            "up": false,
-            "horizontals": true,
-            "west": false
-        }
-    },
-    "sidesolidByType": {
-        "*-north": {
-            "all": false,
-            "east": true,
-            "north": true,
-            "west": true
-        },
-        "*-east": {
-            "all": false,
-            "north": true,
-            "south": true,
-            "east": true
-        },
-        "*-south": {
-            "all": false,
-            "east": true,
-            "south": true,
-            "west": true
-        },
-        "*-west": {
-            "all": false,
-            "west": true,
-            "south": true,
-            "north": true
-        }
-    },
-    "guiTransform": {
-        "rotation": {
-            "x": -22.6,
-            "y": 135,
-            "z": 0
-        }
-    }
+	"code": "annealer",
+	"class": "glassmaking:annealer",
+	"entityclass": "glassmaking:annealer",
+	"blockmaterial": "Ceramic",
+	"behaviors": [
+		{ "name": "HorizontalOrientable" },
+		{ "name": "UnstableFalling" },
+		{ "name": "Unplaceable" }
+	],
+	"variantgroups": [
+		{
+			"code": "side",
+			"loadFromProperties": "abstract/horizontalorientation"
+		}
+	],
+	"attributes": {
+		"contentTransform": {
+			"translation": {
+				"x": -0.375,
+				"y": 0.0625,
+				"z": -0.375
+			},
+			"scale": 0.75
+		},
+		"handbook": {
+			"extraSections": [
+				{
+					"title": "glassmaking:block-handbooktitle-annealer",
+					"text": "glassmaking:block-handbooktext-annealer"
+				}
+			]
+		},
+		"smokeTransformByType": {
+			"*-north": {
+				"translation": {
+					"x": 0.125,
+					"y": 0.75,
+					"z": 0.1875
+				},
+				"scaleXYZ": {
+					"x": 0.75,
+					"z": 0.125
+				}
+			},
+			"*-east": {
+				"translation": {
+					"x": 0.6875,
+					"y": 0.75,
+					"z": 0.125
+				},
+				"scaleXYZ": {
+					"x": 0.125,
+					"z": 0.75
+				}
+			},
+			"*-south": {
+				"translation": {
+					"x": 0.125,
+					"y": 0.75,
+					"z": 0.6875
+				},
+				"scaleXYZ": {
+					"x": 0.75,
+					"z": 0.125
+				}
+			},
+			"*-west": {
+				"translation": {
+					"x": 0.1875,
+					"y": 0.75,
+					"z": 0.125
+				},
+				"scaleXYZ": {
+					"x": 0.125,
+					"z": 0.75
+				}
+			}
+		}
+	},
+	"creativeinventory": {
+		"general": [ "*-north" ],
+		"glassmaking": [ "*-north" ]
+	},
+	"replaceable": 400,
+	"resistance": 3.5,
+	"maxStackSize": 1,
+	"lightAbsorption": 3,
+	"shape": {
+		"base": "block/annealer",
+		"rotateYByType": {
+			"*-east": 270,
+			"*-south": 180,
+			"*-west": 90
+		}
+	},
+	"sounds": {
+		"walk": "game:walk/stone",
+		"place": "game:block/ceramicplace",
+		"byTool": {
+			"Pickaxe": {
+				"hit": "game:block/rock-hit-pickaxe",
+				"break": "game:block/rock-break-pickaxe"
+			}
+		}
+	},
+	"collisionboxes": [
+		{
+			"x1": 0,
+			"y1": 0.25,
+			"z1": 0,
+			"x2": 1,
+			"y2": 1,
+			"z2": 1
+		},
+		{
+			"x1": 0,
+			"y1": 0,
+			"z1": 0.25,
+			"x2": 1,
+			"y2": 0.25,
+			"z2": 1,
+			"rotateYByType": {
+				"*-north": 180,
+				"*-east": 90,
+				"*-west": 270
+			}
+		},
+		{
+			"x1": 0,
+			"y1": 0,
+			"z1": 0,
+			"x2": 0.375,
+			"y2": 0.25,
+			"z2": 0.25,
+			"rotateYByType": {
+				"*-north": 180,
+				"*-east": 90,
+				"*-west": 270
+			}
+		},
+		{
+			"x1": 0.625,
+			"y1": 0,
+			"z1": 0,
+			"x2": 1,
+			"y2": 0.25,
+			"z2": 0.25,
+			"rotateYByType": {
+				"*-north": 180,
+				"*-east": 90,
+				"*-west": 270
+			}
+		}
+	],
+	"selectionbox": {
+		"x1": 0,
+		"y1": 0,
+		"z1": 0,
+		"x2": 1,
+		"y2": 1,
+		"z2": 1
+	},
+	"sideopaqueByType": {
+		"*-north": {
+			"down": false,
+			"up": false,
+			"horizontals": true,
+			"north": false
+		},
+		"*-east": {
+			"down": false,
+			"up": false,
+			"horizontals": true,
+			"east": false
+		},
+		"*-south": {
+			"down": false,
+			"up": false,
+			"horizontals": true,
+			"south": false
+		},
+		"*-west": {
+			"down": false,
+			"up": false,
+			"horizontals": true,
+			"west": false
+		}
+	},
+	"sidesolidByType": {
+		"*-north": {
+			"all": false,
+			"east": true,
+			"north": true,
+			"west": true
+		},
+		"*-east": {
+			"all": false,
+			"north": true,
+			"south": true,
+			"east": true
+		},
+		"*-south": {
+			"all": false,
+			"east": true,
+			"south": true,
+			"west": true
+		},
+		"*-west": {
+			"all": false,
+			"west": true,
+			"south": true,
+			"north": true
+		}
+	},
+	"guiTransform": {
+		"rotation": {
+			"x": -22.6,
+			"y": 135,
+			"z": 0
+		}
+	}
 }
