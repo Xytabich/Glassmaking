@@ -133,7 +133,8 @@ namespace GlassMaking.Items
 					DummyInventory dummyInv = new DummyInventory(api);
 					slot = new DummySlot(stacks[i], dummyInv);
 
-					dummyInv.OnAcquireTransitionSpeed = (transType, stack, mul) => {
+					dummyInv.OnAcquireTransitionSpeed = (transType, stack, mul) =>
+					{
 						return mul * GetContainingTransitionModifierContained(world, slot, transType);
 					};
 
@@ -144,7 +145,8 @@ namespace GlassMaking.Items
 					slot = new DummySlot(stacks[i], inslot.Inventory);
 
 					var pref = inslot.Inventory.OnAcquireTransitionSpeed;
-					inslot.Inventory.OnAcquireTransitionSpeed = (EnumTransitionType transType, ItemStack stack, float mulByConfig) => {
+					inslot.Inventory.OnAcquireTransitionSpeed = (EnumTransitionType transType, ItemStack stack, float mulByConfig) =>
+					{
 						float mul = mulByConfig;
 						if(pref != null)
 						{

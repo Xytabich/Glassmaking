@@ -27,7 +27,8 @@ namespace GlassMaking.Items
 			evaporation = Attributes["evaporation"].AsFloat();
 			if(api.Side == EnumAppSide.Client)
 			{
-				interactions = ObjectCacheUtil.GetOrCreate(api, "glassmaking:heldhelp-wettable", () => {
+				interactions = ObjectCacheUtil.GetOrCreate(api, "glassmaking:heldhelp-wettable", () =>
+				{
 					var capi = (ICoreClientAPI)api;
 					var containers = api.World.GetItem(waterCode).GetHandBookStacks(capi) ?? new List<ItemStack>();
 					return new WorldInteraction[] {
@@ -206,7 +207,8 @@ namespace GlassMaking.Items
 				return null;
 			}
 
-			states[0] = new TransitionState() {
+			states[0] = new TransitionState()
+			{
 				FreshHoursLeft = freshHoursLeft,
 				TransitionLevel = 0,
 				TransitionedHours = transitionedHours[0],

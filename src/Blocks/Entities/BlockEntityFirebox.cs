@@ -518,7 +518,8 @@ namespace GlassMaking.Blocks
 			{
 				if(ambientSound == null || !ambientSound.IsPlaying)
 				{
-					ambientSound = ((IClientWorldAccessor)Api.World).LoadSound(new SoundParams {
+					ambientSound = ((IClientWorldAccessor)Api.World).LoadSound(new SoundParams
+					{
 						Location = new AssetLocation("sounds/environment/fireplace.ogg"),
 						ShouldLoop = true,
 						Position = Pos.ToVec3f().Add(0.5f, 0.25f, 0.5f),

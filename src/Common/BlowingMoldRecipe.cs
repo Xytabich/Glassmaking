@@ -65,7 +65,8 @@ namespace GlassMaking
 
 		public BlowingMoldRecipe Clone()
 		{
-			return new BlowingMoldRecipe() {
+			return new BlowingMoldRecipe()
+			{
 				Output = Output.Clone(),
 				Recipe = Array.ConvertAll(Recipe, r => r.Clone()),
 				FillTime = FillTime,
@@ -96,7 +97,8 @@ namespace GlassMaking
 
 			public GlassAmount Clone()
 			{
-				return new GlassAmount() {
+				return new GlassAmount()
+				{
 					Code = Code.Clone(),
 					Amount = Amount,
 					Var = Var,

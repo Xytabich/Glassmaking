@@ -58,7 +58,8 @@ namespace GlassMaking
 
 		public CastingMoldRecipe Clone()
 		{
-			return new CastingMoldRecipe() {
+			return new CastingMoldRecipe()
+			{
 				Output = Output.Clone(),
 				Recipe = Recipe.Clone(),
 				Name = Name?.Clone()
@@ -78,7 +79,8 @@ namespace GlassMaking
 
 			public GlassAmount Clone()
 			{
-				return new GlassAmount() {
+				return new GlassAmount()
+				{
 					Code = Code.Clone(),
 					Amount = Amount,
 					AllowedVariants = (string[])(AllowedVariants?.Clone())

@@ -63,7 +63,8 @@ namespace GlassMaking
 
 		public SmoothRadialShape Clone()
 		{
-			return new SmoothRadialShape() {
+			return new SmoothRadialShape()
+			{
 				Segments = Segments,
 				Outer = Array.ConvertAll(Outer, x => x.Clone()),
 				Inner = Inner == null ? null : Array.ConvertAll(Inner, x => x.Clone())
@@ -217,7 +218,8 @@ namespace GlassMaking
 
 			public ShapePart Clone()
 			{
-				return new ShapePart() {
+				return new ShapePart()
+				{
 					Segments = Segments,
 					Vertices = Array.ConvertAll(Vertices, v => new float[] { v[0], v[1] })
 				};

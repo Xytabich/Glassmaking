@@ -42,7 +42,8 @@ namespace GlassMaking.Items
 				takeTransform = Attributes["takeTransform"].AsObject<ModelTransform>();
 				takeTransform.EnsureDefaultValues();
 
-				interactions = ObjectCacheUtil.GetOrCreate(api, "glassmaking:heldhelp-ladle", () => {
+				interactions = ObjectCacheUtil.GetOrCreate(api, "glassmaking:heldhelp-ladle", () =>
+				{
 					List<ItemStack> list = new List<ItemStack>();
 					var capi = api as ICoreClientAPI;
 					foreach(Block block in api.World.Blocks)
@@ -133,7 +134,8 @@ namespace GlassMaking.Items
 								if(mold.CanReceiveGlass(new AssetLocation(glassmelt.GetString("code")), glassmelt.GetInt("amount")))
 								{
 									itemstack.TempAttributes.SetFloat("glassmaking:prevTakeTime", 0);
-									byEntity.World.RegisterCallback((world, pos, dt) => {
+									byEntity.World.RegisterCallback((world, pos, dt) =>
+									{
 										if(byEntity.Controls.HandUse == EnumHandInteract.HeldItemInteract)
 										{
 											IPlayer dualCallByPlayer = null;

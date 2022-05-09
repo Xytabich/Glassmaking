@@ -88,11 +88,13 @@ namespace GlassMaking
 				{
 					desc = "";
 				}
-				skillItems.Add(new SkillItem {
+				skillItems.Add(new SkillItem
+				{
 					Code = stack.Collectible.Code.Clone(),
 					Name = stack.GetName(),
 					Description = desc,
-					RenderHandler = (AssetLocation code, float dt, double posX, double posY) => {
+					RenderHandler = (AssetLocation code, float dt, double posX, double posY) =>
+					{
 						double num = GuiElement.scaled(size - 5.0);
 						capi.Render.RenderItemstackToGui(dummySlot, posX + num / 2.0, posY + num / 2.0, 100.0, (float)GuiElement.scaled(GuiElementPassiveItemSlot.unscaledItemSize), -1);
 					}

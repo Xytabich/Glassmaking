@@ -271,7 +271,8 @@ namespace GlassMaking
 
 		public GlassBlowingRecipe Clone()
 		{
-			return new GlassBlowingRecipe() {
+			return new GlassBlowingRecipe()
+			{
 				RecipeId = RecipeId,
 				Code = Code.Clone(),
 				Output = Output.Clone(),
@@ -341,7 +342,8 @@ namespace GlassMaking
 
 		public GlassBlowingRecipeStep Clone()
 		{
-			return new GlassBlowingRecipeStep() {
+			return new GlassBlowingRecipeStep()
+			{
 				Tool = Tool,
 				Shape = Shape.Clone(),
 				Attributes = Attributes?.Clone()
