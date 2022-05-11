@@ -51,6 +51,10 @@ namespace GlassMaking.Workbench
 		{
 		}
 
+		/// <summary>
+		/// Returns hints for using this tool.
+		/// Called if this tool participates in the current recipe step.
+		/// </summary>
 		public virtual WorldInteraction[] GetBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer, WorkbenchRecipe recipe, int step)
 		{
 			return null;

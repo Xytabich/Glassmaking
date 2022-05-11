@@ -106,6 +106,22 @@ namespace GlassMaking.Blocks
 					HotKeyCode = "sprint",
 					MouseButton = EnumMouseButton.Right
 				});
+
+				if(recipe != null)
+				{
+					foreach(var pair in recipe.Steps[recipeStep].Tools)
+					{
+						var beh = mod.GetWorkbenchToolBehavior(pair.Key);
+						if(beh != null)
+						{
+							var arr = beh.GetBlockInteractionHelp(world, selection, forPlayer, recipe, recipeStep);
+							if(arr != null && arr.Length > 0)
+							{
+								list.AddRange(arr);
+							}
+						}
+					}
+				}
 			}
 			else
 			{
@@ -115,9 +131,9 @@ namespace GlassMaking.Blocks
 					if(toolSelection != null && selection.SelectionBoxIndex >= toolSelection.index &&
 						selection.SelectionBoxIndex < (toolSelection.index + toolSelection.boxes.Length))
 					{
-						selection = selection.Clone();
-						selection.SelectionBoxIndex -= toolSelection.index;
-						var arr = inventory.GetBehavior(i).GetBlockInteractionHelp(world, selection, forPlayer, recipe, recipeStep);
+						var sel = selection.Clone();
+						sel.SelectionBoxIndex -= toolSelection.index;
+						var arr = inventory.GetBehavior(i).GetBlockInteractionHelp(world, sel, forPlayer, recipe, recipeStep);
 						list.Add(new WorldInteraction() {
 							ActionLangCode = "glassmaking:blockhelp-workbench-taketool",
 							HotKeyCode = "sprint",
@@ -452,6 +468,14 @@ namespace GlassMaking.Blocks
 			dlg?.Dispose();
 			renderer?.Dispose();
 			base.OnBlockRemoved();
+			if(recipe != null)
+			{
+				foreach(var pair in recipe.Steps[recipeStep].Tools)
+				{
+					var beh = mod.GetWorkbenchToolBehavior(pair.Key);
+					if(beh != null) beh.OnBlockUnloaded(Api.World, Pos, recipe, recipeStep);
+				}
+			}
 			for(int i = toolsCapacity - 1; i >= 0; i--)
 			{
 				var tool = inventory.GetBehavior(i);
@@ -465,6 +489,14 @@ namespace GlassMaking.Blocks
 			dlg?.Dispose();
 			renderer?.Dispose();
 			base.OnBlockUnloaded();
+			if(recipe != null)
+			{
+				foreach(var pair in recipe.Steps[recipeStep].Tools)
+				{
+					var beh = mod.GetWorkbenchToolBehavior(pair.Key);
+					if(beh != null) beh.OnBlockUnloaded(Api.World, Pos, recipe, recipeStep);
+				}
+			}
 			for(int i = toolsCapacity - 1; i >= 0; i--)
 			{
 				var tool = inventory.GetBehavior(i);
