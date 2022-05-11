@@ -291,6 +291,7 @@ namespace GlassMaking.Blocks
 
 					var sel = selection.Clone();
 					bool isStarted = true;
+					WorkbenchToolBehavior beh;
 					foreach(var pair in recipe.Steps[recipeStep].Tools)
 					{
 						if(toolSlots.TryGetValue(pair.Key, out var slotId))
@@ -298,6 +299,10 @@ namespace GlassMaking.Blocks
 							sel.CopyFrom(selection);
 							sel.SelectionBoxIndex -= toolsSelection[slotId].index;
 							isStarted &= inventory.GetBehavior(slotId).OnUseStart(world, byPlayer, sel, recipe, recipeStep);
+						}
+						else if((beh = mod.GetWorkbenchToolBehavior(pair.Key)) != null)
+						{
+							isStarted &= beh.OnUseStart(world, byPlayer, selection, recipe, recipeStep);
 						}
 						else
 						{
@@ -331,6 +336,7 @@ namespace GlassMaking.Blocks
 
 			var sel = selection.Clone();
 			bool canContinue = true;
+			WorkbenchToolBehavior beh;
 			foreach(var pair in recipe.Steps[recipeStep].Tools)
 			{
 				if(toolSlots.TryGetValue(pair.Key, out var slotId))
@@ -338,6 +344,10 @@ namespace GlassMaking.Blocks
 					sel.CopyFrom(selection);
 					sel.SelectionBoxIndex -= toolsSelection[slotId].index;
 					canContinue &= inventory.GetBehavior(slotId).OnUseStep(secondsUsed, world, byPlayer, sel, recipe, recipeStep);
+				}
+				else if((beh = mod.GetWorkbenchToolBehavior(pair.Key)) != null)
+				{
+					canContinue &= beh.OnUseStep(secondsUsed, world, byPlayer, selection, recipe, recipeStep);
 				}
 				else
 				{
@@ -555,7 +565,7 @@ namespace GlassMaking.Blocks
 
 		private bool TryAddTool(IPlayer byPlayer, ItemSlot slot)
 		{
-			if(!(slot.Itemstack.Collectible is IWorkbenchTool tool)) return false;
+			if(!(slot.Itemstack.Collectible is IItemWorkbenchTool tool)) return false;
 			var world = byPlayer.Entity.World;
 			var boxes = GetRotatedBoxes(tool.GetToolBoundingBoxes(world, slot.Itemstack), Block.Shape.rotateY);
 			for(int i = toolsCapacity - 1; i >= 0; i--)
@@ -685,6 +695,7 @@ namespace GlassMaking.Blocks
 			startedStep = -1;
 			waitForComplete = null;
 			var sel = selection.Clone();
+			WorkbenchToolBehavior beh;
 			foreach(var pair in recipe.Steps[recipeStep].Tools)
 			{
 				if(toolSlots.TryGetValue(pair.Key, out var slotId))
@@ -692,6 +703,10 @@ namespace GlassMaking.Blocks
 					sel.CopyFrom(selection);
 					sel.SelectionBoxIndex -= toolsSelection[slotId].index;
 					inventory.GetBehavior(slotId).OnUseCancel(secondsUsed, world, byPlayer, sel, recipe, recipeStep);
+				}
+				else if((beh = mod.GetWorkbenchToolBehavior(pair.Key)) != null)
+				{
+					beh.OnUseCancel(secondsUsed, world, byPlayer, selection, recipe, recipeStep);
 				}
 			}
 			MarkDirty(true);
@@ -740,6 +755,7 @@ namespace GlassMaking.Blocks
 		private void CallOnUseComplete(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection selection)
 		{
 			var sel = selection.Clone();
+			WorkbenchToolBehavior beh;
 			foreach(var pair in recipe.Steps[recipeStep].Tools)
 			{
 				if(toolSlots.TryGetValue(pair.Key, out var slotId))
@@ -747,6 +763,10 @@ namespace GlassMaking.Blocks
 					sel.CopyFrom(selection);
 					sel.SelectionBoxIndex -= toolsSelection[slotId].index;
 					inventory.GetBehavior(slotId).OnUseComplete(secondsUsed, world, byPlayer, sel, recipe, recipeStep);
+				}
+				else if((beh = mod.GetWorkbenchToolBehavior(pair.Key)) != null)
+				{
+					beh.OnUseComplete(secondsUsed, world, byPlayer, selection, recipe, recipeStep);
 				}
 			}
 		}

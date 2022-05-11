@@ -1,47 +1,22 @@
 ﻿using Vintagestory.API.Client;
 using Vintagestory.API.Common;
-using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Workbench
 {
+	/// <summary>
+	/// Describes the behavior of a tool that is not an item.
+	/// Those. some "built-in" behavior for the workbench.
+	/// Is a singleton, i.e. the instance is used for all workbenches at the same time.
+	/// </summary>
 	public abstract class WorkbenchToolBehavior
 	{
-		public string ToolCode;
-
-		/// <summary>
-		/// The block for this behavior instance.
-		/// </summary>
-		public BlockEntity Blockentity;
-
-		public ICoreAPI Api;
-
-		public ItemSlot Slot;
-
-		protected Cuboidf[] boundingBoxes;
-
-		public WorkbenchToolBehavior(string toolCode, BlockEntity blockentity, Cuboidf[] boundingBoxes)
+		public virtual void OnLoaded(ICoreAPI api)
 		{
-			ToolCode = toolCode.ToLowerInvariant();
-			Blockentity = blockentity;
-			this.boundingBoxes = boundingBoxes;
 		}
 
-		/// <summary>
-		/// Called right after the tool behavior was created
-		/// </summary>
-		public virtual void OnLoaded(ICoreAPI api, ItemSlot slot)
-		{
-			Api = api;
-			Slot = slot;
-		}
-
-		/// <summary>
-		/// Called when a tool has been removed from a workbench
-		/// </summary>
 		public virtual void OnUnloaded()
 		{
-
 		}
 
 		/// <summary>
@@ -76,47 +51,15 @@ namespace GlassMaking.Workbench
 		{
 		}
 
-		/// <summary>
-		/// Called if this tool is being used in the current step of the recipe, but crafting is idle (i.e. the player is not interacting with the workbench).
-		/// Called when a craft is canceled, when a tool is placed, or when a recipe is selected. Only on client-side.
-		/// </summary>
-		public virtual void OnIdleStart(IWorldAccessor world, WorkbenchRecipe recipe, int step)
-		{
-		}
-
-		/// <summary>
-		/// Called if crafting has been started or the recipe has changed.
-		/// </summary>
-		/// <param name="recipe">Current recipe value, may be null</param>
-		/// <param name="step">Current recipe step</param>
-		public virtual void OnIdleStop(IWorldAccessor world, WorkbenchRecipe recipe, int step)
-		{
-		}
-
-		public virtual WorldInteraction[] GetBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer, WorkbenchRecipe recipe = null, int step = 0)
+		public virtual WorldInteraction[] GetBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer, WorkbenchRecipe recipe, int step)
 		{
 			return null;
 		}
 
-		public virtual ITreeAttribute ToAttribute()
-		{
-			return null;
-		}
-
-		public virtual void FromAttribute(IAttribute attribute, IWorldAccessor worldAccessForResolve)
-		{
-		}
-
-		public virtual Cuboidf[] GetBoundingBoxes()
-		{
-			return boundingBoxes;
-		}
-
-		public virtual void OnBlockRemoved()
-		{
-		}
-
-		public virtual void OnBlockUnloaded()
+		/// <summary>
+		/// Called if the block was removed or unloaded while the current step of the recipe used (i.e. was in the tools list) this tool
+		/// </summary>
+		public virtual void OnBlockUnloaded(IWorldAccessor world, BlockPos pos, WorkbenchRecipe recipe, int step)
 		{
 		}
 	}

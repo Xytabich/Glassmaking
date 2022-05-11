@@ -4,7 +4,7 @@ using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Items
 {
-	public abstract class ItemWorkbenchTool : Item, IWorkbenchTool
+	public abstract class ItemWorkbenchTool : Item, IItemWorkbenchTool
 	{
 		protected Cuboidf[] toolBoundingBoxes = null;
 
@@ -15,6 +15,6 @@ namespace GlassMaking.Items
 			return toolBoundingBoxes ?? (toolBoundingBoxes = Attributes?["workbenchToolBounds"].AsObject<Cuboidf[]>());
 		}
 
-		public abstract WorkbenchToolBehavior CreateToolBehavior(IWorldAccessor world, ItemStack itemStack, BlockEntity blockentity);
+		public abstract WorkbenchToolItemBehavior CreateToolBehavior(IWorldAccessor world, ItemStack itemStack, BlockEntity blockentity);
 	}
 }

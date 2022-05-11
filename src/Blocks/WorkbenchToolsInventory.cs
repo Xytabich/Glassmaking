@@ -13,7 +13,7 @@ namespace GlassMaking.Blocks
 		public FastList<int> modifiedSlots = new FastList<int>();
 
 		protected ItemSlot[] slots;
-		protected WorkbenchToolBehavior[] behaviors;
+		protected WorkbenchToolItemBehavior[] behaviors;
 		protected BlockEntity blockentity;
 
 		private int toolsCount;
@@ -25,7 +25,7 @@ namespace GlassMaking.Blocks
 			slots = GenEmptySlots(quantitySlots);
 			cachedAttributes = new IAttribute[quantitySlots];
 			toolsCount = quantitySlots - 1;
-			behaviors = new WorkbenchToolBehavior[toolsCount];
+			behaviors = new WorkbenchToolItemBehavior[toolsCount];
 		}
 
 		public WorkbenchToolsInventory(int quantitySlots, string inventoryID, ICoreAPI api, BlockEntity blockentity) : base(inventoryID, api)
@@ -34,7 +34,7 @@ namespace GlassMaking.Blocks
 			slots = GenEmptySlots(quantitySlots);
 			cachedAttributes = new IAttribute[quantitySlots];
 			toolsCount = quantitySlots - 1;
-			behaviors = new WorkbenchToolBehavior[toolsCount];
+			behaviors = new WorkbenchToolItemBehavior[toolsCount];
 		}
 
 		public override ItemSlot this[int slotId]
@@ -57,7 +57,7 @@ namespace GlassMaking.Blocks
 			}
 		}
 
-		public WorkbenchToolBehavior GetBehavior(int slotId)
+		public WorkbenchToolItemBehavior GetBehavior(int slotId)
 		{
 			return behaviors[slotId];
 		}
@@ -70,7 +70,7 @@ namespace GlassMaking.Blocks
 				behaviors[slotId] = null;
 			}
 			slots[slotId].Itemstack = itemStack;
-			if(itemStack?.Collectible is IWorkbenchTool tool)
+			if(itemStack?.Collectible is IItemWorkbenchTool tool)
 			{
 				behaviors[slotId] = tool.CreateToolBehavior(Api.World, itemStack, blockentity);
 				behaviors[slotId].OnLoaded(Api, slots[slotId]);
@@ -82,7 +82,7 @@ namespace GlassMaking.Blocks
 			base.LateInitialize(inventoryID, api);
 			for(int i = 0; i < toolsCount; i++)
 			{
-				if(!slots[i].Empty && slots[i].Itemstack.Collectible is IWorkbenchTool tool)
+				if(!slots[i].Empty && slots[i].Itemstack.Collectible is IItemWorkbenchTool tool)
 				{
 					behaviors[i] = tool.CreateToolBehavior(Api.World, slots[i].Itemstack, blockentity);
 					behaviors[i].OnLoaded(api, slots[i]);
@@ -131,7 +131,7 @@ namespace GlassMaking.Blocks
 
 					slots[i].Itemstack = newstack;
 
-					if(isModified && newstack != null && newstack.Collectible is IWorkbenchTool tool)
+					if(isModified && newstack != null && newstack.Collectible is IItemWorkbenchTool tool)
 					{
 						behaviors[i] = tool.CreateToolBehavior(Api.World, newstack, blockentity);
 						behaviors[i].OnLoaded(Api, slots[i]);

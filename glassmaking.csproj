@@ -184,7 +184,7 @@
     <Compile Include="src\TemporaryMetadata\TemporaryMetadataSystem.cs" />
     <Compile Include="src\ToolDescriptors\ToolBehaviorDescriptor.cs" />
     <Compile Include="src\ToolDescriptors\ToolUseDescriptor.cs" />
-    <Compile Include="src\Workbench\IWorkbenchTool.cs" />
+    <Compile Include="src\Workbench\IItemWorkbenchTool.cs" />
     <Compile Include="src\Common\MinMaxFloat.cs" />
     <Compile Include="src\Common\RecipeRegistryDictionary.cs" />
     <Compile Include="src\Common\SimpleTextureSource.cs" />
@@ -206,6 +206,7 @@
     <Compile Include="src\Workbench\ToolBehaviors\LatheToolBehavior.cs" />
     <Compile Include="src\Workbench\ToolDescriptors\IWorkbenchToolDescriptor.cs" />
     <Compile Include="src\Workbench\WorkbenchToolBehavior.cs" />
+    <Compile Include="src\Workbench\WorkbenchToolItemBehavior.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="assets\**\*.*" />

@@ -14,7 +14,7 @@ namespace GlassMaking.Items
 			return LatheToolBehavior.CODE;
 		}
 
-		public override WorkbenchToolBehavior CreateToolBehavior(IWorldAccessor world, ItemStack itemStack, BlockEntity blockentity)
+		public override WorkbenchToolItemBehavior CreateToolBehavior(IWorldAccessor world, ItemStack itemStack, BlockEntity blockentity)
 		{
 			return new LatheToolBehavior(blockentity, GetToolBoundingBoxes(world, itemStack));
 		}

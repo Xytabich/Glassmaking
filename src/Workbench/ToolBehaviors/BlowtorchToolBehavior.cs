@@ -4,7 +4,7 @@ using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Workbench.ToolBehaviors
 {
-	public class BlowtorchToolBehavior : WorkbenchToolBehavior
+	public class BlowtorchToolBehavior : WorkbenchToolItemBehavior
 	{
 		public const string CODE = "blowtorch";
 

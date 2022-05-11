@@ -7,6 +7,7 @@ using GlassMaking.ItemRender;
 using GlassMaking.Items;
 using GlassMaking.TemporaryMetadata;
 using GlassMaking.ToolDescriptors;
+using GlassMaking.Workbench;
 using GlassMaking.Workbench.ToolDescriptors;
 using HarmonyLib;
 using Newtonsoft.Json;
@@ -32,6 +33,7 @@ namespace GlassMaking
 		private Dictionary<AssetLocation, GlassTypeVariant> glassTypes;
 		private Dictionary<string, IPipeBlowingToolDescriptor> pipeToolDescriptors;
 		private Dictionary<string, IWorkbenchToolDescriptor> workbenchToolDescriptors;
+		private Dictionary<string, WorkbenchToolBehavior> workbenchTools = null;
 
 		private List<Block> blowingMolds = null;
 		private HashSet<AssetLocation> blowingMoldsOutput = null;
@@ -290,6 +292,21 @@ namespace GlassMaking
 			if(workbenchToolDescriptors != null && workbenchToolDescriptors.TryGetValue(tool.ToLowerInvariant(), out var descriptor))
 			{
 				return descriptor;
+			}
+			return null;
+		}
+
+		public void AddWorkbenchToolBehavior(string tool, WorkbenchToolBehavior behavior)
+		{
+			if(workbenchTools == null) workbenchTools = new Dictionary<string, WorkbenchToolBehavior>();
+			workbenchTools[tool.ToLowerInvariant()] = behavior;
+		}
+
+		public WorkbenchToolBehavior GetWorkbenchToolBehavior(string tool)
+		{
+			if(workbenchTools != null && workbenchTools.TryGetValue(tool.ToLowerInvariant(), out var behavior))
+			{
+				return behavior;
 			}
 			return null;
 		}
