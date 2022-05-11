@@ -43,8 +43,7 @@ namespace GlassMaking.Blocks.Renderer
 
 			textureId = capi.BlockTextureAtlas.AtlasTextureIds[0];
 
-			capi.Event.EnqueueMainThreadTask(() =>
-			{
+			capi.Event.EnqueueMainThreadTask(() => {
 				capi.Event.RegisterRenderer(this, EnumRenderStage.Opaque, "glassmaking:blockanimatable");
 				capi.Event.RegisterRenderer(this, EnumRenderStage.ShadowFar, "glassmaking:blockanimatable");
 				capi.Event.RegisterRenderer(this, EnumRenderStage.ShadowNear, "glassmaking:blockanimatable");

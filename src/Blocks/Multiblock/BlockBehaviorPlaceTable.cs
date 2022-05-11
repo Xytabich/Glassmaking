@@ -33,8 +33,7 @@ namespace GlassMaking.Blocks
 			var sideFace = BlockFacing.HORIZONTALS_ANGLEORDER[(face.HorizontalAngleIndex + 3) % 4];
 			if(sideFace.Normald.Dot(new Vec3d(blockSel.HitPosition.X - 0.5, 0, blockSel.HitPosition.Z - 0.5)) >= 0)
 			{
-				blockSel = new BlockSelection()
-				{
+				blockSel = new BlockSelection() {
 					Face = blockSel.Face,
 					Position = blockSel.Position.AddCopy(sideFace.Normali),
 					HitPosition = blockSel.HitPosition

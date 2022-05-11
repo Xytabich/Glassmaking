@@ -92,8 +92,7 @@ namespace GlassMaking.Handbook
 
 		public static IReadOnlyDictionary<string, IReadOnlyList<ItemStack>> GetItemsByToolCode(ICoreClientAPI capi)
 		{
-			return ObjectCacheUtil.GetOrCreate(capi, "glassmaking:workbench-toolitemsbycode", () =>
-			{
+			return ObjectCacheUtil.GetOrCreate(capi, "glassmaking:workbench-toolitemsbycode", () => {
 				var itemsByToolCode = new Dictionary<string, IReadOnlyList<ItemStack>>();
 				foreach(var obj in capi.World.Collectibles)
 				{

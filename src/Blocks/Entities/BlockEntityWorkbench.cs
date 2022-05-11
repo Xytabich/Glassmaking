@@ -85,8 +85,7 @@ namespace GlassMaking.Blocks
 			{
 				if(!workpieceSlot.Empty)
 				{
-					list.Add(new WorldInteraction()
-					{
+					list.Add(new WorldInteraction() {
 						ActionLangCode = "glassmaking:blockhelp-workbench-takeitem",
 						HotKeyCode = "sneak",
 						RequireFreeHand = true,
@@ -96,15 +95,13 @@ namespace GlassMaking.Blocks
 				}
 				else
 				{
-					list.Add(new WorldInteraction()
-					{
+					list.Add(new WorldInteraction() {
 						ActionLangCode = "glassmaking:blockhelp-workbench-recipe",
 						HotKeyCode = "sneak",
 						MouseButton = EnumMouseButton.Right
 					});
 				}
-				list.Add(new WorldInteraction()
-				{
+				list.Add(new WorldInteraction() {
 					ActionLangCode = "glassmaking:blockhelp-workbench-addtool",
 					HotKeyCode = "sprint",
 					MouseButton = EnumMouseButton.Right
@@ -121,8 +118,7 @@ namespace GlassMaking.Blocks
 						selection = selection.Clone();
 						selection.SelectionBoxIndex -= toolSelection.index;
 						var arr = inventory.GetBehavior(i).GetBlockInteractionHelp(world, selection, forPlayer, recipe, recipeStep);
-						list.Add(new WorldInteraction()
-						{
+						list.Add(new WorldInteraction() {
 							ActionLangCode = "glassmaking:blockhelp-workbench-taketool",
 							HotKeyCode = "sprint",
 							RequireFreeHand = true,
@@ -139,8 +135,7 @@ namespace GlassMaking.Blocks
 			}
 			if(recipe != null)
 			{
-				list.Add(new WorldInteraction()
-				{
+				list.Add(new WorldInteraction() {
 					ActionLangCode = "glassmaking:blockhelp-workbench-craft",
 					MouseButton = EnumMouseButton.Right
 				});
@@ -673,8 +668,7 @@ namespace GlassMaking.Blocks
 			if(tool == null) toolsSelection[slotId] = null;
 			else
 			{
-				toolsSelection[slotId] = new SelectionInfo()
-				{
+				toolsSelection[slotId] = new SelectionInfo() {
 					boxes = GetRotatedBoxes(tool.GetBoundingBoxes(), Block.Shape.rotateY)
 				};
 			}
@@ -778,8 +772,7 @@ namespace GlassMaking.Blocks
 				var outputs = Array.ConvertAll(recipes, r => r.Output.ResolvedItemstack);
 				ICoreClientAPI capi = Api as ICoreClientAPI;
 				dlg?.Dispose();
-				dlg = new GuiDialogBlockEntityRecipeSelector(Lang.Get("glassmaking:Select workbench recipe"), outputs, selectedIndex =>
-				{
+				dlg = new GuiDialogBlockEntityRecipeSelector(Lang.Get("glassmaking:Select workbench recipe"), outputs, selectedIndex => {
 					capi.Network.SendBlockEntityPacket(Pos.X, Pos.Y, Pos.Z, 1001, SerializerUtil.Serialize(recipes[selectedIndex].Code.ToShortString()));
 				}, () => { }, Pos, capi);
 				dlg.TryOpen();

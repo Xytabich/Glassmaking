@@ -18,8 +18,7 @@ namespace GlassMaking.Blocks
 			if(api.Side != EnumAppSide.Client) return;
 			ICoreClientAPI capi = api as ICoreClientAPI;
 
-			interactions = ObjectCacheUtil.GetOrCreate(api, "glassmaking:blockhelp-firebox", () =>
-			{
+			interactions = ObjectCacheUtil.GetOrCreate(api, "glassmaking:blockhelp-firebox", () => {
 				List<ItemStack> fuelStacklist = new List<ItemStack>();
 				List<ItemStack> canIgniteStacks = new List<ItemStack>();
 

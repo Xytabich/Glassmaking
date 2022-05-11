@@ -30,8 +30,7 @@ namespace GlassMaking.Items
 			glassTransform.EnsureDefaultValues();
 			if(api.Side == EnumAppSide.Client)
 			{
-				interactions = ObjectCacheUtil.GetOrCreate(api, "glassmaking:heldhelp-glasspipe", () =>
-				{
+				interactions = ObjectCacheUtil.GetOrCreate(api, "glassmaking:heldhelp-glasspipe", () => {
 					List<ItemStack> list = new List<ItemStack>();
 					var capi = api as ICoreClientAPI;
 					foreach(Block block in api.World.Blocks)
@@ -240,8 +239,7 @@ namespace GlassMaking.Items
 								var amountsAttrib = glasslayers["amount"] as IntArrayAttribute;
 								if(mold.CanReceiveGlass(codesAttrib.value, amountsAttrib.value, out _))
 								{
-									byEntity.World.RegisterCallback((world, pos, dt) =>
-									{
+									byEntity.World.RegisterCallback((world, pos, dt) => {
 										if(byEntity.Controls.HandUse == EnumHandInteract.HeldItemInteract)
 										{
 											IPlayer dualCallByPlayer = null;

@@ -90,8 +90,7 @@ namespace GlassMaking.Blocks
 			}
 
 			if(api.Side != EnumAppSide.Client) return;
-			interactions = ObjectCacheUtil.GetOrCreate(api, "glassmaking:blowingmoldinteractions", () =>
-			{
+			interactions = ObjectCacheUtil.GetOrCreate(api, "glassmaking:blowingmoldinteractions", () => {
 				List<ItemStack> smeltedContainerStacks = new List<ItemStack>();
 
 				foreach(CollectibleObject obj in api.World.Items)

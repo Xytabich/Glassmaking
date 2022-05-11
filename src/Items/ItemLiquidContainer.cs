@@ -635,8 +635,7 @@ namespace GlassMaking.Items
 				{
 					int maxstacksize = slot.Itemstack.Collectible.MaxStackSize;
 
-					(byEntity as EntityPlayer)?.WalkInventory((pslot) =>
-					{
+					(byEntity as EntityPlayer)?.WalkInventory((pslot) => {
 						if(pslot.Empty || pslot is ItemSlotCreative || pslot.StackSize == pslot.Itemstack.Collectible.MaxStackSize) return true;
 						int mergableq = slot.Itemstack.Collectible.GetMergableQuantity(slot.Itemstack, pslot.Itemstack, EnumMergePriority.DirectMerge);
 						if(mergableq == 0) return true;

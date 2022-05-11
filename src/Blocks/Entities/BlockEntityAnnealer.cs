@@ -189,8 +189,7 @@ namespace GlassMaking.Blocks
 				var attrib = tree.GetTreeAttribute("process" + i);
 				if(attrib != null)
 				{
-					processes[i] = new ItemProcessInfo()
-					{
+					processes[i] = new ItemProcessInfo() {
 						isHeated = attrib.GetBool("isHeated"),
 						time = attrib.GetDouble("time")
 					};

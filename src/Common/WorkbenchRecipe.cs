@@ -159,8 +159,7 @@ namespace GlassMaking
 		public WorkbenchRecipe Clone()
 		{
 			var input = Input.Clone();
-			return new WorkbenchRecipe()
-			{
+			return new WorkbenchRecipe() {
 				RecipeId = RecipeId,
 				Code = Code.Clone(),
 				Input = input,
@@ -280,8 +279,7 @@ namespace GlassMaking
 
 		public WorkbenchRecipeStep Clone()
 		{
-			return new WorkbenchRecipeStep()
-			{
+			return new WorkbenchRecipeStep() {
 				Shape = Shape.Clone(),
 				Tools = Tools.Select(pair => new KeyValuePair<string, JsonObject>(pair.Key, pair.Value?.Clone())).ToDictionary(pair => pair.Key, pair => pair.Value),
 				UseTime = UseTime

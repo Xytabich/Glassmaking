@@ -98,8 +98,7 @@ namespace GlassMaking.Blocks
 
 		public static WorldInteraction[] GetSmelteryInteractions(ICoreClientAPI capi, string key, InteractionStacksDelegate getMatchingStacks)
 		{
-			return ObjectCacheUtil.GetOrCreate(capi, key, () =>
-			{
+			return ObjectCacheUtil.GetOrCreate(capi, key, () => {
 				List<ItemStack> blends = new List<ItemStack>();
 
 				foreach(Item item in capi.World.Items)

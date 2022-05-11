@@ -479,8 +479,7 @@ namespace GlassMaking.Blocks
 				{
 					ICoreClientAPI capi = (ICoreClientAPI)Api;
 					var bathSource = capi.Tesselator.GetTexSource(Block);
-					var bathMesh = ObjectCacheUtil.GetOrCreate(capi, "glassmaking:largesmeltery-shape", () =>
-					{
+					var bathMesh = ObjectCacheUtil.GetOrCreate(capi, "glassmaking:largesmeltery-shape", () => {
 						var asset = capi.Assets.TryGet(new AssetLocation(Block.Code.Domain, "shapes/block/largesmeltery/bath.json"));
 						capi.Tesselator.TesselateShape("glassmaking:largesmeltery-shape", asset.ToObject<Shape>(), out var bath, bathSource);
 						return capi.Render.UploadMesh(bath);
