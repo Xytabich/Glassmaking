@@ -273,24 +273,21 @@ namespace GlassMaking.Blocks
 			}
 			else
 			{
-				if(byPlayer.Entity.Controls.Sneak)
+				if(byPlayer.Entity.Controls.Sneak && itemstack == null)
 				{
-					if(selection.SelectionBoxIndex < 0)
+					if(selection.SelectionBoxIndex < 0 && !workpieceSlot.Empty)
 					{
-						if(itemstack == null && !workpieceSlot.Empty)
-						{
-							CancelStartedStep(0, world, byPlayer, selection);
+						CancelStartedStep(0, world, byPlayer, selection);
 
-							slot.Itemstack = workpieceSlot.TakeOutWhole();
-							recipe = null;
-							recipeStep = -1;
+						slot.Itemstack = workpieceSlot.TakeOutWhole();
+						recipe = null;
+						recipeStep = -1;
 
-							MarkDirty(true);
-							slot.MarkDirty();
-							handling = EnumHandling.PreventSubsequent;
-							UpdateWorkpieceRenderer();
-							return true;
-						}
+						MarkDirty(true);
+						slot.MarkDirty();
+						handling = EnumHandling.PreventSubsequent;
+						UpdateWorkpieceRenderer();
+						return true;
 					}
 					return false;
 				}
@@ -339,7 +336,7 @@ namespace GlassMaking.Blocks
 		public bool OnBlockInteractStep(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection selection, ref EnumHandling handling)
 		{
 			handling = EnumHandling.PassThrough;
-			if(byPlayer.Entity.Controls.Sneak || byPlayer.Entity.Controls.Sprint || recipe == null)
+			if(byPlayer.Entity.Controls.Sprint || recipe == null)
 			{
 				CancelStartedStep(secondsUsed, world, byPlayer, selection);
 				return false;

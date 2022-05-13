@@ -494,7 +494,6 @@ namespace GlassMaking.Items
 
 			if(GetCurrentLitres(itemslot.Itemstack) >= CapacityLitres) return false;
 
-
 			var contentStack = props.WhenFilled.Stack.ResolvedItemstack.Clone();
 			var cprops = GetContainableProps(contentStack);
 			contentStack.StackSize = 999999;
@@ -534,7 +533,6 @@ namespace GlassMaking.Items
 				world.PlaySoundAt(props.FillSound, pos.X, pos.Y, pos.Z, null);
 			}
 		}
-
 
 		private bool SpillContents(ItemSlot containerSlot, EntityAgent byEntity, BlockSelection blockSel)
 		{
@@ -603,7 +601,6 @@ namespace GlassMaking.Items
 
 				byEntity.World.SpawnItemEntity(stack, blockSel.Position.ToVec3d().Add(blockSel.HitPosition));
 			}
-
 
 			int moved = splitStackAndPerformAction(byEntity, containerSlot, (stack) => { SetContent(stack, null); return contentStack.StackSize; });
 
@@ -867,8 +864,6 @@ namespace GlassMaking.Items
 					switch(prop.Type)
 					{
 						case EnumTransitionType.Perish:
-
-
 							if(transitionLevel > 0)
 							{
 								dsc.Append(comma + Lang.Get("{0}% spoiled", (int)Math.Round(transitionLevel * 100)));
@@ -893,7 +888,6 @@ namespace GlassMaking.Items
 							break;
 
 						case EnumTransitionType.Ripen:
-
 							if(transitionLevel > 0)
 							{
 								dsc.Append(comma + Lang.Get("{1:0.#} days left to ripen ({0}%)", (int)Math.Round(transitionLevel * 100), (state.TransitionHours - state.TransitionedHours) / Api.World.Calendar.HoursPerDay / ripenRate));

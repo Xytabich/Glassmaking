@@ -55,8 +55,8 @@ namespace GlassMaking.Workbench.ToolBehaviors
 				if(slot.Itemstack.StackSize <= 0)
 				{
 					slot.Itemstack = null;
-					slot.MarkDirty();
 				}
+				slot.MarkDirty();
 
 				if(ingredient.ReturnedStack != null)
 				{
@@ -69,15 +69,15 @@ namespace GlassMaking.Workbench.ToolBehaviors
 			}
 		}
 
-		private bool TryGetIngredient(IWorldAccessor world, JsonObject json, AssetLocation recipeCode, out CraftingRecipeIngredient item)
+		private bool TryGetIngredient(IWorldAccessor world, JsonObject json, AssetLocation recipeCode, out CraftingRecipeIngredient ingredient)
 		{
-			item = json?.AsObject<CraftingRecipeIngredient>(null, recipeCode.Domain);
-			if(item == null)
+			ingredient = json?.AsObject<CraftingRecipeIngredient>(null, recipeCode.Domain);
+			if(ingredient == null)
 			{
 				world.Logger.Log(EnumLogType.Warning, "Unable to use item in workbench recipe '{0}' because json is malformed", recipeCode);
 				return false;
 			}
-			return item.Resolve(world, "workbench recipe item");
+			return ingredient.Resolve(world, "workbench recipe item");
 		}
 
 		private bool TryGetItemSlot(IPlayer byPlayer, CraftingRecipeIngredient required, out ItemSlot slot)
