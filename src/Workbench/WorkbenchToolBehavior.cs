@@ -11,6 +11,8 @@ namespace GlassMaking.Workbench
 	/// </summary>
 	public abstract class WorkbenchToolBehavior
 	{
+		public abstract string toolCode { get; }
+
 		public virtual void OnLoaded(ICoreAPI api)
 		{
 		}

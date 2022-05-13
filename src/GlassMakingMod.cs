@@ -8,6 +8,7 @@ using GlassMaking.Items;
 using GlassMaking.TemporaryMetadata;
 using GlassMaking.ToolDescriptors;
 using GlassMaking.Workbench;
+using GlassMaking.Workbench.ToolBehaviors;
 using GlassMaking.Workbench.ToolDescriptors;
 using HarmonyLib;
 using Newtonsoft.Json;
@@ -119,6 +120,9 @@ namespace GlassMaking
 			descriptors.Add(new DryableToolDescriptor(this));
 			descriptors.Add(new IntakeToolDescriptor(this));
 			descriptors.Add(new BlowingToolDescriptor(this));
+
+			AddWorkbenchToolBehavior(new ItemUseBehavior(true));
+			AddWorkbenchToolBehavior(new ItemUseBehavior(false));
 		}
 
 		public override void StartServerSide(ICoreServerAPI api)
@@ -296,10 +300,10 @@ namespace GlassMaking
 			return null;
 		}
 
-		public void AddWorkbenchToolBehavior(string tool, WorkbenchToolBehavior behavior)
+		public void AddWorkbenchToolBehavior(WorkbenchToolBehavior behavior)
 		{
 			if(workbenchTools == null) workbenchTools = new Dictionary<string, WorkbenchToolBehavior>();
-			workbenchTools[tool.ToLowerInvariant()] = behavior;
+			workbenchTools[behavior.toolCode.ToLowerInvariant()] = behavior;
 		}
 
 		public WorkbenchToolBehavior GetWorkbenchToolBehavior(string tool)
