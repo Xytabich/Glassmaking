@@ -31,6 +31,8 @@ namespace GlassMaking.Workbench.ToolBehaviors
 
 		public override void OnUseComplete(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, WorkbenchRecipe recipe, int step)
 		{
+			if(Api.Side == EnumAppSide.Client) return;
+
 			if(!TryGetIngredient(world, recipe.Steps[step].Tools[toolCode], recipe.Code, out var ingredient))
 			{
 				return;

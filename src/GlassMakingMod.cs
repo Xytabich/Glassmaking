@@ -27,6 +27,7 @@ namespace GlassMaking
 	{
 		internal CachedItemRenderer itemsRenderer;
 
+		private ICoreAPI api;
 		private ICoreServerAPI sapi = null;
 		private ICoreClientAPI capi = null;
 		private RecipeRegistryDictionary<GlassBlowingRecipe> glassblowingRecipes;
@@ -53,6 +54,8 @@ namespace GlassMaking
 
 		public override void Start(ICoreAPI api)
 		{
+			this.api = api;
+
 			base.Start(api);
 
 			glassTypes = new Dictionary<AssetLocation, GlassTypeVariant>();
@@ -123,6 +126,7 @@ namespace GlassMaking
 
 			AddWorkbenchToolBehavior(new ItemUseBehavior(true));
 			AddWorkbenchToolBehavior(new ItemUseBehavior(false));
+			AddWorkbenchToolBehavior(new LiquidUseBehavior());
 		}
 
 		public override void StartServerSide(ICoreServerAPI api)
@@ -180,6 +184,13 @@ namespace GlassMaking
 			foreach(var descriptor in descriptors)
 			{
 				descriptor.OnUnloaded();
+			}
+			if(workbenchTools != null)
+			{
+				foreach(var pair in workbenchTools)
+				{
+					pair.Value.OnUnloaded();
+				}
 			}
 			if(capi != null)
 			{
@@ -427,6 +438,7 @@ namespace GlassMaking
 			{
 				descriptor.OnLoaded(capi);
 			}
+			InitWorkbenchTools();
 		}
 
 		private void OnSaveGameLoadedServer()
@@ -437,6 +449,7 @@ namespace GlassMaking
 			{
 				descriptor.OnLoaded(sapi);
 			}
+			InitWorkbenchTools();
 		}
 
 		private void RegisterGlassblowingRecipe(GlassBlowingRecipe r)
@@ -454,6 +467,17 @@ namespace GlassMaking
 			if(!workbenchRecipes.AddRecipe(r))
 			{
 				sapi.Logger.Error("Unable to add workbench recipe {0} with output {1} as a similar recipe has already been added", r.Code, r.Output.Code);
+			}
+		}
+
+		private void InitWorkbenchTools()
+		{
+			if(workbenchTools != null)
+			{
+				foreach(var pair in workbenchTools)
+				{
+					pair.Value.OnLoaded(api);
+				}
 			}
 		}
 	}
