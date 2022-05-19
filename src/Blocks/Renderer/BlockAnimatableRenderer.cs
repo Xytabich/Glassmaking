@@ -23,7 +23,6 @@ namespace GlassMaking.Blocks.Renderer
 
 		private BlockPos blockPos;
 		private Vec3f blockRot;
-		private ModelTransform transform;
 		private Matrixf transformMat = new Matrixf();
 
 		public BlockAnimatableRenderer(ICoreClientAPI capi, BlockPos blockPos, Vec3f blockRot, ModelTransform transform, AnimatorBase animator, MeshRef meshref, bool disposeMesh = true)
@@ -31,15 +30,13 @@ namespace GlassMaking.Blocks.Renderer
 			this.capi = capi;
 			this.blockPos = blockPos;
 			this.blockRot = blockRot;
-			this.transform = transform;
 			this.animator = animator;
 			this.meshref = meshref;
 			this.disposeMesh = disposeMesh;
 
 			if(blockRot == null) this.blockRot = new Vec3f();
-			if(transform == null) this.transform = ModelTransform.NoTransform;
 
-			transform.CopyTo(transformMat);
+			(transform ?? ModelTransform.NoTransform).CopyTo(transformMat);
 
 			textureId = capi.BlockTextureAtlas.AtlasTextureIds[0];
 
@@ -70,7 +67,8 @@ namespace GlassMaking.Blocks.Renderer
 
 			if(shadowPass)
 			{
-				prog.UniformMatrix("modelViewMatrix", Mat4f.Mul(new float[16], capi.Render.CurrentModelviewMatrix, ModelMat));
+				Mat4f.Mul(ModelMat, capi.Render.CurrentModelviewMatrix, ModelMat);
+				prog.UniformMatrix("modelViewMatrix", ModelMat);
 			}
 			else
 			{

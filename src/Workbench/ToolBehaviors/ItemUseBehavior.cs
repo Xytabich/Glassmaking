@@ -1,4 +1,5 @@
-﻿using Vintagestory.API.Common;
+﻿using Vintagestory.API.Client;
+using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
 
 namespace GlassMaking.Workbench.ToolBehaviors
@@ -69,6 +70,22 @@ namespace GlassMaking.Workbench.ToolBehaviors
 					}
 				}
 			}
+		}
+
+		public override WorldInteraction[] GetBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer, WorkbenchRecipe recipe, int step)
+		{
+			if(recipe != null && recipe.Steps[step].Tools.TryGetValue(toolCode, out var json))
+			{
+				if(TryGetIngredient(world, json, recipe.Code, out var ingredient))
+				{
+					return new WorldInteraction[] { new WorldInteraction() {
+						Itemstacks = new ItemStack[] { ingredient.ResolvedItemstack },
+						MouseButton = EnumMouseButton.Right,
+						ActionLangCode = "glassmaking:workbench-tool-item-use"
+					} };
+				}
+			}
+			return base.GetBlockInteractionHelp(world, selection, forPlayer, recipe, step);
 		}
 
 		private bool TryGetIngredient(IWorldAccessor world, JsonObject json, AssetLocation recipeCode, out CraftingRecipeIngredient ingredient)

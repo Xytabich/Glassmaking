@@ -206,6 +206,7 @@
     <Compile Include="src\Workbench\ToolBehaviors\ItemUseBehavior.cs" />
     <Compile Include="src\Workbench\ToolBehaviors\LatheToolBehavior.cs" />
     <Compile Include="src\Workbench\ToolBehaviors\LiquidUseBehavior.cs" />
+    <Compile Include="src\Workbench\ToolBehaviors\SimpleToolBehavior.cs" />
     <Compile Include="src\Workbench\ToolDescriptors\IWorkbenchToolDescriptor.cs" />
     <Compile Include="src\Workbench\WorkbenchToolBehavior.cs" />
     <Compile Include="src\Workbench\WorkbenchToolItemBehavior.cs" />

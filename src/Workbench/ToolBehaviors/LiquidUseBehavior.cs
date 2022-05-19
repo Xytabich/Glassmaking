@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
 using Vintagestory.GameContent;
@@ -44,6 +45,24 @@ namespace GlassMaking.Workbench.ToolBehaviors
 				source.TryTakeContent(slot.Itemstack, quantity);
 				slot.MarkDirty();
 			}
+		}
+
+		public override WorldInteraction[] GetBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer, WorkbenchRecipe recipe, int step)
+		{
+			if(recipe != null && recipe.Steps[step].Tools.TryGetValue(toolCode, out var json))
+			{
+				if(TryGetIngredient(world, json, recipe.Code, out var ingredient))
+				{
+					var itemStack = ingredient.type == EnumItemClass.Item ? new ItemStack(world.GetItem(ingredient.code)) : new ItemStack(world.GetBlock(ingredient.code));
+					itemStack.StackSize = (int)(BlockLiquidContainerBase.GetContainableProps(itemStack).ItemsPerLitre * ingredient.requiresLitres);
+					return new WorldInteraction[] { new WorldInteraction() {
+						Itemstacks = new ItemStack[] { itemStack },
+						MouseButton = EnumMouseButton.Right,
+						ActionLangCode = "glassmaking:workbench-tool-liquid-use"
+					} };
+				}
+			}
+			return base.GetBlockInteractionHelp(world, selection, forPlayer, recipe, step);
 		}
 
 		private bool TryGetIngredient(IWorldAccessor world, JsonObject json, AssetLocation recipeCode, out RequiredLiquid ingredient)

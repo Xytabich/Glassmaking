@@ -69,6 +69,11 @@ namespace GlassMaking.Blocks
 					UpdateToolBounds(i);
 				}
 			}
+			if(workpieceSlot.Empty)
+			{
+				recipe = null;
+				recipeStep = -1;
+			}
 			RebuildSelectionBoxes();
 			if(api.Side == EnumAppSide.Client)
 			{
@@ -443,6 +448,11 @@ namespace GlassMaking.Blocks
 						if(slotId < toolsCapacity) UpdateToolBounds(slotId);
 					}
 					RebuildSelectionBoxes();
+				}
+				if(workpieceSlot.Empty)
+				{
+					recipe = null;
+					recipeStep = -1;
 				}
 				UpdateWorkpieceRenderer();
 				UpdateIdleState();
