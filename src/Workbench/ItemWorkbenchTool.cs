@@ -1,10 +1,9 @@
-﻿using GlassMaking.Workbench;
-using Vintagestory.API.Common;
+﻿using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 
-namespace GlassMaking.Items
+namespace GlassMaking.Workbench
 {
-	public abstract class ItemWorkbenchTool : Item, IItemWorkbenchTool
+	public abstract class ItemWorkbenchTool : Item, ICollectibleWorkbenchTool
 	{
 		protected Cuboidf[] toolBoundingBoxes = null;
 
@@ -15,6 +14,6 @@ namespace GlassMaking.Items
 			return toolBoundingBoxes ?? (toolBoundingBoxes = Attributes?["workbenchToolBounds"].AsObject<Cuboidf[]>());
 		}
 
-		public abstract WorkbenchToolItemBehavior CreateToolBehavior(IWorldAccessor world, ItemStack itemStack, BlockEntity blockentity);
+		public abstract WorkbenchMountedToolBehavior CreateToolBehavior(IWorldAccessor world, ItemStack itemStack, BlockEntity blockentity);
 	}
 }

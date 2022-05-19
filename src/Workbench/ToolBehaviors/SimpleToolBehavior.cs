@@ -3,7 +3,7 @@ using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Workbench.ToolBehaviors
 {
-	public class SimpleToolBehavior : WorkbenchToolItemBehavior
+	public class SimpleToolBehavior : WorkbenchMountedToolBehavior
 	{
 		private AdvancedParticleProperties[] workParticles = null;
 		private long tickerId;

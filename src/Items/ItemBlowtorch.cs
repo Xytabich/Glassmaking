@@ -6,7 +6,7 @@ using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Items
 {
-	public class ItemBlowtorch : StrictLiquidContainer, IItemWorkbenchTool
+	public class ItemBlowtorch : StrictLiquidContainer, ICollectibleWorkbenchTool
 	{
 		public float consumptionPerSecond;
 		public float flameTemperature;
@@ -29,7 +29,7 @@ namespace GlassMaking.Items
 			return toolBoundingBoxes ?? (toolBoundingBoxes = Attributes?["workbenchToolBounds"].AsObject<Cuboidf[]>());
 		}
 
-		public WorkbenchToolItemBehavior CreateToolBehavior(IWorldAccessor world, ItemStack itemStack, BlockEntity blockentity)
+		public WorkbenchMountedToolBehavior CreateToolBehavior(IWorldAccessor world, ItemStack itemStack, BlockEntity blockentity)
 		{
 			return new BlowtorchToolBehavior(blockentity, GetToolBoundingBoxes(world, itemStack));
 		}

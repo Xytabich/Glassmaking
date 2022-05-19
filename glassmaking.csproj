@@ -147,13 +147,14 @@
     <Compile Include="src\Handbook\WorkbenchRecipeInfo.cs" />
     <Compile Include="src\ItemRender\CachedItemRenderer.cs" />
     <Compile Include="src\ItemRender\IItemRenderer.cs" />
+    <Compile Include="src\Items\Behavior\ItemBehaviorWorkbenchTool.cs" />
     <Compile Include="src\Items\GlassLadleRenderer.cs" />
     <Compile Include="src\Items\GlasspipeRenderer.cs" />
     <Compile Include="src\Common\GlassTypeProperty.cs" />
     <Compile Include="src\Common\GuiDialogItemRecipeSelector.cs" />
     <Compile Include="src\Items\GlassRenderUtil.cs" />
     <Compile Include="src\Items\GlassWorkpieceRenderer.cs" />
-    <Compile Include="src\Items\ItemBehaviorWorkbenchTool.cs" />
+    <Compile Include="src\Workbench\CollectibleBehaviorWorkbenchTool.cs" />
     <Compile Include="src\Items\ItemBlowtorch.cs" />
     <Compile Include="src\Items\ItemContainer.cs" />
     <Compile Include="src\Items\ItemGlassContainer.cs" />
@@ -178,14 +179,14 @@
     <Compile Include="src\Handbook\GlassblowingRecipeInfo.cs" />
     <Compile Include="src\Handbook\AnnealOutputInfo.cs" />
     <Compile Include="src\Handbook\AnnealRecipeInfo.cs" />
-    <Compile Include="src\Items\BehaviorGlassBlend.cs" />
+    <Compile Include="src\Items\Behavior\ItemBehaviorGlassBlend.cs" />
     <Compile Include="src\Items\ItemWettable.cs" />
     <Compile Include="src\TemporaryMetadata\IDisposableHandle.cs" />
     <Compile Include="src\TemporaryMetadata\ITemporaryMetadataPool.cs" />
     <Compile Include="src\TemporaryMetadata\TemporaryMetadataSystem.cs" />
     <Compile Include="src\ToolDescriptors\ToolBehaviorDescriptor.cs" />
     <Compile Include="src\ToolDescriptors\ToolUseDescriptor.cs" />
-    <Compile Include="src\Workbench\IItemWorkbenchTool.cs" />
+    <Compile Include="src\Workbench\ICollectibleWorkbenchTool.cs" />
     <Compile Include="src\Common\MinMaxFloat.cs" />
     <Compile Include="src\Common\RecipeRegistryDictionary.cs" />
     <Compile Include="src\Common\SimpleTextureSource.cs" />
@@ -201,7 +202,7 @@
     <Compile Include="src\Items\GlasspipeRenderUtil.cs" />
     <Compile Include="src\GlassblowingTools\BlowingTool.cs" />
     <Compile Include="src\GlassblowingTools\GlassIntakeTool.cs" />
-    <Compile Include="src\Items\ItemWorkbenchTool.cs" />
+    <Compile Include="src\Workbench\ItemWorkbenchTool.cs" />
     <Compile Include="src\Utils.cs" />
     <Compile Include="src\Workbench\ToolBehaviors\BlowtorchToolBehavior.cs" />
     <Compile Include="src\Workbench\ToolBehaviors\ItemUseBehavior.cs" />
@@ -210,7 +211,7 @@
     <Compile Include="src\Workbench\ToolBehaviors\SimpleToolBehavior.cs" />
     <Compile Include="src\Workbench\ToolDescriptors\IWorkbenchToolDescriptor.cs" />
     <Compile Include="src\Workbench\WorkbenchToolBehavior.cs" />
-    <Compile Include="src\Workbench\WorkbenchToolItemBehavior.cs" />
+    <Compile Include="src\Workbench\WorkbenchMountedToolBehavior.cs" />
     <Compile Include="src\Workbench\WorkbenchToolUtils.cs" />
   </ItemGroup>
   <ItemGroup>

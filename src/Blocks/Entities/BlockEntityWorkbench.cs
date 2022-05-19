@@ -477,10 +477,19 @@ namespace GlassMaking.Blocks
 			base.OnBlockRemoved();
 			if(recipe != null)
 			{
-				foreach(var pair in recipe.Steps[recipeStep].Tools)
+				var step = recipe.Steps[recipeStep];
+				foreach(var pair in step.Tools)
 				{
 					var beh = mod.GetWorkbenchToolBehavior(pair.Key);
-					if(beh != null) beh.OnBlockUnloaded(Api.World, Pos, recipe, recipeStep);
+					if(beh != null) beh.OnBlockUnloadedAtStep(Api.World, Pos, recipe, recipeStep);
+				}
+				for(int i = toolsCapacity - 1; i >= 0; i--)
+				{
+					var tool = inventory.GetBehavior(i);
+					if(tool != null && step.Tools.ContainsKey(tool.ToolCode))
+					{
+						tool.OnBlockUnloadedAtStep(Api.World, Pos, recipe, recipeStep);
+					}
 				}
 			}
 			for(int i = toolsCapacity - 1; i >= 0; i--)
@@ -498,10 +507,19 @@ namespace GlassMaking.Blocks
 			base.OnBlockUnloaded();
 			if(recipe != null)
 			{
-				foreach(var pair in recipe.Steps[recipeStep].Tools)
+				var step = recipe.Steps[recipeStep];
+				foreach(var pair in step.Tools)
 				{
 					var beh = mod.GetWorkbenchToolBehavior(pair.Key);
-					if(beh != null) beh.OnBlockUnloaded(Api.World, Pos, recipe, recipeStep);
+					if(beh != null) beh.OnBlockUnloadedAtStep(Api.World, Pos, recipe, recipeStep);
+				}
+				for(int i = toolsCapacity - 1; i >= 0; i--)
+				{
+					var tool = inventory.GetBehavior(i);
+					if(tool != null && step.Tools.ContainsKey(tool.ToolCode))
+					{
+						tool.OnBlockUnloadedAtStep(Api.World, Pos, recipe, recipeStep);
+					}
 				}
 			}
 			for(int i = toolsCapacity - 1; i >= 0; i--)

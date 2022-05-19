@@ -5,15 +5,14 @@ using Vintagestory.API.MathTools;
 namespace GlassMaking.Workbench
 {
 	/// <summary>
-	/// Describes the behavior of a tool that is not an item.
-	/// Those. some "built-in" behavior for the workbench.
+	/// Describes the behavior of a tool that is "embedded" to all workbenches.
 	/// Is a singleton, i.e. the instance is used for all workbenches at the same time.
 	/// </summary>
 	public abstract class WorkbenchToolBehavior
 	{
 		public ICoreAPI Api;
 
-		public abstract string toolCode { get; }
+		public abstract string ToolCode { get; }
 
 		public virtual void OnLoaded(ICoreAPI api)
 		{
@@ -43,14 +42,16 @@ namespace GlassMaking.Workbench
 		}
 
 		/// <summary>
-		/// Called when a recipe step has been completed. Here it is possible to consume items used in crafting, etc.
+		/// Called when a recipe step has been completed.
+		/// Here it is possible to consume items used in crafting, etc.
 		/// </summary>
 		public virtual void OnUseComplete(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, WorkbenchRecipe recipe, int step)
 		{
 		}
 
 		/// <summary>
-		/// Called when a craft was cancelled. But at the same time, <see cref="OnUseStart"/> may not be called on this behavior.
+		/// Called when a craft was cancelled.
+		/// Can be invoked even if <see cref="OnUseStart"/> has not been called before.
 		/// </summary>
 		public virtual void OnUseCancel(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, WorkbenchRecipe recipe, int step)
 		{
@@ -58,17 +59,17 @@ namespace GlassMaking.Workbench
 
 		/// <summary>
 		/// Returns hints for using this tool.
-		/// Called if this tool participates in the current recipe step.
+		/// This method will be called on a "embedded" tool, as long as it is part of a recipe.
 		/// </summary>
-		public virtual WorldInteraction[] GetBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer, WorkbenchRecipe recipe, int step)
+		public virtual WorldInteraction[] GetBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer, WorkbenchRecipe recipe = null, int step = 0)
 		{
 			return null;
 		}
 
 		/// <summary>
-		/// Called if the block was removed or unloaded while the current step of the recipe used (i.e. was in the tools list) this tool
+		/// Called if the block was removed or unloaded while the current step of the recipe used (i.e. was in the tools list) this tool.
 		/// </summary>
-		public virtual void OnBlockUnloaded(IWorldAccessor world, BlockPos pos, WorkbenchRecipe recipe, int step)
+		public virtual void OnBlockUnloadedAtStep(IWorldAccessor world, BlockPos pos, WorkbenchRecipe recipe, int step)
 		{
 		}
 	}

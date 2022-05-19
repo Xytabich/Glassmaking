@@ -11,7 +11,7 @@ using Vintagestory.GameContent;
 
 namespace GlassMaking.Workbench.ToolBehaviors
 {
-	public class LatheToolBehavior : WorkbenchToolItemBehavior
+	public class LatheToolBehavior : WorkbenchMountedToolBehavior
 	{
 		public const string CODE = "lathe";
 

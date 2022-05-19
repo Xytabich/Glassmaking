@@ -1,4 +1,5 @@
-﻿using GlassMaking.Blocks;
+﻿using GlassMaking.Behavior;
+using GlassMaking.Blocks;
 using GlassMaking.Blocks.Multiblock;
 using GlassMaking.Common;
 using GlassMaking.GlassblowingTools;
@@ -113,7 +114,7 @@ namespace GlassMaking
 			api.RegisterCollectibleBehaviorClass("glassmaking:gbt-blowing", typeof(BlowingTool));
 			api.RegisterCollectibleBehaviorClass("glassmaking:gbt-glassintake", typeof(GlassIntakeTool));
 
-			api.RegisterCollectibleBehaviorClass("glassmaking:glassblend", typeof(BehaviorGlassBlend));
+			api.RegisterCollectibleBehaviorClass("glassmaking:glassblend", typeof(ItemBehaviorGlassBlend));
 
 			glassblowingRecipes = api.RegisterRecipeRegistry<RecipeRegistryDictionary<GlassBlowingRecipe>>("glassblowing");
 			workbenchRecipes = api.RegisterRecipeRegistry<RecipeRegistryDictionary<WorkbenchRecipe>>("glassworkbench");
@@ -314,7 +315,7 @@ namespace GlassMaking
 		public void AddWorkbenchToolBehavior(WorkbenchToolBehavior behavior)
 		{
 			if(workbenchTools == null) workbenchTools = new Dictionary<string, WorkbenchToolBehavior>();
-			workbenchTools[behavior.toolCode.ToLowerInvariant()] = behavior;
+			workbenchTools[behavior.ToolCode.ToLowerInvariant()] = behavior;
 		}
 
 		public WorkbenchToolBehavior GetWorkbenchToolBehavior(string tool)

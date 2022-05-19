@@ -3,11 +3,11 @@ using System.Text;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 
-namespace GlassMaking.Items
+namespace GlassMaking.Behavior
 {
-	public class BehaviorGlassBlend : CollectibleBehavior
+	public class ItemBehaviorGlassBlend : CollectibleBehavior
 	{
-		public BehaviorGlassBlend(CollectibleObject collObj) : base(collObj)
+		public ItemBehaviorGlassBlend(CollectibleObject collObj) : base(collObj)
 		{
 		}
 

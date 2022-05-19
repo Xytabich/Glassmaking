@@ -8,11 +8,11 @@ namespace GlassMaking.Workbench.ToolBehaviors
 {
 	public class LiquidUseBehavior : WorkbenchToolBehavior
 	{
-		public override string toolCode => "liquid";
+		public override string ToolCode => "liquid";
 
 		public override bool OnUseStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, WorkbenchRecipe recipe, int step)
 		{
-			if(!TryGetIngredient(world, recipe.Steps[step].Tools[toolCode], recipe.Code, out var item))
+			if(!TryGetIngredient(world, recipe.Steps[step].Tools[ToolCode], recipe.Code, out var item))
 			{
 				return false;
 			}
@@ -22,7 +22,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 
 		public override bool OnUseStep(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, WorkbenchRecipe recipe, int step)
 		{
-			if(!TryGetIngredient(world, recipe.Steps[step].Tools[toolCode], recipe.Code, out var item))
+			if(!TryGetIngredient(world, recipe.Steps[step].Tools[ToolCode], recipe.Code, out var item))
 			{
 				return false;
 			}
@@ -34,7 +34,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 		{
 			if(Api.Side == EnumAppSide.Client) return;
 
-			if(!TryGetIngredient(world, recipe.Steps[step].Tools[toolCode], recipe.Code, out var ingredient))
+			if(!TryGetIngredient(world, recipe.Steps[step].Tools[ToolCode], recipe.Code, out var ingredient))
 			{
 				return;
 			}
@@ -49,7 +49,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 
 		public override WorldInteraction[] GetBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer, WorkbenchRecipe recipe, int step)
 		{
-			if(recipe != null && recipe.Steps[step].Tools.TryGetValue(toolCode, out var json))
+			if(recipe != null && recipe.Steps[step].Tools.TryGetValue(ToolCode, out var json))
 			{
 				if(TryGetIngredient(world, json, recipe.Code, out var ingredient))
 				{

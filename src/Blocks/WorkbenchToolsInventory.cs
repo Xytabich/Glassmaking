@@ -13,7 +13,7 @@ namespace GlassMaking.Blocks
 		public FastList<int> modifiedSlots = new FastList<int>();
 
 		protected ItemSlot[] slots;
-		protected WorkbenchToolItemBehavior[] behaviors;
+		protected WorkbenchMountedToolBehavior[] behaviors;
 		protected BlockEntity blockentity;
 
 		private int toolsCount;
@@ -25,7 +25,7 @@ namespace GlassMaking.Blocks
 			slots = GenEmptySlots(quantitySlots);
 			cachedAttributes = new IAttribute[quantitySlots];
 			toolsCount = quantitySlots - 1;
-			behaviors = new WorkbenchToolItemBehavior[toolsCount];
+			behaviors = new WorkbenchMountedToolBehavior[toolsCount];
 		}
 
 		public WorkbenchToolsInventory(int quantitySlots, string inventoryID, ICoreAPI api, BlockEntity blockentity) : base(inventoryID, api)
@@ -34,7 +34,7 @@ namespace GlassMaking.Blocks
 			slots = GenEmptySlots(quantitySlots);
 			cachedAttributes = new IAttribute[quantitySlots];
 			toolsCount = quantitySlots - 1;
-			behaviors = new WorkbenchToolItemBehavior[toolsCount];
+			behaviors = new WorkbenchMountedToolBehavior[toolsCount];
 		}
 
 		public override ItemSlot this[int slotId]
@@ -57,7 +57,7 @@ namespace GlassMaking.Blocks
 			}
 		}
 
-		public WorkbenchToolItemBehavior GetBehavior(int slotId)
+		public WorkbenchMountedToolBehavior GetBehavior(int slotId)
 		{
 			return behaviors[slotId];
 		}

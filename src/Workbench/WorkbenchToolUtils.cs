@@ -6,20 +6,20 @@ namespace GlassMaking.Workbench
 	{
 		public static bool IsTool(CollectibleObject collectible)
 		{
-			if(collectible is IItemWorkbenchTool) return true;
+			if(collectible is ICollectibleWorkbenchTool) return true;
 			foreach(var beh in collectible.CollectibleBehaviors)
 			{
-				if(beh is IItemWorkbenchTool) return true;
+				if(beh is ICollectibleWorkbenchTool) return true;
 			}
 			return false;
 		}
 
-		public static bool TryGetTool(CollectibleObject collectible, out IItemWorkbenchTool tool)
+		public static bool TryGetTool(CollectibleObject collectible, out ICollectibleWorkbenchTool tool)
 		{
-			if((tool = collectible as IItemWorkbenchTool) != null) return true;
+			if((tool = collectible as ICollectibleWorkbenchTool) != null) return true;
 			foreach(var beh in collectible.CollectibleBehaviors)
 			{
-				if((tool = beh as IItemWorkbenchTool) != null) return true;
+				if((tool = beh as ICollectibleWorkbenchTool) != null) return true;
 			}
 			return false;
 		}

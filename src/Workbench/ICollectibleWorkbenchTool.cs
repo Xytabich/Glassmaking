@@ -3,12 +3,12 @@ using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Workbench
 {
-	public interface IItemWorkbenchTool
+	public interface ICollectibleWorkbenchTool
 	{
 		string GetToolCode(IWorldAccessor world, ItemStack itemStack);
 
 		Cuboidf[] GetToolBoundingBoxes(IWorldAccessor world, ItemStack itemStack);
 
-		WorkbenchToolItemBehavior CreateToolBehavior(IWorldAccessor world, ItemStack itemStack, BlockEntity blockentity);
+		WorkbenchMountedToolBehavior CreateToolBehavior(IWorldAccessor world, ItemStack itemStack, BlockEntity blockentity);
 	}
 }
