@@ -3,7 +3,7 @@ using System.Text;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 
-namespace GlassMaking.Behavior
+namespace GlassMaking.Items.Behavior
 {
 	public class ItemBehaviorGlassBlend : CollectibleBehavior
 	{

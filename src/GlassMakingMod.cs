@@ -1,11 +1,11 @@
-﻿using GlassMaking.Behavior;
-using GlassMaking.Blocks;
+﻿using GlassMaking.Blocks;
 using GlassMaking.Blocks.Multiblock;
 using GlassMaking.Common;
 using GlassMaking.GlassblowingTools;
 using GlassMaking.Handbook;
 using GlassMaking.ItemRender;
 using GlassMaking.Items;
+using GlassMaking.Items.Behavior;
 using GlassMaking.TemporaryMetadata;
 using GlassMaking.ToolDescriptors;
 using GlassMaking.Workbench;
@@ -115,6 +115,7 @@ namespace GlassMaking
 			api.RegisterCollectibleBehaviorClass("glassmaking:gbt-glassintake", typeof(GlassIntakeTool));
 
 			api.RegisterCollectibleBehaviorClass("glassmaking:glassblend", typeof(ItemBehaviorGlassBlend));
+			api.RegisterCollectibleBehaviorClass("glassmaking:workbenchtool", typeof(ItemBehaviorWorkbenchTool));
 
 			glassblowingRecipes = api.RegisterRecipeRegistry<RecipeRegistryDictionary<GlassBlowingRecipe>>("glassblowing");
 			workbenchRecipes = api.RegisterRecipeRegistry<RecipeRegistryDictionary<WorkbenchRecipe>>("glassworkbench");
