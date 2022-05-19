@@ -153,6 +153,7 @@
     <Compile Include="src\Common\GuiDialogItemRecipeSelector.cs" />
     <Compile Include="src\Items\GlassRenderUtil.cs" />
     <Compile Include="src\Items\GlassWorkpieceRenderer.cs" />
+    <Compile Include="src\Items\ItemBehaviorWorkbenchTool.cs" />
     <Compile Include="src\Items\ItemBlowtorch.cs" />
     <Compile Include="src\Items\ItemContainer.cs" />
     <Compile Include="src\Items\ItemGlassContainer.cs" />
@@ -210,6 +211,7 @@
     <Compile Include="src\Workbench\ToolDescriptors\IWorkbenchToolDescriptor.cs" />
     <Compile Include="src\Workbench\WorkbenchToolBehavior.cs" />
     <Compile Include="src\Workbench\WorkbenchToolItemBehavior.cs" />
+    <Compile Include="src\Workbench\WorkbenchToolUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="assets\**\*.*" />

@@ -599,7 +599,7 @@ namespace GlassMaking.Blocks
 
 		private bool TryAddTool(IPlayer byPlayer, ItemSlot slot)
 		{
-			if(!(slot.Itemstack.Collectible is IItemWorkbenchTool tool)) return false;
+			if(!WorkbenchToolUtils.TryGetTool(slot.Itemstack.Collectible, out var tool)) return false;
 			var world = byPlayer.Entity.World;
 			var boxes = GetRotatedBoxes(tool.GetToolBoundingBoxes(world, slot.Itemstack), Block.Shape.rotateY);
 			for(int i = toolsCapacity - 1; i >= 0; i--)

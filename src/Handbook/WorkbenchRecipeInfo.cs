@@ -96,14 +96,14 @@ namespace GlassMaking.Handbook
 				var itemsByToolCode = new Dictionary<string, IReadOnlyList<ItemStack>>();
 				foreach(var obj in capi.World.Collectibles)
 				{
-					if(obj is IItemWorkbenchTool)
+					if(WorkbenchToolUtils.IsTool(obj))
 					{
 						var list = obj.GetHandBookStacks(capi);
 						if(list != null)
 						{
 							foreach(var item in list)
 							{
-								if(item.Collectible is IItemWorkbenchTool tool)
+								if(WorkbenchToolUtils.TryGetTool(item.Collectible, out var tool))
 								{
 									var code = tool.GetToolCode(capi.World, item);
 									if(!itemsByToolCode.TryGetValue(code, out var items))

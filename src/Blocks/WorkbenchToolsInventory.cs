@@ -70,7 +70,7 @@ namespace GlassMaking.Blocks
 				behaviors[slotId] = null;
 			}
 			slots[slotId].Itemstack = itemStack;
-			if(itemStack?.Collectible is IItemWorkbenchTool tool)
+			if(WorkbenchToolUtils.TryGetTool(itemStack?.Collectible, out var tool))
 			{
 				behaviors[slotId] = tool.CreateToolBehavior(Api.World, itemStack, blockentity);
 				behaviors[slotId].OnLoaded(Api, slots[slotId]);
@@ -82,7 +82,7 @@ namespace GlassMaking.Blocks
 			base.LateInitialize(inventoryID, api);
 			for(int i = 0; i < toolsCount; i++)
 			{
-				if(!slots[i].Empty && slots[i].Itemstack.Collectible is IItemWorkbenchTool tool)
+				if(!slots[i].Empty && WorkbenchToolUtils.TryGetTool(slots[i].Itemstack.Collectible, out var tool))
 				{
 					behaviors[i] = tool.CreateToolBehavior(Api.World, slots[i].Itemstack, blockentity);
 					behaviors[i].OnLoaded(api, slots[i]);
@@ -131,7 +131,7 @@ namespace GlassMaking.Blocks
 
 					slots[i].Itemstack = newstack;
 
-					if(isModified && newstack != null && newstack.Collectible is IItemWorkbenchTool tool)
+					if(isModified && newstack != null && WorkbenchToolUtils.TryGetTool(newstack.Collectible, out var tool))
 					{
 						behaviors[i] = tool.CreateToolBehavior(Api.World, newstack, blockentity);
 						behaviors[i].OnLoaded(Api, slots[i]);
