@@ -172,6 +172,10 @@ namespace GlassMaking
 			handbookInfoList.Add(new WorkbenchRecipeInfo(this));
 			handbookInfoList.Add(new MultiblockPlanMaterials());
 
+			AddWorkbenchToolDescriptor(ItemUseBehavior.CODE, new ItemUseDescriptor());
+			AddWorkbenchToolDescriptor(ItemUseBehavior.OTHER_CODE, new ItemUseDescriptor());
+			AddWorkbenchToolDescriptor(LiquidUseBehavior.CODE, new LiquidUseDescriptor());
+
 			blowingMolds = new List<Block>();
 			castingMolds = new List<Block>();
 			blowingMoldsOutput = new HashSet<AssetLocation>();

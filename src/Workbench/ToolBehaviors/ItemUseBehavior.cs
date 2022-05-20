@@ -11,8 +11,11 @@ namespace GlassMaking.Workbench.ToolBehaviors
 
 		public override string ToolCode { get; }
 
+		private bool isOther;
+
 		public ItemUseBehavior(bool isOther)
 		{
+			this.isOther = isOther;
 			this.ToolCode = (isOther ? OTHER_CODE : CODE).ToLowerInvariant();
 		}
 
@@ -102,23 +105,23 @@ namespace GlassMaking.Workbench.ToolBehaviors
 		private bool TryGetItemSlot(IPlayer byPlayer, CraftingRecipeIngredient required, out ItemSlot slot)
 		{
 			ItemStack item;
-			if(ToolCode == CODE)
+			if(isOther)
 			{
-				slot = byPlayer.InventoryManager?.ActiveHotbarSlot;
+				slot = byPlayer.Entity?.RightHandItemSlot;
 				item = slot?.Itemstack;
 				if(item != null && required.SatisfiesAsIngredient(item)) return true;
 
-				slot = byPlayer.Entity?.RightHandItemSlot;
+				slot = byPlayer.InventoryManager?.ActiveHotbarSlot;
 				item = slot?.Itemstack;
 				if(item != null && required.SatisfiesAsIngredient(item)) return true;
 			}
 			else
 			{
-				slot = byPlayer.Entity?.RightHandItemSlot;
+				slot = byPlayer.InventoryManager?.ActiveHotbarSlot;
 				item = slot?.Itemstack;
 				if(item != null && required.SatisfiesAsIngredient(item)) return true;
 
-				slot = byPlayer.InventoryManager?.ActiveHotbarSlot;
+				slot = byPlayer.Entity?.RightHandItemSlot;
 				item = slot?.Itemstack;
 				if(item != null && required.SatisfiesAsIngredient(item)) return true;
 			}

@@ -8,7 +8,9 @@ namespace GlassMaking.Workbench.ToolBehaviors
 {
 	public class LiquidUseBehavior : WorkbenchToolBehavior
 	{
-		public override string ToolCode => "liquid";
+		public const string CODE = "liquid";
+
+		public override string ToolCode => CODE;
 
 		public override bool OnUseStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, WorkbenchRecipe recipe, int step)
 		{
@@ -95,7 +97,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 		}
 
 		[JsonObject]
-		private class RequiredLiquid
+		public sealed class RequiredLiquid
 		{
 			[JsonProperty(Required = Required.Always)]
 			public AssetLocation code;

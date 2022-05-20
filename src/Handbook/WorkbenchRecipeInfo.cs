@@ -80,7 +80,7 @@ namespace GlassMaking.Handbook
 							}
 							else
 							{
-								descriptor.GetStepInfoForHandbook(capi, itemstack, recipe, j, openDetailPageFor, outComponents);
+								descriptor.GetStepInfoForHandbook(capi, itemstack, recipe, j, pair.Value, openDetailPageFor, outComponents);
 							}
 							outComponents.Add(new ClearFloatTextComponent(capi));
 						}
