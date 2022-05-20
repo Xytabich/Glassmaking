@@ -35,7 +35,7 @@
 		"latheViseMaxSize": 0.1875
 	},
 	"shape": { "base": "item/workbench/lathe" },
-	"heldTpIdleAnimation": "holdinglanternrighthand",
+	"heldTpIdleAnimation": "holdbothhandslarge",
 	"creativeinventory": {
 		"general": [ "*" ],
 		"items": [ "*" ],
@@ -44,16 +44,16 @@
 	"maxstacksize": 1,
 	"guiTransform": {
 		"rotation": {
-			"x": -75,
-			"y": -125,
-			"z": 125
+			"x": -35,
+			"y": 120,
+			"z": 180
 		},
 		"origin": {
-			"x": 0.5,
-			"y": 0.3,
-			"z": 0.35
+			"x": 0.45,
+			"y": 0.45,
+			"z": 0.45
 		},
-		"scale": 1.3
+		"scale": 1.9
 	},
 	"fpHandTransform": {
 		"translation": {
@@ -62,31 +62,28 @@
 			"z": 0
 		},
 		"rotation": {
-			"x": 0,
+			"x": 5,
 			"y": -160,
-			"z": 0
+			"z": -5
 		},
 		"origin": {
 			"x": 0.5,
-			"y": 0.25,
-			"z": 0.35
-		}
+			"y": 0.3,
+			"z": 0.4
+		},
+		"scale": 2.01
 	},
 	"tpHandTransform": {
 		"translation": {
-			"x": -1.6,
-			"y": -1.4,
-			"z": -1
+			"x": -0.8,
+			"y": -0.75,
+			"z": -0.4
 		},
 		"rotation": {
-			"x": -95,
-			"y": 0,
-			"z": -100
+			"x": 15,
+			"y": 15,
+			"z": -70
 		},
-		"origin": {
-			"x": 0.5,
-			"y": 0.25,
-			"z": 0.35
-		}
+		"scale": 0.75
 	}
 }

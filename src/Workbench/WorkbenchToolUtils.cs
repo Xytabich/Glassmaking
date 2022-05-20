@@ -16,6 +16,12 @@ namespace GlassMaking.Workbench
 
 		public static bool TryGetTool(CollectibleObject collectible, out ICollectibleWorkbenchTool tool)
 		{
+			if(collectible == null)
+			{
+				tool = null;
+				return false;
+			}
+
 			if((tool = collectible as ICollectibleWorkbenchTool) != null) return true;
 			foreach(var beh in collectible.CollectibleBehaviors)
 			{
