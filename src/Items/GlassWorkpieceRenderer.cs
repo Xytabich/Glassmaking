@@ -1,4 +1,5 @@
 ﻿using GlassMaking.ItemRender;
+using System.Collections.Generic;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
@@ -16,13 +17,21 @@ namespace GlassMaking.Items
 
 		private ICoreClientAPI capi;
 		private ITextureAtlasAPI curAtlas;
+		private Dictionary<string, CompositeTexture> nowTesselatingTextures;
 		private Shape nowTesselatingShape;
 
 		public virtual TextureAtlasPosition this[string textureCode]
 		{
 			get
 			{
-				if(!nowTesselatingShape.Textures.TryGetValue(textureCode, out var texturePath))
+				AssetLocation texturePath = null;
+
+				if(nowTesselatingTextures != null && nowTesselatingTextures.TryGetValue(textureCode, out var comp))
+				{
+					texturePath = comp.Base;
+				}
+
+				if(texturePath == null && !nowTesselatingShape.Textures.TryGetValue(textureCode, out texturePath))
 				{
 					texturePath = new AssetLocation(textureCode);
 				}
@@ -41,7 +50,7 @@ namespace GlassMaking.Items
 			this.code = data.code;
 			this.step = data.step;
 
-			var mesh = GenMesh(capi, itemStack, data.recipe.Steps[data.step].Shape, capi.ItemTextureAtlas);
+			var mesh = GenMesh(capi, data.recipe, data.step, capi.ItemTextureAtlas);
 
 			if(meshRef != null) meshRef.Dispose();
 			meshRef = capi.Render.UploadMesh(mesh);
@@ -62,16 +71,34 @@ namespace GlassMaking.Items
 			}
 		}
 
-		private MeshData GenMesh(ICoreClientAPI capi, ItemStack itemstack, CompositeShape shape, ITextureAtlasAPI targetAtlas)
+		private MeshData GenMesh(ICoreClientAPI capi, WorkbenchRecipe recipe, int step, ITextureAtlasAPI targetAtlas)
 		{
 			this.capi = capi;
 			curAtlas = targetAtlas;
-			nowTesselatingShape = capi.TesselatorManager.GetCachedShape(shape.Base);
+			nowTesselatingTextures = null;
+			CompositeShape shape = null;
+			for(int i = step - 1; i >= 0; i--)
+			{
+				if(nowTesselatingTextures == null)
+				{
+					nowTesselatingTextures = recipe.Steps[i].Textures;
+				}
+				if(shape == null)
+				{
+					shape = recipe.Steps[i].Shape;
+					if(shape != null) break;
+				}
+			}
+			if(shape != null)
+			{
+				nowTesselatingShape = capi.Assets.TryGet(new AssetLocation(shape.Base.Domain, "shapes/" + shape.Base.Path + ".json")).ToObject<Shape>();
+			}
 
 			MeshData meshdata;
-			capi.Tesselator.TesselateItem(itemstack.Item, out meshdata, this);
+			capi.Tesselator.TesselateShape("glassmaking:glass-workpiece", nowTesselatingShape, out meshdata, this);
 
 			nowTesselatingShape = null;
+			nowTesselatingTextures = null;
 			curAtlas = null;
 			this.capi = null;
 
@@ -92,6 +119,7 @@ namespace GlassMaking.Items
 				}
 				else
 				{
+					texpos = curAtlas.UnknownTexturePosition;
 					capi.World.Logger.Warning("Workpiece defined texture {0}, not no such texture found.", texturePath);
 				}
 			}

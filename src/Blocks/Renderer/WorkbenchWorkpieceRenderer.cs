@@ -35,7 +35,7 @@ namespace GlassMaking.Blocks.Renderer
 
 		public void OnRenderFrame(float deltaTime, EnumRenderStage stage)
 		{
-			if(renderInfo != null && renderInfo.ModelRef != null)
+			if(renderInfo?.ModelRef?.Disposed == false)
 			{
 				IRenderAPI rapi = api.Render;
 				rapi.GlToggleBlend(true);

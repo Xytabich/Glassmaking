@@ -311,6 +311,7 @@ namespace GlassMaking.Blocks
 				}
 				else
 				{
+					texpos = capi.BlockTextureAtlas.UnknownTexturePosition;
 					capi.World.Logger.Warning("For render in block " + Block.Code + ", item {0} defined texture {1}, not no such texture found.", nowTesselatingObj.Code, texturePath);
 				}
 			}

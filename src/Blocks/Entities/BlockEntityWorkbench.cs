@@ -265,6 +265,11 @@ namespace GlassMaking.Blocks
 									}
 								}
 							}
+							else
+							{
+								handling = EnumHandling.PreventSubsequent;
+								return true;
+							}
 						}
 						else if(Api.Side == EnumAppSide.Client)
 						{

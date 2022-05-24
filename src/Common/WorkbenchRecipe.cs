@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.Util;
@@ -187,7 +188,29 @@ namespace GlassMaking
 			public void FillPlaceHolder(string key, string value)
 			{
 				recipe.Output.FillPlaceHolder(key, value);
-				recipe.Code = recipe.Code.CopyWithPath(recipe.Code.Path.Replace("{" + key + "}", value));
+				var wkey = "{" + key + "}";
+				recipe.Code = recipe.Code.CopyWithPath(recipe.Code.Path.Replace(wkey, value));
+				foreach(var step in recipe.Steps)
+				{
+					if(step.Shape != null)
+					{
+						step.Shape.Base = step.Shape.Base.CopyWithPath(step.Shape.Base.Path.Replace(wkey, value));
+					}
+					if(step.Textures != null)
+					{
+						foreach(var texture in step.Textures)
+						{
+							if(texture.Value.Base != null)
+							{
+								texture.Value.Base = texture.Value.Base.CopyWithPath(texture.Value.Base.Path.Replace(wkey, value));
+							}
+						}
+					}
+					foreach(var tool in step.Tools)
+					{
+						tool.Value?.FillPlaceHolder(key, value);
+					}
+				}
 			}
 		}
 	}
@@ -196,9 +219,10 @@ namespace GlassMaking
 	public sealed class WorkbenchRecipeStep
 	{
 		[JsonProperty]
-		public CompositeShape Shape;
+		public CompositeShape Shape = null;
 
-		//TODO: textures with wildcard
+		[JsonProperty]
+		public Dictionary<string, CompositeTexture> Textures = null;
 
 		[JsonProperty(Required = Required.Always, ItemConverterType = typeof(JsonAttributesConverter))]
 		public Dictionary<string, JsonObject> Tools;
@@ -223,6 +247,17 @@ namespace GlassMaking
 				writer.Write((byte)Shape.Format);
 				writer.Write(Shape.VoxelizeTexture);
 				writer.Write(Shape.QuantityElements ?? 0);
+			}
+
+			writer.Write(Textures != null);
+			if(Textures != null)
+			{
+				writer.Write(Textures.Count);
+				foreach(var texture in Textures)
+				{
+					writer.Write(texture.Key);
+					writer.Write(texture.Value?.Base ?? new AssetLocation(""));
+				}
 			}
 
 			writer.Write(Tools.Count);
@@ -255,7 +290,20 @@ namespace GlassMaking
 				Shape.VoxelizeTexture = reader.ReadBoolean();
 				Shape.QuantityElements = reader.ReadInt32();
 			}
-			int count = reader.ReadInt32();
+
+			int count;
+			if(reader.ReadBoolean())
+			{
+				count = reader.ReadInt32();
+				Textures = new Dictionary<string, CompositeTexture>(count);
+				for(int i = 0; i < count; i++)
+				{
+					var key = reader.ReadString();
+					Textures[key] = new CompositeTexture(reader.ReadAssetLocation());
+				}
+			}
+
+			count = reader.ReadInt32();
 			Tools = new Dictionary<string, JsonObject>(count);
 			for(int i = 0; i < count; i++)
 			{
@@ -280,7 +328,8 @@ namespace GlassMaking
 		public WorkbenchRecipeStep Clone()
 		{
 			return new WorkbenchRecipeStep() {
-				Shape = Shape.Clone(),
+				Shape = Shape?.Clone(),
+				Textures = Textures?.Select(pair => new KeyValuePair<string, CompositeTexture>(pair.Key, pair.Value?.Clone())).ToDictionary(pair => pair.Key, pair => pair.Value),
 				Tools = Tools.Select(pair => new KeyValuePair<string, JsonObject>(pair.Key, pair.Value?.Clone())).ToDictionary(pair => pair.Key, pair => pair.Value),
 				UseTime = UseTime
 			};

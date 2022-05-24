@@ -147,6 +147,7 @@ namespace GlassMaking.Items
 				}
 				else
 				{
+					texpos = curAtlas.UnknownTexturePosition;
 					capi.World.Logger.Warning("Item {0} defined texture {1}, not no such texture found.", Code, texturePath);
 				}
 			}

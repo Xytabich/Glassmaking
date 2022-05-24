@@ -76,6 +76,7 @@ namespace GlassMaking.Common
 				}
 				else
 				{
+					texpos = atlas.UnknownTexturePosition;
 					capi.World.Logger.Warning("Item {0} defined texture {1}, but no such texture was found.", collectible.Code, texturePath);
 				}
 			}
