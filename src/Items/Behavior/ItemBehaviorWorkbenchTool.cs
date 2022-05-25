@@ -21,6 +21,16 @@ namespace GlassMaking.Items.Behavior
 			isTool = properties["isTool"].AsBool(false);
 		}
 
+		public override void OnLoaded(ICoreAPI api)
+		{
+			base.OnLoaded(api);
+			if(string.IsNullOrEmpty(toolCode))
+			{
+				api.World.Logger.Warning(string.Format("Item {0} does not contain a tool code, specify it for the tool to work correctly.", collObj.Code));
+				toolCode = collObj.Code.ToShortString();
+			}
+		}
+
 		public override string GetToolCode(IWorldAccessor world, ItemStack itemStack)
 		{
 			return toolCode;

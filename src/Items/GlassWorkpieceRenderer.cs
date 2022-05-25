@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
+using Vintagestory.API.Util;
 
 namespace GlassMaking.Items
 {
@@ -91,7 +92,12 @@ namespace GlassMaking.Items
 			}
 			if(shape != null)
 			{
-				nowTesselatingShape = capi.Assets.TryGet(new AssetLocation(shape.Base.Domain, "shapes/" + shape.Base.Path + ".json")).ToObject<Shape>();
+				var shapesCache = ObjectCacheUtil.GetOrCreate(capi, "glassmaking:workbenchrecipeshapes", () => new Dictionary<AssetLocation, Shape>());
+				if(!shapesCache.TryGetValue(shape.Base, out nowTesselatingShape))
+				{
+					nowTesselatingShape = capi.Assets.TryGet(new AssetLocation(shape.Base.Domain, "shapes/" + shape.Base.Path + ".json")).ToObject<Shape>();
+					shapesCache[shape.Base] = nowTesselatingShape;
+				}
 			}
 
 			MeshData meshdata;
