@@ -589,13 +589,15 @@ namespace GlassMaking.Blocks
 
 		private MeshData GenItemMesh(ItemStack stack)
 		{
+			if(stack.Collectible is IWorkbenchCustomRenderer) return null;
+
 			MeshData mesh;
 			var dynBlock = stack.Collectible as IContainedMeshSource;
 
 			if(dynBlock != null)
 			{
 				mesh = dynBlock.GenMesh(stack, capi.BlockTextureAtlas, Pos);
-				if(mesh != null) mesh.Rotate(new Vec3f(0.5f, 0.5f, 0.5f), 0, Block.Shape.rotateY * GameMath.DEG2RAD, 0);
+				mesh.Rotate(new Vec3f(0.5f, 0.5f, 0.5f), 0, Block.Shape.rotateY * GameMath.DEG2RAD, 0);
 			}
 			else
 			{

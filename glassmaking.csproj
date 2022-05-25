@@ -137,6 +137,7 @@
     <Compile Include="src\Common\GlassBlend.cs" />
     <Compile Include="src\Common\GlassBlowingRecipe.cs" />
     <Compile Include="src\Common\BlowingMoldRecipe.cs" />
+    <Compile Include="src\Workbench\IWorkbenchCustomRenderer.cs" />
     <Compile Include="src\Common\IWettable.cs" />
     <Compile Include="src\Common\ValueGraph.cs" />
     <Compile Include="src\GlassblowingTools\DryableTool.cs" />

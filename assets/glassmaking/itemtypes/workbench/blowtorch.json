@@ -1,7 +1,33 @@
 {
 	"code": "blowtorch",
 	"class": "glassmaking:blowtorch",
+	"behaviors": [
+		{
+			"name": "GroundStorable",
+			"properties": {
+				"layout": "Quadrants",
+				"collisionBox": {
+					"x1": 0,
+					"y1": 0,
+					"z1": 0,
+					"x2": 1,
+					"y2": 0.2,
+					"z2": 1
+				}
+			}
+		}
+	],
 	"attributes": {
+		"groundStorageTransform": {
+			"translation": { "z": 0.05 },
+			"rotation": { "y": 35 },
+			"origin": {
+				"x": 0.5,
+				"y": 0,
+				"z": 0.5
+			},
+			"scale": 0.56
+		},
 		"allowedLiquids": [
 			{
 				"code": "game:alcoholportion",

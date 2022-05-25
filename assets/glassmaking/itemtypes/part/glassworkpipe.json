@@ -4,14 +4,13 @@
 		{
 			"name": "GroundStorable",
 			"properties": {
-				"layout": "Halves",
 				"collisionBox": {
 					"x1": 0,
 					"y1": 0,
-					"z1": 0,
+					"z1": -0.25,
 					"x2": 1,
 					"y2": 0.125,
-					"z2": 1
+					"z2": 1.25
 				}
 			}
 		}
@@ -19,21 +18,21 @@
 	"attributes": {
 		"groundStorageTransform": {
 			"translation": {
-				"x": 0.1,
-				"y": 0.01,
-				"z": -0.2
+				"x": 0,
+				"y": 0,
+				"z": -0.175
 			},
 			"rotation": {
 				"x": 0,
-				"y": 3,
+				"y": 30,
 				"z": 0
 			},
 			"origin": {
-				"x": 0.5,
-				"y": 0,
-				"z": 0.5
+				"x": 0,
+				"y": 0.05,
+				"z": 0
 			},
-			"scale": 0.56
+			"scale": 0.8
 		}
 	},
 	"maxstacksize": 1,

@@ -4,14 +4,31 @@
 		{
 			"name": "GroundStorable",
 			"properties": {
-				"layout": "Quadrants",
-				"collisionBox": {
-					"x1": 0,
-					"y1": 0,
-					"z1": 0,
-					"x2": 1,
-					"y2": 0.125,
-					"z2": 1
+				"layoutByType": {
+					"*-handle": "Halves",
+					"*-large": "SingleCenter",
+					"*": "Quadrants"
+				},
+				"collisionBoxByType": {
+					"*-large": {
+						"x1": 0.125,
+						"y1": 0,
+						"z1": 0.125,
+						"x2": 0.875,
+						"y2": 0.4,
+						"z2": 0.875
+					},
+					"*": {
+						"x1": 0,
+						"y1": 0,
+						"z1": 0,
+						"x2": 1,
+						"y2ByType": {
+							"*-handle": 0.125,
+							"*": 0.3
+						},
+						"z2": 1
+					}
 				}
 			}
 		}
@@ -19,30 +36,29 @@
 	"attributes": {
 		"groundStorageTransformByType": {
 			"*-handle": {
-				"rotation": {
-					"x": 0,
-					"y": 45,
-					"z": 0
-				},
 				"origin": {
 					"x": 0.5,
 					"y": 0,
 					"z": 0.5
 				},
-				"scale": 0.79
+				"rotation": {
+					"x": 0,
+					"y": 15,
+					"z": 0
+				}
 			},
 			"@.*-(small|medium|large)": {
+				"origin": {
+					"x": 0.5,
+					"y": 0,
+					"z": 0.5
+				},
 				"rotation": {
 					"x": 0,
 					"y": 35,
 					"z": 0
 				},
-				"origin": {
-					"x": 0.5,
-					"y": 0,
-					"z": 0.5
-				},
-				"scale": 0.7
+				"scale": 0.85
 			}
 		}
 	},

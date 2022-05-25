@@ -1,118 +1,133 @@
 {
-    "code": "glassworkpipe",
-    "class": "glassmaking:glassworkpipe",
-    "behaviors": [
-        {
-            "name": "glassmaking:gbt-blowing",
-            "properties": {
-                "tool": "blowing"
-            }
-        },
-        {
-            "name": "glassmaking:gbt-glassintake",
-            "properties": {
-                "tool": "glassintake"
-            }
-        }
-    ],
-    "maxstacksize": 1,
-    "shape": { "base": "item/glassworkpipe" },
-    "creativeinventory": {
-        "general": [ "*" ],
-        "tools": [ "*" ],
-        "glassmaking": [ "*" ]
-    },
-    "textures": {
-        "glass": { "base": "game:item/resource/ungraded/clearquartz" }
-    },
-    "attributes": {
-        "maxGlass": 1000,
-        "glassTransform": {
-            "translation": {
-                "x": 0,
-                "y": 0,
-                "z": 3
-            }
-        },
-        "handbook": {
-            "extraSections": [
-                {
-                    "title": "glassmaking:handbook-glassblower-tools",
-                    "text": "glassmaking:item-handbooktext-glassworkpipe"
-                }
-            ]
-        }
-    },
-    "storageFlags": 257,
-    "fpHandTransform": {
-        "translation": {
-            "x": 0.5,
-            "y": -0.25,
-            "z": 0.5
-        },
-        "rotation": {
-            "x": -160,
-            "y": 0,
-            "z": 0
-        },
-        "origin": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-        },
-        "scale": 1.5
-    },
-    "groundTransform": {
-        "translation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-        },
-        "rotation": {
-            "x": 0,
-            "y": -90,
-            "z": 0
-        },
-        "origin": {
-            "x": 0.5,
-            "y": 0,
-            "z": 0.5
-        },
-        "scale": 1.5
-    },
-    "guiTransform": {
-        "translation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-        },
-        "rotation": {
-            "x": 160,
-            "y": -20,
-            "z": -15
-        },
-        "origin": {
-            "x": 0,
-            "y": 0,
-            "z": 1.75
-        },
-        "scale": 1.5
-    },
-    "tpHandTransform": {
-        "translation": {
-            "x": 0,
-            "y": 0.1,
-            "z": 0
-        },
-        "rotation": {
-            "x": 0,
-            "y": 90,
-            "z": -53
-        },
-        "origin": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-        }
-    }
+	"code": "glassworkpipe",
+	"class": "glassmaking:glassworkpipe",
+	"behaviors": [
+		{
+			"name": "glassmaking:gbt-blowing",
+			"properties": {
+				"tool": "blowing"
+			}
+		},
+		{
+			"name": "glassmaking:gbt-glassintake",
+			"properties": {
+				"tool": "glassintake"
+			}
+		}
+	],
+	"maxstacksize": 1,
+	"shape": { "base": "item/glassworkpipe" },
+	"creativeinventory": {
+		"general": [ "*" ],
+		"tools": [ "*" ],
+		"glassmaking": [ "*" ]
+	},
+	"textures": {
+		"glass": { "base": "game:item/resource/ungraded/clearquartz" }
+	},
+	"attributes": {
+		"rackable": true,
+		"toolrackTransform": {
+			"origin": {
+				"x": 0,
+				"y": 0,
+				"z": 0.5
+			},
+			"translation": {
+				"x": 1,
+				"y": 0.5,
+				"z": 0
+			},
+			"rotation": { "y": -90 },
+			"scale": 0.9
+		},
+		"maxGlass": 1000,
+		"glassTransform": {
+			"translation": {
+				"x": 0,
+				"y": 0,
+				"z": 3
+			}
+		},
+		"handbook": {
+			"extraSections": [
+				{
+					"title": "glassmaking:handbook-glassblower-tools",
+					"text": "glassmaking:item-handbooktext-glassworkpipe"
+				}
+			]
+		}
+	},
+	"storageFlags": 257,
+	"fpHandTransform": {
+		"translation": {
+			"x": 0.5,
+			"y": -0.25,
+			"z": 0.5
+		},
+		"rotation": {
+			"x": -160,
+			"y": 0,
+			"z": 0
+		},
+		"origin": {
+			"x": 0,
+			"y": 0,
+			"z": 0
+		},
+		"scale": 1.5
+	},
+	"groundTransform": {
+		"translation": {
+			"x": 0,
+			"y": 0,
+			"z": 0
+		},
+		"rotation": {
+			"x": 0,
+			"y": -90,
+			"z": 0
+		},
+		"origin": {
+			"x": 0.5,
+			"y": 0,
+			"z": 0.5
+		},
+		"scale": 1.5
+	},
+	"guiTransform": {
+		"translation": {
+			"x": 0,
+			"y": 0,
+			"z": 0
+		},
+		"rotation": {
+			"x": 160,
+			"y": -20,
+			"z": -15
+		},
+		"origin": {
+			"x": 0,
+			"y": 0,
+			"z": 1.75
+		},
+		"scale": 1.5
+	},
+	"tpHandTransform": {
+		"translation": {
+			"x": 0,
+			"y": 0.1,
+			"z": 0
+		},
+		"rotation": {
+			"x": 0,
+			"y": 90,
+			"z": -53
+		},
+		"origin": {
+			"x": 0,
+			"y": 0,
+			"z": 0
+		}
+	}
 }

@@ -1,7 +1,29 @@
 {
 	"code": "lathe",
 	"class": "glassmaking:lathe",
+	"behaviors": [
+		{
+			"name": "GroundStorable",
+			"properties": {
+				"collisionBox": {
+					"x1": 0.125,
+					"y1": 0,
+					"z1": 0.125,
+					"x2": 0.875,
+					"y2": 0.875,
+					"z2": 0.875
+				}
+			}
+		}
+	],
 	"attributes": {
+		"groundStorageTransform": {
+			"origin": {
+				"x": 0.5,
+				"y": 0,
+				"z": 0.5
+			}
+		},
 		"handbook": {
 			"extraSections": [
 				{

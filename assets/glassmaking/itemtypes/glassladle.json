@@ -22,6 +22,28 @@
 				}
 			]
 		},
+		"rackable": true,
+		"toolrackTransform": {
+			"translationByType": {
+				"*-small": {
+					"x": 0.35,
+					"y": 0.225,
+					"z": 0
+				},
+				"*-medium": {
+					"x": 0.4,
+					"y": 0.175,
+					"z": 0
+				},
+				"*-large": {
+					"x": 0.55,
+					"y": 0.1,
+					"z": 0
+				}
+			},
+			"rotation": { "y": 90 },
+			"scale": 0.75
+		},
 		"maxGlassByType": {
 			"*-small": 250,
 			"*-medium": 500,
