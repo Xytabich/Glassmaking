@@ -1,0 +1,154 @@
+{
+	"code": "lathepart",
+	"behaviors": [
+		{
+			"name": "GroundStorable",
+			"properties": {
+				"layout": "Quadrants",
+				"collisionBox": {
+					"x1": 0,
+					"y1": 0,
+					"z1": 0,
+					"x2": 1,
+					"y2": 0.125,
+					"z2": 1
+				}
+			}
+		}
+	],
+	"attributes": {
+		"groundStorageTransform": {
+			"origin": {
+				"x": 0.5,
+				"y": 0,
+				"z": 0.5
+			},
+			"rotation": {
+				"x": 0,
+				"y": 50,
+				"z": 0
+			}
+		}
+	},
+	"maxstacksize": 4,
+	"variantgroups": [
+		{
+			"code": "part",
+			"states": [ "chuckbody", "chuckjaw" ]
+		}
+	],
+	"shape": { "base": "item/part/lathe-{part}" },
+	"creativeinventory": {
+		"general": [ "*" ],
+		"items": [ "*" ],
+		"glassmaking": [ "*" ]
+	},
+	"guiTransformByType": {
+		"*-chuckbody": {
+			"origin": {
+				"x": 0.45,
+				"y": 0,
+				"z": 0.5
+			},
+			"translation": {
+				"x": 0,
+				"y": 0,
+				"z": 0
+			},
+			"rotation": {
+				"x": 90,
+				"y": 45,
+				"z": 25
+			},
+			"scale": 2.75
+		},
+		"*-chuckjaw": {
+			"origin": {
+				"x": 0.55,
+				"y": 0,
+				"z": 0.55
+			},
+			"translation": {
+				"x": 0,
+				"y": 0,
+				"z": 0
+			},
+			"rotation": {
+				"x": -30,
+				"y": 70,
+				"z": -80
+			},
+			"scale": 5
+		}
+	},
+	"fpHandTransformByType": {
+		"*-chuckbody": {
+			"translation": {
+				"x": -0.4,
+				"y": 0,
+				"z": 0.1
+			},
+			"rotation": {
+				"x": -145,
+				"y": 90,
+				"z": 30
+			},
+			"scale": 2
+		},
+		"*-chuckjaw": {
+			"translation": {
+				"x": -0.7,
+				"y": -0.25,
+				"z": 0.75
+			},
+			"rotation": {
+				"x": 0,
+				"y": 50,
+				"z": 90
+			},
+			"scale": 3
+		}
+	},
+	"tpHandTransform": {
+		"origin": {
+			"x": 0.5,
+			"y": 0,
+			"z": 0.5
+		},
+		"translation": {
+			"x": -0.5,
+			"yByType": {
+				"*-chuckbody": -0.075,
+				"*-chuckjaw": 0
+			},
+			"z": -0.5
+		},
+		"rotation": {
+			"x": 90,
+			"y": 50,
+			"z": 0
+		},
+		"scale": 1
+	},
+	"groundTransform": {
+		"translation": {
+			"x": 0,
+			"y": 0,
+			"z": 0
+		},
+		"rotation": {
+			"x": 0,
+			"y": 0,
+			"z": 0
+		},
+		"origin": {
+			"x": 0.5,
+			"y": 0,
+			"z": 0.5
+		},
+		"scaleByType": {
+			"*-chuckbody": 4,
+			"*-chuckjaw": 5
+		}
+	}
+}

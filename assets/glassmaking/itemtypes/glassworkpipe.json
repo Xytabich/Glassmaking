@@ -38,7 +38,11 @@
 				"y": 0.5,
 				"z": 0
 			},
-			"rotation": { "y": -90 },
+			"rotation": {
+				"x": 0,
+				"y": -90,
+				"z": 0
+			},
 			"scale": 0.9
 		},
 		"maxGlass": 1000,
@@ -93,7 +97,7 @@
 			"y": 0,
 			"z": 0.5
 		},
-		"scale": 1.5
+		"scale": 3
 	},
 	"guiTransform": {
 		"translation": {

@@ -57,7 +57,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 
 		public override void OnIdleStop(IWorldAccessor world, WorkbenchRecipe recipe, int step)
 		{
-			updater.SetVise(null);
+			updater.SetJawSpacing(null);
 
 			updater.targetItemTransform = null;
 		}
@@ -82,7 +82,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 			if(Api.Side == EnumAppSide.Client)
 			{
 				updater.SetRotationSpeed(null);
-				updater.SetVise(null);
+				updater.SetJawSpacing(null);
 
 				updater.targetItemTransform = null;
 			}
@@ -94,7 +94,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 			if(Api.Side == EnumAppSide.Client)
 			{
 				updater.SetRotationSpeed(null);
-				updater.SetVise(null);
+				updater.SetJawSpacing(null);
 
 				updater.targetItemTransform = null;
 			}
@@ -121,7 +121,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 
 		private void SetupRenderer(JsonObject latheInfo)
 		{
-			updater.SetVise(GameMath.Clamp(latheInfo["size"].AsFloat(0.1f) / Slot.Itemstack.Collectible.Attributes["latheViseMaxSize"]?.AsFloat(0.1f) ?? 0.1f, 0f, 1f));
+			updater.SetJawSpacing(GameMath.Clamp(latheInfo["size"].AsFloat(0.1f) / Slot.Itemstack.Collectible.Attributes["latheChuckMaxSize"]?.AsFloat(0.1f) ?? 0.1f, 0f, 1f));
 			if(latheInfo.KeyExists("transform"))
 			{
 				var mat = latheInfo["transform"].AsObject<ModelTransform>().EnsureDefaultValues();
@@ -152,10 +152,10 @@ namespace GlassMaking.Workbench.ToolBehaviors
 
 			private AnimatorBase animator;
 
-			private float? viseValue = null;
-			private float? prevViseValue = null;
-			private RunningAnimation viseState = null;
-			private float viseFrame;
+			private float? jawSpacing = null;
+			private float? prevJawSpacing = null;
+			private RunningAnimation jawsState = null;
+			private float jawsFrame;
 
 			private float[] itemTransform = Mat4f.Create();
 			private AttachmentPointAndPose itemAttachmentPoint;
@@ -204,42 +204,42 @@ namespace GlassMaking.Workbench.ToolBehaviors
 				}
 			}
 
-			public void SetVise(float? value)
+			public void SetJawSpacing(float? value)
 			{
-				this.viseValue = value;
+				this.jawSpacing = value;
 			}
 
 			public void OnRenderFrame(float deltaTime, EnumRenderStage stage)
 			{
-				if(viseValue != prevViseValue)
+				if(jawSpacing != prevJawSpacing)
 				{
-					prevViseValue = viseValue;
-					if(viseValue.HasValue)
+					prevJawSpacing = jawSpacing;
+					if(jawSpacing.HasValue)
 					{
-						if(!activeAnimationsByAnimCode.ContainsKey("vise"))
+						if(!activeAnimationsByAnimCode.ContainsKey("jaws"))
 						{
-							activeAnimationsByAnimCode["vise"] = new AnimationMetaData() { AnimationSpeed = 0f, BlendMode = EnumAnimationBlendMode.Add };
+							activeAnimationsByAnimCode["jaws"] = new AnimationMetaData() { AnimationSpeed = 0f, BlendMode = EnumAnimationBlendMode.Add };
 						}
-						var state = animator.GetAnimationState("vise");
-						viseFrame = (1f - viseValue.Value) * (state.Animation.QuantityFrames - 1);
-						viseState = animator.GetAnimationState("vise");
-						viseState.EasingFactor = 0;
+						var state = animator.GetAnimationState("jaws");
+						jawsFrame = (1f - jawSpacing.Value) * (state.Animation.QuantityFrames - 1);
+						jawsState = animator.GetAnimationState("jaws");
+						jawsState.EasingFactor = 0;
 					}
 					else
 					{
-						activeAnimationsByAnimCode["vise"].AnimationSpeed = 1f;
-						activeAnimationsByAnimCode.Remove("vise");
-						viseState = null;
+						activeAnimationsByAnimCode["jaws"].AnimationSpeed = 1f;
+						activeAnimationsByAnimCode.Remove("jaws");
+						jawsState = null;
 					}
 				}
 				if(activeAnimationsByAnimCode.Count > 0 || animator.ActiveAnimationCount > 0)
 				{
 					animator.OnFrame(activeAnimationsByAnimCode, deltaTime);
-					if(viseState != null)
+					if(jawsState != null)
 					{
-						viseState.Iterations = 0;
-						viseState.EasingFactor = Math.Min(1f, viseState.EasingFactor + (1f - viseState.EasingFactor) * deltaTime * viseState.meta.EaseInSpeed);
-						viseState.CurrentFrame = viseFrame;
+						jawsState.Iterations = 0;
+						jawsState.EasingFactor = Math.Min(1f, jawsState.EasingFactor + (1f - jawsState.EasingFactor) * deltaTime * jawsState.meta.EaseInSpeed);
+						jawsState.CurrentFrame = jawsFrame;
 					}
 					if(targetItemTransform != null)
 					{

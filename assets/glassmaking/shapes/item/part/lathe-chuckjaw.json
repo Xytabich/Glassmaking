@@ -1,0 +1,101 @@
+{
+	"editor": {
+		"allAngles": false,
+		"entityTextureMode": false
+	},
+	"textureWidth": 16,
+	"textureHeight": 16,
+	"textureSizes": {
+	},
+	"textures": {
+		"steel": "game:block/metal/plate/steel",
+		"iron": "game:block/metal/plate/iron"
+	},
+	"elements": [
+		{
+			"name": "Cube42",
+			"from": [ 7.25, 0.125, 9.3571 ], 
+			"to": [ 8.5, 0.875, 10.1071 ], 
+			"rotationOrigin": [ 7.25, 0.5, 9.7321 ],
+			"rotationX": 120.0,
+			"faces": {
+				"north": { "texture": "#iron", "uv": [ 0.0, 0.0, 1.0, 0.5 ] },
+				"east": { "texture": "#iron", "uv": [ 0.0, 0.0, 0.5, 0.5 ] },
+				"south": { "texture": "#iron", "uv": [ 0.0, 0.0, 1.0, 0.5 ] },
+				"west": { "texture": "#iron", "uv": [ 0.0, 0.0, 0.5, 0.5 ] },
+				"up": { "texture": "#iron", "uv": [ 0.0, 0.0, 1.0, 0.5 ] },
+				"down": { "texture": "#iron", "uv": [ 0.0, 0.0, 1.0, 0.5 ] }
+			}
+		},
+		{
+			"name": "chuck1",
+			"from": [ 8.0, 0.25, 9.7321 ], 
+			"to": [ 8.49, 0.75, 11.4321 ], 
+			"rotationOrigin": [ 8.0, 0.5, 9.7321 ],
+			"rotationX": 170.0,
+			"faces": {
+				"north": { "texture": "#steel", "uv": [ 0.0, 0.0, 0.5, 0.5 ], "enabled": false },
+				"east": { "texture": "#steel", "uv": [ 0.0, 0.0, 1.5, 0.5 ] },
+				"south": { "texture": "#steel", "uv": [ 0.0, 0.0, 0.5, 0.5 ], "enabled": false },
+				"west": { "texture": "#steel", "uv": [ 0.0, 0.0, 1.5, 0.5 ], "windMode": [-1,-1,-1,-1] },
+				"up": { "texture": "#steel", "uv": [ 0.0, 0.0, 0.5, 1.5 ] },
+				"down": { "texture": "#steel", "uv": [ 0.0, 0.0, 0.5, 1.5 ] }
+			}
+		},
+		{
+			"name": "chuck2",
+			"from": [ 8.0, 0.5, 11.7321 ], 
+			"to": [ 8.0, 0.5, 11.7321 ], 
+			"rotationOrigin": [ 8.0, 0.5, 9.7321 ],
+			"rotationX": 165.0,
+			"faces": {
+				"north": { "texture": "#steel", "uv": [ 0.0, 0.0, 0.5, 0.5 ], "enabled": false },
+				"east": { "texture": "#steel", "uv": [ 0.0, 0.0, 0.5, 0.5 ], "enabled": false },
+				"south": { "texture": "#steel", "uv": [ 0.0, 0.0, 0.5, 0.5 ], "enabled": false },
+				"west": { "texture": "#steel", "uv": [ 0.0, 0.0, 0.5, 0.5 ], "enabled": false },
+				"up": { "texture": "#steel", "uv": [ 0.0, 0.0, 0.5, 0.5 ], "enabled": false },
+				"down": { "texture": "#steel", "uv": [ 0.0, 0.0, 0.5, 0.5 ], "enabled": false }
+			},
+			"children": [
+				{
+					"name": "chuck3",
+					"from": [ -0.025, -0.7, -0.29 ], 
+					"to": [ 1.975, -0.1, 0.31 ], 
+					"rotationOrigin": [ 0.0, 0.0, 0.0 ],
+					"rotationX": 45.0,
+					"faces": {
+						"north": { "texture": "#steel", "uv": [ 0.0, 0.0, 2.0, 0.5 ] },
+						"east": { "texture": "#steel", "uv": [ 0.0, 0.0, 0.5, 0.5 ] },
+						"south": { "texture": "#steel", "uv": [ 0.0, 0.0, 2.0, 0.5 ] },
+						"west": { "texture": "#steel", "uv": [ 0.0, 0.0, 0.5, 0.5 ] },
+						"up": { "texture": "#steel", "uv": [ 0.0, 0.0, 2.0, 0.5 ] },
+						"down": { "texture": "#steel", "uv": [ 0.0, 0.0, 2.0, 0.5 ] }
+					}
+				}
+			]
+		}
+	],
+	"animations": [
+		{
+			"name": "Rotation",
+			"code": "rotation",
+			"quantityframes": 360,
+			"onActivityStopped": "Rewind",
+			"onAnimationEnd": "Repeat",
+			"keyframes": [
+
+			]
+		},
+
+		{
+			"name": "Jaws",
+			"code": "jaws",
+			"quantityframes": 30,
+			"onActivityStopped": "Rewind",
+			"onAnimationEnd": "Repeat",
+			"keyframes": [
+
+			]
+		}
+	]
+}

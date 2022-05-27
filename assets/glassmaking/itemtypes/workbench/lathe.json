@@ -54,7 +54,7 @@
 				"z": 0
 			}
 		},
-		"latheViseMaxSize": 0.1875
+		"latheChuckMaxSize": 0.1875
 	},
 	"shape": { "base": "item/workbench/lathe" },
 	"heldTpIdleAnimation": "holdbothhandslarge",
@@ -93,7 +93,7 @@
 			"y": 0.3,
 			"z": 0.4
 		},
-		"scale": 2.01
+		"scale": 2
 	},
 	"tpHandTransform": {
 		"translation": {
@@ -107,5 +107,18 @@
 			"z": -70
 		},
 		"scale": 0.75
+	},
+	"groundTransform": {
+		"translation": {
+			"x": 0,
+			"y": 0.15,
+			"z": 0
+		},
+		"rotation": {
+			"x": 0,
+			"y": 0,
+			"z": 90
+		},
+		"scale": 2
 	}
 }

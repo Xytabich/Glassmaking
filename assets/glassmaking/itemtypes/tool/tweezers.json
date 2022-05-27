@@ -46,8 +46,16 @@
 	"attributes": {
 		"rackable": true,
 		"toolrackTransform": {
-			"translation": { "y": 0.7 },
-			"rotation": { "y": 180 },
+			"translation": {
+				"x": 0,
+				"y": 0.7,
+				"z": 0
+			},
+			"rotation": {
+				"x": 0,
+				"y": 180,
+				"z": 0
+			},
 			"scale": 1.5
 		},
 		"handbook": {

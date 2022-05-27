@@ -1,135 +1,150 @@
 {
-    "code": "glassblend",
-    "class": "glassmaking:glassblend",
-    "heldTpIdleAnimation": "holdbothhands",
-    "shape": { "base": "item/resource/crushed/glassshards" },
-    "behaviors": [
-        {
-            "name": "GroundStorable",
-            "properties": {
-                "layout": "Quadrants",
-                "collisionBox": { "x1": 0, "y1": 0, "z1": 0, "x2": 1, "y2": 0.125, "z2": 1 }
-            }
-        }
-    ],
-    "attributes": {
-        "handbook": {
-            "groupBy": [ "glassblend-*" ],
-            "extraSections": [
-                {
-                    "title": "glassmaking:handbook-melting-glass",
-                    "text": "glassmaking:item-handbooktext-glassblend"
-                }
-            ]
-        },
-        "glassmaking:glassblend": {
-            "code": "game:{glasstype}",
-            "amount": 250
-        },
-        "displaycaseable": true,
-        "shelvable": true,
-        "onDisplayTransform": {
-            "translation": {
-                "x": 0.05,
-                "y": 0,
-                "z": 0
-            },
-            "origin": {
-                "x": 0.5,
-                "y": 0,
-                "z": 0.5
-            },
-            "scale": 0.65
-        },
-        "groundStorageTransform": {
-            "translation": { "x": 0.015, "y": 0, "z": 0.015 },
-            "origin": { "x": 0.5, "y": 0, "z": 0.5 },
-            "scale": 0.9
-        }
-    },
-    "skipVariants": [ "*-quartz" ],
-    "textures": {
-        "material": { "base": "game:block/glass/{glasstype}" },
-        "basemat": { "base": "game:item/resource/crushed/quartz" }
-    },
-    "variantgroups": [
-        {
-            "code": "glasstype",
-            "loadFromProperties": "game:abstract/glasstype"
-        }
-    ],
-    "creativeinventory": {
-        "general": [ "*" ],
-        "items": [ "*" ],
-        "glassmaking": [ "*" ]
-    },
-    "maxstacksize": 64,
-    "materialDensity": 500,
-    "guiTransform": {
-        "translation": {
-            "x": 0,
-            "y": 0,
-            "z": -25
-        },
-        "rotation": {
-            "x": 171,
-            "y": 57,
-            "z": -20
-        },
-        "origin": {
-            "x": 0.46,
-            "y": 0.11,
-            "z": 0.39
-        },
-        "scale": 2.64
-    },
-    "fpHandTransform": {
-        "translation": {
-            "x": 0.1,
-            "y": 0.16,
-            "z": 0
-        },
-        "rotation": {
-            "x": 37,
-            "y": 77,
-            "z": 2
-        },
-        "origin": {
-            "x": 0.5,
-            "y": 0.1,
-            "z": 0.5
-        },
-        "scale": 1.95
-    },
-    "tpHandTransform": {
-        "translation": {
-            "x": -1.53,
-            "y": -1.1,
-            "z": -0.7
-        },
-        "rotation": {
-            "x": 19,
-            "y": 26,
-            "z": -83
-        },
-        "scale": 0.48
-    },
-    "groundTransform": {
-        "translation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-        },
-        "rotation": {
-            "x": 3,
-            "y": 1,
-            "z": 0
-        },
-        "origin": {
-            "x": 0.5,
-            "y": 0,
-            "z": 0.5
-        },
-        "scale": 2.65
-    }
+	"code": "glassblend",
+	"class": "glassmaking:glassblend",
+	"heldTpIdleAnimation": "holdbothhands",
+	"shape": { "base": "item/resource/crushed/glassshards" },
+	"behaviors": [
+		{
+			"name": "GroundStorable",
+			"properties": {
+				"layout": "Quadrants",
+				"collisionBox": {
+					"x1": 0,
+					"y1": 0,
+					"z1": 0,
+					"x2": 1,
+					"y2": 0.125,
+					"z2": 1
+				}
+			}
+		}
+	],
+	"attributes": {
+		"handbook": {
+			"groupBy": [ "glassblend-*" ],
+			"extraSections": [
+				{
+					"title": "glassmaking:handbook-melting-glass",
+					"text": "glassmaking:item-handbooktext-glassblend"
+				}
+			]
+		},
+		"glassmaking:glassblend": {
+			"code": "game:{glasstype}",
+			"amount": 250
+		},
+		"displaycaseable": true,
+		"shelvable": true,
+		"onDisplayTransform": {
+			"translation": {
+				"x": 0.05,
+				"y": 0,
+				"z": 0
+			},
+			"origin": {
+				"x": 0.5,
+				"y": 0,
+				"z": 0.5
+			},
+			"scale": 0.65
+		},
+		"groundStorageTransform": {
+			"translation": {
+				"x": 0.015,
+				"y": 0,
+				"z": 0.015
+			},
+			"origin": {
+				"x": 0.5,
+				"y": 0,
+				"z": 0.5
+			},
+			"scale": 0.9
+		}
+	},
+	"skipVariants": [ "*-quartz" ],
+	"textures": {
+		"material": { "base": "game:block/glass/{glasstype}" },
+		"basemat": { "base": "game:item/resource/crushed/quartz" }
+	},
+	"variantgroups": [
+		{
+			"code": "glasstype",
+			"loadFromProperties": "game:abstract/glasstype"
+		}
+	],
+	"creativeinventory": {
+		"general": [ "*" ],
+		"items": [ "*" ],
+		"glassmaking": [ "*" ]
+	},
+	"maxstacksize": 64,
+	"materialDensity": 500,
+	"guiTransform": {
+		"translation": {
+			"x": 0,
+			"y": 0,
+			"z": -25
+		},
+		"rotation": {
+			"x": 171,
+			"y": 57,
+			"z": -20
+		},
+		"origin": {
+			"x": 0.46,
+			"y": 0.11,
+			"z": 0.39
+		},
+		"scale": 2.64
+	},
+	"fpHandTransform": {
+		"translation": {
+			"x": 0.1,
+			"y": 0.16,
+			"z": 0
+		},
+		"rotation": {
+			"x": 37,
+			"y": 77,
+			"z": 2
+		},
+		"origin": {
+			"x": 0.5,
+			"y": 0.1,
+			"z": 0.5
+		},
+		"scale": 1.95
+	},
+	"tpHandTransform": {
+		"translation": {
+			"x": -1.53,
+			"y": -1.1,
+			"z": -0.7
+		},
+		"rotation": {
+			"x": 19,
+			"y": 26,
+			"z": -83
+		},
+		"scale": 0.48
+	},
+	"groundTransform": {
+		"translation": {
+			"x": 0,
+			"y": 0,
+			"z": 0
+		},
+		"rotation": {
+			"x": 3,
+			"y": 1,
+			"z": 0
+		},
+		"origin": {
+			"x": 0.5,
+			"y": 0,
+			"z": 0.5
+		},
+		"scale": 2.65
+	}
 }
