@@ -25,6 +25,14 @@
 		}
 	],
 	"attributes": {
+		"handbook": {
+			"extraSections": [
+				{
+					"title": "glassmaking:handbook-glassblower-tools",
+					"text": "glassmaking:block-handbooktext-workbench"
+				}
+			]
+		},
 		"structureByType": {
 			"*-bottom-right-*": {
 				"codes": [
