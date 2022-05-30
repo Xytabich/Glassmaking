@@ -1,0 +1,56 @@
+{
+	"width": 3,
+	"height": 3,
+	"ingredientPattern": "ABJ,WRF,PCH",
+	"ingredients": {
+		"A": {
+			"code": "game:woodenaxle-ud",
+			"type": "block"
+		},
+		"W": {
+			"code": "game:log-placed-*-ud",
+			"type": "block"
+		},
+		"H": {
+			"type": "item",
+			"code": "game:hammer-*",
+			"isTool": true,
+			"toolDurabilityCost": 30
+		},
+		"P": {
+			"type": "item",
+			"code": "game:metalplate-*",
+			"allowedVariants": [ "iron", "meteoriciron", "steel" ],
+			"quantity": 2
+		},
+		"C": {
+			"type": "item",
+			"code": "game:chisel-*",
+			"isTool": true,
+			"allowedVariants": [ "meteoriciron", "steel" ],
+			"toolDurabilityCost": 50
+		},
+		"F": {
+			"type": "item",
+			"code": "game:fat"
+		},
+		"R": {
+			"type": "item",
+			"code": "game:resin",
+			"quantity": 2
+		},
+		"B": {
+			"type": "item",
+			"code": "lathepart-chuckbody"
+		},
+		"J": {
+			"type": "item",
+			"code": "lathepart-chuckjaw",
+			"quantity": 3
+		}
+	},
+	"output": {
+		"code": "lathe",
+		"type": "item"
+	}
+}

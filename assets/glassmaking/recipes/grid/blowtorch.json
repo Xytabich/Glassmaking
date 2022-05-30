@@ -1,0 +1,44 @@
+{
+	"width": 3,
+	"height": 2,
+	"ingredientPattern": "BPS,CHI",
+	"ingredients": {
+		"B": {
+			"type": "item",
+			"code": "game:metalbit-*",
+			"allowedVariants": [ "steel" ]
+		},
+		"P": {
+			"type": "item",
+			"code": "game:metalplate-*",
+			"allowedVariants": [ "brass" ]
+		},
+		"H": {
+			"type": "item",
+			"code": "game:hammer-*",
+			"isTool": true,
+			"toolDurabilityCost": 10
+		},
+		"C": {
+			"type": "item",
+			"code": "game:chisel-*",
+			"isTool": true,
+			"toolDurabilityCost": 20
+		},
+		"S": {
+			"type": "item",
+			"code": "game:solderbar-*",
+			"allowedVariants": [ "silver" ]
+		},
+		"I": {
+			"type": "item",
+			"code": "game:solderingiron",
+			"isTool": true,
+			"toolDurabilityCost": 1
+		}
+	},
+	"output": {
+		"code": "blowtorch",
+		"type": "item"
+	}
+}

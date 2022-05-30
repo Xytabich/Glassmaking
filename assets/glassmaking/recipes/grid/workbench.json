@@ -1,0 +1,32 @@
+{
+	"width": 3,
+	"height": 3,
+	"ingredientPattern": "PHP,TTT,L_L",
+	"ingredients": {
+		"T": {
+			"code": "game:plank-*",
+			"type": "item",
+			"quantity": 2
+		},
+		"L": {
+			"code": "game:plank-*",
+			"type": "item",
+			"quantity": 4
+		},
+		"H": {
+			"type": "item",
+			"code": "game:hammer-*",
+			"isTool": true,
+			"toolDurabilityCost": 10
+		},
+		"P": {
+			"type": "item",
+			"code": "game:metalplate-*",
+			"allowedVariants": [ "steel" ]
+		}
+	},
+	"output": {
+		"code": "workbench-bottom-right-north",
+		"type": "block"
+	}
+}
