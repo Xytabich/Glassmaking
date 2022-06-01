@@ -924,8 +924,8 @@
 		},
 
 		{
-			"name": "Vise",
-			"code": "vise",
+			"name": "Jaws",
+			"code": "jaws",
 			"quantityframes": 30,
 			"onActivityStopped": "Rewind",
 			"onAnimationEnd": "Repeat",

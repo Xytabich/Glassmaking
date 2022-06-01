@@ -27,6 +27,7 @@ namespace GlassMaking
 	public class GlassMakingMod : ModSystem
 	{
 		internal CachedItemRenderer itemsRenderer;
+		internal CachedMeshRefs meshRefCache;
 
 		private ICoreAPI api;
 		private ICoreServerAPI sapi = null;
@@ -146,8 +147,9 @@ namespace GlassMaking
 			api.Input.RegisterHotKey("itemrecipeselect", Lang.Get("Select Item Recipe"), GlKeys.F, HotkeyType.GUIOrOtherControls);
 			api.Gui.RegisterDialog(new GuiDialogItemRecipeSelector(api));
 
-			var pool = api.ModLoader.GetModSystem<TemporaryMetadataSystem>().CreatePool<CachedItemRenderer.RendererContainer>(TimeSpan.FromSeconds(30));
-			itemsRenderer = new CachedItemRenderer(pool);
+			var tmpMetaSystem = api.ModLoader.GetModSystem<TemporaryMetadataSystem>();
+			itemsRenderer = new CachedItemRenderer(tmpMetaSystem.CreatePool<CachedItemRenderer.RendererContainer>(TimeSpan.FromSeconds(30)));
+			meshRefCache = new CachedMeshRefs(tmpMetaSystem.CreatePool<CachedMeshRefs.RefContainer>(TimeSpan.FromSeconds(30)));
 
 			try
 			{

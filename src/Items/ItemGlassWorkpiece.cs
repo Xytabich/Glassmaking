@@ -12,10 +12,7 @@ namespace GlassMaking.Items
 		public override void OnLoaded(ICoreAPI api)
 		{
 			base.OnLoaded(api);
-			if(api.Side == EnumAppSide.Client)
-			{
-				mod = api.ModLoader.GetModSystem<GlassMakingMod>();
-			}
+			mod = api.ModLoader.GetModSystem<GlassMakingMod>();
 		}
 
 		public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)

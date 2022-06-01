@@ -131,6 +131,7 @@
     <Compile Include="src\Blocks\Renderer\WorkbenchWorkpieceRenderer.cs" />
     <Compile Include="src\Blocks\WorkbenchToolsInventory.cs" />
     <Compile Include="src\Common\AtlasTexSource.cs" />
+    <Compile Include="src\Common\CachedMeshRefs.cs" />
     <Compile Include="src\Common\CastingMoldRecipe.cs" />
     <Compile Include="src\Common\BulkAccessUtil.cs" />
     <Compile Include="src\Common\FastVec2f.cs" />

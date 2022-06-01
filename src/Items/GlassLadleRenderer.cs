@@ -88,7 +88,7 @@ namespace GlassMaking.Items
 			return ObjectCacheUtil.GetOrCreate(capi, "glassmaking:glassladle|" + item.Code.ToString(), () => {
 				Shape shapeBase = capi.Assets.TryGet(new AssetLocation(shape.Base.Domain, "shapes/" + shape.Base.Path + ".json")).ToObject<Shape>();
 				MeshData mesh;
-				capi.Tesselator.TesselateShape("pipemesh", shapeBase, out mesh, tex, new Vec3f(shape.rotateX, shape.rotateY, shape.rotateZ), 0, 0, 0);
+				capi.Tesselator.TesselateShape("glassmaking:ladlemesh", shapeBase, out mesh, tex, new Vec3f(shape.rotateX, shape.rotateY, shape.rotateZ), 0, 0, 0);
 				return mesh;
 			});
 		}

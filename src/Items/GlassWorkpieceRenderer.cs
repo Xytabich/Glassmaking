@@ -1,4 +1,5 @@
-﻿using GlassMaking.ItemRender;
+﻿using GlassMaking.Common;
+using GlassMaking.ItemRender;
 using System.Collections.Generic;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
@@ -14,7 +15,7 @@ namespace GlassMaking.Items
 		private string code;
 		private int step;
 
-		private MeshRef meshRef = null;
+		private CachedMeshRefs.RefHandle meshRefHandle = default;
 
 		private ICoreClientAPI capi;
 		private ITextureAtlasAPI curAtlas;
@@ -43,33 +44,34 @@ namespace GlassMaking.Items
 
 		public void UpdateIfChanged(ICoreClientAPI capi, ItemStack itemStack, Data data)
 		{
-			if(meshRef != null && code == data.code && step == data.step)
+			if(meshRefHandle.isValid && code == data.code && step == data.step)
 			{
+				meshRefHandle.Postpone();
 				return;
 			}
 
 			this.code = data.code;
 			this.step = data.step;
 
-			var mesh = GenMesh(capi, data.recipe, data.step, capi.ItemTextureAtlas);
+			var meshRefCache = capi.ModLoader.GetModSystem<GlassMakingMod>().meshRefCache;
+			var key = new WorkpieceMeshKey(data.recipe.Code, data.step);
+			if(!meshRefCache.TryGetMeshRef(key, out meshRefHandle))
+			{
+				var mesh = GenMesh(capi, data.recipe, data.step, capi.ItemTextureAtlas);
 
-			if(meshRef != null) meshRef.Dispose();
-			meshRef = capi.Render.UploadMesh(mesh);
+				var meshRef = capi.Render.UploadMesh(mesh);
+				meshRefHandle = meshRefCache.SetMeshRef(key, meshRef);
+			}
 		}
 
 		public void SetRenderInfo(ICoreClientAPI capi, ItemStack itemStack, ref ItemRenderInfo renderInfo)
 		{
-			renderInfo.ModelRef = meshRef;
+			renderInfo.ModelRef = meshRefHandle.meshRef;
 			renderInfo.CullFaces = false;
 		}
 
 		public void Dispose()
 		{
-			if(meshRef != null)
-			{
-				meshRef.Dispose();
-				meshRef = null;
-			}
 		}
 
 		private MeshData GenMesh(ICoreClientAPI capi, WorkbenchRecipe recipe, int step, ITextureAtlasAPI targetAtlas)
@@ -144,6 +146,33 @@ namespace GlassMaking.Items
 				this.code = code;
 				this.step = step;
 				this.recipe = recipe;
+			}
+		}
+
+		private struct WorkpieceMeshKey
+		{
+			private AssetLocation code;
+			private int step;
+
+			public WorkpieceMeshKey(AssetLocation code, int step)
+			{
+				this.code = code;
+				this.step = step;
+			}
+
+			public override bool Equals(object obj)
+			{
+				return obj is WorkpieceMeshKey key &&
+					   EqualityComparer<AssetLocation>.Default.Equals(code, key.code) &&
+					   step == key.step;
+			}
+
+			public override int GetHashCode()
+			{
+				int hashCode = -1973448413;
+				hashCode = hashCode * -1521134295 + EqualityComparer<AssetLocation>.Default.GetHashCode(code);
+				hashCode = hashCode * -1521134295 + step.GetHashCode();
+				return hashCode;
 			}
 		}
 	}

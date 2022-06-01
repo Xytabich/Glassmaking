@@ -27,6 +27,7 @@ namespace GlassMaking
 		{
 			Dictionary<string, string[]> mappings = new Dictionary<string, string[]>();
 
+			var mod = world.Api.ModLoader.GetModSystem<GlassMakingMod>();
 			for(int i = 0; i < Recipe.Length; i++)
 			{
 				if(!string.IsNullOrEmpty(Recipe[i].Name))
@@ -37,7 +38,6 @@ namespace GlassMaking
 					{
 						List<string> codes = new List<string>();
 						int wildcardEndLen = part.Code.Path.Length - wildcardStartLen - 1;
-						var mod = world.Api.ModLoader.GetModSystem<GlassMakingMod>();
 						foreach(var pair in mod.GetGlassTypes())
 						{
 							if(WildcardUtil.Match(part.Code, pair.Key))
