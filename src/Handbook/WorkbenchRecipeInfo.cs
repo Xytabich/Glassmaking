@@ -52,6 +52,12 @@ namespace GlassMaking.Handbook
 						outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:Steps for recipe {0}", i + 1) + "\n", CairoFont.WhiteSmallText()));
 					}
 					var recipe = recipes[i];
+					outComponents.Add(new RichTextComponent(capi, "• " + Lang.Get("glassmaking:Input ingredient") + "\n", CairoFont.WhiteSmallText()));
+					var element = new SlideshowItemstackTextComponent(capi, new ItemStack[] { recipe.Input.ResolvedItemstack }, 40.0, EnumFloat.Inline,
+						cs => openDetailPageFor(GuiHandbookItemStackPage.PageCodeForStack(cs)));
+					outComponents.Add(element);
+					outComponents.Add(new ClearFloatTextComponent(capi));
+
 					var steps = recipe.Steps;
 					for(int j = 0; j < steps.Length; j++)
 					{
@@ -73,7 +79,7 @@ namespace GlassMaking.Handbook
 							{
 								if(toolItems.TryGetValue(pair.Key, out var list))
 								{
-									var element = new SlideshowItemstackTextComponent(capi, list.ToArray(), 40.0, EnumFloat.Inline,
+									element = new SlideshowItemstackTextComponent(capi, list.ToArray(), 40.0, EnumFloat.Inline,
 										cs => openDetailPageFor(GuiHandbookItemStackPage.PageCodeForStack(cs)));
 									outComponents.Add(element);
 								}

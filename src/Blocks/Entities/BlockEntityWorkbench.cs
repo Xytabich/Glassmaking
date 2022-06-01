@@ -426,10 +426,10 @@ namespace GlassMaking.Blocks
 			}
 			if(waitForComplete != null)
 			{
+				var waitForComplete = this.waitForComplete;
+				this.waitForComplete = null;
 				if(this.recipeStep != newRecipeStep || this.recipe != newRecipe)
 				{
-					var waitForComplete = this.waitForComplete;
-					this.waitForComplete = null;
 					waitForComplete.Invoke();
 				}
 			}
