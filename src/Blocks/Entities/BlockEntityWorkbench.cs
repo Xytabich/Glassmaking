@@ -681,21 +681,18 @@ namespace GlassMaking.Blocks
 				UpdateWorkpieceMatrix();
 
 				var world = Api.World;
-				if(recipe == null || startedStep >= 0 && recipeStep == startedStep)
+				if(cachedIdleToolsStep != null)
 				{
-					if(cachedIdleToolsStep != null)
+					foreach(var pair in cachedIdleToolsStep.Tools)
 					{
-						foreach(var pair in cachedIdleToolsStep.Tools)
+						if(toolSlots.TryGetValue(pair.Key, out var slotId))
 						{
-							if(toolSlots.TryGetValue(pair.Key, out var slotId))
-							{
-								inventory.GetBehavior(slotId).OnIdleStop(world, recipe, recipeStep);
-							}
+							inventory.GetBehavior(slotId).OnIdleStop(world, recipe, recipeStep);
 						}
-						cachedIdleToolsStep = null;
 					}
+					cachedIdleToolsStep = null;
 				}
-				else
+				if(recipe != null && (startedStep < 0 || recipeStep != startedStep))
 				{
 					cachedIdleToolsStep = recipe.Steps[recipeStep];
 					foreach(var pair in cachedIdleToolsStep.Tools)
