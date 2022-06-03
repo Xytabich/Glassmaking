@@ -24,6 +24,23 @@ namespace GlassMaking
 			return new AssetLocation(reader.ReadString());
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void Write(this BinaryWriter writer, Vec3f value)
+		{
+			writer.Write(value.X);
+			writer.Write(value.Y);
+			writer.Write(value.Z);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static Vec3f ReadVec3f(this BinaryReader reader)
+		{
+			float x = reader.ReadSingle();
+			float y = reader.ReadSingle();
+			float z = reader.ReadSingle();
+			return new Vec3f(x, y, z);
+		}
+
 		/// <summary>
 		/// Interpolates a bezier curve. In this case the incoming list will be reduced to one element, which will contain the result of the calculation.
 		/// </summary>

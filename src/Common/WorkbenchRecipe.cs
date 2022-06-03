@@ -120,8 +120,7 @@ namespace GlassMaking
 			}
 			foreach(var step in Steps)
 			{
-				step.Tools = step.Tools.Select(pair => new KeyValuePair<string, JsonObject>(pair.Key.ToLowerInvariant(), pair.Value))
-					.ToDictionary(pair => pair.Key, pair => pair.Value);
+				step.Initialize();
 			}
 			return true;
 		}
@@ -228,6 +227,9 @@ namespace GlassMaking
 		public Dictionary<string, JsonObject> Tools;
 
 		[JsonProperty]
+		public ModelTransform WorkpieceTransform = null;
+
+		[JsonProperty]
 		public float? UseTime = null;
 
 		public void ToBytes(BinaryWriter writer)
@@ -266,6 +268,15 @@ namespace GlassMaking
 				writer.Write(pair.Key);
 				writer.Write(pair.Value != null);
 				if(pair.Value != null) writer.Write(pair.Value.Token.ToString());
+			}
+
+			writer.Write(WorkpieceTransform != null);
+			if(WorkpieceTransform != null)
+			{
+				writer.Write(WorkpieceTransform.Origin);
+				writer.Write(WorkpieceTransform.Translation);
+				writer.Write(WorkpieceTransform.Rotation);
+				writer.Write(WorkpieceTransform.ScaleXYZ);
 			}
 
 			writer.Write(UseTime.HasValue);
@@ -315,6 +326,16 @@ namespace GlassMaking
 				}
 				Tools[tool] = attribs;
 			}
+
+			if(reader.ReadBoolean())
+			{
+				WorkpieceTransform = new ModelTransform();
+				WorkpieceTransform.Origin = reader.ReadVec3f();
+				WorkpieceTransform.Translation = reader.ReadVec3f();
+				WorkpieceTransform.Rotation = reader.ReadVec3f();
+				WorkpieceTransform.ScaleXYZ = reader.ReadVec3f();
+			}
+
 			if(reader.ReadBoolean())
 			{
 				UseTime = reader.ReadSingle();
@@ -331,8 +352,15 @@ namespace GlassMaking
 				Shape = Shape?.Clone(),
 				Textures = Textures?.Select(pair => new KeyValuePair<string, CompositeTexture>(pair.Key, pair.Value?.Clone())).ToDictionary(pair => pair.Key, pair => pair.Value),
 				Tools = Tools.Select(pair => new KeyValuePair<string, JsonObject>(pair.Key, pair.Value?.Clone())).ToDictionary(pair => pair.Key, pair => pair.Value),
+				WorkpieceTransform = WorkpieceTransform?.Clone(),
 				UseTime = UseTime
 			};
+		}
+
+		public void Initialize()
+		{
+			Tools = Tools.Select(pair => new KeyValuePair<string, JsonObject>(pair.Key.ToLowerInvariant(), pair.Value)).ToDictionary(pair => pair.Key, pair => pair.Value);
+			WorkpieceTransform?.EnsureDefaultValues();
 		}
 	}
 }

@@ -710,16 +710,23 @@ namespace GlassMaking.Blocks
 		{
 			if(renderer != null && !workpieceSlot.Empty)
 			{
+				if(recipe != null)
+				{
+					var transform = recipe.Steps[recipeStep].WorkpieceTransform;
+					if(transform != null)
+					{
+						transform.CopyTo(workpieceRenderer.itemTransform);
+						return;
+					}
+				}
 				var transformAttrib = workpieceSlot.Itemstack.ItemAttributes?["workbenchItemTransform"];
 				if(transformAttrib?.Exists == true)
 				{
 					var mat = transformAttrib.AsObject<ModelTransform>().EnsureDefaultValues();
 					mat.CopyTo(workpieceRenderer.itemTransform);
+					return;
 				}
-				else
-				{
-					((BlockWorkbench)Block).defaultWorkpieceTransform.CopyTo(workpieceRenderer.itemTransform);
-				}
+				((BlockWorkbench)Block).defaultWorkpieceTransform.CopyTo(workpieceRenderer.itemTransform);
 			}
 		}
 
