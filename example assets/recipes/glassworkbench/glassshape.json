@@ -1,0 +1,43 @@
+{
+    "code": "glassshape",
+    "input": {
+        "type": "block",
+        "code": "glassshape-raw"
+    },
+    "output": {
+        "type": "block",
+        "code": "glassshape-annealed"
+    },
+    "steps": [
+		{
+			"shape": { "base": "block/glassshape" },
+			"textures": { "glass0": { "base": "game:block/glass/vintage" } }
+			"tools": {
+				"blowtorch": { "temperature": 1300 }
+			},
+			"useTime": 3
+		},
+		{
+			"tools": {
+				"lathe": {
+					"transform": {
+						"origin": {
+							"x": 0.5,
+							"y": 0,
+							"z": 0.5
+						},
+						"rotation": {
+							"x": 0,
+							"y": 0,
+							"z": -90
+						},
+						"scale": 0.25
+					},
+					"size": 0.11
+				},
+				"blowtorch": { "temperature": 1300 }
+			},
+			"useTime": 10
+		}
+    ]
+}
