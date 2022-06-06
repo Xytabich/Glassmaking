@@ -1,13 +1,13 @@
 {
-    "type": "code",
-    "modid": "glassmaking",
-    "name": "Glassmaking",
-    "authors": ["Xytabich"],
-    "description": "Core system for melting and processing glass",
-    "version": "1.2.0",
-    "dependencies": {
-        "game": "1.16.0",
-        "survival": "1.16.0"
-    },
-    "website": "https://github.com/Xytabich/Glassmaking"
+	"type": "code",
+	"modid": "glassmaking",
+	"name": "Glassmaking",
+	"authors": [ "Xytabich" ],
+	"description": "Core system for melting and processing glass",
+	"version": "1.3.0",
+	"dependencies": {
+		"game": "1.16.0",
+		"survival": "1.16.0"
+	},
+	"website": "https://github.com/Xytabich/Glassmaking"
 }
