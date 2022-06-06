@@ -101,7 +101,9 @@ namespace GlassMaking.Workbench.ToolBehaviors
 		{
 			[JsonProperty(Required = Required.Always)]
 			public AssetLocation code;
+
 			public EnumItemClass type = EnumItemClass.Item;
+
 			[JsonProperty(Required = Required.Always)]
 			public float requiresLitres;
 		}

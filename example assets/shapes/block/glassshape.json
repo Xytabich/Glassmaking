@@ -8,9 +8,9 @@
 	"textureSizes": {
 	},
 	"textures": {
-		"glass2": "block/glass/violet",
-		"glass0": "block/glass/yellow",
-		"glass1": "block/glass/green"
+		"glass2": "game:block/glass/violet",
+		"glass0": "game:block/glass/yellow",
+		"glass1": "game:block/glass/green"
 	},
 	"elements": [
 		{

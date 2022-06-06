@@ -92,7 +92,23 @@ namespace GlassMaking.Items
 					if(shape != null) break;
 				}
 			}
-			if(shape != null)
+
+			MeshData meshdata;
+			if(shape == null)
+			{
+				var stack = recipe.Input.ResolvedItemstack;
+				if(stack.Class == EnumItemClass.Block)
+				{
+					nowTesselatingTextures = stack.Block.Textures;
+					nowTesselatingShape = capi.TesselatorManager.GetCachedShape(stack.Block.Shape.Base);
+					capi.Tesselator.TesselateShape("glassmaking:glass-workpiece", nowTesselatingShape, out meshdata, this);
+				}
+				else
+				{
+					capi.Tesselator.TesselateItem(stack.Item, out meshdata);
+				}
+			}
+			else
 			{
 				var shapesCache = ObjectCacheUtil.GetOrCreate(capi, "glassmaking:workbenchrecipeshapes", () => new Dictionary<AssetLocation, Shape>());
 				if(!shapesCache.TryGetValue(shape.Base, out nowTesselatingShape))
@@ -100,10 +116,9 @@ namespace GlassMaking.Items
 					nowTesselatingShape = capi.Assets.TryGet(new AssetLocation(shape.Base.Domain, "shapes/" + shape.Base.Path + ".json")).ToObject<Shape>();
 					shapesCache[shape.Base] = nowTesselatingShape;
 				}
-			}
 
-			MeshData meshdata;
-			capi.Tesselator.TesselateShape("glassmaking:glass-workpiece", nowTesselatingShape, out meshdata, this);
+				capi.Tesselator.TesselateShape("glassmaking:glass-workpiece", nowTesselatingShape, out meshdata, this);
+			}
 
 			nowTesselatingShape = null;
 			nowTesselatingTextures = null;
