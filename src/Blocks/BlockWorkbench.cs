@@ -112,7 +112,7 @@ namespace GlassMaking.Blocks
 
 		public override Cuboidf[] GetSelectionBoxes(IBlockAccessor blockAccessor, BlockPos pos)
 		{
-			var blockBoxes = base.GetSelectionBoxes(blockAccessor, pos);
+			var blockBoxes = base.GetSelectionBoxes(blockAccessor, pos) ?? new Cuboidf[0];
 
 			pos = GetMainBlockPosition(pos);
 			var be = blockAccessor.GetBlockEntity(pos) as BlockEntityWorkbench;

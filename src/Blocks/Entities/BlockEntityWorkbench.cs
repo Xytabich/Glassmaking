@@ -37,7 +37,7 @@ namespace GlassMaking.Blocks
 
 		private WorkbenchWorkpieceRenderer renderer = null;
 
-		private Cuboidf[] selectionBoxes;
+		private Cuboidf[] selectionBoxes = new Cuboidf[0];
 		private Dictionary<string, int> toolSlots = new Dictionary<string, int>();
 
 		private Action waitForComplete = null;
