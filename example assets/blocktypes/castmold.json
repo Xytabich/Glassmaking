@@ -3,17 +3,19 @@
 	"class": "glassmaking:castingmold",
 	"entityclass": "glassmaking:castingmold",
 	"attributes": {
-		"glassmaking:castingmold": {
-			"recipe": {
-				"code": "game:*",
-				"amount": 1000,
-				"allowedVariants": [ "green", "yellow" ]
-			},
-			"output": {
-				"type": "block",
-				"code": "game:glass-*"
+		"glassmaking:castingmold": [
+			{
+				"recipe": {
+					"code": "game:*",
+					"amount": 1000,
+					"allowedVariants": [ "green", "yellow" ]
+				},
+				"output": {
+					"type": "block",
+					"code": "game:glass-*"
+				}
 			}
-		},
+		],
 		"fillHeight": 11,
 		"fillQuadsByLevel": [
 			{

@@ -39,18 +39,20 @@
     ],
     "attributesByType": {
         "*-burned-glassshape-*": {
-            "glassmaking:glassmold": {
-                "output": {
-                    "type": "block",
-                    "code": "testmod:glassshape-raw"
-                },
-                "recipe": [
-                    {
-                        "code": "game:plain",
-                        "amount": 128
-                    }
-                ]
-            },
+            "glassmaking:glassmold": [
+				{
+					"output": {
+						"type": "block",
+						"code": "testmod:glassshape-raw"
+					},
+					"recipe": [
+						{
+							"code": "game:plain",
+							"amount": 128
+						}
+					]
+				}
+			],
             "contentsTransform": {
                 "translation": {
                     "x": 0,
