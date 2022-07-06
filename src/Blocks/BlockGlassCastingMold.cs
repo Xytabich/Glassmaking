@@ -17,34 +17,40 @@ namespace GlassMaking.Blocks
 		{
 			base.OnLoaded(api);
 
-			var recipe = Attributes?["glassmaking:castingmold"].AsObject<CastingMoldRecipe>(null, Code.Domain);
-			if(recipe != null && recipe.Enabled)
+			if(Attributes.KeyExists("glassmaking:castingmold"))
 			{
 				var world = api.World;
-				var nameToCodeMapping = recipe.GetNameToCodeMapping(world);
-				List<CastingMoldRecipe> recipes = new List<CastingMoldRecipe>();
-				if(nameToCodeMapping.Count > 0)
+				var recipes = new List<CastingMoldRecipe>();
+
+				var attrib = Attributes["glassmaking:castingmold"];
+				foreach(var recipe in (attrib.IsArray() ? attrib.AsObject<CastingMoldRecipe[]>(null, Code.Domain) : new CastingMoldRecipe[] { attrib.AsObject<CastingMoldRecipe>(null, Code.Domain) }))
 				{
-					string[] variants = nameToCodeMapping["type"];
-					if(variants.Length > 0)
+					if(recipe != null && recipe.Enabled)
 					{
-						recipes.Capacity = variants.Length;
-						for(int i = 0; i < variants.Length; i++)
+						var nameToCodeMapping = recipe.GetNameToCodeMapping(world);
+						if(nameToCodeMapping.Count > 0)
 						{
-							var rec = recipe.Clone();
-							rec.Recipe.Code = rec.Recipe.Code.CopyWithPath(rec.Recipe.Code.Path.Replace("*", variants[i]));
-							rec.Output.Code = rec.Output.Code.CopyWithPath(rec.Output.Code.Path.Replace("*", variants[i]));
-							recipes.Add(rec);
+							string[] variants = nameToCodeMapping["type"];
+							if(variants.Length > 0)
+							{
+								for(int i = 0; i < variants.Length; i++)
+								{
+									var rec = recipe.Clone();
+									rec.Recipe.Code = rec.Recipe.Code.CopyWithPath(rec.Recipe.Code.Path.Replace("*", variants[i]));
+									rec.Output.Code = rec.Output.Code.CopyWithPath(rec.Output.Code.Path.Replace("*", variants[i]));
+									recipes.Add(rec);
+								}
+							}
+							else
+							{
+								api.World.Logger.Warning("{0} mold make uses of wildcards, but no blocks or item matching those wildcards were found.", Code);
+							}
+						}
+						else
+						{
+							recipes.Add(recipe);
 						}
 					}
-					else
-					{
-						api.World.Logger.Warning("{0} mold make uses of wildcards, but no blocks or item matching those wildcards were found.", Code);
-					}
-				}
-				else
-				{
-					recipes.Add(recipe);
 				}
 
 				string source = Code.ToString();

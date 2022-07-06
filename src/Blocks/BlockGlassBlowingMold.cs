@@ -17,61 +17,70 @@ namespace GlassMaking.Blocks
 		{
 			base.OnLoaded(api);
 
-			var recipe = Attributes?["glassmaking:glassmold"].AsObject<BlowingMoldRecipe>(null, Code.Domain);
-			if(recipe != null && recipe.Enabled)
+			if(Attributes.KeyExists("glassmaking:glassmold"))
 			{
 				var world = api.World;
-				var nameToCodeMapping = recipe.GetNameToCodeMapping(world);
-				List<BlowingMoldRecipe> recipes = new List<BlowingMoldRecipe>();
-				if(nameToCodeMapping.Count > 0)
+				var recipes = new List<BlowingMoldRecipe>();
+
+				var tmpList = new List<BlowingMoldRecipe>();
+				var attrib = Attributes["glassmaking:glassmold"];
+				foreach(var recipe in (attrib.IsArray() ? attrib.AsObject<BlowingMoldRecipe[]>(null, Code.Domain) : new BlowingMoldRecipe[] { attrib.AsObject<BlowingMoldRecipe>(null, Code.Domain) }))
 				{
-					int qCombs = 0;
-					bool first = true;
-					foreach(var pair in nameToCodeMapping)
+					if(recipe != null && recipe.Enabled)
 					{
-						if(first) qCombs = pair.Value.Length;
-						else qCombs *= pair.Value.Length;
-						first = false;
-					}
-					if(qCombs > 0)
-					{
-						recipes.Capacity = qCombs;
-						for(int i = 0; i < qCombs; i++)
+						var nameToCodeMapping = recipe.GetNameToCodeMapping(world);
+						if(nameToCodeMapping.Count > 0)
 						{
-							recipes.Add(recipe.Clone());
-						}
-						foreach(var pair in nameToCodeMapping)
-						{
-							string variantCode = pair.Key;
-							string[] variants = pair.Value;
-
-							for(int i = 0; i < qCombs; i++)
+							int qCombs = 0;
+							bool first = true;
+							foreach(var pair in nameToCodeMapping)
 							{
-								var rec = recipes[i];
-
-								if(rec.Ingredients != null)
+								if(first) qCombs = pair.Value.Length;
+								else qCombs *= pair.Value.Length;
+								first = false;
+							}
+							if(qCombs > 0)
+							{
+								tmpList.Clear();
+								for(int i = 0; i < qCombs; i++)
 								{
-									foreach(var ingred in rec.Ingredients)
+									tmpList.Add(recipe.Clone());
+								}
+								foreach(var pair in nameToCodeMapping)
+								{
+									string variantCode = pair.Key;
+									string[] variants = pair.Value;
+
+									for(int i = 0; i < qCombs; i++)
 									{
-										if(ingred.Name == variantCode)
+										var rec = tmpList[i];
+
+										if(rec.Ingredients != null)
 										{
-											ingred.Code = ingred.Code.CopyWithPath(ingred.Code.Path.Replace("*", variants[i % variants.Length]));
+											foreach(var ingred in rec.Ingredients)
+											{
+												if(ingred.Name == variantCode)
+												{
+													ingred.Code = ingred.Code.CopyWithPath(ingred.Code.Path.Replace("*", variants[i % variants.Length]));
+												}
+											}
 										}
+
+										rec.Output.FillPlaceHolder(variantCode, variants[i % variants.Length]);
 									}
 								}
-
-								rec.Output.FillPlaceHolder(variantCode, variants[i % variants.Length]);
+								recipes.AddRange(tmpList);
+							}
+							else
+							{
+								api.World.Logger.Warning("{0} mold make uses of wildcards, but no blocks or item matching those wildcards were found.", Code);
 							}
 						}
+						else
+						{
+							recipes.Add(recipe);
+						}
 					}
-					else
-					{
-						api.World.Logger.Warning("{0} mold make uses of wildcards, but no blocks or item matching those wildcards were found.", Code);
-					}
-				}
-				else
-				{
-					recipes.Add(recipe);
 				}
 
 				string source = Code.ToString();
