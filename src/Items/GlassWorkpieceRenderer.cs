@@ -19,7 +19,7 @@ namespace GlassMaking.Items
 
 		private ICoreClientAPI capi;
 		private ITextureAtlasAPI curAtlas;
-		private Dictionary<string, CompositeTexture> nowTesselatingTextures;
+		private IDictionary<string, CompositeTexture> nowTesselatingTextures;
 		private Shape nowTesselatingShape;
 
 		public virtual TextureAtlasPosition this[string textureCode]

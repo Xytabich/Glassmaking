@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Vintagestory.API.Client;
+﻿using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 
@@ -24,7 +23,7 @@ namespace GlassMaking.Common
 		{
 			get
 			{
-				Dictionary<string, CompositeTexture> textures = collectible is Item item ? item.Textures : (collectible as Block).Textures;
+				var textures = collectible is Item item ? item.Textures : (collectible as Block).Textures;
 				AssetLocation texturePath = null;
 				CompositeTexture tex;
 

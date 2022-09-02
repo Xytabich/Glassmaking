@@ -234,7 +234,7 @@ namespace GlassMaking.Blocks
 			GlassBlend blend = GlassBlend.FromJson(slot.Itemstack);
 			if(blend == null) blend = GlassBlend.FromTreeAttributes(slot.Itemstack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
 			if(blend != null && blend.Amount > 0 && (blend.Amount + glassAmount) <= maxGlassAmount &&
-				(glassCode == null && mod.GetGlassTypeInfo(blend.Code) != null || glassCode.Equals(blend.Code)))
+				(glassCode?.Equals(blend.Code) ?? mod.GetGlassTypeInfo(blend.Code) != null))
 			{
 				if(Api.Side == EnumAppSide.Server)
 				{

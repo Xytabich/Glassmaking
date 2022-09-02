@@ -27,7 +27,7 @@ namespace GlassMaking.Items
 
 		private Dictionary<string, ItemStack[]> recipeLiquidContents = new Dictionary<string, ItemStack[]>();
 
-		public override void OnHandbookRecipeRender(ICoreClientAPI capi, GridRecipe gridRecipe, ItemSlot dummyslot, double x, double y, double size)
+		public override void OnHandbookRecipeRender(ICoreClientAPI capi, GridRecipe gridRecipe, ItemSlot dummyslot, double x, double y, double z, double size)
 		{
 			// 1.16.0: Fugly (but backwards compatible) hack: We temporarily store the ingredient index in an unused field of ItemSlot so that OnHandbookRecipeRender() has access to that number. Proper solution would be to alter the method signature to pass on this value.
 			int rindex = dummyslot.BackgroundIcon.ToInt();
@@ -38,7 +38,7 @@ namespace GlassMaking.Items
 
 			if(rprops?.Exists != true)
 			{
-				base.OnHandbookRecipeRender(capi, gridRecipe, dummyslot, x, y, size);
+				base.OnHandbookRecipeRender(capi, gridRecipe, dummyslot, x, y, z, size);
 				return;
 			}
 

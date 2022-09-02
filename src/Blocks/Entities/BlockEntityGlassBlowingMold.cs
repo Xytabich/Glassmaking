@@ -36,7 +36,7 @@ namespace GlassMaking.Blocks
 		{
 			get
 			{
-				Dictionary<string, CompositeTexture> textures = nowTesselatingObj is Item item ? item.Textures : ((Block)nowTesselatingObj).Textures;
+				var textures = nowTesselatingObj is Item item ? item.Textures : ((Block)nowTesselatingObj).Textures;
 				AssetLocation texturePath = null;
 				CompositeTexture tex;
 

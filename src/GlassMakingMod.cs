@@ -19,25 +19,25 @@ using System.Collections.Generic;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
-using Vintagestory.API.Server;
-using Vintagestory.ServerMods;
 
 namespace GlassMaking
 {
 	public class GlassMakingMod : ModSystem
 	{
+		public const string RECIPE_SELECT_HOTKEY = "itemrecipeselect";
+
 		internal CachedItemRenderer itemsRenderer;
 		internal CachedMeshRefs meshRefCache;
 
 		private ICoreAPI api;
-		private ICoreServerAPI sapi = null;
 		private ICoreClientAPI capi = null;
-		private RecipeRegistryDictionary<GlassBlowingRecipe> glassblowingRecipes;
-		private RecipeRegistryDictionary<WorkbenchRecipe> workbenchRecipes;
 		private Dictionary<AssetLocation, GlassTypeVariant> glassTypes;
 		private Dictionary<string, IPipeBlowingToolDescriptor> pipeToolDescriptors;
 		private Dictionary<string, IWorkbenchToolDescriptor> workbenchToolDescriptors;
 		private Dictionary<string, WorkbenchToolBehavior> workbenchTools = null;
+
+		private RecipeRegistryDictionary<GlassBlowingRecipe> glassblowingRecipes => recipeLoader.glassblowingRecipes;
+		private RecipeRegistryDictionary<WorkbenchRecipe> workbenchRecipes => recipeLoader.workbenchRecipes;
 
 		private List<Block> blowingMolds = null;
 		private HashSet<AssetLocation> blowingMoldsOutput = null;
@@ -52,6 +52,8 @@ namespace GlassMaking
 
 		private Harmony harmony;
 
+		private GlassMakingRecipeLoader recipeLoader;
+
 		private List<IDisposable> handbookInfoList;
 
 		public override void Start(ICoreAPI api)
@@ -60,23 +62,9 @@ namespace GlassMaking
 
 			base.Start(api);
 
+			recipeLoader = api.ModLoader.GetModSystem<GlassMakingRecipeLoader>();
+
 			glassTypes = new Dictionary<AssetLocation, GlassTypeVariant>();
-			var glassTypeProperties = api.Assets.GetMany<JToken>(api.Logger, "worldproperties/abstract/glasstype.json");
-			foreach(var pair in glassTypeProperties)
-			{
-				try
-				{
-					var property = pair.Value.ToObject<GlassTypeProperty>(pair.Key.Domain);
-					foreach(var type in property.Variants)
-					{
-						glassTypes[type.Code.Clone()] = type;
-					}
-				}
-				catch(JsonReaderException ex)
-				{
-					api.Logger.Error("Syntax error in json file '{0}': {1}", pair.Key, ex.Message);
-				}
-			}
 
 			api.RegisterItemClass("glassmaking:glassworkpipe", typeof(ItemGlassworkPipe));
 			api.RegisterItemClass("glassmaking:glassblend", typeof(ItemGlassBlend));
@@ -118,9 +106,6 @@ namespace GlassMaking
 			api.RegisterCollectibleBehaviorClass("glassmaking:glassblend", typeof(ItemBehaviorGlassBlend));
 			api.RegisterCollectibleBehaviorClass("glassmaking:workbenchtool", typeof(ItemBehaviorWorkbenchTool));
 
-			glassblowingRecipes = api.RegisterRecipeRegistry<RecipeRegistryDictionary<GlassBlowingRecipe>>("glassblowing");
-			workbenchRecipes = api.RegisterRecipeRegistry<RecipeRegistryDictionary<WorkbenchRecipe>>("glassworkbench");
-
 			descriptors = new List<ToolBehaviorDescriptor>();
 			descriptors.Add(new ToolUseDescriptor(this));
 			descriptors.Add(new DryableToolDescriptor(this));
@@ -132,19 +117,11 @@ namespace GlassMaking
 			AddWorkbenchToolBehavior(new LiquidUseBehavior());
 		}
 
-		public override void StartServerSide(ICoreServerAPI api)
-		{
-			sapi = api;
-			base.StartServerSide(api);
-
-			api.Event.SaveGameLoaded += OnSaveGameLoadedServer;
-		}
-
 		public override void StartClientSide(ICoreClientAPI api)
 		{
 			capi = api;
 			base.StartClientSide(api);
-			api.Input.RegisterHotKey("itemrecipeselect", Lang.Get("Select Item Recipe"), GlKeys.F, HotkeyType.GUIOrOtherControls);
+			api.Input.RegisterHotKey(RECIPE_SELECT_HOTKEY, Lang.Get("Select Item Recipe"), GlKeys.F, HotkeyType.GUIOrOtherControls);
 			api.Gui.RegisterDialog(new GuiDialogItemRecipeSelector(api));
 
 			var tmpMetaSystem = api.ModLoader.GetModSystem<TemporaryMetadataSystem>();
@@ -185,6 +162,26 @@ namespace GlassMaking
 			annealRecipes = new Dictionary<Tuple<EnumItemClass, int>, ItemStack>();
 			annealOutputs = new HashSet<AssetLocation>();
 			api.Event.LevelFinalize += OnClientLevelFinallize;
+		}
+
+		public override void AssetsLoaded(ICoreAPI api)
+		{
+			var glassTypeProperties = api.Assets.GetMany<JToken>(api.Logger, "worldproperties/abstract/glasstype.json");
+			foreach(var pair in glassTypeProperties)
+			{
+				try
+				{
+					var property = pair.Value.ToObject<GlassTypeProperty>(pair.Key.Domain);
+					foreach(var type in property.Variants)
+					{
+						glassTypes[type.Code.Clone()] = type;
+					}
+				}
+				catch(JsonReaderException ex)
+				{
+					api.Logger.Error("Syntax error in json file '{0}': {1}", pair.Key, ex.Message);
+				}
+			}
 		}
 
 		public override void Dispose()
@@ -449,32 +446,15 @@ namespace GlassMaking
 			InitWorkbenchTools();
 		}
 
-		private void OnSaveGameLoadedServer()
+		public override void AssetsFinalize(ICoreAPI api)
 		{
-			sapi.ModLoader.GetModSystem<RecipeLoader>().LoadRecipes<GlassBlowingRecipe>("glassblowing recipe", "recipes/glassblowing", RegisterGlassblowingRecipe);
-			sapi.ModLoader.GetModSystem<RecipeLoader>().LoadRecipes<WorkbenchRecipe>("glassworkbench recipe", "recipes/glassworkbench", RegisterWorkbenchRecipe);
-			foreach(var descriptor in descriptors)
+			if(api.Side == EnumAppSide.Server)
 			{
-				descriptor.OnLoaded(sapi);
-			}
-			InitWorkbenchTools();
-		}
-
-		private void RegisterGlassblowingRecipe(GlassBlowingRecipe r)
-		{
-			r.RecipeId = glassblowingRecipes.Recipes.Count;
-			if(!glassblowingRecipes.AddRecipe(r))
-			{
-				sapi.Logger.Error("Unable to add glassblowing recipe {0} with output {1} as a similar recipe has already been added", r.Code, r.Output.Code);
-			}
-		}
-
-		private void RegisterWorkbenchRecipe(WorkbenchRecipe r)
-		{
-			r.RecipeId = workbenchRecipes.Recipes.Count;
-			if(!workbenchRecipes.AddRecipe(r))
-			{
-				sapi.Logger.Error("Unable to add workbench recipe {0} with output {1} as a similar recipe has already been added", r.Code, r.Output.Code);
+				foreach(var descriptor in descriptors)
+				{
+					descriptor.OnLoaded(api);
+				}
+				InitWorkbenchTools();
 			}
 		}
 

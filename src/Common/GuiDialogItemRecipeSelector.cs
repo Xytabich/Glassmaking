@@ -31,7 +31,7 @@ namespace GlassMaking
 		public override void OnBlockTexturesLoaded()
 		{
 			base.OnBlockTexturesLoaded();
-			capi.Input.SetHotKeyHandler("itemrecipeselect", OnKeyCombination);
+			capi.Input.SetHotKeyHandler(GlassMakingMod.RECIPE_SELECT_HOTKEY, OnKeyCombination);
 		}
 
 		private bool OnKeyCombination(KeyCombination viaKeyComb)

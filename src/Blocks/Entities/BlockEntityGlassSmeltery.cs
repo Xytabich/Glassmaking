@@ -335,6 +335,14 @@ namespace GlassMaking.Blocks
 			}
 		}
 
+		void IBlockEntityContainer.DropContents(Vec3d atPos)
+		{
+			foreach(var item in GetDropItems())
+			{
+				Api.World.SpawnItemEntity(item, atPos);
+			}
+		}
+
 		void ITimeBasedHeatReceiver.SetHeatSource(ITimeBasedHeatSourceControl heatSource)
 		{
 			this.heatSource = heatSource;

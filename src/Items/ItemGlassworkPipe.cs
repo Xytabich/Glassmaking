@@ -132,7 +132,7 @@ namespace GlassMaking.Items
 				var tmp = new WorldInteraction[] {
 					new WorldInteraction() {
 						ActionLangCode = "glassmaking:heldhelp-glasspipe-recipe",
-						HotKeyCode = "itemrecipeselect",
+						HotKeyCode = GlassMakingMod.RECIPE_SELECT_HOTKEY,
 						MouseButton = EnumMouseButton.None
 					}
 				}.Append(list);
