@@ -1,17 +1,21 @@
 {
-    "code": "glassshape",
-    "input": {
-        "type": "block",
-        "code": "glassshape-raw"
-    },
-    "output": {
-        "type": "block",
-        "code": "glassshape-annealed"
-    },
-    "steps": [
+	"code": "glassshape",
+	"input": {
+		"type": "block",
+		"code": "glassshape-raw"
+	},
+	"output": {
+		"type": "block",
+		"code": "glassshape-annealed"
+	},
+	"steps": [
 		{
 			"shape": { "base": "block/glassshape" },
-			"textures": { "glass0": { "base": "game:block/glass/vintage" } }
+			"textures": {
+				"glass0": { "base": "game:block/glass/vintage" },
+				"glass1": { "base": "game:block/glass/green" },
+				"glass2": { "base": "game:block/glass/violet" }
+			},
 			"tools": {
 				"blowtorch": { "temperature": 1300 }
 			},
@@ -39,5 +43,5 @@
 			},
 			"useTime": 10
 		}
-    ]
+	]
 }
