@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GlassMaking.Common;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Vintagestory.API.Client;
@@ -64,7 +65,7 @@ namespace GlassMaking.Blocks
 					texturePath = new AssetLocation(textureCode);
 				}
 
-				return GetOrCreateTexPos(texturePath);
+				return AtlasTexSource.GetOrCreateTexPos(capi, capi.BlockTextureAtlas, texturePath, "For render in block " + Block.Code + ", item " + nowTesselatingObj.Code);
 			}
 		}
 
@@ -295,28 +296,6 @@ namespace GlassMaking.Blocks
 			mesh.ModelTransform(contentsTransform);
 
 			return mesh;
-		}
-
-		private TextureAtlasPosition GetOrCreateTexPos(AssetLocation texturePath)
-		{
-			TextureAtlasPosition texpos = capi.BlockTextureAtlas[texturePath];
-
-			if(texpos == null)
-			{
-				IAsset texAsset = capi.Assets.TryGet(texturePath.Clone().WithPathPrefixOnce("textures/").WithPathAppendixOnce(".png"));
-				if(texAsset != null)
-				{
-					BitmapRef bmp = texAsset.ToBitmap(capi);
-					capi.BlockTextureAtlas.InsertTextureCached(texturePath, bmp, out _, out texpos);
-				}
-				else
-				{
-					texpos = capi.BlockTextureAtlas.UnknownTexturePosition;
-					capi.World.Logger.Warning("For render in block " + Block.Code + ", item {0} defined texture {1}, not no such texture found.", nowTesselatingObj.Code, texturePath);
-				}
-			}
-
-			return texpos;
 		}
 	}
 }

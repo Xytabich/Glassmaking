@@ -1,6 +1,7 @@
 ﻿using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
+using Vintagestory.ServerMods.NoObf;
 
 namespace GlassMaking.Common
 {
@@ -51,7 +52,7 @@ namespace GlassMaking.Common
 					texturePath = new AssetLocation(textureCode);
 				}
 
-				return GetOrCreateTexPos(texturePath);
+				return GetOrCreateTexPos(capi, atlas, texturePath, "Item " + collectible.Code);
 			}
 		}
 
@@ -61,22 +62,19 @@ namespace GlassMaking.Common
 			this.shape = shape;
 		}
 
-		private TextureAtlasPosition GetOrCreateTexPos(AssetLocation texturePath)
+		public static TextureAtlasPosition GetOrCreateTexPos(ICoreClientAPI capi, ITextureAtlasAPI atlas, AssetLocation texturePath, string logFirstPart)
 		{
 			TextureAtlasPosition texpos = atlas[texturePath];
 
 			if(texpos == null)
 			{
-				IAsset texAsset = capi.Assets.TryGet(texturePath.Clone().WithPathPrefixOnce("textures/").WithPathAppendixOnce(".png"));
-				if(texAsset != null)
-				{
-					BitmapRef bmp = texAsset.ToBitmap(capi);
-					atlas.InsertTextureCached(texturePath, bmp, out _, out texpos);
-				}
-				else
+				if(atlas.GetOrInsertTexture(texturePath, out _, out texpos, () => {
+					IAsset texAsset = capi.Assets.TryGet(texturePath.Clone().WithPathPrefixOnce("textures/").WithPathAppendixOnce(".png"));
+					return texAsset?.ToBitmap(capi);
+				}) == false)
 				{
 					texpos = atlas.UnknownTexturePosition;
-					capi.World.Logger.Warning("Item {0} defined texture {1}, but no such texture was found.", collectible.Code, texturePath);
+					capi.World.Logger.Warning("{0} defined texture {1}, but no such texture was found.", logFirstPart, texturePath);
 				}
 			}
 

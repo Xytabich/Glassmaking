@@ -12,7 +12,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 		public override bool OnUseStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, WorkbenchRecipe recipe, int step)
 		{
 			int cost = recipe.Steps[step].Tools[ToolCode]["toolDurabilityCost"].AsInt(1);
-			if(Slot.Itemstack.Attributes.GetInt("durability", Slot.Itemstack.Collectible.GetDurability(Slot.Itemstack)) < cost)
+			if(Slot.Itemstack.Attributes.GetInt("durability", Slot.Itemstack.Collectible.GetMaxDurability(Slot.Itemstack)) < cost)
 			{
 				return false;
 			}
@@ -22,7 +22,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 		public override bool OnUseStep(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, WorkbenchRecipe recipe, int step)
 		{
 			int cost = recipe.Steps[step].Tools[ToolCode]["toolDurabilityCost"].AsInt(1);
-			if(Slot.Itemstack.Attributes.GetInt("durability", Slot.Itemstack.Collectible.GetDurability(Slot.Itemstack)) < cost)
+			if(Slot.Itemstack.Attributes.GetInt("durability", Slot.Itemstack.Collectible.GetMaxDurability(Slot.Itemstack)) < cost)
 			{
 				return false;
 			}

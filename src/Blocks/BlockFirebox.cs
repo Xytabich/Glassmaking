@@ -7,7 +7,7 @@ using Vintagestory.GameContent;
 
 namespace GlassMaking.Blocks
 {
-	public class BlockFirebox : Block
+	public class BlockFirebox : Block, IIgnitable
 	{
 		private WorldInteraction[] interactions;
 
@@ -101,7 +101,7 @@ namespace GlassMaking.Blocks
 			return false;
 		}
 
-		public override EnumIgniteState OnTryIgniteBlock(EntityAgent byEntity, BlockPos pos, float secondsIgniting)
+		public virtual EnumIgniteState OnTryIgniteBlock(EntityAgent byEntity, BlockPos pos, float secondsIgniting)
 		{
 			if(!(byEntity.World.BlockAccessor.GetBlockEntity(pos) as BlockEntityFirebox).CanIgnite())
 			{
@@ -114,7 +114,7 @@ namespace GlassMaking.Blocks
 			return EnumIgniteState.IgniteNow;
 		}
 
-		public override void OnTryIgniteBlockOver(EntityAgent byEntity, BlockPos pos, float secondsIgniting, ref EnumHandling handling)
+		public virtual void OnTryIgniteBlockOver(EntityAgent byEntity, BlockPos pos, float secondsIgniting, ref EnumHandling handling)
 		{
 			handling = EnumHandling.PreventDefault;
 			(byEntity.World.BlockAccessor.GetBlockEntity(pos) as BlockEntityFirebox)?.TryIgnite();

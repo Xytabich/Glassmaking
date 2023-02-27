@@ -478,13 +478,13 @@ namespace GlassMaking.Blocks
 				if(renderer == null && isStructureComplete)
 				{
 					ICoreClientAPI capi = (ICoreClientAPI)Api;
-					var bathSource = capi.Tesselator.GetTexSource(Block);
+					var bathSource = capi.Tesselator.GetTextureSource(Block);
 					var bathMesh = ObjectCacheUtil.GetOrCreate(capi, "glassmaking:largesmeltery-shape", () => {
 						var asset = capi.Assets.TryGet(new AssetLocation(Block.Code.Domain, "shapes/block/largesmeltery/bath.json"));
 						capi.Tesselator.TesselateShape("glassmaking:largesmeltery-shape", asset.ToObject<Shape>(), out var bath, bathSource);
 						return capi.Render.UploadMesh(bath);
 					});
-					renderer = new BlockRendererGlassSmeltery(capi, Pos, EnumRenderStage.Opaque, bathMesh, capi.Tesselator.GetTexSource(Block),
+					renderer = new BlockRendererGlassSmeltery(capi, Pos, EnumRenderStage.Opaque, bathMesh, capi.Tesselator.GetTextureSource(Block),
 						bathSource["inside"].atlasTextureId, 0.4375f, 0.6875f, 0.375f, 2f, 0.0001f);
 				}
 				if(renderer != null)

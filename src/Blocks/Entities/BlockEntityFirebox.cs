@@ -59,7 +59,7 @@ namespace GlassMaking.Blocks
 			if(api.Side == EnumAppSide.Client)
 			{
 				ICoreClientAPI capi = (ICoreClientAPI)api;
-				renderer = new BlockRendererFirebox(Pos, capi.Tesselator.GetTexSource(Block), capi);
+				renderer = new BlockRendererFirebox(Pos, capi.Tesselator.GetTextureSource(Block), capi);
 				capi.Event.RegisterRenderer(renderer, EnumRenderStage.Opaque, "glassmaking:firebox");
 				UpdateRendererFull();
 				ToggleAmbientSounds(burning);

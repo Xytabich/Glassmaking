@@ -39,7 +39,6 @@ namespace GlassMaking.Blocks
 				inventory[i].MaxSlotStackSize = 1;
 			}
 			processes = new ItemProcessInfo[itemCapacity];
-			meshes = new MeshData[itemCapacity];
 		}
 
 		public override void Initialize(ICoreAPI api)
@@ -210,12 +209,22 @@ namespace GlassMaking.Blocks
 			}
 		}
 
-		public override void TranslateMesh(MeshData mesh, int index)
+		protected override float[][] genTransformationMatrices()
 		{
-			int x = index % gridSize;
-			int z = index / gridSize;
+			int len = DisplayedItems;
+			float[][] tfMatrices = new float[len][];
+			var tmpMat = new Matrixf();
 			var transform = ((BlockAnnealer)Block).contentTransform;
-			mesh.Translate(transform.Translation.X + (x + 0.5f) / gridSize * transform.ScaleXYZ.X, transform.Translation.Y, transform.Translation.Z + (z + 0.5f) / gridSize * transform.ScaleXYZ.Z);
+			for(int i = 0; i < len; i++)
+			{
+				int x = i % gridSize;
+				int z = i / gridSize;
+
+				tmpMat.Identity();
+				tmpMat.Translate(transform.Translation.X + (x + 0.5f) / gridSize * transform.ScaleXYZ.X, transform.Translation.Y, transform.Translation.Z + (z + 0.5f) / gridSize * transform.ScaleXYZ.Z);
+				tfMatrices[i] = (float[])tmpMat.Values.Clone();
+			}
+			return tfMatrices;
 		}
 
 		public override void updateMeshes()

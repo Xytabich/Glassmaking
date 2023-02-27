@@ -54,7 +54,7 @@ namespace GlassMaking.Items
 					texturePath = new AssetLocation(textureCode);
 				}
 
-				return GetOrCreateTexPos(texturePath);
+				return AtlasTexSource.GetOrCreateTexPos(api as ICoreClientAPI, curAtlas, texturePath, "Item " + Code);
 			}
 		}
 
@@ -130,29 +130,6 @@ namespace GlassMaking.Items
 				return GetItemBaseCode(Code) + "|" + blend.Code.ToString();
 			}
 			return "glassmaking:blend|" + Code.ToString();
-		}
-
-		protected TextureAtlasPosition GetOrCreateTexPos(AssetLocation texturePath)
-		{
-			var capi = api as ICoreClientAPI;
-			TextureAtlasPosition texpos = curAtlas[texturePath];
-
-			if(texpos == null)
-			{
-				IAsset texAsset = capi.Assets.TryGet(texturePath.Clone().WithPathPrefixOnce("textures/").WithPathAppendixOnce(".png"));
-				if(texAsset != null)
-				{
-					BitmapRef bmp = texAsset.ToBitmap(capi);
-					curAtlas.InsertTextureCached(texturePath, bmp, out _, out texpos);
-				}
-				else
-				{
-					texpos = curAtlas.UnknownTexturePosition;
-					capi.World.Logger.Warning("Item {0} defined texture {1}, not no such texture found.", Code, texturePath);
-				}
-			}
-
-			return texpos;
 		}
 
 		private MeshData genMesh(ICoreClientAPI capi, ItemStack itemstack)

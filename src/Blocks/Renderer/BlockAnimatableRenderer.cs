@@ -38,7 +38,7 @@ namespace GlassMaking.Blocks.Renderer
 
 			(transform ?? ModelTransform.NoTransform).CopyTo(transformMat);
 
-			textureId = capi.BlockTextureAtlas.AtlasTextureIds[0];
+			textureId = capi.BlockTextureAtlas.AtlasTextures[0].TextureId;
 
 			capi.Event.EnqueueMainThreadTask(() => {
 				capi.Event.RegisterRenderer(this, EnumRenderStage.Opaque, "glassmaking:blockanimatable");
@@ -92,10 +92,10 @@ namespace GlassMaking.Blocks.Renderer
 
 			prog.Uniform("addRenderFlags", 0);
 
-			prog.UniformMatrices(
+			prog.UniformMatrices4x3(
 				"elementTransforms",
 				GlobalConstants.MaxAnimatedElements,
-				animator.Matrices
+				animator.Matrices4x3
 			);
 
 			capi.Render.RenderMesh(meshref);

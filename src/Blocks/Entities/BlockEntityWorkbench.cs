@@ -48,7 +48,6 @@ namespace GlassMaking.Blocks
 		public BlockEntityWorkbench()
 		{
 			inventory = new WorkbenchToolsInventory(toolsCapacity + 1, InventoryClassName + "-" + Pos, null, this);
-			meshes = new MeshData[toolsCapacity];
 			toolsSelection = new SelectionInfo[toolsCapacity];
 		}
 
@@ -557,15 +556,31 @@ namespace GlassMaking.Blocks
 			}
 		}
 
+		protected override float[][] genTransformationMatrices()
+		{
+			int len = DisplayedItems;
+			float[][] tfMatrices = new float[len][];
+			for(int i = 0; i < len; i++)
+			{
+				var mat = new float[16];
+				Mat4f.Identity(mat);
+				tfMatrices[i] = mat;
+			}
+			return tfMatrices;
+		}
+
 		protected override void updateMesh(int index)
 		{
 			if(index == toolsCapacity) return;
 			base.updateMesh(index);
 		}
 
-		protected override MeshData genMesh(ItemStack stack)
+		protected override MeshData getOrCreateMesh(ItemStack stack, int index)
 		{
-			MeshData mesh = GenItemMesh(stack);
+			MeshData mesh = getMesh(stack);
+			if(mesh != null) return mesh;
+
+			mesh = GenItemMesh(stack);
 			if(mesh == null) return null;
 
 			if(stack.Collectible.Attributes?[AttributeTransformCode].Exists == true)
@@ -911,6 +926,7 @@ namespace GlassMaking.Blocks
 			}
 			return false;
 		}
+
 		private class SelectionInfo
 		{
 			public int index;

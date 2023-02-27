@@ -7,7 +7,7 @@ using Vintagestory.API.Util;
 
 namespace GlassMaking
 {
-	public class AnimUtil
+	public static class AnimUtil
 	{
 		public static float Reach(float current, float to)
 		{

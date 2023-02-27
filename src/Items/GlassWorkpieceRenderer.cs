@@ -38,7 +38,7 @@ namespace GlassMaking.Items
 					texturePath = new AssetLocation(textureCode);
 				}
 
-				return GetOrCreateTexPos(capi, texturePath);
+				return AtlasTexSource.GetOrCreateTexPos(capi, curAtlas, texturePath, "Worpiece");
 			}
 		}
 
@@ -126,28 +126,6 @@ namespace GlassMaking.Items
 			this.capi = null;
 
 			return meshdata;
-		}
-
-		private TextureAtlasPosition GetOrCreateTexPos(ICoreClientAPI capi, AssetLocation texturePath)
-		{
-			TextureAtlasPosition texpos = curAtlas[texturePath];
-
-			if(texpos == null)
-			{
-				IAsset texAsset = capi.Assets.TryGet(texturePath.Clone().WithPathPrefixOnce("textures/").WithPathAppendixOnce(".png"));
-				if(texAsset != null)
-				{
-					BitmapRef bmp = texAsset.ToBitmap(capi);
-					curAtlas.InsertTextureCached(texturePath, bmp, out _, out texpos);
-				}
-				else
-				{
-					texpos = curAtlas.UnknownTexturePosition;
-					capi.World.Logger.Warning("Workpiece defined texture {0}, not no such texture found.", texturePath);
-				}
-			}
-
-			return texpos;
 		}
 
 		internal struct Data
