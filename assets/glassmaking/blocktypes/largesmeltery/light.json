@@ -14,6 +14,11 @@
 	"attributes": {
 		"handbook": {
 			"exclude": true
+		},
+		"structureSurrogate": {
+			"subVariants": {
+				"level": [ "0", "1", "2" ]
+			}
 		}
 	},
 	"blockmaterial": "Air",

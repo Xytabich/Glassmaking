@@ -217,11 +217,14 @@ namespace GlassMaking.Blocks
 			var transform = ((BlockAnnealer)Block).contentTransform;
 			for(int i = 0; i < len; i++)
 			{
-				int x = i % gridSize;
-				int z = i / gridSize;
-
 				tmpMat.Identity();
-				tmpMat.Translate(transform.Translation.X + (x + 0.5f) / gridSize * transform.ScaleXYZ.X, transform.Translation.Y, transform.Translation.Z + (z + 0.5f) / gridSize * transform.ScaleXYZ.Z);
+				if(gridSize != 0)
+				{
+					int x = i % gridSize;
+					int z = i / gridSize;
+
+					tmpMat.Translate(transform.Translation.X + (x + 0.5f) / gridSize * transform.ScaleXYZ.X, transform.Translation.Y, transform.Translation.Z + (z + 0.5f) / gridSize * transform.ScaleXYZ.Z);
+				}
 				tfMatrices[i] = (float[])tmpMat.Values.Clone();
 			}
 			return tfMatrices;

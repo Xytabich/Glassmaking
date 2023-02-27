@@ -76,8 +76,7 @@ namespace GlassMaking.Blocks.Multiblock
 
 									throw new Exception(string.Join("Unable to initialize surrogate {0} with different main block coordinates", sblock.Code));
 								}
-								sblock.isSurrogate = sblock.Id != Id;
-								sblock.mainOffset = new Vec3i(-(x + structureOffset.X), -(y + structureOffset.Y), -(z + structureOffset.Z));
+								sblock.InitStructurePart(api, sblock.Id != Id, new Vec3i(-(x + structureOffset.X), -(y + structureOffset.Y), -(z + structureOffset.Z)));
 							}
 						}
 					}
@@ -455,6 +454,36 @@ namespace GlassMaking.Blocks.Multiblock
 		{
 			loadStep++;
 			if(loadStep == 2) OnStructureLoaded();
+		}
+
+		protected virtual void InitStructurePart(ICoreAPI api, bool isSurrogate, Vec3i mainOffset, bool isVariant = false)
+		{
+			this.isSurrogate = isSurrogate;
+			this.mainOffset = mainOffset;
+			if(isSurrogate && !isVariant)
+			{
+				if(Attributes != null && Attributes.KeyExists("structureSurrogate") && Attributes["structureSurrogate"].KeyExists("subVariants"))
+				{
+					var subVariants = Attributes["structureSurrogate"]["subVariants"].AsObject<Dictionary<string, string[]>>();
+					if(subVariants != null && subVariants.Count > 0)
+					{
+						foreach(var pair in subVariants)
+						{
+							if(!string.IsNullOrEmpty(pair.Key) && pair.Value != null && pair.Value.Length > 0)
+							{
+								foreach(var v in pair.Value)
+								{
+									var block = api.World.GetBlock(CodeWithVariant(pair.Key, v));
+									if(block is BlockHorizontalStructure part)
+									{
+										part.InitStructurePart(api, isSurrogate, mainOffset, true);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 
 		protected virtual void OnStructureLoaded()
