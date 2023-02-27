@@ -607,11 +607,9 @@ namespace GlassMaking.Blocks
 			if(stack.Collectible is IWorkbenchCustomRenderer) return null;
 
 			MeshData mesh;
-			var dynBlock = stack.Collectible as IContainedMeshSource;
-
-			if(dynBlock != null)
+			if(stack.Collectible is IContainedMeshSource meshSource)
 			{
-				mesh = dynBlock.GenMesh(stack, capi.BlockTextureAtlas, Pos);
+				mesh = meshSource.GenMesh(stack, this.capi.BlockTextureAtlas, Pos);
 				mesh.Rotate(new Vec3f(0.5f, 0.5f, 0.5f), 0, Block.Shape.rotateY * GameMath.DEG2RAD, 0);
 			}
 			else
@@ -625,15 +623,16 @@ namespace GlassMaking.Blocks
 				{
 					nowTesselatingObj = stack.Collectible;
 					nowTesselatingShape = null;
-					if(stack.Item.Shape != null)
+					if(stack.Item.Shape?.Base != null)
 					{
 						nowTesselatingShape = capi.TesselatorManager.GetCachedShape(stack.Item.Shape.Base);
 					}
 					capi.Tesselator.TesselateItem(stack.Item, out mesh, this);
-
 					mesh.RenderPassesAndExtraBits.Fill((short)EnumChunkRenderPass.BlendNoCull);
 				}
 			}
+			string key = getMeshCacheKey(stack);
+			MeshCache[key] = mesh;
 			return mesh;
 		}
 
