@@ -76,7 +76,7 @@
 	},
 	"textures": {
 		"mix": { "base": "game:block/stone/quartz/full/plain1" },
-		"melt": { "base": "game:block/quartzglass" }
+		"melt": { "base": "game:block/glass/quartzglass" }
 	},
 	"replaceable": 400,
 	"resistance": 3.5,
