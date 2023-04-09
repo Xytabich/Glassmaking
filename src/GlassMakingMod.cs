@@ -64,8 +64,6 @@ namespace GlassMaking
 
 			recipeLoader = api.ModLoader.GetModSystem<GlassMakingRecipeLoader>();
 
-			glassTypes = new Dictionary<AssetLocation, GlassTypeVariant>();
-
 			api.RegisterItemClass("glassmaking:glassworkpipe", typeof(ItemGlassworkPipe));
 			api.RegisterItemClass("glassmaking:glassblend", typeof(ItemGlassBlend));
 			api.RegisterItemClass("glassmaking:wettable", typeof(ItemWettable));
@@ -105,6 +103,8 @@ namespace GlassMaking
 
 			api.RegisterCollectibleBehaviorClass("glassmaking:glassblend", typeof(ItemBehaviorGlassBlend));
 			api.RegisterCollectibleBehaviorClass("glassmaking:workbenchtool", typeof(ItemBehaviorWorkbenchTool));
+
+			glassTypes = api.RegisterRecipeRegistry<GlassTypeRegistry>("glassmaking:glasstypes").GlassTypes;
 
 			descriptors = new List<ToolBehaviorDescriptor>();
 			descriptors.Add(new ToolUseDescriptor(this));
@@ -166,20 +166,22 @@ namespace GlassMaking
 
 		public override void AssetsLoaded(ICoreAPI api)
 		{
-			var glassTypeProperties = api.Assets.GetMany<JToken>(api.Logger, "worldproperties/abstract/glasstype.json");
-			foreach(var pair in glassTypeProperties)
+			if(api.Side == EnumAppSide.Server)
 			{
-				try
+				foreach(var pair in api.Assets.GetMany<JToken>(api.Logger, "worldproperties/abstract/glasstype.json"))
 				{
-					var property = pair.Value.ToObject<GlassTypeProperty>(pair.Key.Domain);
-					foreach(var type in property.Variants)
+					try
 					{
-						glassTypes[type.Code.Clone()] = type;
+						var property = pair.Value.ToObject<GlassTypeProperty>(pair.Key.Domain);
+						foreach(var type in property.Variants)
+						{
+							glassTypes[type.Code.Clone()] = type;
+						}
 					}
-				}
-				catch(JsonReaderException ex)
-				{
-					api.Logger.Error("Syntax error in json file '{0}': {1}", pair.Key, ex.Message);
+					catch(JsonReaderException ex)
+					{
+						api.Logger.Error("Syntax error in json file '{0}': {1}", pair.Key, ex.Message);
+					}
 				}
 			}
 		}
