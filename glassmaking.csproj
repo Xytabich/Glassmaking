@@ -66,10 +66,6 @@
       <HintPath>C:\Games\Vintagestory18\Lib\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="OpenTK">
-      <HintPath>C:\Games\Vintagestory18\Lib\OpenTK.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="protobuf-net">
       <HintPath>C:\Games\Vintagestory18\Lib\protobuf-net.dll</HintPath>
       <Private>False</Private>

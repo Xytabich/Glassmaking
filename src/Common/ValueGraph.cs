@@ -1,5 +1,4 @@
-﻿using OpenTK;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace GlassMaking.Common
@@ -134,7 +133,7 @@ namespace GlassMaking.Common
 
 		private bool TryFindStartPoint(double tOffset, out int nextIndex, out Point point)
 		{
-			if(MathHelper.ApproximatelyEqualEpsilon(points[0].t, tOffset, EPSILON))
+			if(ApproximatelyEqualEpsilon(points[0].t, tOffset, EPSILON))
 			{
 				point = points[0];
 				nextIndex = 1;
@@ -179,7 +178,7 @@ namespace GlassMaking.Common
 				{
 					int index = indices[i];
 					var graphPoints = graphs[i].points;
-					if(index < graphPoints.Length && MathHelper.ApproximatelyEqualEpsilon(graphPoints[index].t, tMin, EPSILON))
+					if(index < graphPoints.Length && ApproximatelyEqualEpsilon(graphPoints[index].t, tMin, EPSILON))
 					{
 						index++;
 						indices[i] = index;
@@ -216,11 +215,11 @@ namespace GlassMaking.Common
 
 		private static double CalcSegmentFinalValue(Point a, Point b, double start, double gain, double loss)
 		{
-			if(MathHelper.ApproximatelyEqualEpsilon(a.t, b.t, EPSILON)) return start;
+			if(ApproximatelyEqualEpsilon(a.t, b.t, EPSILON)) return start;
 
-			if(MathHelper.ApproximatelyEqualEpsilon(a.v, start, EPSILON))
+			if(ApproximatelyEqualEpsilon(a.v, start, EPSILON))
 			{
-				if(MathHelper.ApproximatelyEqualEpsilon(a.v, b.v, EPSILON))
+				if(ApproximatelyEqualEpsilon(a.v, b.v, EPSILON))
 				{
 					return b.v;
 				}
@@ -244,7 +243,7 @@ namespace GlassMaking.Common
 				double vd = (b.v - a.v) / t;
 				double d = a.v > start ? gain : -loss;
 
-				if(MathHelper.ApproximatelyEqualEpsilon(vd, d, EPSILON))
+				if(ApproximatelyEqualEpsilon(vd, d, EPSILON))
 				{
 					return start + d * t;
 				}
@@ -261,15 +260,15 @@ namespace GlassMaking.Common
 
 		private static bool CalcSegmentReachValue(Point a, Point b, ref double value, double target, double gain, double loss, out double ti)
 		{
-			if(MathHelper.ApproximatelyEqualEpsilon(a.t, b.t, EPSILON))
+			if(ApproximatelyEqualEpsilon(a.t, b.t, EPSILON))
 			{
 				ti = 0;
-				return MathHelper.ApproximatelyEqualEpsilon(value, target, EPSILON);
+				return ApproximatelyEqualEpsilon(value, target, EPSILON);
 			}
 
-			if(MathHelper.ApproximatelyEqualEpsilon(a.v, value, EPSILON))
+			if(ApproximatelyEqualEpsilon(a.v, value, EPSILON))
 			{
-				if(MathHelper.ApproximatelyEqualEpsilon(a.v, b.v, EPSILON))
+				if(ApproximatelyEqualEpsilon(a.v, b.v, EPSILON))
 				{
 					ti = b.t - a.t;
 					return false;
@@ -289,7 +288,7 @@ namespace GlassMaking.Common
 				double vd = (b.v - a.v) / t;
 				double d = a.v > value ? gain : -loss;
 
-				if(MathHelper.ApproximatelyEqualEpsilon(vd, d, EPSILON))
+				if(ApproximatelyEqualEpsilon(vd, d, EPSILON))
 				{
 					return TryReachValue(ref value, target, d, t, out ti);
 				}
@@ -340,6 +339,22 @@ namespace GlassMaking.Common
 				if(b.v < value) return 0;
 				return (1 - (value - a.v) / (b.v - a.v)) * (b.t - a.t);
 			}
+		}
+
+		private static bool ApproximatelyEqualEpsilon(double a, double b, double epsilon)
+		{
+			double aa = Math.Abs(a);
+			double ab = Math.Abs(b);
+			double av = Math.Abs(a - b);
+			if(a == b)
+			{
+				return true;
+			}
+			if(a == 0.0 || b == 0.0 || av < 2.2250738585072014E-308)
+			{
+				return av < epsilon * 2.2250738585072014E-308;
+			}
+			return av / Math.Min(aa + ab, double.MaxValue) < epsilon;
 		}
 
 		public struct Point
