@@ -206,7 +206,7 @@ namespace GlassMaking
 				{
 					info.Dispose();
 				}
-				harmony.UnpatchAll("glassmaking");
+				harmony?.UnpatchAll("glassmaking");
 			}
 			base.Dispose();
 		}
