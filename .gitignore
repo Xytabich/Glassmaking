@@ -2,3 +2,4 @@
 /glassmaking.pdb
 *.csproj.user
 /bin/
+/obj/

@@ -1,229 +1,71 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D67E0A76-0110-4FA0-8895-87431B342CB8}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GlassMaking</RootNamespace>
-    <AssemblyName>glassmaking</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>$(ProjectDir)\bin</OutputPath>
-    <IntermediateOutputPath>..\..\obj\Debug\glassmaking\</IntermediateOutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>$(ProjectDir)\bin</OutputPath>
-    <IntermediateOutputPath>..\..\obj\Release\glassmaking\</IntermediateOutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-    <Reference Include="VintagestoryAPI">
-      <HintPath>C:\Games\Vintagestory18\VintagestoryAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="VintagestoryLib">
-      <HintPath>C:\Games\Vintagestory18\VintagestoryLib.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="VSSurvivalMod">
-      <HintPath>C:\Games\Vintagestory18\Mods\VSSurvivalMod.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="VSEssentials">
-      <HintPath>C:\Games\Vintagestory18\Mods\VSEssentials.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="VSCreativeMod">
-      <HintPath>C:\Games\Vintagestory18\Mods\VSCreativeMod.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>C:\Games\Vintagestory18\Lib\Newtonsoft.Json.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="protobuf-net">
-      <HintPath>C:\Games\Vintagestory18\Lib\protobuf-net.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="0Harmony">
-      <HintPath>C:\Games\Vintagestory18\Lib\0Harmony.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="cairo-sharp">
-      <HintPath>C:\Games\Vintagestory18\Lib\cairo-sharp.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="modinfo.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="src\AnimUtil.cs" />
-    <Compile Include="src\Blocks\BlockGlassBlowingMold.cs" />
-    <Compile Include="src\Blocks\BlockAnnealer.cs" />
-    <Compile Include="src\Blocks\BlockGlassCastingMold.cs" />
-    <Compile Include="src\Blocks\BlockLargeSmeltery.cs" />
-    <Compile Include="src\Blocks\BlockLargeSmelteryHearth.cs" />
-    <Compile Include="src\Blocks\Entities\BlockEntityAnnealer.cs" />
-    <Compile Include="src\Blocks\Entities\BlockEntityGlassCastingMold.cs" />
-    <Compile Include="src\Blocks\Entities\BlockEntityLargeSmelteryCore.cs" />
-    <Compile Include="src\Blocks\Entities\BlockEntityLargeSmelteryHearth.cs" />
-    <Compile Include="src\Blocks\Entities\BlockEntityWorkbench.cs" />
-    <Compile Include="src\Blocks\BlockWorkbench.cs" />
-    <Compile Include="src\Blocks\IGlassmeltSink.cs" />
-    <Compile Include="src\Blocks\IGlassCastingMold.cs" />
-    <Compile Include="src\Blocks\IGlassmeltSource.cs" />
-    <Compile Include="src\Blocks\IGlassmeltSourceBlock.cs" />
-    <Compile Include="src\Blocks\IHeatSourceModifier.cs" />
-    <Compile Include="src\Blocks\IGlassBlowingMold.cs" />
-    <Compile Include="src\Blocks\ITimeBasedHeatReceiver.cs" />
-    <Compile Include="src\Blocks\ITimeBasedHeatSource.cs" />
-    <Compile Include="src\Blocks\IWorkpieceRenderer.cs" />
-    <Compile Include="src\Blocks\Multiblock\BEHorizontalStructurePlanMain.cs" />
-    <Compile Include="src\Blocks\Multiblock\BlockBehaviorPlaceTable.cs" />
-    <Compile Include="src\Blocks\Entities\BlockEntityFirebox.cs" />
-    <Compile Include="src\Blocks\Entities\BlockEntityGlassSmeltery.cs" />
-    <Compile Include="src\Blocks\BlockFirebox.cs" />
-    <Compile Include="src\Blocks\BlockGlassSmeltery.cs" />
-    <Compile Include="src\Blocks\Entities\BlockEntityGlassBlowingMold.cs" />
-    <Compile Include="src\Blocks\HeatedBlockBase.cs" />
-    <Compile Include="src\Blocks\IEntityGlassBlowingMold.cs" />
-    <Compile Include="src\Blocks\IHeaterPlaceableBlock.cs" />
-    <Compile Include="src\Blocks\GlassSmelteryInventory.cs" />
-    <Compile Include="src\Blocks\Multiblock\BlockHorizontalStructure.cs" />
-    <Compile Include="src\Blocks\Multiblock\BlockHorizontalStructurePlan.cs" />
-    <Compile Include="src\Blocks\Multiblock\BlockHorizontalStructurePlanMain.cs" />
-    <Compile Include="src\Blocks\Multiblock\IStructurePlanMainBlock.cs" />
-    <Compile Include="src\Blocks\Multiblock\IStructurePlanOptionalBlock.cs" />
-    <Compile Include="src\Blocks\Renderer\BlockAnimatableRenderer.cs" />
-    <Compile Include="src\Blocks\Renderer\BlockRendererFirebox.cs" />
-    <Compile Include="src\Blocks\Renderer\BlockRendererGlassSmeltery.cs" />
-    <Compile Include="src\Blocks\Renderer\CastingMoldRenderer.cs" />
-    <Compile Include="src\Blocks\Renderer\WorkbenchWorkpieceRenderer.cs" />
-    <Compile Include="src\Blocks\WorkbenchToolsInventory.cs" />
-    <Compile Include="src\Common\AtlasTexSource.cs" />
-    <Compile Include="src\Common\CachedMeshRefs.cs" />
-    <Compile Include="src\Common\CastingMoldRecipe.cs" />
-    <Compile Include="src\Common\BulkAccessUtil.cs" />
-    <Compile Include="src\Common\FastVec2f.cs" />
-    <Compile Include="src\Common\GlassBlend.cs" />
-    <Compile Include="src\Common\GlassBlowingRecipe.cs" />
-    <Compile Include="src\Common\BlowingMoldRecipe.cs" />
-    <Compile Include="src\GlassMakingRecipeLoader.cs" />
-    <Compile Include="src\Workbench\IWorkbenchCustomRenderer.cs" />
-    <Compile Include="src\Common\IWettable.cs" />
-    <Compile Include="src\Common\ValueGraph.cs" />
-    <Compile Include="src\GlassblowingTools\DryableTool.cs" />
-    <Compile Include="src\Handbook\AllowedLiquidsList.cs" />
-    <Compile Include="src\Handbook\CastingMoldOutputInfo.cs" />
-    <Compile Include="src\Handbook\CastingMoldRecipeInfo.cs" />
-    <Compile Include="src\Handbook\MultiblockPlanMaterials.cs" />
-    <Compile Include="src\Handbook\WorkbenchRecipeInfo.cs" />
-    <Compile Include="src\ItemRender\CachedItemRenderer.cs" />
-    <Compile Include="src\ItemRender\IItemRenderer.cs" />
-    <Compile Include="src\Items\Behavior\ItemBehaviorWorkbenchTool.cs" />
-    <Compile Include="src\Items\GlassLadleRenderer.cs" />
-    <Compile Include="src\Items\GlasspipeRenderer.cs" />
-    <Compile Include="src\Common\GlassType.cs" />
-    <Compile Include="src\Common\GuiDialogItemRecipeSelector.cs" />
-    <Compile Include="src\Items\GlassRenderUtil.cs" />
-    <Compile Include="src\Items\GlassWorkpieceRenderer.cs" />
-    <Compile Include="src\Workbench\CollectibleBehaviorWorkbenchTool.cs" />
-    <Compile Include="src\Items\ItemBlowtorch.cs" />
-    <Compile Include="src\Items\ItemContainer.cs" />
-    <Compile Include="src\Items\ItemGlassContainer.cs" />
-    <Compile Include="src\Items\ItemGlassLadle.cs" />
-    <Compile Include="src\Items\ItemGlassWorkpiece.cs" />
-    <Compile Include="src\Items\ItemLathe.cs" />
-    <Compile Include="src\Items\ItemLiquidContainer.cs" />
-    <Compile Include="src\Items\StrictLiquidContainer.cs" />
-    <Compile Include="src\ToolDescriptors\BlowingToolDescriptor.cs" />
-    <Compile Include="src\ToolDescriptors\DryableToolDescriptor.cs" />
-    <Compile Include="src\ToolDescriptors\IntakeToolDescriptor.cs" />
-    <Compile Include="src\ToolDescriptors\IPipeBlowingToolDescriptor.cs" />
-    <Compile Include="src\Handbook\BlowingMoldOutputInfo.cs" />
-    <Compile Include="src\Handbook\ItemMeltableInfo.cs" />
-    <Compile Include="src\HandbookPatcher\HandbookItemInfoEvent.cs" />
-    <Compile Include="src\HandbookPatcher\HandbookItemInfoPatch.cs" />
-    <Compile Include="src\Common\IItemCrafter.cs" />
-    <Compile Include="src\Common\WorkbenchRecipe.cs" />
-    <Compile Include="src\GlassblowingTools\GlassblowingToolBehavior.cs" />
-    <Compile Include="src\HandbookPatcher\HandbookItemInfoSection.cs" />
-    <Compile Include="src\Handbook\BlowingMoldRecipeInfo.cs" />
-    <Compile Include="src\Handbook\GlassblowingRecipeInfo.cs" />
-    <Compile Include="src\Handbook\AnnealOutputInfo.cs" />
-    <Compile Include="src\Handbook\AnnealRecipeInfo.cs" />
-    <Compile Include="src\Items\Behavior\ItemBehaviorGlassBlend.cs" />
-    <Compile Include="src\Items\ItemWettable.cs" />
-    <Compile Include="src\TemporaryMetadata\IDisposableHandle.cs" />
-    <Compile Include="src\TemporaryMetadata\ITemporaryMetadataPool.cs" />
-    <Compile Include="src\TemporaryMetadata\TemporaryMetadataSystem.cs" />
-    <Compile Include="src\ToolDescriptors\ToolBehaviorDescriptor.cs" />
-    <Compile Include="src\ToolDescriptors\ToolUseDescriptor.cs" />
-    <Compile Include="src\Workbench\ICollectibleWorkbenchTool.cs" />
-    <Compile Include="src\Common\MinMaxFloat.cs" />
-    <Compile Include="src\Common\RecipeRegistryDictionary.cs" />
-    <Compile Include="src\Common\SimpleTextureSource.cs" />
-    <Compile Include="src\Common\SmoothRadialShape.cs" />
-    <Compile Include="src\GenericItemAction\GenericItemActionSystem.cs" />
-    <Compile Include="src\GenericItemAction\GuiHeldItemActionDialog.cs" />
-    <Compile Include="src\GenericItemAction\HeldItemActionMessage.cs" />
-    <Compile Include="src\GenericItemAction\IGenericHeldItemAction.cs" />
-    <Compile Include="src\GlassblowingTools\ToolUse.cs" />
-    <Compile Include="src\GlassMakingMod.cs" />
-    <Compile Include="src\Items\ItemGlassBlend.cs" />
-    <Compile Include="src\Items\ItemGlassworkPipe.cs" />
-    <Compile Include="src\Items\GlasspipeRenderUtil.cs" />
-    <Compile Include="src\GlassblowingTools\BlowingTool.cs" />
-    <Compile Include="src\GlassblowingTools\GlassIntakeTool.cs" />
-    <Compile Include="src\Workbench\ItemWorkbenchTool.cs" />
-    <Compile Include="src\Utils.cs" />
-    <Compile Include="src\Workbench\ToolBehaviors\BlowtorchToolBehavior.cs" />
-    <Compile Include="src\Workbench\ToolBehaviors\DamageableToolBehavior.cs" />
-    <Compile Include="src\Workbench\ToolBehaviors\ItemUseBehavior.cs" />
-    <Compile Include="src\Workbench\ToolBehaviors\LatheToolBehavior.cs" />
-    <Compile Include="src\Workbench\ToolBehaviors\LiquidUseBehavior.cs" />
-    <Compile Include="src\Workbench\ToolBehaviors\SimpleToolBehavior.cs" />
-    <Compile Include="src\Workbench\ToolDescriptors\LiquidUseDescriptor.cs" />
-    <Compile Include="src\Workbench\ToolDescriptors\ItemUseDescriptor.cs" />
-    <Compile Include="src\Workbench\ToolDescriptors\IWorkbenchToolDescriptor.cs" />
-    <Compile Include="src\Workbench\WorkbenchToolBehavior.cs" />
-    <Compile Include="src\Workbench\WorkbenchMountedToolBehavior.cs" />
-    <Compile Include="src\Workbench\WorkbenchToolUtils.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="assets\**\*.*" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>
-copy "$(TargetPath)" "$(ProjectDir)" 
-copy "$(TargetDir)\$(TargetName).pdb" "$(ProjectDir)" 
-    </PostBuildEvent>
-  </PropertyGroup>
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<OutputType>Library</OutputType>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+		<OutputPath>$(ProjectDir)\bin</OutputPath>
+		<IntermediateOutputPath>..\..\obj\Debug\glassmaking\</IntermediateOutputPath>
+		<CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+		<OutputPath>$(ProjectDir)\bin</OutputPath>
+		<IntermediateOutputPath>..\..\obj\Release\glassmaking\</IntermediateOutputPath>
+	</PropertyGroup>
+	<ItemGroup>
+		<Reference Include="VintagestoryAPI">
+			<HintPath>C:\Games\Vintagestory18.NET7\VintagestoryAPI.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="VintagestoryLib">
+			<HintPath>C:\Games\Vintagestory18.NET7\VintagestoryLib.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="VSSurvivalMod">
+			<HintPath>C:\Games\Vintagestory18.NET7\Mods\VSSurvivalMod.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="VSEssentials">
+			<HintPath>C:\Games\Vintagestory18.NET7\Mods\VSEssentials.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="VSCreativeMod">
+			<HintPath>C:\Games\Vintagestory18.NET7\Mods\VSCreativeMod.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Newtonsoft.Json">
+			<HintPath>C:\Games\Vintagestory18.NET7\Lib\Newtonsoft.Json.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="OpenTK">
+			<HintPath>C:\Games\Vintagestory18.NET7\Lib\OpenTK.Mathematics.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="protobuf-net">
+			<HintPath>C:\Games\Vintagestory18.NET7\Lib\protobuf-net.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="0Harmony">
+			<HintPath>C:\Games\Vintagestory18.NET7\Lib\0Harmony.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="cairo-sharp">
+			<HintPath>C:\Games\Vintagestory18.NET7\Lib\cairo-sharp.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+	</ItemGroup>
+	<ItemGroup>
+		<Content Include="modinfo.json" />
+	</ItemGroup>
+	<ItemGroup>
+		<Content Include="assets\**\*.*" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+		<PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+	</ItemGroup>
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+	  <Exec Command="copy &quot;$(TargetPath)&quot; &quot;$(ProjectDir)&quot; &#xD;&#xA;copy &quot;$(TargetDir)\$(TargetName).pdb&quot; &quot;$(ProjectDir)&quot;" />
+	</Target>
 </Project>
