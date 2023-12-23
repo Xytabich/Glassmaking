@@ -373,10 +373,10 @@ namespace GlassMaking.Blocks
 			return temp * temperatureModifier;
 		}
 
-		public override void OnLoadCollectibleMappings(IWorldAccessor worldForNewMappings, Dictionary<int, AssetLocation> oldBlockIdMapping, Dictionary<int, AssetLocation> oldItemIdMapping, int schematicSeed)
+		public override void OnLoadCollectibleMappings(IWorldAccessor worldForNewMappings, Dictionary<int, AssetLocation> oldBlockIdMapping, Dictionary<int, AssetLocation> oldItemIdMapping, int schematicSeed, bool resolveImports)
 		{
-			base.OnLoadCollectibleMappings(worldForNewMappings, oldBlockIdMapping, oldItemIdMapping, schematicSeed);
-			Utils.FixIdMappingOrClear(contentsSlot, oldBlockIdMapping, oldItemIdMapping, worldForNewMappings);
+			base.OnLoadCollectibleMappings(worldForNewMappings, oldBlockIdMapping, oldItemIdMapping, schematicSeed, resolveImports);
+			Utils.FixIdMappingOrClear(contentsSlot, oldBlockIdMapping, oldItemIdMapping, worldForNewMappings, resolveImports);
 			if(contents == null) burning = false;
 		}
 
@@ -501,7 +501,7 @@ namespace GlassMaking.Blocks
 
 		private void EmitParticles()
 		{
-			if(Api.World.GetLockFreeBlockAccessor().GetBlockId(Pos.X, Pos.Y + 1, Pos.Z) == 0)
+			if(Api.World.GetLockFreeBlockAccessor().GetBlockId(new BlockPos(Pos.X, Pos.Y + 1, Pos.Z, 0)) == 0)
 			{
 				double fuelOffset = GetFuelHeight() / 24.0 + 1.0 / 16;
 				smokeParticles.MinPos.Set(Pos.X + 0.5 - 0.3125, Pos.Y + fuelOffset, Pos.Z + 0.5 - 0.3125);

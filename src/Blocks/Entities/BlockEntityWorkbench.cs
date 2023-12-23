@@ -684,7 +684,7 @@ namespace GlassMaking.Blocks
 		{
 			if(renderer != null)
 			{
-				renderer.SetItemRenderInfo(workpieceSlot.Empty ? null : capi.Render.GetItemStackRenderInfo(workpieceSlot, EnumItemRenderTarget.Ground));
+				renderer.SetItemRenderInfo(workpieceSlot.Empty ? null : capi.Render.GetItemStackRenderInfo(workpieceSlot, EnumItemRenderTarget.Ground, 0f));
 			}
 		}
 

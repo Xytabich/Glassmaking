@@ -1,4 +1,6 @@
-﻿namespace GlassMaking
+﻿using System;
+
+namespace GlassMaking
 {
 	public enum HandbookItemInfoSection : int
 	{
@@ -6,6 +8,8 @@
 		AfterAll,
 		AfterItemHeader,
 		BeforeExtraSections,
-		BeforeHandbookInfo
+		BeforeStorableInfo,
+		[Obsolete("Use BeforeStorableInfo or BeforeExtraSections instead")]
+		BeforeHandbookInfo = BeforeStorableInfo
 	}
 }

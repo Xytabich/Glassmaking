@@ -7,9 +7,9 @@ namespace GlassMaking.Common
 {
 	public class CachedMeshRefs
 	{
-		private Dictionary<object, RefContainer> containers = new Dictionary<object, RefContainer>();
+		private readonly Dictionary<object, RefContainer> containers = new Dictionary<object, RefContainer>();
 
-		private ITemporaryMetadataPool<RefContainer> pool;
+		private readonly ITemporaryMetadataPool<RefContainer> pool;
 
 		internal CachedMeshRefs(ITemporaryMetadataPool<RefContainer> pool)
 		{
@@ -29,7 +29,7 @@ namespace GlassMaking.Common
 			return false;
 		}
 
-		public RefHandle SetMeshRef(object key, MeshRef meshRef)
+		public RefHandle SetMeshRef(object key, MultiTextureMeshRef meshRef)
 		{
 			if(containers.TryGetValue(key, out var container))
 			{
@@ -47,12 +47,12 @@ namespace GlassMaking.Common
 		internal class RefContainer : IDisposable
 		{
 			internal IDisposableHandle tmpHandle;
-			internal MeshRef meshRef;
+			internal MultiTextureMeshRef meshRef;
 			internal object key;
 
 			private CachedMeshRefs manager;
 
-			public RefContainer(CachedMeshRefs manager, object key, MeshRef meshRef)
+			public RefContainer(CachedMeshRefs manager, object key, MultiTextureMeshRef meshRef)
 			{
 				this.manager = manager;
 				this.key = key;
@@ -81,13 +81,13 @@ namespace GlassMaking.Common
 
 		public struct RefHandle
 		{
-			public MeshRef meshRef;
+			public MultiTextureMeshRef meshRef;
 
 			public bool isValid => meshRef != null && !meshRef.Disposed;
 
 			private RefContainer container;
 
-			internal RefHandle(MeshRef meshRef, RefContainer container)
+			internal RefHandle(MultiTextureMeshRef meshRef, RefContainer container)
 			{
 				this.meshRef = meshRef;
 				this.container = container;

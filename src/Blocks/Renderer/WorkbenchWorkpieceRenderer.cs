@@ -86,7 +86,7 @@ namespace GlassMaking.Blocks.Renderer
 					rapi.GlDisableCullFace();
 				}
 
-				rapi.RenderMesh(renderInfo.ModelRef);
+				rapi.RenderMultiTextureMesh(renderInfo.ModelRef, "tex");
 
 				if(!renderInfo.CullFaces)
 				{

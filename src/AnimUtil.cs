@@ -54,7 +54,7 @@ namespace GlassMaking
 
 				shape.ResolveReferences(capi.World.Logger, cacheKey);
 				CacheInvTransforms(shape.Elements);
-				shape.ResolveAndLoadJoints();
+				shape.ResolveAndFindJoints(capi.Logger, cacheKey);
 				texSource.Init(collectible, shape);
 				capi.Tesselator.TesselateShapeWithJointIds("blockanim", shape, out var modeldata, texSource, null, collShape.QuantityElements, collShape.SelectiveElements);
 				meshRef = capi.Render.UploadMesh(modeldata);

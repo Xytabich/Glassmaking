@@ -230,7 +230,7 @@ namespace GlassMaking.Blocks.Multiblock
 						{
 							if(structure[x, y, z] == null || structure[x, y, z].Id == Id) continue;
 
-							sel.Position.Set(blockSel.Position);
+							sel.Position.SetAll(blockSel.Position);
 							sel.Position.Add(x + structureOffset.X, y + structureOffset.Y, z + structureOffset.Z);
 							var pos = sel.Position.Copy();
 							structure[x, y, z].DoPlaceBlock(world, byPlayer, sel, byItemStack);
@@ -531,8 +531,8 @@ namespace GlassMaking.Blocks.Multiblock
 		[JsonObject]
 		private class Structure
 		{
-			public AssetLocation[,,] codes;
-			public int rotateY;
+			public AssetLocation[,,] codes = default;
+			public int rotateY = default;
 
 			public AssetLocation[,,] GetRotated()
 			{

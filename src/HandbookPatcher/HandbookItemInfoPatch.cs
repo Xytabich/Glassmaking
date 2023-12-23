@@ -18,52 +18,30 @@ namespace GlassMaking
 			var body = original.GetMethodBody();
 			var locals = body.LocalVariables;
 
+			const BindingFlags flags = BindingFlags.Instance | BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.NonPublic;
+			var addGeneralInfoMethod = typeof(CollectibleBehaviorHandbookTextAndExtraInfo).GetMethod("addGeneralInfo", flags);
+			var addExtraSectionsMethod = typeof(CollectibleBehaviorHandbookTextAndExtraInfo).GetMethod("addExtraSections", flags);
+
 			int listLocIndex = -1;
+			for(int i = 0; i < locals.Count; i++)
+			{
+				if(locals[i].LocalType == typeof(List<RichTextComponentBase>))
+				{
+					listLocIndex = i;
+					break;
+				}
+			}
+			if(listLocIndex < 0) throw new InvalidOperationException();
 
 			int index = 0;
 			while(index < insts.Count)
 			{
-				if(TryGetStloc(insts[index], out listLocIndex))
+				if(insts[index].Calls(addGeneralInfoMethod))
 				{
-					if(typeof(List<RichTextComponentBase>).IsAssignableFrom(locals[listLocIndex].LocalType))
-					{
-						index++;
-						break;
-					}
-				}
-				index++;
-			}
-			if(index >= insts.Count) throw new InvalidOperationException();
-
-			InsertEventCall(insts, ref index, listLocIndex, HandbookItemInfoSection.BeforeAll);
-
-			while(index < insts.Count)
-			{
-				if(insts[index].opcode == OpCodes.Newobj)
-				{
-					if(typeof(ClearFloatTextComponent).IsAssignableFrom(((ConstructorInfo)insts[index].operand).DeclaringType))
-					{
-						index++;
-						InsertEventCall(insts, ref index, listLocIndex, HandbookItemInfoSection.AfterItemHeader);
-						break;
-					}
-				}
-				index++;
-			}
-			if(index >= insts.Count) throw new InvalidOperationException();
-
-			FieldInfo extraSectionsField = typeof(CollectibleBehaviorHandbookTextAndExtraInfo).GetField(nameof(CollectibleBehaviorHandbookTextAndExtraInfo.ExtraHandBookSections));
-
-			while(index < insts.Count)
-			{
-				if(insts[index].opcode == OpCodes.Ldfld)
-				{
-					if(extraSectionsField == (FieldInfo)insts[index].operand)
-					{
-						index++;
-						InsertEventCall(insts, ref index, listLocIndex, HandbookItemInfoSection.BeforeExtraSections);
-						break;
-					}
+					InsertEventCall(insts, ref index, listLocIndex, HandbookItemInfoSection.BeforeAll);
+					index++;
+					InsertEventCall(insts, ref index, listLocIndex, HandbookItemInfoSection.AfterItemHeader);
+					break;
 				}
 				index++;
 			}
@@ -71,14 +49,12 @@ namespace GlassMaking
 
 			while(index < insts.Count)
 			{
-				if(insts[index].opcode == OpCodes.Ldstr)
+				if(insts[index].Calls(addExtraSectionsMethod))
 				{
-					if(((string)insts[index].operand).Contains("handbooktitle"))
-					{
-						index++;
-						InsertEventCall(insts, ref index, listLocIndex, HandbookItemInfoSection.BeforeHandbookInfo);
-						break;
-					}
+					InsertEventCall(insts, ref index, listLocIndex, HandbookItemInfoSection.BeforeExtraSections);
+					index++;
+					InsertEventCall(insts, ref index, listLocIndex, HandbookItemInfoSection.BeforeStorableInfo);
+					break;
 				}
 				index++;
 			}
@@ -88,47 +64,12 @@ namespace GlassMaking
 			{
 				if(insts[index].opcode == OpCodes.Ret)
 				{
-					index--;
 					InsertEventCall(insts, ref index, listLocIndex, HandbookItemInfoSection.AfterAll);
-					index++;
-					index++;
 					break;
 				}
 				index++;
 			}
-			for(int i = 0; i < insts.Count; i++)
-			{
-				yield return insts[i];
-			}
-		}
-
-		private static bool TryGetStloc(CodeInstruction inst, out int index)
-		{
-			switch(inst.opcode.Value)
-			{
-				case 0x0A:
-					index = 0;
-					return true;
-				case 0x0B:
-					index = 1;
-					return true;
-				case 0x0C:
-					index = 2;
-					return true;
-				case 0x0D:
-					index = 3;
-					return true;
-				case 0x13:
-					index = ((LocalBuilder)inst.operand).LocalIndex;
-					return true;
-			}
-			if(inst.opcode == OpCodes.Stloc)
-			{
-				index = ((LocalBuilder)inst.operand).LocalIndex;
-				return true;
-			}
-			index = default;
-			return false;
+			return insts;
 		}
 
 		private static void InsertEventCall(List<CodeInstruction> insts, ref int index, int listLocIndex, HandbookItemInfoSection section)

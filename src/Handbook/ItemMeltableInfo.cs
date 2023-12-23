@@ -31,9 +31,9 @@ namespace GlassMaking.Handbook
 			if(blend == null) blend = GlassBlend.FromTreeAttributes(inSlot.Itemstack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
 			if(blend != null && blend.Amount > 0)
 			{
-				outComponents.Add(new ClearFloatTextComponent(capi, 7f));
 				outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:Melting in the glass smeltery") + "\n", CairoFont.WhiteSmallText().WithWeight(FontWeight.Bold)));
 				outComponents.AddRange(VtmlUtil.Richtextify(capi, Lang.Get("{0} units of {1} glass at {2}°C", blend.Amount, Lang.Get(GlassBlend.GetBlendNameCode(blend.Code)), mod.GetGlassTypeInfo(blend.Code)?.meltingPoint.ToString("0")) + "\n", CairoFont.WhiteSmallText()));
+				outComponents.Add(new ClearFloatTextComponent(capi, 7f));
 			}
 		}
 	}

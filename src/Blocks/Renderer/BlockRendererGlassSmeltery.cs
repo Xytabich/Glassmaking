@@ -111,10 +111,10 @@ namespace GlassMaking.Blocks
 
 		private MeshData GenerateMesh()
 		{
-			MeshData mesh = CubeMeshUtil.GetCubeFace(BlockFacing.UP);
+			var mesh = CubeMeshUtil.GetCubeFace(BlockFacing.UP);
 			float scale = frustum * 0.5f;
 			float uv = Math.Min(2f * scale, 1);
-			for(int i = 0; i < mesh.GetVerticesCount(); i++)
+			for(int i = 0; i < mesh.VerticesCount; i++)
 			{
 				mesh.xyz[3 * i] *= scale;
 				mesh.xyz[3 * i + 2] *= scale;
@@ -122,7 +122,8 @@ namespace GlassMaking.Blocks
 				mesh.Uv[2 * i] *= uv;
 				mesh.Uv[2 * i + 1] *= uv;
 			}
-			mesh.Flags = new int[24];
+			mesh.Flags = new int[mesh.VerticesCount];
+			mesh.TextureIndices = new byte[mesh.VerticesCount / mesh.VerticesPerFace];
 			mesh.SetTexPos(isMix ? mixTexture : meltTexture);
 			return mesh;
 		}

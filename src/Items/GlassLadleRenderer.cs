@@ -1,4 +1,5 @@
 ﻿using GlassMaking.ItemRender;
+using System;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
@@ -12,7 +13,7 @@ namespace GlassMaking.Items
 		private int amount;
 		private TemperatureState temperature;
 
-		private MeshRef meshRef = null;
+		private MultiTextureMeshRef meshRef = null;
 
 		public void UpdateIfChanged(ICoreClientAPI capi, ItemStack itemStack, Data data)
 		{
@@ -41,18 +42,14 @@ namespace GlassMaking.Items
 			var baseMesh = GetLadleMesh(capi, item, tex);
 			var mesh = GetMeltMesh(fill, glow, tex, meshTransform);
 
-			var toUpload = new MeshData(baseMesh.VerticesCount + mesh.VerticesCount, baseMesh.IndicesCount + mesh.IndicesCount, false, true, true, true).WithColorMaps();
-			toUpload.AddMeshData(baseMesh);
-			toUpload.AddMeshData(mesh);
-			if(meshRef == null)
-			{
-				if(meshRef != null) meshRef.Dispose();
-				meshRef = capi.Render.UploadMesh(toUpload);
-			}
-			else
-			{
-				capi.Render.UpdateMesh(meshRef, toUpload);
-			}
+			if(meshRef != null) meshRef.Dispose();
+
+			meshRef = capi.Render.UploadMultiTextureMesh(baseMesh);
+			int index = meshRef.meshrefs.Length;
+			Array.Resize(ref meshRef.meshrefs, index + 1);
+			meshRef.meshrefs[index] = capi.Render.UploadMesh(mesh);
+			Array.Resize(ref meshRef.textureids, index + 1);
+			meshRef.textureids[index] = mesh.TextureIds[0];
 		}
 
 		public void Dispose()
@@ -68,6 +65,7 @@ namespace GlassMaking.Items
 		{
 			var mesh = CubeMeshUtil.GetCubeFace(BlockFacing.UP).WithColorMaps();
 			mesh.Flags = new int[mesh.VerticesCount];
+			mesh.TextureIndices = new byte[mesh.VerticesCount / mesh.VerticesPerFace];
 			mesh.Scale(Vec3f.Zero, 0.5f, 0.5f, 0.5f);
 			mesh.Translate(0.5f, 0, 0.5f);
 			mesh.SetTexPos(tex["glass"]);

@@ -120,6 +120,19 @@ namespace GlassMaking.Blocks
 			(byEntity.World.BlockAccessor.GetBlockEntity(pos) as BlockEntityFirebox)?.TryIgnite();
 		}
 
+		public virtual EnumIgniteState OnTryIgniteStack(EntityAgent byEntity, BlockPos pos, ItemSlot slot, float secondsIgniting)
+		{
+			if(!(byEntity.World.BlockAccessor.GetBlockEntity(pos) as BlockEntityFirebox).CanIgnite())
+			{
+				return EnumIgniteState.NotIgnitablePreventDefault;
+			}
+			if(!(secondsIgniting > 4f))
+			{
+				return EnumIgniteState.Ignitable;
+			}
+			return EnumIgniteState.IgniteNow;
+		}
+
 		public override void OnBlockBroken(IWorldAccessor world, BlockPos pos, IPlayer byPlayer, float dropQuantityMultiplier = 1)
 		{
 			var upPos = pos.UpCopy();

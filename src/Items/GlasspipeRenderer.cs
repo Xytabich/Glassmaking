@@ -16,7 +16,7 @@ namespace GlassMaking.Items
 		private int lastLayerSize;
 		private TemperatureState temperature;
 
-		private MeshRef meshRef = null;
+		private MultiTextureMeshRef meshRef = null;
 		private MeshData mesh;
 
 		public PipeLayersRenderer()
@@ -54,20 +54,18 @@ namespace GlassMaking.Items
 		public void UpdateMeshRef(ICoreClientAPI capi, Item item, ITexPositionSource tex, ModelTransform meshTransform, bool reupload)
 		{
 			mesh.SetTexPos(tex["glass"]);
-			var baseMesh = GlasspipeRenderUtil.GetPipeMesh(capi, item, tex);
-			var toUpload = new MeshData(baseMesh.VerticesCount + mesh.VerticesCount, baseMesh.IndicesCount + mesh.IndicesCount, false, true, true, true).WithColorMaps();
-			toUpload.AddMeshData(baseMesh);
 			mesh.ModelTransform(meshTransform);
-			toUpload.AddMeshData(mesh);
-			if(meshRef == null || reupload)
-			{
-				if(meshRef != null) meshRef.Dispose();
-				meshRef = capi.Render.UploadMesh(toUpload);
-			}
-			else
-			{
-				capi.Render.UpdateMesh(meshRef, toUpload);
-			}
+
+			var baseMesh = GlasspipeRenderUtil.GetPipeMesh(capi, item, tex);
+
+			if(meshRef != null) meshRef.Dispose();
+
+			meshRef = capi.Render.UploadMultiTextureMesh(baseMesh);
+			int index = meshRef.meshrefs.Length;
+			Array.Resize(ref meshRef.meshrefs, index + 1);
+			meshRef.meshrefs[index] = capi.Render.UploadMesh(mesh);
+			Array.Resize(ref meshRef.textureids, index + 1);
+			meshRef.textureids[index] = mesh.TextureIds[0];
 		}
 
 		public void Dispose()
@@ -130,7 +128,7 @@ namespace GlassMaking.Items
 		private float recipeProgress;
 		private TemperatureState temperature;
 
-		private MeshRef meshRef = null;
+		private MultiTextureMeshRef meshRef = null;
 		private MeshData mesh;
 
 		public PipeRecipeRenderer()
@@ -170,20 +168,18 @@ namespace GlassMaking.Items
 		public void UpdateMeshRef(ICoreClientAPI capi, Item item, ITexPositionSource tex, ModelTransform meshTransform, bool reupload)
 		{
 			mesh.SetTexPos(tex["glass"]);
-			var baseMesh = GlasspipeRenderUtil.GetPipeMesh(capi, item, tex);
-			var toUpload = new MeshData(baseMesh.VerticesCount + mesh.VerticesCount, baseMesh.IndicesCount + mesh.IndicesCount, false, true, true, true).WithColorMaps();
-			toUpload.AddMeshData(baseMesh);
 			mesh.ModelTransform(meshTransform);
-			toUpload.AddMeshData(mesh);
-			if(meshRef == null || reupload)
-			{
-				if(meshRef != null) meshRef.Dispose();
-				meshRef = capi.Render.UploadMesh(toUpload);
-			}
-			else
-			{
-				capi.Render.UpdateMesh(meshRef, toUpload);
-			}
+
+			var baseMesh = GlasspipeRenderUtil.GetPipeMesh(capi, item, tex);
+
+			if(meshRef != null) meshRef.Dispose();
+
+			meshRef = capi.Render.UploadMultiTextureMesh(baseMesh);
+			int index = meshRef.meshrefs.Length;
+			Array.Resize(ref meshRef.meshrefs, index + 1);
+			meshRef.meshrefs[index] = capi.Render.UploadMesh(mesh);
+			Array.Resize(ref meshRef.textureids, index + 1);
+			meshRef.textureids[index] = mesh.TextureIds[0];
 		}
 
 		public void Dispose()
@@ -200,10 +196,7 @@ namespace GlassMaking.Items
 			mesh.Clear();
 		}
 
-		void IMeshContainer.EndMeshChange()
-		{
-
-		}
+		void IMeshContainer.EndMeshChange() { }
 
 		internal struct Data
 		{

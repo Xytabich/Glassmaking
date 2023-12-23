@@ -220,10 +220,10 @@ namespace GlassMaking.Blocks
 			}
 		}
 
-		public override void OnLoadCollectibleMappings(IWorldAccessor worldForNewMappings, Dictionary<int, AssetLocation> oldBlockIdMapping, Dictionary<int, AssetLocation> oldItemIdMapping, int schematicSeed)
+		public override void OnLoadCollectibleMappings(IWorldAccessor worldForNewMappings, Dictionary<int, AssetLocation> oldBlockIdMapping, Dictionary<int, AssetLocation> oldItemIdMapping, int schematicSeed, bool resolveImports)
 		{
-			base.OnLoadCollectibleMappings(worldForNewMappings, oldBlockIdMapping, oldItemIdMapping, schematicSeed);
-			Utils.FixIdMappingOrClear(ref contents, oldBlockIdMapping, oldItemIdMapping, worldForNewMappings);
+			base.OnLoadCollectibleMappings(worldForNewMappings, oldBlockIdMapping, oldItemIdMapping, schematicSeed, resolveImports);
+			Utils.FixIdMappingOrClear(ref contents, oldBlockIdMapping, oldItemIdMapping, worldForNewMappings, resolveImports);
 		}
 
 		public override void OnStoreCollectibleMappings(Dictionary<int, AssetLocation> blockIdMapping, Dictionary<int, AssetLocation> itemIdMapping)

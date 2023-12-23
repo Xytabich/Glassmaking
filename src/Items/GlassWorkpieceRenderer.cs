@@ -59,7 +59,7 @@ namespace GlassMaking.Items
 			{
 				var mesh = GenMesh(capi, data.recipe, data.step, capi.ItemTextureAtlas);
 
-				var meshRef = capi.Render.UploadMesh(mesh);
+				var meshRef = capi.Render.UploadMultiTextureMesh(mesh);
 				meshRefHandle = meshRefCache.SetMeshRef(key, meshRef);
 			}
 		}

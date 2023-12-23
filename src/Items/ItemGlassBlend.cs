@@ -62,7 +62,7 @@ namespace GlassMaking.Items
 		{
 			base.OnUnloaded(api);
 
-			Dictionary<string, MeshRef> blendMeshrefs = ObjectCacheUtil.TryGet<Dictionary<string, MeshRef>>(api, "glassmaking:blendMeshRefs");
+			var blendMeshrefs = ObjectCacheUtil.TryGet<Dictionary<string, MultiTextureMeshRef>>(api, "glassmaking:blendMeshRefs");
 			if(blendMeshrefs != null)
 			{
 				foreach(var val in blendMeshrefs.Values)
@@ -101,14 +101,14 @@ namespace GlassMaking.Items
 			GlassBlend blend = GlassBlend.FromTreeAttributes(itemstack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
 			if(blend == null) return;
 
-			Dictionary<string, MeshRef> blendMeshrefs = ObjectCacheUtil.GetOrCreate(capi, "glassmaking:blendMeshRefs", () => new Dictionary<string, MeshRef>());
+			var blendMeshrefs = ObjectCacheUtil.GetOrCreate(capi, "glassmaking:blendMeshRefs", () => new Dictionary<string, MultiTextureMeshRef>());
 			string key = GetItemBaseCode(Code) + "|" + blend.Code.ToString();
 
-			MeshRef meshRef;
+			MultiTextureMeshRef meshRef;
 			if(!blendMeshrefs.TryGetValue(key, out meshRef))
 			{
 				var mesh = GenMesh(itemstack, capi.ItemTextureAtlas);
-				meshRef = mesh == null ? renderinfo.ModelRef : capi.Render.UploadMesh(mesh);
+				meshRef = mesh == null ? renderinfo.ModelRef : capi.Render.UploadMultiTextureMesh(mesh);
 				blendMeshrefs[key] = meshRef;
 			}
 			renderinfo.ModelRef = meshRef;

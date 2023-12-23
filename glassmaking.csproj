@@ -3,6 +3,7 @@
 		<TargetFramework>net7.0</TargetFramework>
 		<OutputType>Library</OutputType>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<RootNamespace>GlassMaking</RootNamespace>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
 		<OutputPath>$(ProjectDir)\bin</OutputPath>
@@ -15,43 +16,47 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<Reference Include="VintagestoryAPI">
-			<HintPath>C:\Games\Vintagestory18.NET7\VintagestoryAPI.dll</HintPath>
+			<HintPath>C:\Games\Vintagestory19\VintagestoryAPI.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="VintagestoryLib">
-			<HintPath>C:\Games\Vintagestory18.NET7\VintagestoryLib.dll</HintPath>
+			<HintPath>C:\Games\Vintagestory19\VintagestoryLib.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="VSSurvivalMod">
-			<HintPath>C:\Games\Vintagestory18.NET7\Mods\VSSurvivalMod.dll</HintPath>
+			<HintPath>C:\Games\Vintagestory19\Mods\VSSurvivalMod.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="VSEssentials">
-			<HintPath>C:\Games\Vintagestory18.NET7\Mods\VSEssentials.dll</HintPath>
+			<HintPath>C:\Games\Vintagestory19\Mods\VSEssentials.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="VSCreativeMod">
-			<HintPath>C:\Games\Vintagestory18.NET7\Mods\VSCreativeMod.dll</HintPath>
+			<HintPath>C:\Games\Vintagestory19\Mods\VSCreativeMod.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="Newtonsoft.Json">
-			<HintPath>C:\Games\Vintagestory18.NET7\Lib\Newtonsoft.Json.dll</HintPath>
+			<HintPath>C:\Games\Vintagestory19\Lib\Newtonsoft.Json.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="OpenTK">
-			<HintPath>C:\Games\Vintagestory18.NET7\Lib\OpenTK.Mathematics.dll</HintPath>
+			<HintPath>C:\Games\Vintagestory19\Lib\OpenTK.Mathematics.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="protobuf-net">
-			<HintPath>C:\Games\Vintagestory18.NET7\Lib\protobuf-net.dll</HintPath>
+			<HintPath>C:\Games\Vintagestory19\Lib\protobuf-net.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="0Harmony">
-			<HintPath>C:\Games\Vintagestory18.NET7\Lib\0Harmony.dll</HintPath>
+			<HintPath>C:\Games\Vintagestory19\Lib\0Harmony.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="cairo-sharp">
-			<HintPath>C:\Games\Vintagestory18.NET7\Lib\cairo-sharp.dll</HintPath>
+			<HintPath>C:\Games\Vintagestory19\Lib\cairo-sharp.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="SkiaSharp">
+			<HintPath>C:\Games\Vintagestory19\Lib\SkiaSharp.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 	</ItemGroup>

@@ -13,6 +13,15 @@ namespace GlassMaking
 	public static class Utils
 	{
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void SetAll(this BlockPos target, BlockPos source)
+		{
+			target.X = source.X;
+			target.Y = source.Y;
+			target.Z = source.Z;
+			target.dimension = source.dimension;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void Write(this BinaryWriter writer, AssetLocation location)
 		{
 			writer.Write(location.ToShortString());
@@ -69,7 +78,7 @@ namespace GlassMaking
 			return self.X2 >= other.X1 && self.X1 <= other.X2 && self.Y2 >= other.Y1 && self.Y1 <= other.Y2 && self.Z2 >= other.Z1 && self.Z1 <= other.Z2;
 		}
 
-		public static void FixIdMappingOrClear(ItemSlot itemSlot, Dictionary<int, AssetLocation> oldBlockIdMapping, Dictionary<int, AssetLocation> oldItemIdMapping, IWorldAccessor worldForNewMappings)
+		public static void FixIdMappingOrClear(ItemSlot itemSlot, Dictionary<int, AssetLocation> oldBlockIdMapping, Dictionary<int, AssetLocation> oldItemIdMapping, IWorldAccessor worldForNewMappings, bool resolveImports)
 		{
 			if(itemSlot.Itemstack != null)
 			{
@@ -79,12 +88,12 @@ namespace GlassMaking
 				}
 				else
 				{
-					itemSlot.Itemstack.Collectible.OnLoadCollectibleMappings(worldForNewMappings, itemSlot, oldBlockIdMapping, oldItemIdMapping);
+					itemSlot.Itemstack.Collectible.OnLoadCollectibleMappings(worldForNewMappings, itemSlot, oldBlockIdMapping, oldItemIdMapping, resolveImports);
 				}
 			}
 		}
 
-		public static void FixIdMappingOrClear(ref ItemStack itemStack, Dictionary<int, AssetLocation> oldBlockIdMapping, Dictionary<int, AssetLocation> oldItemIdMapping, IWorldAccessor worldForNewMappings)
+		public static void FixIdMappingOrClear(ref ItemStack itemStack, Dictionary<int, AssetLocation> oldBlockIdMapping, Dictionary<int, AssetLocation> oldItemIdMapping, IWorldAccessor worldForNewMappings, bool resolveImports)
 		{
 			if(itemStack != null)
 			{
@@ -94,7 +103,7 @@ namespace GlassMaking
 				}
 				else
 				{
-					itemStack.Collectible.OnLoadCollectibleMappings(worldForNewMappings, new DummySlot(itemStack), oldBlockIdMapping, oldItemIdMapping);
+					itemStack.Collectible.OnLoadCollectibleMappings(worldForNewMappings, new DummySlot(itemStack), oldBlockIdMapping, oldItemIdMapping, resolveImports);
 				}
 			}
 		}
@@ -157,7 +166,7 @@ namespace GlassMaking
 
 		public static void CopyFrom(this BlockSelection self, BlockSelection other)
 		{
-			self.Position.Set(other.Position);
+			self.Position.SetAll(other.Position);
 			self.HitPosition.Set(other.HitPosition);
 			self.Face = other.Face;
 			self.SelectionBoxIndex = other.SelectionBoxIndex;

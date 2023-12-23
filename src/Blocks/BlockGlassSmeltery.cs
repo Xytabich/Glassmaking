@@ -66,7 +66,7 @@ namespace GlassMaking.Blocks
 				if(bathMesh != null)
 				{
 					bathMesh.Dispose();
-					ObjectCacheUtil.Delete(api, "glassmaking:smeltery-shape" + Variant["side"]);
+					ObjectCacheUtil.Delete(api, "glassmaking:smeltery-shape-" + Variant["side"]);
 				}
 			}
 		}
