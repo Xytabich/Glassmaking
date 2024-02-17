@@ -9,11 +9,17 @@ namespace GlassMaking.Blocks
 {
 	public class BlockFirebox : Block, IIgnitable
 	{
+		public double tempIncreasePerHour;
+		public double tempDecreasePerHour;
+
 		private WorldInteraction[] interactions;
 
 		public override void OnLoaded(ICoreAPI api)
 		{
 			base.OnLoaded(api);
+
+			tempIncreasePerHour = Attributes["heatingRate"].AsDouble();
+			tempDecreasePerHour = Attributes["coolingRate"].AsDouble();
 
 			if(api.Side != EnumAppSide.Client) return;
 			ICoreClientAPI capi = api as ICoreClientAPI;

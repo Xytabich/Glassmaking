@@ -7,39 +7,7 @@
 			"properties": {
 				"tool": "stretch",
 				"minTier": 0,
-				"transform": {
-					"origin": {
-						"x": -0.5,
-						"y": -0.5,
-						"z": -0.5
-					},
-					"translation": {
-						"x": 0.24,
-						"y": 0.1,
-						"z": -0.5
-					},
-					"rotation": {
-						"y": 30,
-						"z": 25
-					}
-				},
-				"animation": {
-					"origin": {
-						"x": -0.5,
-						"y": -0.5,
-						"z": -0.5
-					},
-					"translation": {
-						"x": 0.1,
-						"y": 0.1,
-						"z": -0.3
-					},
-					"rotation": {
-						"y": 30,
-						"z": 25
-					}
-				},
-				"speed": 3
+				"animation": "gwtoolstretch"
 			}
 		}
 	],

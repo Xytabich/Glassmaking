@@ -1,0 +1,172 @@
+[
+	{
+		"file": "game:shapes/entity/humanoid/seraph-faceless",
+		"op": "add",
+		"path": "/animations/-",
+		"value": {
+			"name": "GlasspipeIntake",
+			"code": "glasspipeintake",
+			"quantityframes": 30,
+			"onActivityStopped": "Rewind",
+			"onAnimationEnd": "Repeat",
+			"keyframes": [
+				{
+					"frame": 0,
+					"elements": {
+						"LowerTorso": { "rotationX": -2.0, "rotationY": -50.0, "rotationZ": -8.0 },
+						"UpperTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 5.0, "rotationY": -17.0, "rotationZ": 0.0 },
+						"UpperArmR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 55.0, "rotationY": -22.0, "rotationZ": -6.0 },
+						"LowerArmR": { "offsetX": 0.0, "offsetY": 1.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": -116.0 },
+						"ItemAnchor": { "rotationX": -69.0, "rotationY": 0.0, "rotationZ": 69.0 },
+						"UpperArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -11.0, "rotationY": 6.0, "rotationZ": -30.0 },
+						"LowerArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": -66.0 },
+						"Neck": { "rotationX": 0.0, "rotationY": 11.0, "rotationZ": 0.0 },
+						"Head": { "rotationX": 0.0, "rotationY": 17.0, "rotationZ": 8.0 },
+						"UpperFootL": { "rotationX": -6.0, "rotationY": 36.0, "rotationZ": 8.0 },
+						"UpperFootR": { "rotationX": 0.0, "rotationY": 25.0, "rotationZ": 8.0 }
+					}
+				},
+				{
+					"frame": 15,
+					"elements": {
+						"LowerTorso": { "rotationX": -2.0, "rotationY": -50.0, "rotationZ": -8.0 },
+						"UpperTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 5.0, "rotationY": -17.0, "rotationZ": 0.0 },
+						"UpperArmR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 55.0, "rotationY": -22.0, "rotationZ": -6.0 },
+						"LowerArmR": { "offsetX": 0.0, "offsetY": 1.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": -115.0 },
+						"ItemAnchor": { "offsetX": 0.0, "offsetY": 0.2, "offsetZ": 0.3, "rotationX": -73.0, "rotationY": -10.0, "rotationZ": 69.0 },
+						"UpperArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -11.0, "rotationY": 6.0, "rotationZ": -31.0 },
+						"LowerArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 1.0, "rotationY": 1.0, "rotationZ": -65.0 },
+						"Neck": { "rotationX": 0.0, "rotationY": 11.0, "rotationZ": 0.0 },
+						"Head": { "rotationX": 0.0, "rotationY": 17.0, "rotationZ": 8.0 },
+						"UpperFootL": { "rotationX": -6.0, "rotationY": 36.0, "rotationZ": 8.0 },
+						"UpperFootR": { "rotationX": 0.0, "rotationY": 25.0, "rotationZ": 8.0 }
+					}
+				}
+			]
+		}
+	},
+	{
+		"file": "game:entities/humanoid/player",
+		"op": "add",
+		"path": "/client/animations/-",
+		"value": {
+			code: "glasspipeintake",
+			animation: "glasspipeintake",
+			blendMode: "Add",
+			easeInSpeed: 1,
+			blendMode: "AddAverage",
+			elementWeight: {
+				"ItemAnchor": 200,
+				"LowerTorso": 2,
+				"UpperTorso": 90,
+				"UpperArmL": 90,
+				"LowerArmL": 90,
+				"UpperArmR": 90,
+				"LowerArmR": 90,
+				"Neck": 1,
+				"Head": 1,
+				"UpperFootL": 1,
+				"UpperFootR": 1,
+			}
+		}
+	},
+	{
+		"file": "game:shapes/entity/humanoid/seraph-faceless",
+		"op": "add",
+		"path": "/animations/-",
+		"value": {
+			"name": "GlasspipeAction",
+			"code": "glasspipeaction",
+			"quantityframes": 30,
+			"onActivityStopped": "EaseOut",
+			"onAnimationEnd": "EaseOut",
+			"keyframes": [
+				{
+					"frame": 0,
+					"elements": {
+						"UpperArmR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 1.0, "rotationX": 26.0, "rotationY": 14.0, "rotationZ": 33.0 },
+						"LowerArmR": { "offsetX": 0.0, "offsetY": 1.0, "offsetZ": 0.0, "rotationX": 26.0, "rotationY": -2.0, "rotationZ": -67.0 },
+						"ItemAnchor": { "rotationX": 0.0, "rotationY": 0.0, "rotationZ": -6.0 },
+						"UpperArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -11.0, "rotationY": 8.0, "rotationZ": -58.0 },
+						"LowerArmL": { "offsetX": 0.0, "offsetY": 0.5, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": -45.0 }
+					}
+				}
+			]
+		}
+	},
+	{
+		"file": "game:entities/humanoid/player",
+		"op": "add",
+		"path": "/client/animations/-",
+		"value": {
+			code: "glasspipeaction",
+			animation: "glasspipeaction",
+			blendMode: "Add",
+			weight: 90,
+			easeInSpeed: 1,
+			blendMode: "AddAverage"
+		}
+	},
+	{
+		"file": "game:shapes/entity/humanoid/seraph-faceless",
+		"op": "add",
+		"path": "/animations/-",
+		"value": {
+			"name": "GlasspipeBlow",
+			"code": "glasspipeblow",
+			"quantityframes": 30,
+			"onActivityStopped": "Rewind",
+			"onAnimationEnd": "Repeat",
+			"keyframes": [
+				{
+					"frame": 0,
+					"elements": {
+						"LowerTorso": { "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 0.0 },
+						"UpperTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 0.0 },
+						"ItemAnchor": { "offsetX": -1.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 100.0, "rotationY": 0.0, "rotationZ": 110.0 },
+						"UpperArmL": { "offsetX": 2.0, "offsetY": 0.0, "offsetZ": -1.0, "rotationX": -28.0, "rotationY": -10.0, "rotationZ": -95.0 },
+						"LowerArmL": { "rotationX": 0.0, "rotationY": -3.0, "rotationZ": -5.0 },
+						"UpperArmR": { "offsetX": 2.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -27.0, "rotationY": -42.0, "rotationZ": -100.0 },
+						"LowerArmR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": -0.2, "rotationX": -122.0, "rotationY": -1.0, "rotationZ": -11.0 },
+						"Neck": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 1.0 }
+					}
+				},
+				{
+					"frame": 15,
+					"elements": {
+						"LowerTorso": { "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 0.0 },
+						"UpperTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 0.0 },
+						"ItemAnchor": { "offsetX": -1.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 100.0, "rotationY": 0.0, "rotationZ": 110.0 },
+						"UpperArmL": { "offsetX": 2.0, "offsetY": 0.0, "offsetZ": -1.0, "rotationX": -28.0, "rotationY": -11.0, "rotationZ": -94.0 },
+						"LowerArmL": { "rotationX": -1.0, "rotationY": -4.0, "rotationZ": -7.0 },
+						"UpperArmR": { "offsetX": 2.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -25.0, "rotationY": -42.0, "rotationZ": -102.0 },
+						"LowerArmR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": -0.2, "rotationX": -122.0, "rotationY": 0.0, "rotationZ": -11.0 },
+						"Neck": { "offsetX": -0.1, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 0.0 }
+					}
+				}
+			]
+		}
+	},
+	{
+		"file": "game:entities/humanoid/player",
+		"op": "add",
+		"path": "/client/animations/-",
+		"value": {
+			code: "glasspipeblow",
+			animation: "glasspipeblow",
+			blendMode: "Add",
+			easeInSpeed: 1,
+			blendMode: "AddAverage",
+			elementWeight: {
+				"ItemAnchor": 200,
+				"LowerTorso": 1,
+				"UpperTorso": 90,
+				"UpperArmL": 90,
+				"LowerArmL": 90,
+				"UpperArmR": 90,
+				"LowerArmR": 90,
+				"Neck": 1,
+			}
+		}
+	}
+]

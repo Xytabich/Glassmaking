@@ -45,11 +45,10 @@ namespace GlassMaking.Items
 			attr.SetFloat("temperature", temperature);
 		}
 
-		protected float GetGlassTemperatureWithoutCheck(ItemStack itemstack)
+		public virtual void ResetGlassTemperature(IWorldAccessor world, ItemStack itemstack)
 		{
-			ITreeAttribute attr = (ITreeAttribute)itemstack.Attributes["glassTemperature"];
-			if(attr == null) return 20;
-			return attr.GetFloat("temperature");
+			if(itemstack == null) return;
+			itemstack.Attributes.RemoveAttribute("glassTemperature");
 		}
 	}
 }

@@ -8,9 +8,7 @@ namespace GlassMaking.GlassblowingTools
 {
 	public class DryableTool : GlassblowingToolBehavior
 	{
-		protected ModelTransform transform;
-		protected ModelTransform animationTransform;
-		protected float animationSpeed;
+		private string animation;
 
 		public DryableTool(CollectibleObject collObj) : base(collObj)
 		{
@@ -19,9 +17,7 @@ namespace GlassMaking.GlassblowingTools
 		public override void Initialize(JsonObject properties)
 		{
 			base.Initialize(properties);
-			transform = properties?["transform"].AsObject<ModelTransform>()?.EnsureDefaultValues() ?? ModelTransform.NoTransform;
-			animationTransform = properties?["animation"].AsObject<ModelTransform>()?.EnsureDefaultValues() ?? transform;
-			animationSpeed = properties?["speed"].AsFloat() ?? 0f;
+			animation = properties["animation"].AsString();
 		}
 
 		public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling, ref EnumHandling handling)
@@ -31,6 +27,9 @@ namespace GlassMaking.GlassblowingTools
 				if(wettable.GetHumidity(slot.Itemstack, byEntity.World) >= step.StepAttributes["consume"].AsFloat(0) && step.BeginStep())
 				{
 					if(api.Side == EnumAppSide.Client) step.SetProgress(0);
+
+					byEntity.AnimManager.StartAnimation(animation);
+
 					handHandling = EnumHandHandling.PreventDefault;
 					handling = EnumHandling.PreventSubsequent;
 					return;
@@ -45,28 +44,6 @@ namespace GlassMaking.GlassblowingTools
 			{
 				if(step.ContinueStep() && wettable.GetHumidity(slot.Itemstack, byEntity.World) >= step.StepAttributes["consume"].AsFloat(0))
 				{
-					if(byEntity.Api.Side == EnumAppSide.Client)
-					{
-						const float speed = 2f;
-						ModelTransform leftTransform = new ModelTransform();
-						leftTransform.EnsureDefaultValues();
-						leftTransform.Origin.Set(0f, 0f, 0f);
-						leftTransform.Scale = 1f + Math.Min(0.25f, speed * secondsUsed / 3f);
-						leftTransform.Rotation.Y = Math.Min(25f, secondsUsed * 45f * speed);
-						leftTransform.Rotation.X = GameMath.Lerp(0f, 0.5f * GameMath.Clamp(byEntity.Pos.Pitch - (float)Math.PI, -0.2f, 1.0995574f) * GameMath.RAD2DEG, Math.Min(1, secondsUsed * speed * 4f));
-						leftTransform.Rotation.Z = secondsUsed * 90f % 360f;
-						byEntity.Controls.LeftUsingHeldItemTransformBefore = leftTransform;
-
-						ModelTransform rightTransform = new ModelTransform();
-						rightTransform.EnsureDefaultValues();
-						float pt = GameMath.Min(secondsUsed * speed * 1.5f, 1f);
-						float at = GameMath.FastSin(secondsUsed * animationSpeed) * 0.5f + 0.5f;
-						rightTransform.Lerp(transform, pt).Lerp(animationTransform, at);
-						byEntity.Controls.UsingHeldItemTransformBefore = rightTransform;
-
-						byEntity.Controls.HandUse = EnumHandInteract.None;
-					}
-
 					float time = step.StepAttributes["time"].AsFloat(1);
 					if(api.Side == EnumAppSide.Client)
 					{
@@ -110,6 +87,7 @@ namespace GlassMaking.GlassblowingTools
 					step.SetProgress(0);
 				}
 			}
+			byEntity.AnimManager.StopAnimation(animation);
 			base.OnHeldInteractStop(secondsUsed, slot, byEntity, blockSel, entitySel, ref handling);
 		}
 	}

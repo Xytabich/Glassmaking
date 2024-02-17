@@ -1,4 +1,5 @@
 ﻿using Cairo;
+using GlassMaking.Blocks;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,6 +8,7 @@ using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
+using Vintagestory.API.Util;
 
 namespace GlassMaking
 {
@@ -156,6 +158,23 @@ namespace GlassMaking
 			self.Rotation = self.Rotation.LerpDelta(delta.Rotation, t);
 			self.ScaleXYZ = self.ScaleXYZ.LerpDelta(delta.ScaleXYZ, t);
 			return self;
+		}
+
+		public static ItemStack[] GetGlassmeltSources(ICoreAPI api)
+		{
+			return ObjectCacheUtil.GetOrCreate(api, "glassmaking:glassmeltsources", () => {
+				var list = new List<ItemStack>();
+				var capi = api as ICoreClientAPI;
+				foreach(Block block in api.World.Blocks)
+				{
+					if(block is IGlassmeltSourceBlock)
+					{
+						var stacks = block.GetHandBookStacks(capi);
+						if(stacks != null) list.AddRange(stacks);
+					}
+				}
+				return list.ToArray();
+			});
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

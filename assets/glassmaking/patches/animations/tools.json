@@ -1,0 +1,592 @@
+[
+	{
+		"file": "game:shapes/entity/humanoid/seraph-faceless",
+		"op": "add",
+		"path": "/animations/-",
+		"value": {
+			"name": "Glasswork Tool - Flatten",
+			"code": "gwtoolflatten",
+			"quantityframes": 25,
+			"onActivityStopped": "EaseOut",
+			"onAnimationEnd": "Repeat",
+			"keyframes": [
+				{
+					"frame": 0,
+					"elements": {
+						"LowerTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 30.0, "rotationZ": 1.0 },
+						"UpperTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 5.0, "rotationZ": 4.0 },
+						"UpperArmR": { "offsetX": 0.5, "offsetY": -1.0, "offsetZ": 0.2, "rotationX": 6.0, "rotationY": -40.0, "rotationZ": -38.0 },
+						"LowerArmR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": -5.0 },
+						"ItemAnchor": { "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 20.0 },
+						"UpperArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -17.0, "rotationY": -40.0, "rotationZ": 8.0 },
+						"LowerArmL": { "offsetX": 0.0, "offsetY": 0.3, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -4.0, "rotationZ": -42.0 },
+						"Neck": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -9.0, "rotationZ": 0.0 },
+						"Head": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -12.0, "rotationZ": 6.0 },
+						"UpperFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -19.0, "rotationZ": -7.0 },
+						"LowerFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 7.0 },
+						"UpperFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -22.0, "rotationZ": -1.0 },
+						"LowerFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 6.0 }
+					}
+				},
+				{
+					"frame": 13,
+					"elements": {
+						"LowerTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 30.0, "rotationZ": 1.0 },
+						"UpperTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 5.0, "rotationZ": 4.0 },
+						"UpperArmR": { "offsetX": 0.5, "offsetY": -1.0, "offsetZ": 0.2, "rotationX": 8.0, "rotationY": -38.0, "rotationZ": -30.0 },
+						"LowerArmR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": -3.0 },
+						"ItemAnchor": { "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 20.0 },
+						"UpperArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -17.0, "rotationY": -40.0, "rotationZ": 8.0 },
+						"LowerArmL": { "offsetX": 0.0, "offsetY": 0.3, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -4.0, "rotationZ": -42.0 },
+						"Neck": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -9.0, "rotationZ": 0.0 },
+						"Head": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -12.0, "rotationZ": 6.0 },
+						"UpperFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -19.0, "rotationZ": -7.0 },
+						"LowerFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 7.0 },
+						"UpperFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -22.0, "rotationZ": -1.0 },
+						"LowerFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 6.0 }
+					}
+				}
+			]
+		}
+	},
+	{
+		"file": "game:entities/humanoid/player",
+		"op": "add",
+		"path": "/client/animations/-",
+		"value": {
+			code: "gwtoolflatten",
+			animation: "gwtoolflatten",
+			blendMode: "AddAverage",
+			easeInSpeed: 1,
+			elementWeight: {
+				"ItemAnchor": 200,
+				"LowerTorso": 2,
+				"UpperTorso": 90,
+				"UpperArmL": 90,
+				"LowerArmL": 90,
+				"UpperArmR": 90,
+				"LowerArmR": 90,
+				"Neck": 1,
+				"Head": 1,
+				"UpperFootL": 1,
+				"UpperFootR": 1,
+			}
+		}
+	},
+	{
+		"file": "game:shapes/entity/humanoid/seraph-faceless",
+		"op": "add",
+		"path": "/animations/-",
+		"value": {
+			"name": "Glasswork Tool - Stretch",
+			"code": "gwtoolstretch",
+			"quantityframes": 36,
+			"onActivityStopped": "EaseOut",
+			"onAnimationEnd": "Repeat",
+			"keyframes": [
+				{
+					"frame": 0,
+					"elements": {
+						"LowerTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 30.0, "rotationZ": 1.0 },
+						"UpperTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 5.0, "rotationZ": 4.0 },
+						"UpperArmR": { "offsetX": 0.5, "offsetY": -1.0, "offsetZ": 0.2, "rotationX": 8.0, "rotationY": -38.0, "rotationZ": -30.0 },
+						"LowerArmR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": -3.0 },
+						"ItemAnchor": { "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 20.0 },
+						"UpperArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -17.0, "rotationY": -36.0, "rotationZ": 8.0 },
+						"LowerArmL": { "offsetX": 0.0, "offsetY": 0.3, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -4.0, "rotationZ": -39.0 },
+						"Neck": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -9.0, "rotationZ": 0.0 },
+						"Head": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -12.0, "rotationZ": 6.0 },
+						"UpperFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -19.0, "rotationZ": -7.0 },
+						"LowerFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 7.0 },
+						"UpperFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -22.0, "rotationZ": -1.0 },
+						"LowerFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 6.0 }
+					}
+				},
+				{
+					"frame": 10,
+					"elements": {
+						"LowerTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 30.0, "rotationZ": 1.0 },
+						"UpperTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 5.0, "rotationZ": 4.0 },
+						"UpperArmR": { "offsetX": 0.5, "offsetY": -1.0, "offsetZ": 0.2, "rotationX": 16.0, "rotationY": -10.0, "rotationZ": -43.0 },
+						"LowerArmR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": -7.0 },
+						"ItemAnchor": { "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 20.0 },
+						"UpperArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -17.0, "rotationY": -36.0, "rotationZ": 8.0 },
+						"LowerArmL": { "offsetX": 0.0, "offsetY": 0.3, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -4.0, "rotationZ": -39.0 },
+						"Neck": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -9.0, "rotationZ": 0.0 },
+						"Head": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -12.0, "rotationZ": 6.0 },
+						"UpperFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -19.0, "rotationZ": -7.0 },
+						"LowerFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 7.0 },
+						"UpperFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -22.0, "rotationZ": -1.0 },
+						"LowerFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 6.0 }
+					}
+				},
+				{
+					"frame": 26,
+					"elements": {
+						"LowerTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 30.0, "rotationZ": 1.0 },
+						"UpperTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 5.0, "rotationZ": 4.0 },
+						"UpperArmR": { "offsetX": 0.5, "offsetY": -1.0, "offsetZ": 0.2, "rotationX": 4.0, "rotationY": -40.0, "rotationZ": -48.0 },
+						"LowerArmR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": -3.0 },
+						"ItemAnchor": { "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 20.0 },
+						"UpperArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -17.0, "rotationY": -36.0, "rotationZ": 8.0 },
+						"LowerArmL": { "offsetX": 0.0, "offsetY": 0.3, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -4.0, "rotationZ": -39.0 },
+						"Neck": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -9.0, "rotationZ": 0.0 },
+						"Head": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -12.0, "rotationZ": 6.0 },
+						"UpperFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -19.0, "rotationZ": -7.0 },
+						"LowerFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 7.0 },
+						"UpperFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -22.0, "rotationZ": -1.0 },
+						"LowerFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 6.0 }
+					}
+				}
+			]
+		}
+	},
+	{
+		"file": "game:entities/humanoid/player",
+		"op": "add",
+		"path": "/client/animations/-",
+		"value": {
+			code: "gwtoolstretch",
+			animation: "gwtoolstretch",
+			blendMode: "AddAverage",
+			easeInSpeed: 1,
+			elementWeight: {
+				"ItemAnchor": 200,
+				"LowerTorso": 2,
+				"UpperTorso": 90,
+				"UpperArmL": 90,
+				"LowerArmL": 90,
+				"UpperArmR": 90,
+				"LowerArmR": 90,
+				"Neck": 1,
+				"Head": 1,
+				"UpperFootL": 1,
+				"UpperFootR": 1,
+			}
+		}
+	},
+	{
+		"file": "game:shapes/entity/humanoid/seraph-faceless",
+		"op": "add",
+		"path": "/animations/-",
+		"value": {
+			"name": "Glasswork Tool - Recess",
+			"code": "gwtoolrecess",
+			"quantityframes": 36,
+			"onActivityStopped": "EaseOut",
+			"onAnimationEnd": "Repeat",
+			"keyframes": [
+				{
+					"frame": 0,
+					"elements": {
+						"LowerTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 30.0, "rotationZ": 1.0 },
+						"UpperTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 5.0, "rotationZ": 4.0 },
+						"UpperArmR": { "offsetX": 0.5, "offsetY": -1.0, "offsetZ": 0.2, "rotationX": 8.0, "rotationY": -38.0, "rotationZ": -30.0 },
+						"LowerArmR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": -3.0 },
+						"ItemAnchor": { "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 30.0 },
+						"UpperArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -17.0, "rotationY": -36.0, "rotationZ": 8.0 },
+						"LowerArmL": { "offsetX": 0.0, "offsetY": 0.3, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -4.0, "rotationZ": -39.0 },
+						"Neck": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -9.0, "rotationZ": 0.0 },
+						"Head": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -12.0, "rotationZ": 6.0 },
+						"UpperFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -19.0, "rotationZ": -7.0 },
+						"LowerFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 7.0 },
+						"UpperFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -22.0, "rotationZ": -1.0 },
+						"LowerFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 6.0 }
+					}
+				},
+				{
+					"frame": 10,
+					"elements": {
+						"LowerTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 30.0, "rotationZ": 1.0 },
+						"UpperTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 5.0, "rotationZ": 4.0 },
+						"UpperArmR": { "offsetX": 0.5, "offsetY": -1.0, "offsetZ": 0.2, "rotationX": 4.0, "rotationY": -40.0, "rotationZ": -48.0 },
+						"LowerArmR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": -3.0 },
+						"ItemAnchor": { "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 30.0 },
+						"UpperArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -17.0, "rotationY": -36.0, "rotationZ": 8.0 },
+						"LowerArmL": { "offsetX": 0.0, "offsetY": 0.3, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -4.0, "rotationZ": -39.0 },
+						"Neck": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -9.0, "rotationZ": 0.0 },
+						"Head": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -12.0, "rotationZ": 6.0 },
+						"UpperFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -19.0, "rotationZ": -7.0 },
+						"LowerFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 7.0 },
+						"UpperFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -22.0, "rotationZ": -1.0 },
+						"LowerFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 6.0 }
+					}
+				},
+				{
+					"frame": 26,
+					"elements": {
+						"LowerTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 30.0, "rotationZ": 1.0 },
+						"UpperTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 5.0, "rotationZ": 4.0 },
+						"UpperArmR": { "offsetX": 0.5, "offsetY": -1.0, "offsetZ": 0.2, "rotationX": 16.0, "rotationY": -10.0, "rotationZ": -43.0 },
+						"LowerArmR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": -7.0 },
+						"ItemAnchor": { "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 30.0 },
+						"UpperArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -17.0, "rotationY": -36.0, "rotationZ": 8.0 },
+						"LowerArmL": { "offsetX": 0.0, "offsetY": 0.3, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -4.0, "rotationZ": -39.0 },
+						"Neck": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -9.0, "rotationZ": 0.0 },
+						"Head": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -12.0, "rotationZ": 6.0 },
+						"UpperFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -19.0, "rotationZ": -7.0 },
+						"LowerFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 7.0 },
+						"UpperFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -22.0, "rotationZ": -1.0 },
+						"LowerFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 6.0 }
+					}
+				}
+			]
+		}
+	},
+	{
+		"file": "game:entities/humanoid/player",
+		"op": "add",
+		"path": "/client/animations/-",
+		"value": {
+			code: "gwtoolrecess",
+			animation: "gwtoolrecess",
+			blendMode: "AddAverage",
+			easeInSpeed: 1,
+			elementWeight: {
+				"ItemAnchor": 200,
+				"LowerTorso": 2,
+				"UpperTorso": 90,
+				"UpperArmL": 90,
+				"LowerArmL": 90,
+				"UpperArmR": 90,
+				"LowerArmR": 90,
+				"Neck": 1,
+				"Head": 1,
+				"UpperFootL": 1,
+				"UpperFootR": 1,
+			}
+		}
+	},
+	{
+		"file": "game:shapes/entity/humanoid/seraph-faceless",
+		"op": "add",
+		"path": "/animations/-",
+		"value": {
+			"name": "Glasswork Tool - Incise",
+			"code": "gwtoolincise",
+			"quantityframes": 36,
+			"onActivityStopped": "EaseOut",
+			"onAnimationEnd": "Repeat",
+			"keyframes": [
+				{
+					"frame": 0,
+					"elements": {
+						"LowerTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 30.0, "rotationZ": 1.0 },
+						"UpperTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 5.0, "rotationZ": 4.0 },
+						"UpperArmR": { "offsetX": 0.5, "offsetY": -1.0, "offsetZ": 0.2, "rotationX": 8.0, "rotationY": -38.0, "rotationZ": -30.0 },
+						"LowerArmR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": -3.0 },
+						"ItemAnchor": { "rotationX": 0.0, "rotationY": 20.0, "rotationZ": 0.0 },
+						"UpperArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -17.0, "rotationY": -32.0, "rotationZ": 8.0 },
+						"LowerArmL": { "offsetX": 0.0, "offsetY": 0.3, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -4.0, "rotationZ": -39.0 },
+						"Neck": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -9.0, "rotationZ": 0.0 },
+						"Head": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -12.0, "rotationZ": 6.0 },
+						"UpperFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -19.0, "rotationZ": -7.0 },
+						"LowerFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 7.0 },
+						"UpperFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -22.0, "rotationZ": -1.0 },
+						"LowerFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 6.0 }
+					}
+				},
+				{
+					"frame": 10,
+					"elements": {
+						"LowerTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 30.0, "rotationZ": 1.0 },
+						"UpperTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 5.0, "rotationZ": 4.0 },
+						"UpperArmR": { "offsetX": 0.5, "offsetY": -1.0, "offsetZ": 0.2, "rotationX": 12.0, "rotationY": -12.0, "rotationZ": -40.0 },
+						"LowerArmR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": -7.0 },
+						"ItemAnchor": { "rotationX": 0.0, "rotationY": 20.0, "rotationZ": 0.0 },
+						"UpperArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -17.0, "rotationY": -32.0, "rotationZ": 8.0 },
+						"LowerArmL": { "offsetX": 0.0, "offsetY": 0.3, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -4.0, "rotationZ": -39.0 },
+						"Neck": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -9.0, "rotationZ": 0.0 },
+						"Head": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -12.0, "rotationZ": 6.0 },
+						"UpperFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -19.0, "rotationZ": -7.0 },
+						"LowerFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 7.0 },
+						"UpperFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -22.0, "rotationZ": -1.0 },
+						"LowerFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 6.0 }
+					}
+				},
+				{
+					"frame": 26,
+					"elements": {
+						"LowerTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 30.0, "rotationZ": 1.0 },
+						"UpperTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 5.0, "rotationZ": 4.0 },
+						"UpperArmR": { "offsetX": 0.5, "offsetY": -1.0, "offsetZ": 0.2, "rotationX": 4.0, "rotationY": -40.0, "rotationZ": -48.0 },
+						"LowerArmR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": -3.0 },
+						"ItemAnchor": { "rotationX": 0.0, "rotationY": 20.0, "rotationZ": 0.0 },
+						"UpperArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -17.0, "rotationY": -32.0, "rotationZ": 8.0 },
+						"LowerArmL": { "offsetX": 0.0, "offsetY": 0.3, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -4.0, "rotationZ": -39.0 },
+						"Neck": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -9.0, "rotationZ": 0.0 },
+						"Head": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -12.0, "rotationZ": 6.0 },
+						"UpperFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -19.0, "rotationZ": -7.0 },
+						"LowerFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 7.0 },
+						"UpperFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -22.0, "rotationZ": -1.0 },
+						"LowerFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 6.0 }
+					}
+				}
+			]
+		}
+	},
+	{
+		"file": "game:entities/humanoid/player",
+		"op": "add",
+		"path": "/client/animations/-",
+		"value": {
+			code: "gwtoolincise",
+			animation: "gwtoolincise",
+			blendMode: "AddAverage",
+			easeInSpeed: 1,
+			elementWeight: {
+				"ItemAnchor": 200,
+				"LowerTorso": 2,
+				"UpperTorso": 90,
+				"UpperArmL": 90,
+				"LowerArmL": 90,
+				"UpperArmR": 90,
+				"LowerArmR": 90,
+				"Neck": 1,
+				"Head": 1,
+				"UpperFootL": 1,
+				"UpperFootR": 1,
+			}
+		}
+	},
+	{
+		"file": "game:shapes/entity/humanoid/seraph-faceless",
+		"op": "add",
+		"path": "/animations/-",
+		"value": {
+			"name": "Glasswork Tool - Squeeze",
+			"code": "gwtoolsqueeze",
+			"quantityframes": 30,
+			"onActivityStopped": "EaseOut",
+			"onAnimationEnd": "Repeat",
+			"keyframes": [
+				{
+					"frame": 0,
+					"elements": {
+						"LowerTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 30.0, "rotationZ": 1.0 },
+						"UpperTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 5.0, "rotationZ": 4.0 },
+						"UpperArmR": { "offsetX": 0.5, "offsetY": -1.0, "offsetZ": 0.2, "rotationX": 8.0, "rotationY": -38.0, "rotationZ": -30.0 },
+						"LowerArmR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": -3.0 },
+						"ItemAnchor": { "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 20.0 },
+						"UpperArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -17.0, "rotationY": -40.0, "rotationZ": 8.0 },
+						"LowerArmL": { "offsetX": 0.0, "offsetY": 0.3, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -4.0, "rotationZ": -42.0 },
+						"Neck": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -9.0, "rotationZ": 0.0 },
+						"Head": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -12.0, "rotationZ": 6.0 },
+						"UpperFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -19.0, "rotationZ": -7.0 },
+						"LowerFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 7.0 },
+						"UpperFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -22.0, "rotationZ": -1.0 },
+						"LowerFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 6.0 }
+					}
+				},
+				{
+					"frame": 20,
+					"elements": {
+						"LowerTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 30.0, "rotationZ": 1.0 },
+						"UpperTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 5.0, "rotationZ": 4.0 },
+						"UpperArmR": { "offsetX": 0.5, "offsetY": -1.0, "offsetZ": 0.2, "rotationX": 6.0, "rotationY": -40.0, "rotationZ": -38.0 },
+						"LowerArmR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": -5.0 },
+						"ItemAnchor": { "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 20.0 },
+						"UpperArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -17.0, "rotationY": -40.0, "rotationZ": 8.0 },
+						"LowerArmL": { "offsetX": 0.0, "offsetY": 0.3, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -4.0, "rotationZ": -42.0 },
+						"Neck": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -9.0, "rotationZ": 0.0 },
+						"Head": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -12.0, "rotationZ": 6.0 },
+						"UpperFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -19.0, "rotationZ": -7.0 },
+						"LowerFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 7.0 },
+						"UpperFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -22.0, "rotationZ": -1.0 },
+						"LowerFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 6.0 }
+					}
+				}
+			]
+		}
+	},
+	{
+		"file": "game:entities/humanoid/player",
+		"op": "add",
+		"path": "/client/animations/-",
+		"value": {
+			code: "gwtoolsqueeze",
+			animation: "gwtoolsqueeze",
+			blendMode: "AddAverage",
+			easeInSpeed: 1,
+			elementWeight: {
+				"ItemAnchor": 200,
+				"LowerTorso": 2,
+				"UpperTorso": 90,
+				"UpperArmL": 90,
+				"LowerArmL": 90,
+				"UpperArmR": 90,
+				"LowerArmR": 90,
+				"Neck": 1,
+				"Head": 1,
+				"UpperFootL": 1,
+				"UpperFootR": 1,
+			}
+		}
+	},
+	{
+		"file": "game:shapes/entity/humanoid/seraph-faceless",
+		"op": "add",
+		"path": "/animations/-",
+		"value": {
+			"name": "Glasswork Tool - Cutoff",
+			"code": "gwtoolcutoff",
+			"quantityframes": 30,
+			"onActivityStopped": "EaseOut",
+			"onAnimationEnd": "Repeat",
+			"keyframes": [
+				{
+					"frame": 0,
+					"elements": {
+						"LowerTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 30.0, "rotationZ": 1.0 },
+						"UpperTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 4.0 },
+						"UpperArmR": { "offsetX": 0.5, "offsetY": -1.0, "offsetZ": 1.0, "rotationX": 20.0, "rotationY": 0.0, "rotationZ": -20.0 },
+						"LowerArmR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 3.0, "rotationY": 0.0, "rotationZ": -3.0 },
+						"ItemAnchor": { "rotationX": -15.0, "rotationY": 0.0, "rotationZ": 0.0 },
+						"UpperArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -17.0, "rotationY": -34.0, "rotationZ": 8.0 },
+						"LowerArmL": { "offsetX": 0.0, "offsetY": 0.3, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -4.0, "rotationZ": -32.0 },
+						"Neck": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -9.0, "rotationZ": 0.0 },
+						"Head": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -12.0, "rotationZ": 6.0 },
+						"UpperFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -19.0, "rotationZ": -7.0 },
+						"LowerFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 7.0 },
+						"UpperFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -22.0, "rotationZ": -1.0 },
+						"LowerFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 6.0 }
+					}
+				},
+				{
+					"frame": 20,
+					"elements": {
+						"LowerTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 30.0, "rotationZ": 1.0 },
+						"UpperTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 4.0 },
+						"UpperArmR": { "offsetX": 0.5, "offsetY": -1.0, "offsetZ": 1.0, "rotationX": 40.0, "rotationY": 0.0, "rotationZ": -42.0 },
+						"LowerArmR": { "offsetX": 0.5, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 6.0, "rotationY": 0.0, "rotationZ": -11.0 },
+						"ItemAnchor": { "rotationX": -15.0, "rotationY": 0.0, "rotationZ": 0.0 },
+						"UpperArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -17.0, "rotationY": -34.0, "rotationZ": 8.0 },
+						"LowerArmL": { "offsetX": 0.0, "offsetY": 0.3, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -4.0, "rotationZ": -32.0 },
+						"Neck": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -9.0, "rotationZ": 0.0 },
+						"Head": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -12.0, "rotationZ": 6.0 },
+						"UpperFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -19.0, "rotationZ": -7.0 },
+						"LowerFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 7.0 },
+						"UpperFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -22.0, "rotationZ": -1.0 },
+						"LowerFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 6.0 }
+					}
+				}
+			]
+		}
+	},
+	{
+		"file": "game:entities/humanoid/player",
+		"op": "add",
+		"path": "/client/animations/-",
+		"value": {
+			code: "gwtoolcutoff",
+			animation: "gwtoolcutoff",
+			blendMode: "AddAverage",
+			easeInSpeed: 1,
+			elementWeight: {
+				"ItemAnchor": 200,
+				"LowerTorso": 2,
+				"UpperTorso": 90,
+				"UpperArmL": 90,
+				"LowerArmL": 90,
+				"UpperArmR": 90,
+				"LowerArmR": 90,
+				"Neck": 1,
+				"Head": 1,
+				"UpperFootL": 1,
+				"UpperFootR": 1,
+			}
+		}
+	},
+	{
+		"file": "game:shapes/entity/humanoid/seraph-faceless",
+		"op": "add",
+		"path": "/animations/-",
+		"value": {
+			"name": "Glasswork Tool - Flare",
+			"code": "gwtoolflare",
+			"quantityframes": 40,
+			"onActivityStopped": "EaseOut",
+			"onAnimationEnd": "Repeat",
+			"keyframes": [
+				{
+					"frame": 0,
+					"elements": {
+						"LowerTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 30.0, "rotationZ": 1.0 },
+						"UpperTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 4.0 },
+						"UpperArmR": { "offsetX": 1.0, "offsetY": 0.0, "offsetZ": 2.0, "rotationX": 70.0, "rotationY": 0.0, "rotationZ": -42.0 },
+						"LowerArmR": { "offsetX": 0.5, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 6.0, "rotationY": 0.0, "rotationZ": -15.0 },
+						"ItemAnchor": { "rotationX": 0.0, "rotationY": 30.0, "rotationZ": -30.0 },
+						"UpperArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -17.0, "rotationY": -34.0, "rotationZ": 8.0 },
+						"LowerArmL": { "offsetX": 0.0, "offsetY": 0.3, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -4.0, "rotationZ": -32.0 },
+						"Neck": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -9.0, "rotationZ": 0.0 },
+						"Head": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -12.0, "rotationZ": 6.0 },
+						"UpperFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -19.0, "rotationZ": -7.0 },
+						"LowerFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 7.0 },
+						"UpperFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -22.0, "rotationZ": -1.0 },
+						"LowerFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 6.0 }
+					}
+				},
+				{
+					"frame": 20,
+					"elements": {
+						"LowerTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 30.0, "rotationZ": 1.0 },
+						"UpperTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 4.0 },
+						"UpperArmR": { "offsetX": 1.0, "offsetY": 0.0, "offsetZ": 2.0, "rotationX": 60.0, "rotationY": 0.0, "rotationZ": -30.0 },
+						"LowerArmR": { "offsetX": 0.5, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 6.0, "rotationY": 0.0, "rotationZ": -5.0 },
+						"ItemAnchor": { "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 20.0 },
+						"UpperArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -17.0, "rotationY": -34.0, "rotationZ": 8.0 },
+						"LowerArmL": { "offsetX": 0.0, "offsetY": 0.3, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -4.0, "rotationZ": -32.0 },
+						"Neck": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -9.0, "rotationZ": 0.0 },
+						"Head": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -12.0, "rotationZ": 6.0 },
+						"UpperFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -19.0, "rotationZ": -7.0 },
+						"LowerFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 7.0 },
+						"UpperFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -22.0, "rotationZ": -1.0 },
+						"LowerFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 6.0 }
+					}
+				},
+				{
+					"frame": 30,
+					"elements": {
+						"LowerTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 30.0, "rotationZ": 1.0 },
+						"UpperTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 4.0 },
+						"UpperArmR": { "offsetX": 1.0, "offsetY": 0.0, "offsetZ": 2.0, "rotationX": 50.0, "rotationY": 0.0, "rotationZ": -20.0 },
+						"LowerArmR": { "offsetX": 0.5, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 6.0, "rotationY": 0.0, "rotationZ": -5.0 },
+						"ItemAnchor": { "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 20.0 },
+						"UpperArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -17.0, "rotationY": -34.0, "rotationZ": 8.0 },
+						"LowerArmL": { "offsetX": 0.0, "offsetY": 0.3, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -4.0, "rotationZ": -32.0 },
+						"Neck": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -9.0, "rotationZ": 0.0 },
+						"Head": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -12.0, "rotationZ": 6.0 },
+						"UpperFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -19.0, "rotationZ": -7.0 },
+						"LowerFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 7.0 },
+						"UpperFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -22.0, "rotationZ": -1.0 },
+						"LowerFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 6.0 }
+					}
+				}
+			]
+		}
+	},
+	{
+		"file": "game:entities/humanoid/player",
+		"op": "add",
+		"path": "/client/animations/-",
+		"value": {
+			code: "gwtoolflare",
+			animation: "gwtoolflare",
+			blendMode: "AddAverage",
+			easeInSpeed: 1,
+			elementWeight: {
+				"ItemAnchor": 200,
+				"LowerTorso": 2,
+				"UpperTorso": 90,
+				"UpperArmL": 90,
+				"LowerArmL": 90,
+				"UpperArmR": 90,
+				"LowerArmR": 90,
+				"Neck": 1,
+				"Head": 1,
+				"UpperFootL": 1,
+				"UpperFootR": 1,
+			}
+		}
+	}
+]

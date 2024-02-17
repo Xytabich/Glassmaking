@@ -7,6 +7,9 @@ namespace GlassMaking.Blocks
 {
 	public class BlockLargeSmeltery : BlockHorizontalStructurePlanMain, IGlassmeltSourceBlock
 	{
+		public double processHoursPerUnit;
+		public double bubblingProcessMultiplier;
+
 		public ModelTransform smokeTransform;
 		public Vec3i[] hearthOffsets;
 		public Vec3i lightOffset;
@@ -40,6 +43,8 @@ namespace GlassMaking.Blocks
 					}
 				}
 			}
+			processHoursPerUnit = Attributes["hoursPerUnit"].AsDouble();
+			bubblingProcessMultiplier = Attributes["bubblingMult"].AsDouble();
 		}
 
 		public override ItemStack[] GetDrops(IWorldAccessor world, BlockPos pos, IPlayer byPlayer, float dropQuantityMultiplier = 1)

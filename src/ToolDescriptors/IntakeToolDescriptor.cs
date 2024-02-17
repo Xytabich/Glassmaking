@@ -1,5 +1,4 @@
-﻿using GlassMaking.Blocks;
-using GlassMaking.Common;
+﻿using GlassMaking.Common;
 using GlassMaking.GlassblowingTools;
 using System;
 using System.Collections.Generic;
@@ -36,17 +35,7 @@ namespace GlassMaking.ToolDescriptors
 			}
 			if(api.Side == EnumAppSide.Client)
 			{
-				var capi = (ICoreClientAPI)api;
-				List<ItemStack> list = new List<ItemStack>();
-				foreach(var block in capi.World.Blocks)
-				{
-					if(block is IGlassmeltSourceBlock)
-					{
-						List<ItemStack> stacks = block.GetHandBookStacks(capi);
-						if(stacks != null) list.AddRange(stacks);
-					}
-				}
-				items = list.ToArray();
+				items = Utils.GetGlassmeltSources(api);
 			}
 		}
 
@@ -114,7 +103,7 @@ namespace GlassMaking.ToolDescriptors
 			}
 			if(amountByCode.Count == 0) return;
 
-			foreach(var item in GlassBlend.GetShardsList(world, amountByCode))
+			foreach(var item in mod.GetShardsList(world, amountByCode))
 			{
 				outList.Add(item);
 			}

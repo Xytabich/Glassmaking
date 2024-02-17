@@ -62,7 +62,9 @@
 					"z": 0.625
 				}
 			}
-		}
+		},
+		"hoursPerUnit": 0.001,
+		"bubblingMult": 3
 	},
 	"variantgroups": [
 		{

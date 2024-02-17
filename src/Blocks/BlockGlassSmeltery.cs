@@ -10,6 +10,9 @@ namespace GlassMaking.Blocks
 {
 	public class BlockGlassSmeltery : HeatedBlockBase, IGlassmeltSourceBlock
 	{
+		public double processHoursPerUnit;
+		public double bubblingProcessMultiplier;
+
 		public ModelTransform smokeTransform;
 
 		private WorldInteraction[] interactions;
@@ -17,6 +20,9 @@ namespace GlassMaking.Blocks
 		public override void OnLoaded(ICoreAPI api)
 		{
 			base.OnLoaded(api);
+
+			processHoursPerUnit = Attributes["hoursPerUnit"].AsDouble();
+			bubblingProcessMultiplier = Attributes["bubblingMult"].AsDouble();
 
 			if(api.Side != EnumAppSide.Client) return;
 			ICoreClientAPI capi = api as ICoreClientAPI;

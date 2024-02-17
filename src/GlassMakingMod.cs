@@ -15,16 +15,22 @@ using HarmonyLib;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
+using Vintagestory.API.Server;
 
 namespace GlassMaking
 {
 	public class GlassMakingMod : ModSystem
 	{
 		public const string RECIPE_SELECT_HOTKEY = "itemrecipeselect";
+
+		public ModConfig Config { get; private set; } = ModConfig.CreateEmpty();
 
 		internal CachedItemRenderer itemsRenderer;
 		internal CachedMeshRefs meshRefCache;
@@ -45,7 +51,7 @@ namespace GlassMaking
 		private List<Block> castingMolds = null;
 		private HashSet<AssetLocation> castingMoldsOutput = null;
 
-		private Dictionary<Tuple<EnumItemClass, int>, ItemStack> annealRecipes = null;
+		private Dictionary<(EnumItemClass type, int id), ItemStack> annealRecipes = null;
 		private HashSet<AssetLocation> annealOutputs = null;
 
 		private List<ToolBehaviorDescriptor> descriptors = null;
@@ -55,6 +61,8 @@ namespace GlassMaking
 		private GlassMakingRecipeLoader recipeLoader;
 
 		private List<IDisposable> handbookInfoList;
+
+		private IServerNetworkChannel networkChannel = null!;
 
 		public override void Start(ICoreAPI api)
 		{
@@ -101,6 +109,10 @@ namespace GlassMaking
 			api.RegisterCollectibleBehaviorClass("glassmaking:gbt-blowing", typeof(BlowingTool));
 			api.RegisterCollectibleBehaviorClass("glassmaking:gbt-glassintake", typeof(GlassIntakeTool));
 
+			api.RegisterCollectibleBehaviorClass("glassmaking:gp-heatup", typeof(GlasspipeHeatupBehavior));
+			api.RegisterCollectibleBehaviorClass("glassmaking:gp-mold", typeof(GlasspipeMoldBehavior));
+			api.RegisterCollectibleBehaviorClass("glassmaking:gp-recipe", typeof(GlasspipeRecipeBehavior));
+
 			api.RegisterCollectibleBehaviorClass("glassmaking:glassblend", typeof(ItemBehaviorGlassBlend));
 			api.RegisterCollectibleBehaviorClass("glassmaking:workbenchtool", typeof(ItemBehaviorWorkbenchTool));
 
@@ -115,6 +127,13 @@ namespace GlassMaking
 			AddWorkbenchToolBehavior(new ItemUseBehavior(true));
 			AddWorkbenchToolBehavior(new ItemUseBehavior(false));
 			AddWorkbenchToolBehavior(new LiquidUseBehavior());
+		}
+
+		public override void StartServerSide(ICoreServerAPI api)
+		{
+			base.StartServerSide(api);
+			networkChannel = api.Network.RegisterChannel("glassmaking").RegisterMessageType<ModConfig>();
+			api.Event.PlayerJoin += SendConfig;
 		}
 
 		public override void StartClientSide(ICoreClientAPI api)
@@ -159,8 +178,11 @@ namespace GlassMaking
 			castingMolds = new List<Block>();
 			blowingMoldsOutput = new HashSet<AssetLocation>();
 			castingMoldsOutput = new HashSet<AssetLocation>();
-			annealRecipes = new Dictionary<Tuple<EnumItemClass, int>, ItemStack>();
+			annealRecipes = new Dictionary<(EnumItemClass, int), ItemStack>();
 			annealOutputs = new HashSet<AssetLocation>();
+
+			api.Network.RegisterChannel("glassmaking").RegisterMessageType<ModConfig>().SetMessageHandler<ModConfig>(OnConfigReceived);
+
 			api.Event.LevelFinalize += OnClientLevelFinallize;
 		}
 
@@ -183,6 +205,7 @@ namespace GlassMaking
 						api.Logger.Error("Syntax error in json file '{0}': {1}", pair.Key, ex.Message);
 					}
 				}
+				PrepareConfig(api.LoadModConfig<ModConfigJson>("fieldsofsalt.json") ?? new ModConfigJson());
 			}
 		}
 
@@ -335,6 +358,7 @@ namespace GlassMaking
 
 		public bool TryGetBlowingMoldsForItem(CollectibleObject item, out Block[] molds)
 		{
+			if(blowingMoldsOutput == null) throw new Exception("The client side of the glassmaking mod is still not loaded");
 			if(blowingMoldsOutput.Contains(item.Code))
 			{
 				List<Block> list = new List<Block>();
@@ -358,6 +382,7 @@ namespace GlassMaking
 
 		public bool TryGetCastingMoldsForItem(CollectibleObject item, out Block[] molds)
 		{
+			if(castingMoldsOutput == null) throw new Exception("The client side of the glassmaking mod is still not loaded");
 			if(castingMoldsOutput.Contains(item.Code))
 			{
 				List<Block> list = new List<Block>();
@@ -381,6 +406,7 @@ namespace GlassMaking
 
 		public bool TryGetMaterialsForAnneal(ItemStack forOutputItem, out CollectibleObject[] materials)
 		{
+			if(annealOutputs == null) throw new Exception("The client side of the glassmaking mod is still not loaded");
 			if(annealOutputs.Contains(forOutputItem.Collectible.Code))
 			{
 				List<CollectibleObject> list = new List<CollectibleObject>();
@@ -388,7 +414,9 @@ namespace GlassMaking
 				{
 					if(pair.Value.Collectible.Equals(pair.Value, forOutputItem, GlobalConstants.IgnoredStackAttributes))
 					{
-						list.Add((pair.Key.Item1 == EnumItemClass.Block) ? (CollectibleObject)capi.World.GetBlock(pair.Key.Item2) : (CollectibleObject)capi.World.GetItem(pair.Key.Item2));
+						list.Add((pair.Key.type == EnumItemClass.Block) ?
+							(CollectibleObject)capi.World.GetBlock(pair.Key.id) :
+							(CollectibleObject)capi.World.GetItem(pair.Key.id));
 					}
 				}
 				materials = list.ToArray();
@@ -400,8 +428,78 @@ namespace GlassMaking
 
 		private void OnClientLevelFinallize()
 		{
-			foreach(var block in capi.World.Blocks)
+			CollectMolds();
+			CollectAnnealRecipes();
+			foreach(var descriptor in descriptors)
 			{
+				descriptor.OnLoaded(capi);
+			}
+			InitWorkbenchTools();
+		}
+
+		public override void AssetsFinalize(ICoreAPI api)
+		{
+			if(api.Side == EnumAppSide.Server)
+			{
+				foreach(var descriptor in descriptors)
+				{
+					descriptor.OnLoaded(api);
+				}
+				InitWorkbenchTools();
+			}
+		}
+
+		private void PrepareConfig(ModConfigJson jsonConfig)
+		{
+			Config = new ModConfig(jsonConfig.Shards.OrderByDescending(p => p.Amount).Select(p => (p.Code, p.Type, p.Amount)).ToArray());
+		}
+
+		private void SendConfig(IServerPlayer toPlayer)
+		{
+			networkChannel.SendPacket(Config, toPlayer);
+		}
+
+		private void OnConfigReceived(ModConfig config)
+		{
+			Config = config;
+		}
+
+		private void CollectAnnealRecipes()
+		{
+			var annealSources = new ConcurrentBag<CollectibleObject>();
+			Parallel.ForEach(capi.World.Collectibles, collectible => {
+				if(collectible.Attributes != null && collectible.Attributes.KeyExists("glassmaking:anneal"))
+				{
+					annealSources.Add(collectible);
+				}
+			});
+			foreach(var collectible in annealSources)
+			{
+				var properties = collectible.Attributes["glassmaking:anneal"];
+				try
+				{
+					var output = properties["output"].AsObject<JsonItemStack>(null, collectible.Code.Domain);
+					if(output.Resolve(capi.World, "recipes collect"))
+					{
+						var outputItem = output.ResolvedItemstack;
+						annealRecipes.Add((collectible.ItemClass, collectible.Id), outputItem);
+						annealOutputs.Add(outputItem.Collectible.Code);
+					}
+				}
+				catch(Exception e)
+				{
+					api.Logger.Warning($"Exception when trying to load an annealing recipe for '{collectible.Code}', the recipe will be skipped\n{e}");
+				}
+			}
+		}
+
+		private void CollectMolds()
+		{
+			var blowingMolds = new ConcurrentBag<Block>();
+			var blowingMoldsOutput = new ConcurrentBag<AssetLocation>();
+			var castingMolds = new ConcurrentBag<Block>();
+			var castingMoldsOutput = new ConcurrentBag<AssetLocation>();
+			Parallel.ForEach(capi.World.Blocks, block => {
 				if(block is IGlassBlowingMold bmold)
 				{
 					var recipes = bmold.GetRecipes();
@@ -426,38 +524,11 @@ namespace GlassMaking
 						}
 					}
 				}
-			}
-			foreach(var collectible in capi.World.Collectibles)
-			{
-				if(collectible.Attributes != null && collectible.Attributes.KeyExists("glassmaking:anneal"))
-				{
-					var properties = collectible.Attributes["glassmaking:anneal"];
-					var output = properties["output"].AsObject<JsonItemStack>(null, collectible.Code.Domain);
-					if(output.Resolve(capi.World, "recipes collect"))
-					{
-						var outputItem = output.ResolvedItemstack;
-						annealRecipes.Add(new Tuple<EnumItemClass, int>(collectible.ItemClass, collectible.Id), outputItem);
-						annealOutputs.Add(outputItem.Collectible.Code);
-					}
-				}
-			}
-			foreach(var descriptor in descriptors)
-			{
-				descriptor.OnLoaded(capi);
-			}
-			InitWorkbenchTools();
-		}
-
-		public override void AssetsFinalize(ICoreAPI api)
-		{
-			if(api.Side == EnumAppSide.Server)
-			{
-				foreach(var descriptor in descriptors)
-				{
-					descriptor.OnLoaded(api);
-				}
-				InitWorkbenchTools();
-			}
+			});
+			this.blowingMolds.AddRange(blowingMolds);
+			this.blowingMoldsOutput.UnionWith(blowingMoldsOutput);
+			this.castingMolds.AddRange(castingMolds);
+			this.castingMoldsOutput.UnionWith(castingMoldsOutput);
 		}
 
 		private void InitWorkbenchTools()

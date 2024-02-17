@@ -17,7 +17,9 @@
 					"text": "glassmaking:block-handbooktext-firebox"
 				}
 			]
-		}
+		},
+		"heatingRate": 1500,
+		"coolingRate": 2000
 	},
 	"creativeinventory": {
 		"general": [ "*-north" ],

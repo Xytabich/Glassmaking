@@ -166,7 +166,7 @@ namespace GlassMaking.Blocks
 			if(glassCode == null) return null;
 			if(fillLevel < requiredUnits || !IsHardened)
 			{
-				return GlassBlend.GetShardsList(Api.World, glassCode, fillLevel);
+				return mod.GetShardsList(Api.World, glassCode, fillLevel);
 			}
 			return GetReadyMoldedStacks();
 		}

@@ -5,14 +5,32 @@
 		{
 			"name": "glassmaking:gbt-blowing",
 			"properties": {
-				"tool": "blowing"
+				"tool": "blowing",
+				"animation": "glasspipeblow"
 			}
 		},
 		{
 			"name": "glassmaking:gbt-glassintake",
 			"properties": {
-				"tool": "glassintake"
+				"tool": "glassintake",
+				"animation": "glasspipeintake"
 			}
+		},
+		{
+			"name": "glassmaking:gp-heatup",
+			"properties": {
+				"animation": "glasspipeintake"
+			}
+		},
+		{
+			"name": "glassmaking:gp-mold",
+			"properties": {
+				"blowAnimation": "glasspipeblow",
+				"intakeAnimation": "glasspipeintake"
+			}
+		},
+		{
+			"name": "glassmaking:gp-recipe"
 		}
 	],
 	"maxstacksize": 1,
@@ -63,24 +81,6 @@
 		}
 	},
 	"storageFlags": 257,
-	"fpHandTransform": {
-		"translation": {
-			"x": 0.5,
-			"y": -0.25,
-			"z": 0.5
-		},
-		"rotation": {
-			"x": -160,
-			"y": 0,
-			"z": 0
-		},
-		"origin": {
-			"x": 0,
-			"y": 0,
-			"z": 0
-		},
-		"scale": 1.5
-	},
 	"groundTransform": {
 		"translation": {
 			"x": 0,
@@ -132,6 +132,7 @@
 			"x": 0,
 			"y": 0,
 			"z": 0
-		}
+		},
+		"scale": 0.5
 	}
 }

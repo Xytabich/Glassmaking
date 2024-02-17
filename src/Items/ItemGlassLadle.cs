@@ -1,7 +1,6 @@
 ﻿using GlassMaking.Blocks;
 using GlassMaking.Common;
 using System;
-using System.Collections.Generic;
 using System.Text;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
@@ -42,25 +41,13 @@ namespace GlassMaking.Items
 				takeTransform = Attributes["takeTransform"].AsObject<ModelTransform>();
 				takeTransform.EnsureDefaultValues();
 
-				interactions = ObjectCacheUtil.GetOrCreate(api, "glassmaking:heldhelp-ladle", () => {
-					List<ItemStack> list = new List<ItemStack>();
-					var capi = api as ICoreClientAPI;
-					foreach(Block block in api.World.Blocks)
-					{
-						if(block is IGlassmeltSourceBlock)
-						{
-							List<ItemStack> stacks = block.GetHandBookStacks(capi);
-							if(stacks != null) list.AddRange(stacks);
-						}
+				interactions = new WorldInteraction[] {
+					new WorldInteraction() {
+						ActionLangCode = "glassmaking:heldhelp-ladle-intake",
+						MouseButton = EnumMouseButton.Right,
+						Itemstacks = Utils.GetGlassmeltSources(api)
 					}
-					return new WorldInteraction[] {
-						new WorldInteraction() {
-							ActionLangCode = "glassmaking:heldhelp-ladle-intake",
-							MouseButton = EnumMouseButton.Right,
-							Itemstacks = list.ToArray()
-						}
-					};
-				});
+				};
 			}
 		}
 
@@ -86,7 +73,7 @@ namespace GlassMaking.Items
 				dsc.AppendLine(Lang.Get("Temperature: {0}°C", GetGlassTemperature(world, inSlot.Itemstack).ToString("0")));
 
 				bool showHeader = true;
-				foreach(var item in GlassBlend.GetShardsList(world, code, amount))
+				foreach(var item in mod.GetShardsList(world, code, amount))
 				{
 					if(showHeader)
 					{
@@ -391,7 +378,7 @@ namespace GlassMaking.Items
 					if(glassmelt != null)
 					{
 						var entity = byPlayer.Entity;
-						foreach(var item in GlassBlend.GetShardsList(api.World, new AssetLocation(glassmelt.GetString("code")), glassmelt.GetInt("amount")))
+						foreach(var item in mod.GetShardsList(api.World, new AssetLocation(glassmelt.GetString("code")), glassmelt.GetInt("amount")))
 						{
 							if(!entity.TryGiveItemStack(item))
 							{

@@ -1,12 +1,24 @@
-﻿using System;
+﻿using GlassMaking.Items.Behavior;
+using System;
 using Vintagestory.API.Common;
+using Vintagestory.API.Datastructures;
 
 namespace GlassMaking.GlassblowingTools
 {
-	public class BlowingTool : GlassblowingToolBehavior
+	public class BlowingTool : GlassblowingToolBehavior, IPrioritizedBehavior
 	{
+		public double Priority => 2;
+
+		private string animation;
+
 		public BlowingTool(CollectibleObject collObj) : base(collObj)
 		{
+		}
+
+		public override void Initialize(JsonObject properties)
+		{
+			base.Initialize(properties);
+			animation = properties["animation"].AsString();
 		}
 
 		public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling, ref EnumHandling handling)
@@ -16,6 +28,9 @@ namespace GlassMaking.GlassblowingTools
 				if(step.BeginStep())
 				{
 					if(api.Side == EnumAppSide.Client) step.SetProgress(0);
+
+					byEntity.AnimManager.StartAnimation(animation);
+
 					handHandling = EnumHandHandling.PreventDefault;
 					handling = EnumHandling.PreventSubsequent;
 					return;
@@ -30,16 +45,6 @@ namespace GlassMaking.GlassblowingTools
 			{
 				if(step.ContinueStep())
 				{
-					if(byEntity.Api.Side == EnumAppSide.Client)
-					{
-						const float speed = 1.5f;
-						ModelTransform modelTransform = new ModelTransform();
-						modelTransform.EnsureDefaultValues();
-						modelTransform.Translation.Set(-Math.Min(1.275f, speed * secondsUsed * 1.5f), -Math.Min(0.5f, speed * secondsUsed), -Math.Min(0.25f, speed * Math.Max(0, secondsUsed - 0.5f) * 0.5f));
-						modelTransform.Scale = 1f + Math.Min(0.25f, speed * secondsUsed / 4f);
-						byEntity.Controls.UsingHeldItemTransformBefore = modelTransform;
-					}
-
 					float time = step.StepAttributes["time"].AsFloat(1);
 					if(api.Side == EnumAppSide.Client)
 					{
@@ -74,7 +79,21 @@ namespace GlassMaking.GlassblowingTools
 					step.SetProgress(0);
 				}
 			}
+			byEntity.AnimManager.StopAnimation(animation);
 			base.OnHeldInteractStop(secondsUsed, slot, byEntity, blockSel, entitySel, ref handling);
+		}
+
+		public override bool OnHeldInteractCancel(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, EnumItemUseCancelReason cancelReason, ref EnumHandling handled)
+		{
+			if(api.Side == EnumAppSide.Client && TryGetRecipeStep(slot, byEntity, out var step))
+			{
+				if(step.ContinueStep())
+				{
+					step.SetProgress(0);
+				}
+			}
+			byEntity.AnimManager.StopAnimation(animation);
+			return true;
 		}
 	}
 }

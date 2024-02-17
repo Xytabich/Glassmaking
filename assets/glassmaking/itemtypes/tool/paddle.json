@@ -6,39 +6,7 @@
 			"name": "glassmaking:gbt-dryable",
 			"properties": {
 				"tool": "flatten",
-				"transform": {
-					"origin": {
-						"x": -0.5,
-						"y": -0.5,
-						"z": -0.5
-					},
-					"translation": {
-						"x": 1,
-						"y": -0.6,
-						"z": -1.75
-					},
-					"rotation": {
-						"y": 22,
-						"z": 25
-					}
-				},
-				"animation": {
-					"origin": {
-						"x": -0.5,
-						"y": -0.5,
-						"z": -0.5
-					},
-					"translation": {
-						"x": 1.2,
-						"y": -0.6,
-						"z": -1.95
-					},
-					"rotation": {
-						"y": 28,
-						"z": 25
-					}
-				},
-				"speed": 6
+				"animation": "gwtoolflatten"
 			}
 		}
 	],

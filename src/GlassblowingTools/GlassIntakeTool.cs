@@ -1,15 +1,26 @@
 ﻿using GlassMaking.Blocks;
 using GlassMaking.Items;
+using GlassMaking.Items.Behavior;
 using System;
 using Vintagestory.API.Common;
-using Vintagestory.API.MathTools;
+using Vintagestory.API.Datastructures;
 
 namespace GlassMaking.GlassblowingTools
 {
-	public class GlassIntakeTool : GlassblowingToolBehavior
+	public class GlassIntakeTool : GlassblowingToolBehavior, IPrioritizedBehavior
 	{
+		public double Priority => 2;
+
+		private string animation;
+
 		public GlassIntakeTool(CollectibleObject collObj) : base(collObj)
 		{
+		}
+
+		public override void Initialize(JsonObject properties)
+		{
+			base.Initialize(properties);
+			animation = properties["animation"].AsString();
 		}
 
 		public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling, ref EnumHandling handling)
@@ -33,6 +44,9 @@ namespace GlassMaking.GlassblowingTools
 									slot.Itemstack.TempAttributes.SetFloat("glassmaking:lastAddGlassTime", 0f);
 								}
 								slot.Itemstack.TempAttributes.SetBool("glassmaking:intakeStarted", true);
+
+								byEntity.AnimManager.StartAnimation(animation);
+
 								handHandling = EnumHandHandling.PreventDefault;
 								handling = EnumHandling.PreventSubsequent;
 							}
@@ -61,18 +75,6 @@ namespace GlassMaking.GlassblowingTools
 							if(intake < amount)
 							{
 								const float speed = 1.5f;
-								if(byEntity.Api.Side == EnumAppSide.Client)
-								{
-									ModelTransform modelTransform = new ModelTransform();
-									modelTransform.EnsureDefaultValues();
-									modelTransform.Origin.Set(0f, 0f, 0f);
-									modelTransform.Translation.Set(-Math.Min(0.5f, speed * secondsUsed), -Math.Min(0.5f, speed * secondsUsed), Math.Min(0.5f, speed * secondsUsed));
-									modelTransform.Scale = 1f - Math.Min(0.1f, speed * secondsUsed / 4f);
-									modelTransform.Rotation.X = -Math.Min(10f, secondsUsed * 45f * speed);
-									modelTransform.Rotation.Y = -Math.Min(15f, secondsUsed * 45f * speed) + GameMath.FastSin(secondsUsed * 1.5f);
-									modelTransform.Rotation.Z = secondsUsed * 90f % 360f;
-									byEntity.Controls.UsingHeldItemTransformBefore = modelTransform;
-								}
 								const float useTime = 2f;
 								if(byEntity.Api.Side == EnumAppSide.Server && secondsUsed >= useTime)
 								{
@@ -124,9 +126,24 @@ namespace GlassMaking.GlassblowingTools
 
 		public override void OnHeldInteractStop(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, ref EnumHandling handling)
 		{
-			slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:lastAddGlassTime");
-			slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:intakeStarted");
+			if(slot.Itemstack.TempAttributes.HasAttribute("glassmaking:intakeStarted"))
+			{
+				slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:lastAddGlassTime");
+				slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:intakeStarted");
+				byEntity.AnimManager.StopAnimation(animation);
+			}
 			base.OnHeldInteractStop(secondsUsed, slot, byEntity, blockSel, entitySel, ref handling);
+		}
+
+		public override bool OnHeldInteractCancel(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, EnumItemUseCancelReason cancelReason, ref EnumHandling handled)
+		{
+			if(slot.Itemstack.TempAttributes.HasAttribute("glassmaking:intakeStarted"))
+			{
+				slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:lastAddGlassTime");
+				slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:intakeStarted");
+				byEntity.AnimManager.StopAnimation(animation);
+			}
+			return true;
 		}
 
 		private int GetAmountFromPreviousSteps(ToolRecipeStep stepInfo)

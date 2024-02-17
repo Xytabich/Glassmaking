@@ -8,14 +8,14 @@ using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
+using Vintagestory.API.Server;
 using Vintagestory.API.Util;
 
 namespace GlassMaking.Blocks
 {
 	public class BlockEntityLargeSmelteryCore : BEHorizontalStructurePlanMain, IHeatSourceModifier
 	{
-		private const double PROCESS_HOURS_PER_UNIT = 0.00025;
-		private const double BUBBLING_PROCESS_MULTIPLIER = 2;
+		private const int PROGRESS_PACKET_ID = 2005;
 
 		private static readonly ValueGraph defaultGraph = new ValueGraph(new ValueGraph.Point(0, 20));
 		private static SimpleParticleProperties smokeParticles;
@@ -29,17 +29,19 @@ namespace GlassMaking.Blocks
 
 		private BlockRendererGlassSmeltery renderer = null;
 
+		private GlassMakingMod mod;
+		private BlockLargeSmeltery smelteryBlock;
+
 		private SmelteryState state;
 		private int glassAmount;
 		private AssetLocation glassCode;
 		private double processProgress;
-
-		private GlassMakingMod mod;
 		private float meltingTemperature;
 
 		private ITimeBasedHeatSourceControl[] heaters;
 		private ValueGraph[] heatGraphs;
 
+		private int msgTickCounter = 0;
 		private int prevLightLevel = 0;
 
 		private GlassSmelteryInventory inventory = new GlassSmelteryInventory(null, null);
@@ -53,7 +55,9 @@ namespace GlassMaking.Blocks
 		public override void Initialize(ICoreAPI api)
 		{
 			mod = api.ModLoader.GetModSystem<GlassMakingMod>();
+			smelteryBlock = (BlockLargeSmeltery)Block;
 			base.Initialize(api);
+
 			inventory.LateInitialize("glassmaking:largesmeltery-" + Pos.X + "/" + Pos.Y + "/" + Pos.Z, api);
 			if(state != SmelteryState.Empty)
 			{
@@ -70,10 +74,9 @@ namespace GlassMaking.Blocks
 				}
 			}
 
-			var block = (BlockLargeSmeltery)Block;
 			for(int i = 0; i < heatersCount; i++)
 			{
-				(api.World.BlockAccessor.GetBlockEntity(Pos.AddCopy(block.hearthOffsets[i])) as BlockEntityLargeSmelteryHearth)?.OnCoreUpdated(this);
+				(api.World.BlockAccessor.GetBlockEntity(Pos.AddCopy(smelteryBlock.hearthOffsets[i])) as BlockEntityLargeSmelteryHearth)?.OnCoreUpdated(this);
 			}
 
 			if(api.Side == EnumAppSide.Client)
@@ -110,12 +113,12 @@ namespace GlassMaking.Blocks
 					break;
 				case SmelteryState.Melting:
 					dsc.AppendLine(Lang.Get("glassmaking:Contains {0} units of {1} glass", glassAmount, Lang.Get(GlassBlend.GetBlendNameCode(glassCode))));
-					dsc.AppendLine(Lang.Get("glassmaking:Glass melting progress: {0}%", (processProgress / (glassAmount * PROCESS_HOURS_PER_UNIT) * 100).ToString("0")));
+					dsc.AppendLine(Lang.Get("glassmaking:Glass melting progress: {0}%", (processProgress / (glassAmount * smelteryBlock.processHoursPerUnit) * 100).ToString("0")));
 					dsc.AppendLine(Lang.Get("Temperature: {0}°C", GetTemperature().ToString("0")));
 					break;
 				case SmelteryState.Bubbling:
 					dsc.AppendLine(Lang.Get("glassmaking:Contains {0} units of {1} glass", glassAmount, Lang.Get(GlassBlend.GetBlendNameCode(glassCode))));
-					dsc.AppendLine(Lang.Get("glassmaking:Glass bubbling progress: {0}%", (processProgress / (glassAmount * PROCESS_HOURS_PER_UNIT * BUBBLING_PROCESS_MULTIPLIER) * 100).ToString("0")));
+					dsc.AppendLine(Lang.Get("glassmaking:Glass bubbling progress: {0}%", (processProgress / (glassAmount * smelteryBlock.processHoursPerUnit * smelteryBlock.bubblingProcessMultiplier) * 100).ToString("0")));
 					dsc.AppendLine(Lang.Get("Temperature: {0}°C", GetTemperature().ToString("0")));
 					break;
 				case SmelteryState.ContainsGlass:
@@ -188,10 +191,9 @@ namespace GlassMaking.Blocks
 		{
 			base.OnBlockUnloaded();
 			renderer?.Dispose();
-			var block = (BlockLargeSmeltery)Block;
 			for(int i = 0; i < heatersCount; i++)
 			{
-				(Api.World.BlockAccessor.GetBlockEntity(Pos.AddCopy(block.hearthOffsets[i])) as BlockEntityLargeSmelteryHearth)?.OnCoreUpdated(null);
+				(Api.World.BlockAccessor.GetBlockEntity(Pos.AddCopy(smelteryBlock.hearthOffsets[i])) as BlockEntityLargeSmelteryHearth)?.OnCoreUpdated(null);
 			}
 		}
 
@@ -216,7 +218,7 @@ namespace GlassMaking.Blocks
 		{
 			if(state == SmelteryState.Bubbling)
 			{
-				double processDuration = glassAmount * PROCESS_HOURS_PER_UNIT * BUBBLING_PROCESS_MULTIPLIER;
+				double processDuration = glassAmount * smelteryBlock.processHoursPerUnit * smelteryBlock.bubblingProcessMultiplier;
 				// The last half hour the melt should "calm down"
 				if(processProgress >= processDuration - 0.5) return false;
 
@@ -248,7 +250,7 @@ namespace GlassMaking.Blocks
 						if(GetTemperature() >= meltingTemperature)
 						{
 							state = SmelteryState.Melting;
-							processProgress = PROCESS_HOURS_PER_UNIT * glassAmount;
+							processProgress = smelteryBlock.processHoursPerUnit * glassAmount;
 						}
 						else
 						{
@@ -276,7 +278,7 @@ namespace GlassMaking.Blocks
 			var items = inventory.CollectItems();
 			if(glassAmount > 0 && glassCode != null)
 			{
-				foreach(var item in GlassBlend.GetShardsList(Api.World, glassCode, glassAmount))
+				foreach(var item in mod.GetShardsList(Api.World, glassCode, glassAmount))
 				{
 					items.Add(item);
 				}
@@ -363,11 +365,24 @@ namespace GlassMaking.Blocks
 			}
 		}
 
+		public override void OnReceivedServerPacket(int packetid, byte[] data)
+		{
+			base.OnReceivedServerPacket(packetid, data);
+			if(packetid == PROGRESS_PACKET_ID)
+			{
+				try
+				{
+					processProgress = SerializerUtil.Deserialize<double>(data);
+				}
+				catch { }
+			}
+		}
+
 		private void OnCommonTick(float dt)
 		{
 			if(isStructureComplete)
 			{
-				if(state != SmelteryState.Empty && state != SmelteryState.ContainsGlass)
+				if(state != SmelteryState.Empty && state != SmelteryState.ContainsGlass && Api.Side == EnumAppSide.Server)
 				{
 					bool hasActive = false;
 					for(int i = 0; i < heaters.Length; i++)
@@ -386,9 +401,10 @@ namespace GlassMaking.Blocks
 					{
 						var graph = ValueGraph.Avg(heatGraphs);
 						double timeOffset = 0;
+
 						if(state == SmelteryState.ContainsMix)
 						{
-							if(Api.Side == EnumAppSide.Server && graph.CalculateValueRetention(timeOffset, meltingTemperature) > 0)
+							if(graph.CalculateValueRetention(timeOffset, meltingTemperature) > 0)
 							{
 								state = SmelteryState.Melting;
 								processProgress = 0;
@@ -397,12 +413,13 @@ namespace GlassMaking.Blocks
 								MarkDirty(true);
 							}
 						}
+
 						if(state == SmelteryState.Melting)
 						{
-							double timeLeft = glassAmount * PROCESS_HOURS_PER_UNIT - processProgress;
+							double timeLeft = glassAmount * smelteryBlock.processHoursPerUnit - processProgress;
 							double time = graph.CalculateValueRetention(timeOffset, meltingTemperature);
 							processProgress += Math.Min(time, timeLeft);
-							if(Api.Side == EnumAppSide.Server && time >= timeLeft)
+							if(time >= timeLeft)
 							{
 								timeOffset += timeLeft;
 								processProgress = 0;
@@ -410,16 +427,24 @@ namespace GlassMaking.Blocks
 								MarkDirty(true);
 							}
 						}
+
 						if(state == SmelteryState.Bubbling)
 						{
-							double timeLeft = glassAmount * PROCESS_HOURS_PER_UNIT * BUBBLING_PROCESS_MULTIPLIER - processProgress;
+							double timeLeft = glassAmount * smelteryBlock.processHoursPerUnit * smelteryBlock.bubblingProcessMultiplier - processProgress;
 							double time = graph.CalculateValueRetention(timeOffset, meltingTemperature * 1.11f);
 							processProgress += Math.Min(time, timeLeft);
-							if(Api.Side == EnumAppSide.Server && time >= timeLeft)
+							if(time >= timeLeft)
 							{
 								state = SmelteryState.ContainsGlass;
 								MarkDirty(true);
 							}
+						}
+
+						msgTickCounter++;
+						if(msgTickCounter >= 4)
+						{
+							msgTickCounter = 0;
+							((ICoreServerAPI)Api).Network.BroadcastBlockEntityPacket(Pos, PROGRESS_PACKET_ID, processProgress);
 						}
 					}
 				}
@@ -452,7 +477,7 @@ namespace GlassMaking.Blocks
 		{
 			if(Api.World.Rand.Next(3) > 0)
 			{
-				var transform = ((BlockLargeSmeltery)Block).smokeTransform;
+				var transform = smelteryBlock.smokeTransform;
 				smokeParticles.MinPos.Set(Pos.X + transform.Translation.X, Pos.Y + transform.Translation.Y, Pos.Z + transform.Translation.Z);
 				smokeParticles.AddPos.Set(transform.ScaleXYZ.X, 0.0, transform.ScaleXYZ.Z);
 				Api.World.SpawnParticles(smokeParticles);
@@ -465,9 +490,8 @@ namespace GlassMaking.Blocks
 			{
 				prevLightLevel = newLightLevel;
 
-				var block = (BlockLargeSmeltery)Block;
-				int newId = world.GetBlock(block.GetStructureBlock(block.lightOffset).CodeWithVariant("level", newLightLevel.ToString())).Id;
-				world.BlockAccessor.ExchangeBlock(newId, Pos.AddCopy(block.lightOffset));
+				int newId = world.GetBlock(smelteryBlock.GetStructureBlock(smelteryBlock.lightOffset).CodeWithVariant("level", newLightLevel.ToString())).Id;
+				world.BlockAccessor.ExchangeBlock(newId, Pos.AddCopy(smelteryBlock.lightOffset));
 			}
 		}
 

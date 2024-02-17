@@ -7,43 +7,7 @@
 			"properties": {
 				"tool": "flare",
 				"minTier": 0,
-				"transform": {
-					"origin": {
-						"x": -0.5,
-						"y": -0.5,
-						"z": -0.5
-					},
-					"translation": {
-						"x": 1.1,
-						"y": -0.5,
-						"z": -1.25
-					},
-					"rotation": {
-						"x": 80,
-						"y": 90,
-						"z": 25
-					},
-					"scale": 1.1
-				},
-				"animation": {
-					"origin": {
-						"x": -0.5,
-						"y": -0.5,
-						"z": -0.5
-					},
-					"translation": {
-						"x": 1.1,
-						"y": -0.5,
-						"z": -1.25
-					},
-					"rotation": {
-						"x": 80,
-						"y": 75,
-						"z": 20
-					},
-					"scale": 1.1
-				},
-				"speed": 2
+				"animation": "gwtoolflare"
 			}
 		},
 		{
@@ -51,39 +15,7 @@
 			"properties": {
 				"tool": "recess",
 				"minTier": 0,
-				"transform": {
-					"origin": {
-						"x": -0.5,
-						"y": -0.5,
-						"z": -0.5
-					},
-					"translation": {
-						"x": 0.24,
-						"y": 0.1,
-						"z": -0.5
-					},
-					"rotation": {
-						"y": 22,
-						"z": 25
-					}
-				},
-				"animation": {
-					"origin": {
-						"x": -0.5,
-						"y": -0.5,
-						"z": -0.5
-					},
-					"translation": {
-						"x": 0.24,
-						"y": 0.1,
-						"z": -0.5
-					},
-					"rotation": {
-						"y": 28,
-						"z": 25
-					}
-				},
-				"speed": 6
+				"animation": "gwtoolrecess"
 			}
 		}
 	],
@@ -139,19 +71,6 @@
 		},
 		"scale": 2.5
 	},
-	"fpHandTransform": {
-		"translation": {
-			"x": -0.24,
-			"y": 0.1,
-			"z": 0.1
-		},
-		"rotation": {
-			"x": -35,
-			"y": 15,
-			"z": 90
-		},
-		"scale": 2.45
-	},
 	"groundTransform": {
 		"translation": {
 			"x": 0,
@@ -172,20 +91,20 @@
 	},
 	"tpHandTransform": {
 		"translation": {
-			"x": -0.9,
-			"y": -0.11,
-			"z": -0.35
+			"x": -1.1,
+			"y": 0.08,
+			"z": -0.43
 		},
 		"rotation": {
-			"x": -10,
+			"x": -90,
 			"y": 0,
-			"z": -25
+			"z": 0
 		},
 		"origin": {
 			"x": 0.68,
 			"y": 0,
 			"z": 0.42
 		},
-		"scale": 1
+		"scale": 0.89
 	}
 }

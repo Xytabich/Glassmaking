@@ -83,7 +83,9 @@
 					]
 				]
 			]
-		}
+		},
+		"hoursPerUnit": 0.00025,
+		"bubblingMult": 2
 	},
 	"blockmaterial": "Ceramic",
 	"creativeinventory": {

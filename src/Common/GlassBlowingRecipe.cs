@@ -1,5 +1,6 @@
 ﻿using GlassMaking.Common;
 using GlassMaking.Items;
+using GlassMaking.Items.Behavior;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -175,10 +176,12 @@ namespace GlassMaking
 
 		public void OnStepProgress(ItemSlot slot, float progress)
 		{
-			if(((ItemGlassworkPipe)slot.Itemstack.Collectible).TryGetRecipeAttribute(slot.Itemstack, out var recipeAttribute))
+			var beh = GetRecipeBehavior(slot.Itemstack.Collectible);
+			if(beh == null) return;
+			if(beh.TryGetRecipeAttribute(slot.Itemstack, out var recipeAttribute))
 			{
 				recipeAttribute.SetFloat("progress", GameMath.Clamp(progress, 0, 1));
-				((ItemGlassworkPipe)slot.Itemstack.Collectible).OnRecipeUpdated(slot, false);
+				beh.OnRecipeUpdated(slot, false);
 				slot.MarkDirty();
 			}
 		}
@@ -186,20 +189,22 @@ namespace GlassMaking
 		public void OnStepComplete(ItemSlot slot, EntityAgent byEntity)
 		{
 			if(byEntity.Api.Side != EnumAppSide.Server) return;
-			var pipe = (ItemGlassworkPipe)slot.Itemstack.Collectible;
-			if(pipe.TryGetRecipeAttribute(slot.Itemstack, out var recipeAttribute))
+			var beh = GetRecipeBehavior(slot.Itemstack.Collectible);
+			if(beh == null) return;
+			if(beh.TryGetRecipeAttribute(slot.Itemstack, out var recipeAttribute))
 			{
 				int step = recipeAttribute.GetInt("step", 0) + 1;
 				if(step >= Steps.Length)
 				{
 					var item = Output.ResolvedItemstack.Clone();
+					var pipe = (ItemGlassworkPipe)slot.Itemstack.Collectible;
 					item.Collectible.SetTemperature(byEntity.World, item, pipe.GetGlassTemperature(byEntity.World, slot.Itemstack));
 					if(!byEntity.TryGiveItemStack(item))
 					{
 						byEntity.World.SpawnItemEntity(item, byEntity.Pos.XYZ.Add(0.0, 0.5, 0.0));
 					}
 					slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:blowingStep");
-					pipe.OnRecipeUpdated(slot, true);
+					beh.OnRecipeUpdated(slot, true);
 				}
 				else
 				{
@@ -279,6 +284,15 @@ namespace GlassMaking
 				Name = Name.Clone(),
 				Enabled = Enabled
 			};
+		}
+
+		private static GlasspipeRecipeBehavior GetRecipeBehavior(CollectibleObject collectible)
+		{
+			foreach(var beh in collectible.CollectibleBehaviors)
+			{
+				if(beh is GlasspipeRecipeBehavior grb) return grb;
+			}
+			return null;
 		}
 
 		private static GlassBlowingRecipeStep CloneStep(GlassBlowingRecipeStep other)

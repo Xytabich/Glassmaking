@@ -13,9 +13,6 @@ namespace GlassMaking.Blocks
 {
 	public class BlockEntityFirebox : BlockEntity, ITimeBasedHeatSource, ITimeBasedHeatSourceContainer, ITimeBasedHeatSourceControl, IHeatSource
 	{
-		private const float TEMP_INCREASE_PER_HOUR = 1500;
-		private const float TEMP_DECREASE_PER_HOUR = 2000;
-
 		private static SimpleParticleProperties smokeParticles;
 		private static AdvancedParticleProperties fireParticles;
 
@@ -25,6 +22,7 @@ namespace GlassMaking.Blocks
 		private ItemSlot contentsSlot => inventory[0];
 		private InventoryGeneric inventory = new InventoryGeneric(1, "firebox-1", null);
 
+		private BlockFirebox fireboxBlock;
 		private BlockRendererFirebox renderer = null;
 
 		private ITimeBasedHeatReceiver receiver = null;
@@ -52,6 +50,7 @@ namespace GlassMaking.Blocks
 
 		public override void Initialize(ICoreAPI api)
 		{
+			fireboxBlock = (BlockFirebox)Block;
 			base.Initialize(api);
 			inventory.LateInitialize("firebox-1", api);
 			if(contents != null) ApplyFuelParameters();
@@ -262,8 +261,8 @@ namespace GlassMaking.Blocks
 				double burnTime = fuelLevel + fuelBurnDuration * GetFuelCount();
 				if(temp < fuelTemperature)
 				{
-					double time = Math.Min((fuelTemperature - temp) / TEMP_INCREASE_PER_HOUR, Math.Min(hours, burnTime));
-					temp += (float)(time * TEMP_INCREASE_PER_HOUR);
+					double time = Math.Min((fuelTemperature - temp) / fireboxBlock.tempIncreasePerHour, Math.Min(hours, burnTime));
+					temp += (float)(time * fireboxBlock.tempIncreasePerHour);
 					hours -= time;
 					burnTime -= time;
 					transitionTime = time;
@@ -276,8 +275,8 @@ namespace GlassMaking.Blocks
 				}
 				else if(temp > fuelTemperature)
 				{
-					transitionTime = Math.Min((temp - fuelTemperature) / TEMP_DECREASE_PER_HOUR, hours);
-					temp -= (float)(transitionTime * TEMP_DECREASE_PER_HOUR);
+					transitionTime = Math.Min((temp - fuelTemperature) / fireboxBlock.tempDecreasePerHour, hours);
+					temp -= (float)(transitionTime * fireboxBlock.tempDecreasePerHour);
 					workingTemperature = temp;
 					if(transitionTime > 0)
 					{
@@ -298,8 +297,8 @@ namespace GlassMaking.Blocks
 			}
 			if(hours > 0)
 			{
-				coolingTime = Math.Min((temp - 20) / TEMP_DECREASE_PER_HOUR, hours);
-				temp -= (float)(coolingTime * TEMP_DECREASE_PER_HOUR);
+				coolingTime = Math.Min((temp - 20) / fireboxBlock.tempDecreasePerHour, hours);
+				temp -= (float)(coolingTime * fireboxBlock.tempDecreasePerHour);
 				if(coolingTime > 0)
 				{
 					pointCount++;
@@ -352,14 +351,14 @@ namespace GlassMaking.Blocks
 				double burnTime = fuelLevel + fuelBurnDuration * GetFuelCount();
 				if(temp < fuelTemperature)
 				{
-					double time = Math.Min((fuelTemperature - temp) / TEMP_INCREASE_PER_HOUR, Math.Min(hours, burnTime));
-					temp += (float)(time * TEMP_INCREASE_PER_HOUR);
+					double time = Math.Min((fuelTemperature - temp) / fireboxBlock.tempIncreasePerHour, Math.Min(hours, burnTime));
+					temp += (float)(time * fireboxBlock.tempIncreasePerHour);
 					hours -= time;
 					burnTime -= time;
 				}
 				else if(temp > fuelTemperature)
 				{
-					temp = Math.Max(fuelTemperature, temp - (float)(hours * TEMP_DECREASE_PER_HOUR));
+					temp = Math.Max(fuelTemperature, temp - (float)(hours * fireboxBlock.tempDecreasePerHour));
 				}
 				if(hours > 0)
 				{
@@ -368,7 +367,7 @@ namespace GlassMaking.Blocks
 			}
 			if(hours > 0)
 			{
-				temp -= (float)(Math.Min((temp - 20) / TEMP_DECREASE_PER_HOUR, hours) * TEMP_DECREASE_PER_HOUR);
+				temp -= (float)(Math.Min((temp - 20) / fireboxBlock.tempDecreasePerHour, hours) * fireboxBlock.tempDecreasePerHour);
 			}
 			return temp * temperatureModifier;
 		}
@@ -407,15 +406,15 @@ namespace GlassMaking.Blocks
 				double burnTime = fuelLevel + fuelBurnDuration * fuelCount;
 				if(temperature < fuelTemperature)
 				{
-					double time = Math.Min((fuelTemperature - temperature) / TEMP_INCREASE_PER_HOUR, Math.Min(hours, burnTime));
-					temperature += (float)(time * TEMP_INCREASE_PER_HOUR);
+					double time = Math.Min((fuelTemperature - temperature) / fireboxBlock.tempIncreasePerHour, Math.Min(hours, burnTime));
+					temperature += (float)(time * fireboxBlock.tempIncreasePerHour);
 					hours -= time;
 					burnTime -= time;
 					lastTickTime += time;
 				}
 				else if(temperature > fuelTemperature)
 				{
-					temperature = Math.Max(fuelTemperature, temperature - (float)(hours * TEMP_DECREASE_PER_HOUR));
+					temperature = Math.Max(fuelTemperature, temperature - (float)(hours * fireboxBlock.tempDecreasePerHour));
 				}
 				if(hours > 0)
 				{
@@ -455,7 +454,7 @@ namespace GlassMaking.Blocks
 			if(!burning && temperature > 20)
 			{
 				double hours = totalHours - lastTickTime;
-				temperature = Math.Max(20, temperature - (float)(hours * TEMP_DECREASE_PER_HOUR));
+				temperature = Math.Max(20, temperature - (float)(hours * fireboxBlock.tempDecreasePerHour));
 			}
 			lastTickTime = totalHours;
 

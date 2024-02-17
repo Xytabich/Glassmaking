@@ -1,4 +1,5 @@
 ﻿using GlassMaking.Items;
+using GlassMaking.Items.Behavior;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
@@ -45,27 +46,29 @@ namespace GlassMaking.GlassblowingTools
 					pipeSlot = byEntity.LeftHandItemSlot;
 				}
 			}
-			if(pipeSlot != null)
+			if(pipeSlot?.Itemstack.Collectible is ItemGlassworkPipe glassworkPipe)
 			{
-				var recipeAttribute = pipeSlot.Itemstack.Attributes.GetTreeAttribute("glassmaking:recipe");
-				if(recipeAttribute != null)
+				if(glassworkPipe.GetActiveCraft(pipeSlot.Itemstack) is GlasspipeRecipeBehavior recipeBehavior)
 				{
-					if(!workingTemperatureRequired || ((ItemGlassworkPipe)pipeSlot.Itemstack.Collectible).IsWorkingTemperature(byEntity.World, pipeSlot.Itemstack))
+					if(recipeBehavior.TryGetRecipeAttribute(pipeSlot.Itemstack, out var recipeAttribute))
 					{
-						var recipe = mod.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
-						if(recipe != null)
+						if(!workingTemperatureRequired || recipeBehavior.IsWorkingTemperature(byEntity.World, pipeSlot.Itemstack))
 						{
-							var step = recipe.GetStepIndex(recipeAttribute);
-							if(step >= 0 && recipe.Steps[step].Tool == ToolCode)
+							var recipe = mod.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
+							if(recipe != null)
 							{
-								stepInfo = new ToolRecipeStep(step, pipeSlot, recipe, recipe.Steps[step].Attributes);
-								return true;
+								var step = recipe.GetStepIndex(recipeAttribute);
+								if(step >= 0 && recipe.Steps[step].Tool == ToolCode)
+								{
+									stepInfo = new ToolRecipeStep(step, pipeSlot, recipe, recipe.Steps[step].Attributes);
+									return true;
+								}
 							}
 						}
-					}
-					else if(showWarning && api.Side == EnumAppSide.Client)
-					{
-						((ICoreClientAPI)api).TriggerIngameError(this, "toocold", Lang.Get("glassmaking:The workpiece is not hot enough to work"));
+						else if(showWarning && api.Side == EnumAppSide.Client)
+						{
+							((ICoreClientAPI)api).TriggerIngameError(this, "toocold", Lang.Get("glassmaking:The workpiece is not hot enough to work"));
+						}
 					}
 				}
 			}
