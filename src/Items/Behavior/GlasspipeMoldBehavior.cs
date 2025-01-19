@@ -285,7 +285,7 @@ namespace GlassMaking.Items.Behavior
 			float point = 0f;
 			foreach(var code in codesAttrib.value)
 			{
-				point += glassMaking.GetGlassTypeInfo(new AssetLocation(code)).meltingPoint;
+				point += glassMaking.GetGlassTypeInfo(new AssetLocation(code)).MeltingPoint;
 			}
 			return point / codesAttrib.value.Length * 0.8f;
 		}

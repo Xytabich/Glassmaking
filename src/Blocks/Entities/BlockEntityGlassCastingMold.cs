@@ -17,9 +17,9 @@ namespace GlassMaking.Blocks
 
 		public float Temperature { get { return temperature.GetTemperature(Api.World); } }
 
-		public bool IsHardened { get { return Temperature < 0.45f * mod.GetGlassTypeInfo(glassCode).meltingPoint; } }
+		public bool IsHardened { get { return Temperature < 0.45f * mod.GetGlassTypeInfo(glassCode).MeltingPoint; } }
 
-		public bool IsLiquid { get { return Temperature > mod.GetGlassTypeInfo(glassCode).meltingPoint; } }
+		public bool IsLiquid { get { return Temperature > mod.GetGlassTypeInfo(glassCode).MeltingPoint; } }
 
 		public bool IsFull { get { return fillLevel >= requiredUnits; } }
 

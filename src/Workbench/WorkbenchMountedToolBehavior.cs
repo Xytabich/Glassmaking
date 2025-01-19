@@ -16,7 +16,7 @@ namespace GlassMaking.Workbench
 		/// </summary>
 		public BlockEntity Blockentity;
 
-		public ItemSlot Slot;
+		public ItemSlot Slot = default!;
 
 		protected Cuboidf[] boundingBoxes;
 
@@ -53,12 +53,12 @@ namespace GlassMaking.Workbench
 		{
 		}
 
-		public virtual IAttribute ToAttribute()
+		public virtual IAttribute? ToAttribute()
 		{
 			return null;
 		}
 
-		public virtual void FromAttribute(IAttribute attribute, IWorldAccessor worldAccessForResolve)
+		public virtual void FromAttribute(IAttribute? attribute, IWorldAccessor worldAccessForResolve)
 		{
 		}
 

@@ -14,7 +14,7 @@ namespace GlassMaking
 
 		private const double FLOATY_DIALOG_ALIGN = 0.75;
 
-		public override string ToggleKeyCombinationCode => null;
+		public override string? ToggleKeyCombinationCode => null;
 
 		public override bool PrefersUngrabbedMouse => false;
 
@@ -42,11 +42,11 @@ namespace GlassMaking
 			item = itemstack.Collectible;
 
 			bool sourceSelected = false;
-			IItemCrafter source;
+			IItemCrafter? source;
 			if((source = itemstack.Collectible as IItemCrafter) != null)
 			{
-				if(source.PreventRecipeAssignment(player, itemstack)) return false;
-				if(source.TryGetRecipeOutputs(player, itemstack, out recipeOutputs))
+				if(source.PreventRecipeAssignment(player!, itemstack)) return false;
+				if(source.TryGetRecipeOutputs(player!, itemstack, out recipeOutputs))
 				{
 					sourceSelected = true;
 				}
@@ -57,8 +57,8 @@ namespace GlassMaking
 				{
 					if((source = behavior as IItemCrafter) != null)
 					{
-						if(source.PreventRecipeAssignment(player, itemstack)) return false;
-						if(source.TryGetRecipeOutputs(player, itemstack, out recipeOutputs))
+						if(source.PreventRecipeAssignment(player!, itemstack)) return false;
+						if(source.TryGetRecipeOutputs(player!, itemstack, out recipeOutputs))
 						{
 							sourceSelected = true;
 							break;

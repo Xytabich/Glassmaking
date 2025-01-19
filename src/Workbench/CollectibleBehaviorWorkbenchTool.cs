@@ -6,7 +6,7 @@ namespace GlassMaking.Workbench
 {
 	public abstract class CollectibleBehaviorWorkbenchTool : CollectibleBehavior, ICollectibleWorkbenchTool
 	{
-		protected Cuboidf[] toolBoundingBoxes = null;
+		protected Cuboidf[] toolBoundingBoxes = null!;
 
 		protected CollectibleBehaviorWorkbenchTool(CollectibleObject collObj) : base(collObj)
 		{

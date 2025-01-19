@@ -12,8 +12,8 @@ namespace GlassMaking.ToolDescriptors
 {
 	public class IntakeToolDescriptor : ToolBehaviorDescriptor<GlassIntakeTool>
 	{
-		private HashSet<string> toolCodes = new HashSet<string>();
-		private ItemStack[] items;
+		private readonly HashSet<string> toolCodes = new HashSet<string>();
+		private ItemStack[] items = default!;
 
 		public IntakeToolDescriptor(GlassMakingMod mod) : base(mod)
 		{
@@ -73,7 +73,7 @@ namespace GlassMaking.ToolDescriptors
 				if(toolCodes.Contains(steps[i].Tool))
 				{
 					var info = mod.GetGlassTypeInfo(new AssetLocation(steps[i].Attributes["code"].AsString()));
-					temperature = Math.Max(info.meltingPoint * 0.8f, temperature);
+					temperature = Math.Max((info?.MeltingPoint ?? 0) * 0.8f, temperature);
 				}
 			}
 			return temperature > 0f;

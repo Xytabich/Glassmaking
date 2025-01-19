@@ -70,7 +70,7 @@ namespace GlassMaking.Blocks
 				}
 				else
 				{
-					meltingTemperature = mod.GetGlassTypeInfo(glassCode).meltingPoint;
+					meltingTemperature = mod.GetGlassTypeInfo(glassCode).MeltingPoint;
 				}
 			}
 
@@ -176,7 +176,7 @@ namespace GlassMaking.Blocks
 					}
 					else
 					{
-						meltingTemperature = mod.GetGlassTypeInfo(glassCode).meltingPoint;
+						meltingTemperature = mod.GetGlassTypeInfo(glassCode).MeltingPoint;
 					}
 				}
 			}
@@ -243,7 +243,7 @@ namespace GlassMaking.Blocks
 					if(glassCode == null)
 					{
 						glassCode = blend.Code.Clone();
-						meltingTemperature = mod.GetGlassTypeInfo(glassCode).meltingPoint;
+						meltingTemperature = mod.GetGlassTypeInfo(glassCode).MeltingPoint;
 					}
 					if(state == SmelteryState.Bubbling || state == SmelteryState.ContainsGlass)
 					{

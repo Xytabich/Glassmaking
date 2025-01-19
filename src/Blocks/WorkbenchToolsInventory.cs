@@ -10,14 +10,14 @@ namespace GlassMaking.Blocks
 		public override int Count => slots.Length;
 		public override bool TakeLocked { get => true; set { } }
 
-		public FastList<int> modifiedSlots = new FastList<int>();
+		public readonly FastList<int> ModifiedSlots = new FastList<int>();
 
 		protected ItemSlot[] slots;
-		protected WorkbenchMountedToolBehavior[] behaviors;
+		protected WorkbenchMountedToolBehavior?[] behaviors;
 		protected BlockEntity blockentity;
 
-		private int toolsCount;
-		private IAttribute[] cachedAttributes;
+		private readonly int toolsCount;
+		private readonly IAttribute?[] cachedAttributes;
 
 		public WorkbenchToolsInventory(int quantitySlots, string className, string instanceID, ICoreAPI api, BlockEntity blockentity) : base(className, instanceID, api)
 		{
@@ -57,7 +57,7 @@ namespace GlassMaking.Blocks
 			}
 		}
 
-		public WorkbenchMountedToolBehavior GetBehavior(int slotId)
+		public WorkbenchMountedToolBehavior? GetBehavior(int slotId)
 		{
 			return behaviors[slotId];
 		}
@@ -66,14 +66,14 @@ namespace GlassMaking.Blocks
 		{
 			if(behaviors[slotId] != null)
 			{
-				behaviors[slotId].OnUnloaded();
+				behaviors[slotId]!.OnUnloaded();
 				behaviors[slotId] = null;
 			}
 			slots[slotId].Itemstack = itemStack;
 			if(WorkbenchToolUtils.TryGetTool(itemStack?.Collectible, out var tool))
 			{
 				behaviors[slotId] = tool.CreateToolBehavior(Api.World, itemStack, blockentity);
-				behaviors[slotId].OnLoaded(Api, slots[slotId]);
+				behaviors[slotId]!.OnLoaded(Api, slots[slotId]);
 			}
 		}
 
@@ -85,8 +85,8 @@ namespace GlassMaking.Blocks
 				if(!slots[i].Empty && WorkbenchToolUtils.TryGetTool(slots[i].Itemstack.Collectible, out var tool))
 				{
 					behaviors[i] = tool.CreateToolBehavior(Api.World, slots[i].Itemstack, blockentity);
-					behaviors[i].OnLoaded(api, slots[i]);
-					behaviors[i].FromAttribute(cachedAttributes[i], api.World);
+					behaviors[i]!.OnLoaded(api, slots[i]);
+					behaviors[i]!.FromAttribute(cachedAttributes[i], api.World);
 				}
 			}
 		}
@@ -95,13 +95,13 @@ namespace GlassMaking.Blocks
 		{
 			if(tree == null) return;
 
-			modifiedSlots.Clear();
+			ModifiedSlots.Clear();
 			var slotsAttrib = tree.GetTreeAttribute("slots");
 			var toolsAttrib = tree.GetTreeAttribute("tools");
 			for(int i = 0; i < slots.Length; i++)
 			{
-				ItemStack newstack = slotsAttrib?.GetItemstack(i.ToString());
-				ItemStack oldstack = slots[i].Itemstack;
+				ItemStack? newstack = slotsAttrib?.GetItemstack(i.ToString());
+				ItemStack? oldstack = slots[i].Itemstack;
 
 				if(Api?.World == null)
 				{
@@ -121,10 +121,10 @@ namespace GlassMaking.Blocks
 
 					if(isModified)
 					{
-						modifiedSlots.Add(i);
+						ModifiedSlots.Add(i);
 						if(behaviors[i] != null)
 						{
-							behaviors[i].OnUnloaded();
+							behaviors[i]!.OnUnloaded();
 							behaviors[i] = null;
 						}
 					}
@@ -134,7 +134,7 @@ namespace GlassMaking.Blocks
 					if(isModified && newstack != null && WorkbenchToolUtils.TryGetTool(newstack.Collectible, out var tool))
 					{
 						behaviors[i] = tool.CreateToolBehavior(Api.World, newstack, blockentity);
-						behaviors[i].OnLoaded(Api, slots[i]);
+						behaviors[i]!.OnLoaded(Api, slots[i]);
 					}
 					behaviors[i]?.FromAttribute(toolsAttrib?[i.ToString()], Api.World);
 				}
@@ -148,13 +148,13 @@ namespace GlassMaking.Blocks
 		public override void ToTreeAttributes(ITreeAttribute tree)
 		{
 			SlotsToTreeAttributes(slots, tree);
-			ITreeAttribute toolsAttrib = null;
+			ITreeAttribute? toolsAttrib = null;
 			for(int i = 0; i < toolsCount; i++)
 			{
 				var attr = behaviors[i]?.ToAttribute();
 				if(attr != null)
 				{
-					if(toolsAttrib == null) toolsAttrib = tree.GetOrAddTreeAttribute("tools");
+					toolsAttrib ??= tree.GetOrAddTreeAttribute("tools");
 					toolsAttrib[i.ToString()] = attr;
 				}
 			}

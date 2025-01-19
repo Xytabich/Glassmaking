@@ -33,8 +33,11 @@ namespace GlassMaking.Items
 			int rindex = dummyslot.BackgroundIcon.ToInt();
 			var ingredient = gridRecipe.resolvedIngredients[rindex];
 
-			JsonObject rprops = ingredient.RecipeAttributes;
-			if(rprops?.Exists != true || rprops?["requiresContent"].Exists != true) rprops = gridRecipe.Attributes?["liquidContainerProps"];
+			JsonObject? rprops = ingredient.RecipeAttributes;
+			if(rprops?.Exists != true || rprops?["requiresContent"].Exists != true)
+			{
+				rprops = gridRecipe.Attributes?["liquidContainerProps"];
+			}
 
 			if(rprops?.Exists != true)
 			{
@@ -47,10 +50,10 @@ namespace GlassMaking.Items
 			float litres = gridRecipe.Attributes["liquidContainerProps"]["requiresLitres"].AsFloat();
 
 			string key = contentType + "-" + contentCode;
-			ItemStack[] stacks;
+			ItemStack[]? stacks;
 			if(!recipeLiquidContents.TryGetValue(key, out stacks))
 			{
-				if(contentCode.Contains("*"))
+				if(contentCode.Contains('*'))
 				{
 					EnumItemClass contentClass = contentType == "block" ? EnumItemClass.Block : EnumItemClass.Item;
 					List<ItemStack> lstacks = new List<ItemStack>();
@@ -76,7 +79,7 @@ namespace GlassMaking.Items
 					else stacks[0] = new ItemStack(capi.World.GetBlock(new AssetLocation(contentCode)));
 
 					var props = GetContainableProps(stacks[0]);
-					stacks[0].StackSize = (int)(props.ItemsPerLitre * litres);
+					stacks[0].StackSize = (int)(props!.ItemsPerLitre * litres);
 				}
 			}
 
@@ -92,7 +95,7 @@ namespace GlassMaking.Items
 				dummyslot,
 				x,
 				y,
-				100, (float)size * 0.58f, ColorUtil.WhiteArgb,
+				z, (float)size * 0.58f, ColorUtil.WhiteArgb,
 				true, false, true
 			);
 		}
@@ -113,7 +116,7 @@ namespace GlassMaking.Items
 			}
 			else
 			{
-				var props = Attributes?["liquidContainerProps"]?.AsObject<LiquidTopOpenContainerProps>(null, Code.Domain);
+				var props = Attributes?["liquidContainerProps"]?.AsObject<LiquidTopOpenContainerProps?>(null, Code.Domain);
 				if(props != null)
 				{
 					capacityLitresFromAttributes = props.CapacityLitres;
@@ -153,10 +156,10 @@ namespace GlassMaking.Items
 
 		public bool SetCurrentLitres(ItemStack containerStack, float litres)
 		{
-			WaterTightContainableProps props = GetContentProps(containerStack);
+			WaterTightContainableProps? props = GetContentProps(containerStack);
 			if(props == null) return false;
 
-			ItemStack contentStack = GetContent(containerStack);
+			ItemStack contentStack = GetContent(containerStack)!;
 			contentStack.StackSize = (int)(litres * props.ItemsPerLitre);
 
 			SetContent(containerStack, contentStack);
@@ -165,10 +168,10 @@ namespace GlassMaking.Items
 
 		public float GetCurrentLitres(ItemStack containerStack)
 		{
-			WaterTightContainableProps props = GetContentProps(containerStack);
+			WaterTightContainableProps? props = GetContentProps(containerStack);
 			if(props == null) return 0;
 
-			return (float)GetContent(containerStack).StackSize / props.ItemsPerLitre;
+			return (float)GetContent(containerStack)!.StackSize / props.ItemsPerLitre;
 		}
 
 		public bool IsFull(ItemStack containerStack)
@@ -176,13 +179,13 @@ namespace GlassMaking.Items
 			return GetCurrentLitres(containerStack) >= CapacityLitres;
 		}
 
-		public WaterTightContainableProps GetContentProps(ItemStack containerStack)
+		public WaterTightContainableProps? GetContentProps(ItemStack containerStack)
 		{
-			ItemStack stack = GetContent(containerStack);
+			ItemStack? stack = GetContent(containerStack);
 			return GetContainableProps(stack);
 		}
 
-		public static int GetTransferStackSize(ILiquidInterface containerBlock, ItemStack contentStack, IPlayer player = null)
+		public static int GetTransferStackSize(ILiquidInterface containerBlock, ItemStack contentStack, IPlayer? player = null)
 		{
 			return GetTransferStackSize(containerBlock, contentStack, player?.Entity?.Controls.Sneak == true);
 		}
@@ -193,7 +196,7 @@ namespace GlassMaking.Items
 
 			float litres = containerBlock.TransferSizeLitres;
 			var liqProps = GetContainableProps(contentStack);
-			int stacksize = (int)(liqProps.ItemsPerLitre * litres);
+			int stacksize = (int)(liqProps!.ItemsPerLitre * litres);
 
 			if(maxCapacity)
 			{
@@ -203,12 +206,15 @@ namespace GlassMaking.Items
 			return stacksize;
 		}
 
-		public static WaterTightContainableProps GetContainableProps(ItemStack stack)
+		public static WaterTightContainableProps? GetContainableProps(ItemStack? stack)
 		{
 			try
 			{
-				JsonObject obj = stack?.ItemAttributes?["waterTightContainerProps"];
-				if(obj != null && obj.Exists) return obj.AsObject<WaterTightContainableProps>(null, stack.Collectible.Code.Domain);
+				JsonObject? obj = stack?.ItemAttributes?["waterTightContainerProps"];
+				if(obj != null && obj.Exists)
+				{
+					return obj.AsObject<WaterTightContainableProps?>(null, stack!.Collectible.Code.Domain);
+				}
 				return null;
 			}
 			catch(Exception)
@@ -222,14 +228,14 @@ namespace GlassMaking.Items
 		/// </summary>
 		/// <param name="containerStack"></param>
 		/// <param name="content"></param>
-		public void SetContent(ItemStack containerStack, ItemStack content)
+		public void SetContent(ItemStack containerStack, ItemStack? content)
 		{
 			if(content == null)
 			{
 				SetContents(containerStack, null);
 				return;
 			}
-			SetContents(containerStack, new ItemStack[] { content });
+			SetContents(containerStack, new ItemStack?[] { content });
 		}
 
 		/// <summary>
@@ -238,9 +244,9 @@ namespace GlassMaking.Items
 		/// <param name="world"></param>
 		/// <param name="containerStack"></param>
 		/// <returns></returns>
-		public ItemStack GetContent(ItemStack containerStack)
+		public ItemStack? GetContent(ItemStack containerStack)
 		{
-			ItemStack[] stacks = GetContents(api.World, containerStack);
+			ItemStack?[]? stacks = GetContents(api.World, containerStack);
 			int id = GetContainerSlotId(containerStack);
 			return (stacks != null && stacks.Length > 0) ? stacks[Math.Min(stacks.Length - 1, id)] : null;
 		}
@@ -252,7 +258,7 @@ namespace GlassMaking.Items
 			if(stackAttr.HasAttribute("makefull"))
 			{
 				var props = GetContainableProps(stack);
-				stack.StackSize = (int)(CapacityLitres * props.ItemsPerLitre);
+				stack.StackSize = (int)(CapacityLitres * props!.ItemsPerLitre);
 			}
 
 			return stack;
@@ -265,9 +271,9 @@ namespace GlassMaking.Items
 		/// <param name="containerStack"></param>
 		/// <param name="quantityItems"></param>
 		/// <returns></returns>
-		public ItemStack TryTakeContent(ItemStack containerStack, int quantityItems)
+		public ItemStack? TryTakeContent(ItemStack containerStack, int quantityItems)
 		{
-			ItemStack stack = GetContent(containerStack);
+			ItemStack? stack = GetContent(containerStack);
 			if(stack == null) return null;
 
 			ItemStack takenStack = stack.Clone();
@@ -280,7 +286,7 @@ namespace GlassMaking.Items
 			return takenStack;
 		}
 
-		public ItemStack TryTakeLiquid(ItemStack containerStack, float desiredLitres)
+		public ItemStack? TryTakeLiquid(ItemStack containerStack, float desiredLitres)
 		{
 			var props = GetContainableProps(GetContent(containerStack));
 			if(props == null) return null;
@@ -310,8 +316,8 @@ namespace GlassMaking.Items
 			int desiredItems = (int)(props.ItemsPerLitre * desiredLitres);
 			int availItems = liquidStack.StackSize;
 
-			ItemStack stack = GetContent(containerStack);
-			ILiquidSink sink = containerStack.Collectible as ILiquidSink;
+			ItemStack? stack = GetContent(containerStack);
+			ILiquidSink sink = (ILiquidSink)containerStack.Collectible;
 
 			if(stack == null)
 			{
@@ -358,10 +364,10 @@ namespace GlassMaking.Items
 
 			if(AllowHeldLiquidTransfer)
 			{
-				IPlayer byPlayer = (byEntity as EntityPlayer)?.Player;
+				IPlayer? byPlayer = (byEntity as EntityPlayer)?.Player;
 
-				ItemStack contentStack = GetContent(itemslot.Itemstack);
-				WaterTightContainableProps props = contentStack == null ? null : GetContentProps(contentStack);
+				ItemStack? contentStack = GetContent(itemslot.Itemstack);
+				WaterTightContainableProps? props = contentStack == null ? null : GetContentProps(contentStack);
 
 				Block targetedBlock = byEntity.World.BlockAccessor.GetBlock(blockSel.Position);
 
@@ -374,15 +380,13 @@ namespace GlassMaking.Items
 
 				if(!TryFillFromBlock(itemslot, byEntity, blockSel.Position))
 				{
-					BlockLiquidContainerTopOpened targetCntBlock = targetedBlock as BlockLiquidContainerTopOpened;
-					if(targetCntBlock != null)
+					if(targetedBlock is BlockLiquidContainerTopOpened targetCntBlock)
 					{
 						if(targetCntBlock.TryPutLiquid(blockSel.Position, contentStack, targetCntBlock.CapacityLitres) > 0)
 						{
 							TryTakeContent(itemslot.Itemstack, 1);
-							byEntity.World.PlaySoundAt(props.FillSpillSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);
+							byEntity.World.PlaySoundAt(props!.FillSpillSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);
 						}
-
 					}
 					else
 					{
@@ -410,7 +414,7 @@ namespace GlassMaking.Items
 			}
 		}
 
-		protected override bool tryEatStep(float secondsUsed, ItemSlot slot, EntityAgent byEntity, ItemStack spawnParticleStack = null)
+		protected override bool tryEatStep(float secondsUsed, ItemSlot slot, EntityAgent byEntity, ItemStack? spawnParticleStack = null)
 		{
 			return base.tryEatStep(secondsUsed, slot, byEntity, GetContent(slot.Itemstack));
 		}
@@ -437,10 +441,13 @@ namespace GlassMaking.Items
 
 				byEntity.ReceiveSaturation(nutriProps.Satiety * satLossMul, nutriProps.FoodCategory);
 
-				IPlayer player = null;
-				if(byEntity is EntityPlayer) player = byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID);
+				IPlayer? player = null;
+				if(byEntity is EntityPlayer entityPlayer)
+				{
+					player = byEntity.World.PlayerByUid(entityPlayer.PlayerUID);
+				}
 
-				splitStackAndPerformAction(byEntity, slot, (stack) => TryTakeLiquid(stack, litresToDrink)?.StackSize ?? 0);
+				SplitStackAndPerformAction(byEntity, slot, (stack) => TryTakeLiquid(stack, litresToDrink)?.StackSize ?? 0);
 
 				float healthChange = nutriProps.Health * healthLossMul;
 
@@ -453,25 +460,25 @@ namespace GlassMaking.Items
 				}
 
 				slot.MarkDirty();
-				player.InventoryManager.BroadcastHotbarSlot();
+				player?.InventoryManager.BroadcastHotbarSlot();
 			}
 		}
 
 		public override FoodNutritionProperties GetNutritionProperties(IWorldAccessor world, ItemStack itemstack, Entity forEntity)
 		{
-			ItemStack contentStack = GetContent(itemstack);
-			WaterTightContainableProps props = contentStack == null ? null : GetContainableProps(contentStack);
+			ItemStack? contentStack = GetContent(itemstack);
+			WaterTightContainableProps? props = contentStack == null ? null : GetContainableProps(contentStack);
 
 			if(props?.NutritionPropsPerLitre != null)
 			{
 				var nutriProps = props.NutritionPropsPerLitre.Clone();
-				float litre = contentStack.StackSize / props.ItemsPerLitre;
+				float litre = contentStack!.StackSize / props.ItemsPerLitre;
 				nutriProps.Health *= litre;
 				nutriProps.Satiety *= litre;
 				nutriProps.EatenStack = new JsonItemStack();
 				nutriProps.EatenStack.ResolvedItemstack = itemstack.Clone();
 				nutriProps.EatenStack.ResolvedItemstack.StackSize = 1;
-				(nutriProps.EatenStack.ResolvedItemstack.Collectible as ILiquidSink).SetContent(nutriProps.EatenStack.ResolvedItemstack, null);
+				((ILiquidSink)nutriProps.EatenStack.ResolvedItemstack.Collectible).SetContent(nutriProps.EatenStack.ResolvedItemstack, null);
 
 				return nutriProps;
 			}
@@ -481,13 +488,13 @@ namespace GlassMaking.Items
 
 		public bool TryFillFromBlock(ItemSlot itemslot, EntityAgent byEntity, BlockPos pos)
 		{
-			IPlayer byPlayer = (byEntity as EntityPlayer)?.Player;
+			IPlayer? byPlayer = (byEntity as EntityPlayer)?.Player;
 			IBlockAccessor blockAcc = byEntity.World.BlockAccessor;
 
 			Block block = blockAcc.GetBlock(pos);
 			if(block.Attributes?["waterTightContainerProps"].Exists == false) return false;
 
-			WaterTightContainableProps props = block.Attributes?["waterTightContainerProps"]?.AsObject<WaterTightContainableProps>();
+			WaterTightContainableProps? props = block.Attributes?["waterTightContainerProps"]?.AsObject<WaterTightContainableProps>();
 			if(props?.WhenFilled == null || !props.Containable) return false;
 
 			props.WhenFilled.Stack.Resolve(byEntity.World, "liquidcontainerbase");
@@ -498,7 +505,7 @@ namespace GlassMaking.Items
 			var cprops = GetContainableProps(contentStack);
 			contentStack.StackSize = 999999;
 
-			int moved = splitStackAndPerformAction(byEntity, itemslot, (stack) => TryPutLiquid(stack, contentStack, CapacityLitres));
+			int moved = SplitStackAndPerformAction(byEntity, itemslot, (stack) => TryPutLiquid(stack, contentStack, CapacityLitres));
 
 			if(moved > 0)
 			{
@@ -515,34 +522,34 @@ namespace GlassMaking.Items
 			Block block = world.BlockAccessor.GetBlock(pos);
 
 			if(block.Attributes?["waterTightContainerProps"].Exists == false) return;
-			WaterTightContainableProps props = block.Attributes?["waterTightContainerProps"].AsObject<WaterTightContainableProps>();
+			WaterTightContainableProps? props = block.Attributes?["waterTightContainerProps"].AsObject<WaterTightContainableProps>();
 			if(props?.WhenFilled == null || !props.Containable) return;
 
 			if(props.WhenFilled.Stack.ResolvedItemstack == null) props.WhenFilled.Stack.Resolve(world, "liquidcontainerbase");
 
-			ItemStack whenFilledStack = props.WhenFilled.Stack.ResolvedItemstack;
+			ItemStack whenFilledStack = props.WhenFilled.Stack.ResolvedItemstack!;
 
-			ItemStack contentStack = GetContent(byEntityItem.Itemstack);
+			ItemStack? contentStack = GetContent(byEntityItem.Itemstack);
 			bool canFill = contentStack == null || (contentStack.Equals(world, whenFilledStack, GlobalConstants.IgnoredStackAttributes) && GetCurrentLitres(byEntityItem.Itemstack) < CapacityLitres);
 			if(!canFill) return;
 
-			contentStack.StackSize = 999999;
-			int moved = splitStackAndPerformAction(byEntityItem, byEntityItem.Slot, (stack) => TryPutLiquid(stack, contentStack, CapacityLitres));
+			whenFilledStack.StackSize = 999999;
+			int moved = SplitStackAndPerformAction(byEntityItem, byEntityItem.Slot, (stack) => TryPutLiquid(stack, whenFilledStack, CapacityLitres));
 			if(moved > 0)
 			{
-				world.PlaySoundAt(props.FillSound, pos.X, pos.Y, pos.Z, null);
+				world.PlaySoundAt(props.FillSound, pos, -0.4, null);
 			}
 		}
 
 		private bool SpillContents(ItemSlot containerSlot, EntityAgent byEntity, BlockSelection blockSel)
 		{
 			BlockPos pos = blockSel.Position;
-			IPlayer byPlayer = (byEntity as EntityPlayer)?.Player;
+			IPlayer? byPlayer = (byEntity as EntityPlayer)?.Player;
 			IBlockAccessor blockAcc = byEntity.World.BlockAccessor;
 			BlockPos secondPos = blockSel.Position.AddCopy(blockSel.Face);
-			var contentStack = GetContent(containerSlot.Itemstack);
+			var contentStack = GetContent(containerSlot.Itemstack)!;
 
-			WaterTightContainableProps props = GetContentProps(containerSlot.Itemstack);
+			WaterTightContainableProps? props = GetContentProps(containerSlot.Itemstack);
 
 			if(props == null || !props.AllowSpill || props.WhenSpilled == null) return false;
 
@@ -565,25 +572,27 @@ namespace GlassMaking.Items
 
 				if(props.WhenSpilled.StackByFillLevel != null)
 				{
-					JsonItemStack fillLevelStack;
+					JsonItemStack? fillLevelStack;
 					props.WhenSpilled.StackByFillLevel.TryGetValue((int)currentlitres, out fillLevelStack);
 					if(fillLevelStack != null) waterBlock = byEntity.World.GetBlock(fillLevelStack.Code);
 				}
 
 				Block currentblock = blockAcc.GetBlock(pos);
-				if(currentblock.Replaceable >= 6000)
+				if(!currentblock.DisplacesLiquids(blockAcc, pos))
 				{
-					blockAcc.SetBlock(waterBlock.BlockId, pos);
+					blockAcc.SetBlock(waterBlock.BlockId, pos, BlockLayersAccess.Fluid);
 					blockAcc.TriggerNeighbourBlockUpdate(pos);
-					blockAcc.MarkBlockDirty(pos);
+					waterBlock.OnNeighbourBlockChange(byEntity.World, pos, secondPos);
+					blockAcc.MarkBlockDirty(pos);   // Maybe unnecessary to call this server side as this code will be called client-side anyhow
 				}
 				else
 				{
-					if(blockAcc.GetBlock(secondPos).Replaceable >= 6000)
+					if(!blockAcc.GetBlock(secondPos).DisplacesLiquids(blockAcc, pos))
 					{
-						blockAcc.SetBlock(waterBlock.BlockId, secondPos);
-						blockAcc.TriggerNeighbourBlockUpdate(pos);
-						blockAcc.MarkBlockDirty(secondPos);
+						blockAcc.SetBlock(waterBlock.BlockId, secondPos, BlockLayersAccess.Fluid);
+						blockAcc.TriggerNeighbourBlockUpdate(secondPos);
+						waterBlock.OnNeighbourBlockChange(byEntity.World, secondPos, pos);
+						blockAcc.MarkBlockDirty(secondPos);   // Maybe unnecessary to call this server side as this code will be called client-side anyhow
 					}
 					else
 					{
@@ -602,7 +611,8 @@ namespace GlassMaking.Items
 				byEntity.World.SpawnItemEntity(stack, blockSel.Position.ToVec3d().Add(blockSel.HitPosition));
 			}
 
-			int moved = splitStackAndPerformAction(byEntity, containerSlot, (stack) => { SetContent(stack, null); return contentStack.StackSize; });
+
+			int moved = SplitStackAndPerformAction(byEntity, containerSlot, (stack) => { SetContent(stack, null); return contentStack.StackSize; });
 
 			DoLiquidMovedEffects(byPlayer, contentStack, moved, EnumLiquidDirection.Pour);
 			return true;
@@ -610,11 +620,11 @@ namespace GlassMaking.Items
 		#endregion
 
 		public enum EnumLiquidDirection { Fill, Pour }
-		public void DoLiquidMovedEffects(IPlayer player, ItemStack contentStack, int moved, EnumLiquidDirection dir)
+		public void DoLiquidMovedEffects(IPlayer? player, ItemStack contentStack, int moved, EnumLiquidDirection dir)
 		{
 			if(player == null) return;
 
-			WaterTightContainableProps props = GetContainableProps(contentStack);
+			WaterTightContainableProps props = GetContainableProps(contentStack)!;
 			float litresMoved = moved / props.ItemsPerLitre;
 
 			(player as IClientPlayer)?.TriggerFpAnimation(EnumHandInteract.HeldItemInteract);
@@ -622,8 +632,9 @@ namespace GlassMaking.Items
 			api.World.SpawnCubeParticles(player.Entity.Pos.AheadCopy(0.25).XYZ.Add(0, player.Entity.SelectionBox.Y2 / 2, 0), contentStack, 0.75f, (int)litresMoved * 2, 0.45f);
 		}
 
-		private int splitStackAndPerformAction(Entity byEntity, ItemSlot slot, System.Func<ItemStack, int> action)
+		public int SplitStackAndPerformAction(Entity byEntity, ItemSlot slot, System.Func<ItemStack, int> action)
 		{
+			if(slot.Itemstack == null) return 0;
 			if(slot.Itemstack.StackSize == 1)
 			{
 				int moved = action(slot.Itemstack);
@@ -637,8 +648,8 @@ namespace GlassMaking.Items
 						int mergableq = slot.Itemstack.Collectible.GetMergableQuantity(slot.Itemstack, pslot.Itemstack, EnumMergePriority.DirectMerge);
 						if(mergableq == 0) return true;
 
-						var selfLiqBlock = slot.Itemstack.Collectible as ILiquidInterface;
-						var invLiqBlock = pslot.Itemstack.Collectible as ILiquidInterface;
+						var selfLiqBlock = slot.Itemstack.Collectible as BlockLiquidContainerBase;
+						var invLiqBlock = pslot.Itemstack.Collectible as BlockLiquidContainerBase;
 
 						if((selfLiqBlock?.GetContent(slot.Itemstack)?.StackSize ?? 0) != (invLiqBlock?.GetContent(pslot.Itemstack)?.StackSize ?? 0)) return true;
 
@@ -689,12 +700,12 @@ namespace GlassMaking.Items
 
 			if(entityItem.Swimming && world.Rand.NextDouble() < 0.01)
 			{
-				ItemStack[] stacks = GetContents(world, entityItem.Itemstack);
+				ItemStack?[] stacks = GetContents(world, entityItem.Itemstack);
 				if(MealMeshCache.ContentsRotten(stacks))
 				{
 					for(int i = 0; i < stacks.Length; i++)
 					{
-						if(stacks[i] != null && stacks[i].StackSize > 0 && stacks[i].Collectible.Code.Path == "rot")
+						if(stacks[i] != null && stacks[i]!.StackSize > 0 && stacks[i]!.Collectible.Code.Path == "rot")
 						{
 							world.SpawnItemEntity(stacks[i], entityItem.ServerPos.XYZ);
 						}
@@ -715,10 +726,9 @@ namespace GlassMaking.Items
 		public virtual void GetContentInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world)
 		{
 			float litres = GetCurrentLitres(inSlot.Itemstack);
-			ItemStack contentStack = GetContent(inSlot.Itemstack);
+			ItemStack contentStack = GetContent(inSlot.Itemstack)!;
 
 			if(litres <= 0) dsc.Append(Lang.Get("Empty"));
-
 			else
 			{
 				string incontainerrname = Lang.Get("incontainer-" + contentStack.Class.ToString().ToLowerInvariant() + "-" + contentStack.Collectible.Code.Path);
@@ -739,8 +749,8 @@ namespace GlassMaking.Items
 			if(op.MovableQuantity == 0) return;
 			if(!op.SinkSlot.CanTakeFrom(op.SourceSlot, op.CurrentPriority)) return;
 
-			ItemStack sinkContent = GetContent(op.SinkSlot.Itemstack);
-			ItemStack sourceContent = GetContent(op.SourceSlot.Itemstack);
+			ItemStack? sinkContent = GetContent(op.SinkSlot.Itemstack);
+			ItemStack? sourceContent = GetContent(op.SourceSlot.Itemstack);
 
 			if(sinkContent == null && sourceContent == null)
 			{
@@ -789,8 +799,11 @@ namespace GlassMaking.Items
 
 		public override bool MatchesForCrafting(ItemStack inputStack, GridRecipe gridRecipe, CraftingRecipeIngredient ingredient)
 		{
-			JsonObject rprops = ingredient.RecipeAttributes;
-			if(rprops?.Exists != true || rprops?["requiresContent"].Exists != true) rprops = gridRecipe.Attributes?["liquidContainerProps"];
+			JsonObject? rprops = ingredient.RecipeAttributes;
+			if(rprops?.Exists != true || rprops?["requiresContent"].Exists != true)
+			{
+				rprops = gridRecipe.Attributes?["liquidContainerProps"];
+			}
 
 			if(rprops?.Exists != true)
 			{
@@ -800,13 +813,13 @@ namespace GlassMaking.Items
 			string contentCode = rprops["requiresContent"]["code"].AsString();
 			string contentType = rprops["requiresContent"]["type"].AsString();
 
-			ItemStack contentStack = GetContent(inputStack);
+			ItemStack? contentStack = GetContent(inputStack);
 
 			if(contentStack == null) return false;
 
 			float litres = rprops["requiresLitres"].AsFloat();
 			var props = GetContainableProps(contentStack);
-			int q = (int)(props.ItemsPerLitre * litres) / inputStack.StackSize;
+			int q = (int)(props!.ItemsPerLitre * litres) / inputStack.StackSize;
 
 			bool a = string.Equals(contentStack.Class.ToString(), contentType, StringComparison.InvariantCultureIgnoreCase);
 			bool b = WildcardUtil.Match(new AssetLocation(contentCode), contentStack.Collectible.Code);
@@ -817,8 +830,11 @@ namespace GlassMaking.Items
 
 		public override void OnConsumedByCrafting(ItemSlot[] allInputSlots, ItemSlot stackInSlot, GridRecipe gridRecipe, CraftingRecipeIngredient fromIngredient, IPlayer byPlayer, int quantity)
 		{
-			JsonObject rprops = fromIngredient.RecipeAttributes;
-			if(rprops?.Exists != true || rprops?["requiresContent"].Exists != true) rprops = gridRecipe.Attributes?["liquidContainerProps"];
+			JsonObject? rprops = fromIngredient.RecipeAttributes;
+			if(rprops?.Exists != true || rprops?["requiresContent"].Exists != true)
+			{
+				rprops = gridRecipe.Attributes?["liquidContainerProps"];
+			}
 
 			if(rprops?.Exists != true)
 			{
@@ -826,10 +842,10 @@ namespace GlassMaking.Items
 				return;
 			}
 
-			ItemStack contentStack = GetContent(stackInSlot.Itemstack);
+			ItemStack contentStack = GetContent(stackInSlot.Itemstack)!;
 			float litres = rprops["requiresLitres"].AsFloat();
 			var props = GetContainableProps(contentStack);
-			int q = (int)(props.ItemsPerLitre * litres / stackInSlot.StackSize);
+			int q = (int)(props!.ItemsPerLitre * litres / stackInSlot.StackSize);
 
 			TryTakeContent(stackInSlot.Itemstack, q);
 		}
@@ -843,7 +859,7 @@ namespace GlassMaking.Items
 				dsc.Append(contentSlot.Itemstack.GetName());
 			}
 
-			TransitionState[] transitionStates = contentSlot.Itemstack?.Collectible.UpdateAndGetTransitionStates(Api.World, contentSlot);
+			TransitionState[]? transitionStates = contentSlot.Itemstack?.Collectible.UpdateAndGetTransitionStates(Api.World, contentSlot);
 
 			if(transitionStates != null)
 			{
@@ -854,7 +870,7 @@ namespace GlassMaking.Items
 					TransitionState state = transitionStates[i];
 
 					TransitionableProperties prop = state.Props;
-					float perishRate = contentSlot.Itemstack.Collectible.GetTransitionRateMul(Api.World, contentSlot, prop.Type);
+					float perishRate = contentSlot.Itemstack!.Collectible.GetTransitionRateMul(Api.World, contentSlot, prop.Type);
 
 					if(perishRate <= 0) continue;
 

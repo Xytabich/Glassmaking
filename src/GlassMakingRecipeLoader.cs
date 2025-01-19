@@ -6,10 +6,10 @@ namespace GlassMaking
 {
 	internal class GlassMakingRecipeLoader : ModSystem
 	{
-		private ICoreAPI api = null;
+		private ICoreAPI api = default!;
 
-		internal RecipeRegistryDictionary<GlassBlowingRecipe> glassblowingRecipes;
-		internal RecipeRegistryDictionary<WorkbenchRecipe> workbenchRecipes;
+		internal RecipeRegistryDictionary<GlassBlowingRecipe> glassblowingRecipes = default!;
+		internal RecipeRegistryDictionary<WorkbenchRecipe> workbenchRecipes = default!;
 
 		public override double ExecuteOrder()
 		{

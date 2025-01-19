@@ -1,4 +1,5 @@
-﻿using Vintagestory.API.Common;
+﻿using System.Diagnostics.CodeAnalysis;
+using Vintagestory.API.Common;
 
 namespace GlassMaking.Workbench
 {
@@ -14,7 +15,7 @@ namespace GlassMaking.Workbench
 			return false;
 		}
 
-		public static bool TryGetTool(CollectibleObject collectible, out ICollectibleWorkbenchTool tool)
+		public static bool TryGetTool([NotNullWhen(true)] CollectibleObject? collectible, [NotNullWhen(true)] out ICollectibleWorkbenchTool? tool)
 		{
 			if(collectible == null)
 			{

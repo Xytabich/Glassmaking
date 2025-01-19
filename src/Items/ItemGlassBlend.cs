@@ -117,7 +117,7 @@ namespace GlassMaking.Items
 		public MeshData GenMesh(ItemStack itemstack, ITextureAtlasAPI targetAtlas, BlockPos forBlockPos = null)
 		{
 			curAtlas = targetAtlas;
-			MeshData mesh = genMesh(api as ICoreClientAPI, itemstack);
+			MeshData mesh = GenMesh(api as ICoreClientAPI, itemstack);
 			mesh.RenderPassesAndExtraBits.Fill((short)EnumChunkRenderPass.BlendNoCull);
 			return mesh;
 		}
@@ -132,7 +132,7 @@ namespace GlassMaking.Items
 			return "glassmaking:blend|" + Code.ToString();
 		}
 
-		private MeshData genMesh(ICoreClientAPI capi, ItemStack itemstack)
+		private MeshData GenMesh(ICoreClientAPI capi, ItemStack itemstack)
 		{
 			Shape blendShape = capi.TesselatorManager.GetCachedShape(itemstack.Item.Shape.Base);
 

@@ -2,6 +2,7 @@
 using GlassMaking.Blocks.Multiblock;
 using GlassMaking.Common;
 using GlassMaking.GlassblowingTools;
+using GlassMaking.Gui;
 using GlassMaking.Handbook;
 using GlassMaking.ItemRender;
 using GlassMaking.Items;
@@ -29,38 +30,39 @@ namespace GlassMaking
 	public class GlassMakingMod : ModSystem
 	{
 		public const string RECIPE_SELECT_HOTKEY = "itemrecipeselect";
+		// public const string GLASSPIPE_HUD = "glassmaking:pipehud";
 
 		public ModConfig Config { get; private set; } = ModConfig.CreateEmpty();
 
-		internal CachedItemRenderer itemsRenderer;
-		internal CachedMeshRefs meshRefCache;
+		internal CachedItemRenderer itemsRenderer = default!;
+		internal CachedMeshRefs meshRefCache = default!;
 
-		private ICoreAPI api;
-		private ICoreClientAPI capi = null;
-		private Dictionary<AssetLocation, GlassTypeVariant> glassTypes;
-		private Dictionary<string, IPipeBlowingToolDescriptor> pipeToolDescriptors;
-		private Dictionary<string, IWorkbenchToolDescriptor> workbenchToolDescriptors;
-		private Dictionary<string, WorkbenchToolBehavior> workbenchTools = null;
+		private ICoreAPI api = default!;
+		private ICoreClientAPI capi = null!;
+		private Dictionary<AssetLocation, GlassTypeVariant> glassTypes = default!;
+		private Dictionary<string, IPipeBlowingToolDescriptor>? pipeToolDescriptors;
+		private Dictionary<string, IWorkbenchToolDescriptor>? workbenchToolDescriptors;
+		private Dictionary<string, WorkbenchToolBehavior>? workbenchTools = null;
 
 		private RecipeRegistryDictionary<GlassBlowingRecipe> glassblowingRecipes => recipeLoader.glassblowingRecipes;
 		private RecipeRegistryDictionary<WorkbenchRecipe> workbenchRecipes => recipeLoader.workbenchRecipes;
 
-		private List<Block> blowingMolds = null;
-		private HashSet<AssetLocation> blowingMoldsOutput = null;
+		private List<Block> blowingMolds = default!;
+		private HashSet<AssetLocation> blowingMoldsOutput = default!;
 
-		private List<Block> castingMolds = null;
-		private HashSet<AssetLocation> castingMoldsOutput = null;
+		private List<Block> castingMolds = default!;
+		private HashSet<AssetLocation> castingMoldsOutput = default!;
 
-		private Dictionary<(EnumItemClass type, int id), ItemStack> annealRecipes = null;
-		private HashSet<AssetLocation> annealOutputs = null;
+		private Dictionary<(EnumItemClass type, int id), ItemStack>? annealRecipes = null;
+		private HashSet<AssetLocation>? annealOutputs = null;
 
-		private List<ToolBehaviorDescriptor> descriptors = null;
+		private List<ToolBehaviorDescriptor> descriptors = default!;
 
-		private Harmony harmony;
+		private Harmony? harmony;
 
-		private GlassMakingRecipeLoader recipeLoader;
+		private GlassMakingRecipeLoader recipeLoader = default!;
 
-		private List<IDisposable> handbookInfoList;
+		private List<IDisposable> handbookInfoList = default!;
 
 		private IServerNetworkChannel networkChannel = null!;
 
@@ -141,7 +143,9 @@ namespace GlassMaking
 			capi = api;
 			base.StartClientSide(api);
 			api.Input.RegisterHotKey(RECIPE_SELECT_HOTKEY, Lang.Get("Select Item Recipe"), GlKeys.F, HotkeyType.GUIOrOtherControls);
+			// api.Input.RegisterHotKey(GLASSPIPE_HUD, Lang.Get("Blow Glass Shape"), GlKeys.U, HotkeyType.GUIOrOtherControls);
 			api.Gui.RegisterDialog(new GuiDialogItemRecipeSelector(api));
+			// api.Gui.RegisterDialog(new GlasspipeHUD(api));
 
 			var tmpMetaSystem = api.ModLoader.GetModSystem<TemporaryMetadataSystem>();
 			itemsRenderer = new CachedItemRenderer(tmpMetaSystem.CreatePool<CachedItemRenderer.RendererContainer>(TimeSpan.FromSeconds(30)));
@@ -234,7 +238,7 @@ namespace GlassMaking
 			base.Dispose();
 		}
 
-		public GlassBlowingRecipe GetGlassBlowingRecipe(string code)
+		public GlassBlowingRecipe? GetGlassBlowingRecipe(string code)
 		{
 			if(glassblowingRecipes.Pairs.TryGetValue(code.ToLowerInvariant(), out var recipe))
 			{
@@ -243,7 +247,7 @@ namespace GlassMaking
 			return null;
 		}
 
-		public GlassBlowingRecipe GetGlassBlowingRecipe(AssetLocation code)
+		public GlassBlowingRecipe? GetGlassBlowingRecipe(AssetLocation code)
 		{
 			if(glassblowingRecipes.Pairs.TryGetValue(code.ToShortString(), out var recipe))
 			{
@@ -252,7 +256,7 @@ namespace GlassMaking
 			return null;
 		}
 
-		public WorkbenchRecipe GetWorkbenchRecipe(string code)
+		public WorkbenchRecipe? GetWorkbenchRecipe(string code)
 		{
 			if(workbenchRecipes.Pairs.TryGetValue(code, out var recipe))
 			{
@@ -261,7 +265,7 @@ namespace GlassMaking
 			return null;
 		}
 
-		public WorkbenchRecipe GetWorkbenchRecipe(AssetLocation code)
+		public WorkbenchRecipe? GetWorkbenchRecipe(AssetLocation code)
 		{
 			if(workbenchRecipes.Pairs.TryGetValue(code.ToShortString(), out var recipe))
 			{
@@ -270,14 +274,14 @@ namespace GlassMaking
 			return null;
 		}
 
-		public bool TryFindWorkbenchRecipes(ItemStack ingredient, out WorkbenchRecipe[] recipes)
+		public bool TryFindWorkbenchRecipes(ItemStack ingredient, out WorkbenchRecipe[]? recipes)
 		{
-			List<WorkbenchRecipe> list = null;
+			List<WorkbenchRecipe>? list = null;
 			foreach(var recipe in workbenchRecipes.Recipes)
 			{
 				if(recipe.Input.SatisfiesAsIngredient(ingredient))
 				{
-					if(list == null) list = new List<WorkbenchRecipe>();
+					list ??= new List<WorkbenchRecipe>();
 					list.Add(recipe);
 				}
 			}
@@ -300,7 +304,7 @@ namespace GlassMaking
 			return workbenchRecipes.Pairs;
 		}
 
-		public GlassTypeVariant GetGlassTypeInfo(AssetLocation code)
+		public GlassTypeVariant? GetGlassTypeInfo(AssetLocation code)
 		{
 			if(glassTypes.TryGetValue(code, out var info)) return info;
 			return null;
@@ -317,7 +321,7 @@ namespace GlassMaking
 			pipeToolDescriptors[tool.ToLowerInvariant()] = descriptor;
 		}
 
-		public IPipeBlowingToolDescriptor GetPipeToolDescriptor(string tool)
+		public IPipeBlowingToolDescriptor? GetPipeToolDescriptor(string tool)
 		{
 			if(pipeToolDescriptors != null && pipeToolDescriptors.TryGetValue(tool.ToLowerInvariant(), out var descriptor))
 			{
@@ -332,7 +336,7 @@ namespace GlassMaking
 			workbenchToolDescriptors[tool.ToLowerInvariant()] = descriptor;
 		}
 
-		public IWorkbenchToolDescriptor GetWorkbenchToolDescriptor(string tool)
+		public IWorkbenchToolDescriptor? GetWorkbenchToolDescriptor(string tool)
 		{
 			if(workbenchToolDescriptors != null && workbenchToolDescriptors.TryGetValue(tool.ToLowerInvariant(), out var descriptor))
 			{
@@ -347,7 +351,7 @@ namespace GlassMaking
 			workbenchTools[behavior.ToolCode.ToLowerInvariant()] = behavior;
 		}
 
-		public WorkbenchToolBehavior GetWorkbenchToolBehavior(string tool)
+		public WorkbenchToolBehavior? GetWorkbenchToolBehavior(string tool)
 		{
 			if(workbenchTools != null && workbenchTools.TryGetValue(tool.ToLowerInvariant(), out var behavior))
 			{
@@ -356,7 +360,7 @@ namespace GlassMaking
 			return null;
 		}
 
-		public bool TryGetBlowingMoldsForItem(CollectibleObject item, out Block[] molds)
+		public bool TryGetBlowingMoldsForItem(CollectibleObject item, out Block[]? molds)
 		{
 			if(blowingMoldsOutput == null) throw new Exception("The client side of the glassmaking mod is still not loaded");
 			if(blowingMoldsOutput.Contains(item.Code))
@@ -380,13 +384,13 @@ namespace GlassMaking
 			return false;
 		}
 
-		public bool TryGetCastingMoldsForItem(CollectibleObject item, out Block[] molds)
+		public bool TryGetCastingMoldsForItem(CollectibleObject item, out Block[]? molds)
 		{
 			if(castingMoldsOutput == null) throw new Exception("The client side of the glassmaking mod is still not loaded");
 			if(castingMoldsOutput.Contains(item.Code))
 			{
-				List<Block> list = new List<Block>();
-				foreach(var block in this.castingMolds)
+				var list = new List<Block>();
+				foreach(var block in castingMolds)
 				{
 					var mold = (IGlassCastingMold)block;
 					foreach(var recipe in mold.GetRecipes())
@@ -404,13 +408,13 @@ namespace GlassMaking
 			return false;
 		}
 
-		public bool TryGetMaterialsForAnneal(ItemStack forOutputItem, out CollectibleObject[] materials)
+		public bool TryGetMaterialsForAnneal(ItemStack forOutputItem, out CollectibleObject[]? materials)
 		{
 			if(annealOutputs == null) throw new Exception("The client side of the glassmaking mod is still not loaded");
 			if(annealOutputs.Contains(forOutputItem.Collectible.Code))
 			{
 				List<CollectibleObject> list = new List<CollectibleObject>();
-				foreach(var pair in annealRecipes)
+				foreach(var pair in annealRecipes!)
 				{
 					if(pair.Value.Collectible.Equals(pair.Value, forOutputItem, GlobalConstants.IgnoredStackAttributes))
 					{
@@ -478,12 +482,12 @@ namespace GlassMaking
 				var properties = collectible.Attributes["glassmaking:anneal"];
 				try
 				{
-					var output = properties["output"].AsObject<JsonItemStack>(null, collectible.Code.Domain);
+					var output = properties["output"].AsObject<JsonItemStack>(null!, collectible.Code.Domain);
 					if(output.Resolve(capi.World, "recipes collect"))
 					{
 						var outputItem = output.ResolvedItemstack;
-						annealRecipes.Add((collectible.ItemClass, collectible.Id), outputItem);
-						annealOutputs.Add(outputItem.Collectible.Code);
+						annealRecipes!.Add((collectible.ItemClass, collectible.Id), outputItem);
+						annealOutputs!.Add(outputItem.Collectible.Code);
 					}
 				}
 				catch(Exception e)

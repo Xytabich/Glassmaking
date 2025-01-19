@@ -1,0 +1,182 @@
+[
+	{
+		"file": "game:shapes/entity/humanoid/seraph-faceless",
+		"op": "add",
+		"path": "/animations/-",
+		"value": {
+			"name": "Glasswork Ladle - Take",
+			"code": "glassladletake",
+			"quantityframes": 56,
+			"onActivityStopped": "EaseOut",
+			"onAnimationEnd": "Hold",
+			"keyframes": [
+				{
+					"frame": 0,
+					"elements": {
+						"LowerTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -40.0, "rotationZ": 0.0 },
+						"UpperTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -4.0, "rotationY": -11.0, "rotationZ": 12.0 },
+						"UpperArmR": { "offsetX": 0.0, "offsetY": 0.5, "offsetZ": 2.0, "rotationX": 83.0, "rotationY": -8.0, "rotationZ": 61.0 },
+						"LowerArmR": { "offsetX": 0.0, "offsetY": 1.0, "offsetZ": 0.0, "rotationX": 22.0, "rotationY": 0.0, "rotationZ": -127.0 },
+						"ItemAnchor": { "rotationX": -90.0, "rotationY": -9.0, "rotationZ": -20.0 },
+						"UpperArmL": { "offsetX": 1.0, "offsetY": -0.9, "offsetZ": -0.5, "rotationX": -17.0, "rotationY": -19.0, "rotationZ": -19.0 },
+						"LowerArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 11.0, "rotationZ": -94.0 },
+						"Neck": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 14.0, "rotationZ": 0.0 },
+						"Head": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 3.0, "rotationZ": 9.0 },
+						"UpperFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 18.0, "rotationZ": -3.0 },
+						"LowerFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 11.0 },
+						"UpperFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 4.0, "rotationY": 14.0, "rotationZ": -11.0 },
+						"LowerFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 17.0 }
+					}
+				},
+				{
+					"frame": 15,
+					"elements": {
+						"LowerTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -40.0, "rotationZ": 0.0 },
+						"UpperTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -4.0, "rotationY": -11.0, "rotationZ": 12.0 },
+						"UpperArmR": { "offsetX": 0.0, "offsetY": 0.5, "offsetZ": 2.0, "rotationX": 83.0, "rotationY": -8.0, "rotationZ": 61.0 },
+						"LowerArmR": { "offsetX": 0.0, "offsetY": 1.0, "offsetZ": 0.0, "rotationX": 22.0, "rotationY": 0.0, "rotationZ": -127.0 },
+						"ItemAnchor": { "rotationX": 0.0, "rotationY": -2.0, "rotationZ": -8.0 },
+						"UpperArmL": { "offsetX": 1.0, "offsetY": -0.9, "offsetZ": -0.5, "rotationX": -17.0, "rotationY": -19.0, "rotationZ": -15.0 },
+						"LowerArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 7.0, "rotationZ": -92.0 },
+						"Neck": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 14.0, "rotationZ": 0.0 },
+						"Head": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 3.0, "rotationZ": 9.0 },
+						"UpperFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 18.0, "rotationZ": -3.0 },
+						"LowerFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 11.0 },
+						"UpperFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 4.0, "rotationY": 14.0, "rotationZ": -11.0 },
+						"LowerFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 17.0 }
+					}
+				},
+				{
+					"frame": 55,
+					"elements": {
+						"LowerTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -40.0, "rotationZ": 0.0 },
+						"UpperTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -4.0, "rotationY": -11.0, "rotationZ": 12.0 },
+						"UpperArmR": { "offsetX": 0.0, "offsetY": 0.5, "offsetZ": 2.0, "rotationX": 83.0, "rotationY": -8.0, "rotationZ": 61.0 },
+						"LowerArmR": { "offsetX": 0.0, "offsetY": 1.0, "offsetZ": 0.0, "rotationX": 22.0, "rotationY": 0.0, "rotationZ": -127.0 },
+						"ItemAnchor": { "rotationX": -90.0, "rotationY": -9.0, "rotationZ": -20.0 },
+						"UpperArmL": { "offsetX": 1.0, "offsetY": -0.9, "offsetZ": -0.5, "rotationX": -17.0, "rotationY": -19.0, "rotationZ": -19.0 },
+						"LowerArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 11.0, "rotationZ": -94.0 },
+						"Neck": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 14.0, "rotationZ": 0.0 },
+						"Head": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 3.0, "rotationZ": 9.0 },
+						"UpperFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 18.0, "rotationZ": -3.0 },
+						"LowerFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 11.0 },
+						"UpperFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 4.0, "rotationY": 14.0, "rotationZ": -11.0 },
+						"LowerFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 17.0 }
+					}
+				}
+			]
+		}
+	},
+	{
+		"file": "game:entities/humanoid/player",
+		"op": "add",
+		"path": "/client/animations/-",
+		"value": {
+			"code": "glassladletake",
+			"animation": "glassladletake",
+			"easeInSpeed": 1,
+			"blendMode": "AddAverage",
+			"elementWeight": {
+				"ItemAnchor": 200,
+				"LowerTorso": 2,
+				"UpperTorso": 200,
+				"UpperArmL": 200,
+				"LowerArmL": 200,
+				"UpperArmR": 200,
+				"LowerArmR": 200,
+				"Neck": 1,
+				"Head": 1
+			}
+		}
+	},
+	{
+		"file": "game:shapes/entity/humanoid/seraph-faceless",
+		"op": "add",
+		"path": "/animations/-",
+		"value": {
+			"name": "Glasswork Ladle - Pour",
+			"code": "glassladlepour",
+			"quantityframes": 21,
+			"onActivityStopped": "EaseOut",
+			"onAnimationEnd": "Hold",
+			"keyframes": [
+				{
+					"frame": 0,
+					"elements": {
+						"LowerTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -22.0, "rotationZ": 0.0 },
+						"UpperTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -4.0, "rotationY": -11.0, "rotationZ": 12.0 },
+						"UpperArmR": { "offsetX": -0.5, "offsetY": -0.5, "offsetZ": 0.0, "rotationX": 17.0, "rotationY": 25.0, "rotationZ": 28.0 },
+						"LowerArmR": { "offsetX": 0.0, "offsetY": 1.0, "offsetZ": 0.0, "rotationX": 11.0, "rotationY": 0.0, "rotationZ": -53.0 },
+						"ItemAnchor": { "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 0.0 },
+						"UpperArmL": { "offsetX": 0.0, "offsetY": -0.9, "offsetZ": 0.0, "rotationX": -9.0, "rotationY": -28.0, "rotationZ": -60.0 },
+						"LowerArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -19.0, "rotationZ": -11.0 },
+						"Neck": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 14.0, "rotationZ": 0.0 },
+						"Head": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 3.0, "rotationZ": 9.0 },
+						"UpperFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 18.0, "rotationZ": -3.0 },
+						"LowerFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 11.0 },
+						"UpperFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 4.0, "rotationY": 14.0, "rotationZ": -11.0 },
+						"LowerFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 17.0 }
+					}
+				},
+				{
+					"frame": 10,
+					"elements": {
+						"LowerTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -15.0, "rotationZ": 0.0 },
+						"UpperTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -4.0, "rotationY": -5.0, "rotationZ": 15.0 },
+						"UpperArmR": { "offsetX": -0.5, "offsetY": -0.5, "offsetZ": 0.0, "rotationX": 17.0, "rotationY": 30.0, "rotationZ": 20.0 },
+						"LowerArmR": { "offsetX": 0.0, "offsetY": 1.0, "offsetZ": 0.0, "rotationX": 11.0, "rotationY": 0.0, "rotationZ": -53.0 },
+						"ItemAnchor": { "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 10.0 },
+						"UpperArmL": { "offsetX": 0.0, "offsetY": -0.9, "offsetZ": 0.0, "rotationX": -9.0, "rotationY": -35.0, "rotationZ": -40.0 },
+						"LowerArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -19.0, "rotationZ": -40.0 },
+						"Neck": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 14.0, "rotationZ": 0.0 },
+						"Head": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 3.0, "rotationZ": 9.0 },
+						"UpperFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 18.0, "rotationZ": -3.0 },
+						"LowerFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 11.0 },
+						"UpperFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 4.0, "rotationY": 14.0, "rotationZ": -11.0 },
+						"LowerFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 17.0 }
+					}
+				},
+				{
+					"frame": 20,
+					"elements": {
+						"LowerTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -15.0, "rotationZ": 0.0 },
+						"UpperTorso": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": -4.0, "rotationY": -5.0, "rotationZ": 15.0 },
+						"UpperArmR": { "offsetX": -0.5, "offsetY": -0.5, "offsetZ": 0.0, "rotationX": 17.0, "rotationY": 30.0, "rotationZ": 25.0 },
+						"LowerArmR": { "offsetX": 0.0, "offsetY": 1.0, "offsetZ": 0.0, "rotationX": 11.0, "rotationY": 0.0, "rotationZ": -60.0 },
+						"ItemAnchor": { "rotationX": 90.0, "rotationY": 10.0, "rotationZ": 0.0 },
+						"UpperArmL": { "offsetX": 0.0, "offsetY": -0.9, "offsetZ": 0.0, "rotationX": -9.0, "rotationY": -35.0, "rotationZ": -40.0 },
+						"LowerArmL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": -19.0, "rotationZ": -45.0 },
+						"Neck": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 14.0, "rotationZ": 0.0 },
+						"Head": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 3.0, "rotationZ": 9.0 },
+						"UpperFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 18.0, "rotationZ": -3.0 },
+						"LowerFootL": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 11.0 },
+						"UpperFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 4.0, "rotationY": 14.0, "rotationZ": -11.0 },
+						"LowerFootR": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 17.0 }
+					}
+				}
+			]
+		}
+	},
+	{
+		"file": "game:entities/humanoid/player",
+		"op": "add",
+		"path": "/client/animations/-",
+		"value": {
+			"code": "glassladlepour",
+			"animation": "glassladlepour",
+			"easeInSpeed": 1,
+			"blendMode": "AddAverage",
+			"elementWeight": {
+				"ItemAnchor": 200,
+				"LowerTorso": 2,
+				"UpperTorso": 200,
+				"UpperArmL": 200,
+				"LowerArmL": 200,
+				"UpperArmR": 200,
+				"LowerArmR": 200,
+				"Neck": 1,
+				"Head": 1
+			}
+		}
+	}
+]

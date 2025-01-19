@@ -48,18 +48,18 @@ namespace GlassMaking.Common
 	public class GlassTypeVariant : WorldPropertyVariant
 	{
 		[JsonProperty(Required = Required.Always)]
-		public float meltingPoint;
+		public float MeltingPoint;
 
 		public void WriteTo(BinaryWriter writer)
 		{
 			writer.Write(Code.ToShortString());
-			writer.Write(meltingPoint);
+			writer.Write(MeltingPoint);
 		}
 
 		public void ReadFrom(BinaryReader reader)
 		{
 			Code = new AssetLocation(reader.ReadString());
-			meltingPoint = reader.ReadSingle();
+			MeltingPoint = reader.ReadSingle();
 		}
 	}
 }

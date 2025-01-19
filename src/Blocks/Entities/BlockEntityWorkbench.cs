@@ -438,7 +438,7 @@ namespace GlassMaking.Blocks
 			base.FromTreeAttributes(tree, worldForResolving);
 			if(Api?.World != null)
 			{
-				if(inventory.modifiedSlots.Count > 0)
+				if(inventory.ModifiedSlots.Count > 0)
 				{
 					toolSlots.Clear();
 					for(int i = toolsCapacity - 1; i >= 0; i--)
@@ -446,9 +446,9 @@ namespace GlassMaking.Blocks
 						var tool = inventory.GetBehavior(i);
 						if(tool != null) toolSlots[tool.ToolCode] = i;
 					}
-					for(int i = inventory.modifiedSlots.Count - 1; i >= 0; i--)
+					for(int i = inventory.ModifiedSlots.Count - 1; i >= 0; i--)
 					{
-						int slotId = inventory.modifiedSlots[i];
+						int slotId = inventory.ModifiedSlots[i];
 						if(slotId < toolsCapacity) UpdateToolBounds(slotId);
 					}
 					RebuildSelectionBoxes();

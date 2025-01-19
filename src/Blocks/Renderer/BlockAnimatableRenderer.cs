@@ -91,14 +91,19 @@ namespace GlassMaking.Blocks.Renderer
 			prog.UniformMatrix("projectionMatrix", rpi.CurrentProjectionMatrix);
 
 			prog.Uniform("addRenderFlags", 0);
+			prog.UBOs["Animation"].Update(animator.Matrices, 0, animator.MaxJointId * 16 * 4);
 
-			prog.UniformMatrices4x3(
-				"elementTransforms",
-				GlobalConstants.MaxAnimatedElements,
-				animator.Matrices4x3
-			);
+			// if((stage == EnumRenderStage.Opaque || stage == EnumRenderStage.ShadowNear) && !backfaceCulling)
+			// {
+			// 	capi.Render.GlDisableCullFace();
+			// }
 
 			capi.Render.RenderMesh(meshref);
+
+			// if((stage == EnumRenderStage.Opaque || stage == EnumRenderStage.ShadowNear) && !backfaceCulling)
+			// {
+			// 	capi.Render.GlEnableCullFace();
+			// }
 
 			prog.Stop();
 			prevProg?.Use();

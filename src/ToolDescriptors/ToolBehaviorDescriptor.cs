@@ -8,9 +8,9 @@ namespace GlassMaking.ToolDescriptors
 {
 	public abstract class ToolBehaviorDescriptor<T> : ToolBehaviorDescriptor, IPipeBlowingToolDescriptor where T : GlassblowingToolBehavior
 	{
-		protected GlassMakingMod mod;
+		protected readonly GlassMakingMod mod;
 
-		protected Dictionary<string, ItemStack[]> handbookItemsByType;
+		protected Dictionary<string, ItemStack[]> handbookItemsByType = default!;
 
 		public ToolBehaviorDescriptor(GlassMakingMod mod)
 		{
@@ -20,7 +20,7 @@ namespace GlassMaking.ToolDescriptors
 		public override void OnLoaded(ICoreAPI api)
 		{
 			var capi = api as ICoreClientAPI;
-			Dictionary<string, List<ItemStack>> byType = null;
+			Dictionary<string, List<ItemStack>> byType = null!;
 			if(capi != null)
 			{
 				byType = new Dictionary<string, List<ItemStack>>();

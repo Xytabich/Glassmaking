@@ -4,10 +4,10 @@
 	"name": "Glassmaking",
 	"authors": [ "Xytabich" ],
 	"description": "Core system for melting and processing glass",
-	"version": "1.4.0",
+	"version": "1.4.1",
 	"dependencies": {
-		"game": "1.19.0",
-		"survival": "1.19.0"
+		"game": "1.20.0",
+		"survival": "1.20.0"
 	},
 	"website": "https://github.com/Xytabich/Glassmaking"
 }

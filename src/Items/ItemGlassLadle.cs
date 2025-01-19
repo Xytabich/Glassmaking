@@ -19,9 +19,9 @@ namespace GlassMaking.Items
 		private int amountThreshold;
 		private WorldInteraction[] interactions;
 
-		private ModelTransform pourTransform;
-		private ModelTransform takeTransform;
-		private float pourAnimationSpeed;
+		private string pourAnimation;
+		private string takeAnimation;
+		private float pourAnimationPrepare;
 
 		public override void OnLoaded(ICoreAPI api)
 		{
@@ -29,17 +29,14 @@ namespace GlassMaking.Items
 			mod = api.ModLoader.GetModSystem<GlassMakingMod>();
 			maxGlassAmount = Attributes["maxGlass"].AsInt();
 			amountThreshold = Attributes["glassThreshold"].AsInt();
-			pourAnimationSpeed = Attributes["takeSpeed"].AsFloat(1f);
+			pourAnimationPrepare = Attributes["pourAnimationPrepare"].AsFloat();
+			pourAnimation = Attributes["pourAnimation"].AsString();
+			takeAnimation = Attributes["takeAnimation"].AsString();
+
 			if(api.Side == EnumAppSide.Client)
 			{
 				glassTransform = Attributes["glassTransform"].AsObject<ModelTransform>();
 				glassTransform.EnsureDefaultValues();
-
-				pourTransform = Attributes["pourTransform"].AsObject<ModelTransform>();
-				pourTransform.EnsureDefaultValues();
-
-				takeTransform = Attributes["takeTransform"].AsObject<ModelTransform>();
-				takeTransform.EnsureDefaultValues();
 
 				interactions = new WorldInteraction[] {
 					new WorldInteraction() {
@@ -119,6 +116,7 @@ namespace GlassMaking.Items
 							{
 								if(mold.CanReceiveGlass(new AssetLocation(glassmelt.GetString("code")), glassmelt.GetInt("amount")))
 								{
+									byEntity.StartAnimation(pourAnimation);
 									itemstack.TempAttributes.SetFloat("glassmaking:prevTakeTime", 0);
 									byEntity.World.RegisterCallback((world, pos, dt) => {
 										if(byEntity.Controls.HandUse == EnumHandInteract.HeldItemInteract)
@@ -154,6 +152,7 @@ namespace GlassMaking.Items
 						if(amount > amountThreshold && CanTakeGlass(byEntity.World, itemstack, source.GetGlassCode(), out isTooCold))
 						{
 							handling = EnumHandHandling.PreventDefault;
+							byEntity.StartAnimation(takeAnimation);
 							if(api.Side == EnumAppSide.Client)
 							{
 								itemstack.TempAttributes.SetBool("glassmaking:glassFlag", true);
@@ -211,26 +210,12 @@ namespace GlassMaking.Items
 							var code = new AssetLocation(glassmelt.GetString("code"));
 							if(mold.CanReceiveGlass(code, amount))
 							{
-								if(api.Side == EnumAppSide.Client)
-								{
-									ModelTransform modelTransform = pourTransform.Clone();
-
-									float offsetMult = Math.Min(1, secondsUsed * 2 * pourAnimationSpeed);
-									modelTransform.Translation.Mul(offsetMult);
-
-									modelTransform.Scale = AnimUtil.Reach(secondsUsed * 0.2f * pourAnimationSpeed, 1, pourTransform.ScaleXYZ.X);
-									modelTransform.Rotation.X = AnimUtil.Reach(secondsUsed * 45f * pourAnimationSpeed, pourTransform.Rotation.X);
-									modelTransform.Rotation.Y = AnimUtil.Reach(secondsUsed * 45f * pourAnimationSpeed, pourTransform.Rotation.Y);
-									modelTransform.Rotation.Z = AnimUtil.Tri(0, pourTransform.Rotation.Z, -90, 2f / 4f, Math.Min(secondsUsed * 1.5f * pourAnimationSpeed, 1));
-									byEntity.Controls.UsingHeldItemTransformBefore = modelTransform;
-								}
-								float prepareTime = 0.5f / pourAnimationSpeed;
-								if(secondsUsed > prepareTime)
+								if(secondsUsed > pourAnimationPrepare)
 								{
 									float prevTime = itemstack.TempAttributes.GetFloat("glassmaking:prevTakeTime", 0f);
-									itemstack.TempAttributes.SetFloat("glassmaking:prevTakeTime", secondsUsed - prepareTime);
+									itemstack.TempAttributes.SetFloat("glassmaking:prevTakeTime", secondsUsed - pourAnimationPrepare);
 
-									int takeAmount = Math.Max(1, Math.Min(amount, (int)((secondsUsed - prepareTime - prevTime) * 250)));
+									int takeAmount = Math.Max(1, Math.Min(amount, (int)((secondsUsed - pourAnimationPrepare - prevTime) * 250)));
 									amount -= takeAmount;
 
 									mold.ReceiveGlass(byEntity, code, ref takeAmount, GetGlassTemperature(byEntity.World, itemstack));
@@ -289,21 +274,6 @@ namespace GlassMaking.Items
 					if(glassFlag || amount > amountThreshold && CanTakeGlass(byEntity.World, itemstack, source.GetGlassCode(), out _))
 					{
 						const float useTime = 3f;
-						if(api.Side == EnumAppSide.Client)
-						{
-							ModelTransform modelTransform = takeTransform.Clone();
-
-							float offsetMult = AnimUtil.Quad(0, 1, 1, 0, 0.5f / useTime, 2.5f / useTime, Math.Min(secondsUsed / useTime, 1));
-							modelTransform.Translation.Mul(offsetMult);
-
-							float scale = takeTransform.ScaleXYZ.X;
-							modelTransform.Scale = AnimUtil.Quad(1, scale, scale, 1, 0.5f / useTime, 2.5f / useTime, Math.Min(secondsUsed / useTime, 1));
-							modelTransform.Rotation.X = AnimUtil.Tri(0, takeTransform.Rotation.X, 0, 1f / (useTime * 3f), Math.Min(secondsUsed / useTime, 1));
-							modelTransform.Rotation.Y = AnimUtil.Quad(0, takeTransform.Rotation.Y + 5,
-								takeTransform.Rotation.Y, 0, 2f / useTime, 2.5f / useTime, Math.Min(secondsUsed / useTime, 1));
-							modelTransform.Rotation.Z = AnimUtil.Tri(0, takeTransform.Rotation.Z, 0, 0.2f, Math.Min(secondsUsed / 2, 1));
-							byEntity.Controls.UsingHeldItemTransformBefore = modelTransform;
-						}
 						const float addTime = 1.5f;
 						if(api.Side == EnumAppSide.Server && secondsUsed >= addTime)
 						{
@@ -338,6 +308,8 @@ namespace GlassMaking.Items
 			base.OnHeldInteractStop(secondsUsed, slot, byEntity, blockSel, entitySel);
 			slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:glassFlag");
 			slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:prevTakeTime");
+			byEntity.StopAnimation(pourAnimation);
+			byEntity.StopAnimation(takeAnimation);
 
 			slot.MarkDirty();
 			if(blockSel != null)
@@ -351,6 +323,8 @@ namespace GlassMaking.Items
 		{
 			slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:glassFlag");
 			slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:prevTakeTime");
+			byEntity.StopAnimation(pourAnimation);
+			byEntity.StopAnimation(takeAnimation);
 			return true;
 		}
 
@@ -423,7 +397,7 @@ namespace GlassMaking.Items
 			var glassmelt = item.Attributes.GetTreeAttribute("glassmelt");
 			if(glassmelt == null) return 0;
 
-			return mod.GetGlassTypeInfo(new AssetLocation(glassmelt.GetString("code"))).meltingPoint;
+			return mod.GetGlassTypeInfo(new AssetLocation(glassmelt.GetString("code"))).MeltingPoint;
 		}
 
 		private bool CanTakeGlass(IWorldAccessor world, ItemStack itemStack, AssetLocation code, out bool isTooCold)
