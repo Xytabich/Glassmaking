@@ -4,11 +4,12 @@
 		<OutputType>Library</OutputType>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<RootNamespace>GlassMaking</RootNamespace>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
 		<OutputPath>$(MSBuildProjectDirectory)\bin</OutputPath>
 		<IntermediateOutputPath>..\..\obj\Debug\glassmaking\</IntermediateOutputPath>
-		<CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
 		<OutputPath>$(MSBuildProjectDirectory)\bin</OutputPath>
@@ -16,47 +17,47 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<Reference Include="VintagestoryAPI">
-			<HintPath>C:\Games\Vintagestory19\VintagestoryAPI.dll</HintPath>
+			<HintPath>$(VINTAGE_STORY)/VintagestoryAPI.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="VintagestoryLib">
-			<HintPath>C:\Games\Vintagestory19\VintagestoryLib.dll</HintPath>
+			<HintPath>$(VINTAGE_STORY)/VintagestoryLib.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="VSSurvivalMod">
-			<HintPath>C:\Games\Vintagestory19\Mods\VSSurvivalMod.dll</HintPath>
+			<HintPath>$(VINTAGE_STORY)/Mods/VSSurvivalMod.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="VSEssentials">
-			<HintPath>C:\Games\Vintagestory19\Mods\VSEssentials.dll</HintPath>
+			<HintPath>$(VINTAGE_STORY)/Mods/VSEssentials.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="VSCreativeMod">
-			<HintPath>C:\Games\Vintagestory19\Mods\VSCreativeMod.dll</HintPath>
+			<HintPath>$(VINTAGE_STORY)/Mods/VSCreativeMod.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="Newtonsoft.Json">
-			<HintPath>C:\Games\Vintagestory19\Lib\Newtonsoft.Json.dll</HintPath>
+			<HintPath>$(VINTAGE_STORY)/Lib/Newtonsoft.Json.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="OpenTK">
-			<HintPath>C:\Games\Vintagestory19\Lib\OpenTK.Mathematics.dll</HintPath>
+			<HintPath>$(VINTAGE_STORY)/Lib/OpenTK.Mathematics.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="protobuf-net">
-			<HintPath>C:\Games\Vintagestory19\Lib\protobuf-net.dll</HintPath>
+			<HintPath>$(VINTAGE_STORY)/Lib/protobuf-net.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="0Harmony">
-			<HintPath>C:\Games\Vintagestory19\Lib\0Harmony.dll</HintPath>
+			<HintPath>$(VINTAGE_STORY)/Lib/0Harmony.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="cairo-sharp">
-			<HintPath>C:\Games\Vintagestory19\Lib\cairo-sharp.dll</HintPath>
+			<HintPath>$(VINTAGE_STORY)/Lib/cairo-sharp.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="SkiaSharp">
-			<HintPath>C:\Games\Vintagestory19\Lib\SkiaSharp.dll</HintPath>
+			<HintPath>$(VINTAGE_STORY)/Lib/SkiaSharp.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 	</ItemGroup>
@@ -71,6 +72,6 @@
 		<PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
 	</ItemGroup>
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-	  <Exec Command="copy &quot;$(TargetPath)&quot; &quot;$(MSBuildProjectDirectory)&quot; &#xD;&#xA;copy &quot;$(TargetDir)\$(TargetName).pdb&quot; &quot;$(MSBuildProjectDirectory)&quot;" />
+	  <Exec Command="cp &quot;$(TargetPath)&quot; &quot;$(MSBuildProjectDirectory)&quot; &#xD;&#xA;cp &quot;$(TargetDir)\$(TargetName).pdb&quot; &quot;$(MSBuildProjectDirectory)&quot;" />
 	</Target>
 </Project>

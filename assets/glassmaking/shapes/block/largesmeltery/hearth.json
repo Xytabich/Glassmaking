@@ -8,14 +8,14 @@
 	"textureSizes": {
 	},
 	"textures": {
-		"brick": "game:block/clay/brick/fire2",
+		"brick": "game:block/clay/brick/four/running/fire2",
 		"fireclay": "game:block/clay/fireclay"
 	},
 	"elements": [
 		{
 			"name": "Face7",
-			"from": [ 0.0, 0.0, 0.0 ], 
-			"to": [ 16.0, 16.0, 16.0 ], 
+			"from": [ 0.0, 0.0, 0.0 ],
+			"to": [ 16.0, 16.0, 16.0 ],
 			"faces": {
 				"north": { "texture": "#brick", "uv": [ 0.0, 0.0, 16.0, 16.0 ], "enabled": false },
 				"east": { "texture": "#brick", "uv": [ 0.0, 0.0, 16.0, 16.0 ], "enabled": false },
@@ -27,8 +27,8 @@
 			"children": [
 				{
 					"name": "Face8",
-					"from": [ 0.0, -4.0, 0.0 ], 
-					"to": [ 16.0, 0.0, 16.0 ], 
+					"from": [ 0.0, -4.0, 0.0 ],
+					"to": [ 16.0, 0.0, 16.0 ],
 					"rotationOrigin": [ 0.0, 0.0, 16.0 ],
 					"rotationX": 15.0,
 					"faces": {
@@ -42,8 +42,8 @@
 				},
 				{
 					"name": "Cube15",
-					"from": [ 0.0, -3.0, 1.0 ], 
-					"to": [ 9.0, 0.0, 16.0 ], 
+					"from": [ 0.0, -3.0, 1.0 ],
+					"to": [ 9.0, 0.0, 16.0 ],
 					"rotationOrigin": [ 0.0, 0.0, 16.0 ],
 					"rotationX": 22.5,
 					"rotationZ": -15.0,
@@ -58,8 +58,8 @@
 				},
 				{
 					"name": "Cube16",
-					"from": [ 7.0, -3.0, 1.0 ], 
-					"to": [ 16.0, 0.0, 16.0 ], 
+					"from": [ 7.0, -3.0, 1.0 ],
+					"to": [ 16.0, 0.0, 16.0 ],
 					"rotationOrigin": [ 16.0, 0.0, 16.0 ],
 					"rotationX": 22.5,
 					"rotationZ": 15.0,
@@ -74,8 +74,8 @@
 				},
 				{
 					"name": "Cube20",
-					"from": [ -3.0, -3.0, 2.0 ], 
-					"to": [ 0.0, 5.0, 8.0 ], 
+					"from": [ -3.0, -3.0, 2.0 ],
+					"to": [ 0.0, 5.0, 8.0 ],
 					"rotationOrigin": [ 0.0, 0.0, 16.0 ],
 					"rotationX": 18.0,
 					"rotationZ": -9.0,
@@ -90,8 +90,8 @@
 					"children": [
 						{
 							"name": "Cube21",
-							"from": [ 0.0, 8.0, 0.0 ], 
-							"to": [ 3.0, 16.0, 6.0 ], 
+							"from": [ 0.0, 8.0, 0.0 ],
+							"to": [ 3.0, 16.0, 6.0 ],
 							"rotationOrigin": [ 0.0, 8.0, 0.0 ],
 							"rotationX": 6.0,
 							"rotationZ": -12.0,
@@ -108,8 +108,8 @@
 				},
 				{
 					"name": "Cube23",
-					"from": [ 16.0, -3.0, 2.0 ], 
-					"to": [ 19.0, 5.0, 8.0 ], 
+					"from": [ 16.0, -3.0, 2.0 ],
+					"to": [ 19.0, 5.0, 8.0 ],
 					"rotationOrigin": [ 16.0, 0.0, 16.0 ],
 					"rotationX": 18.0,
 					"rotationZ": 9.0,
@@ -124,8 +124,8 @@
 					"children": [
 						{
 							"name": "Cube24",
-							"from": [ 0.0, 8.0, 0.0 ], 
-							"to": [ 3.0, 16.0, 6.0 ], 
+							"from": [ 0.0, 8.0, 0.0 ],
+							"to": [ 3.0, 16.0, 6.0 ],
 							"rotationOrigin": [ 3.0, 8.0, 0.0 ],
 							"rotationX": 6.0,
 							"rotationZ": 12.0,

@@ -92,82 +92,15 @@
 				"z": 0
 			}
 		},
-		"takeTransform": {
-			"origin": {
-				"x": 0.5,
-				"y": 0.2,
-				"z": 0.5
-			},
-			"translationByType": {
-				"*-small": {
-					"x": 0.75,
-					"y": 0.4,
-					"z": 0.5
-				},
-				"*-medium": {
-					"x": 0.4,
-					"y": 0.4,
-					"z": 0.5
-				},
-				"*-large": {
-					"x": 0,
-					"y": 0.4,
-					"z": 0.5
-				}
-			},
-			"rotation": {
-				"x": -10,
-				"y": 10,
-				"z": -90
-			},
-			"scale": 0.9
+		"takeAnimation": "glassladletake",
+		"pourAnimationByType": {
+			"*-large": "glassladlepourslow",
+			"*": "glassladlepour"
 		},
-		"pourTransform": {
-			"origin": {
-				"x": 0.5,
-				"y": 0.2,
-				"z": 0.5
-			},
-			"translationByType": {
-				"*-small": {
-					"x": 0.75,
-					"y": 0.4,
-					"z": 0.5
-				},
-				"*-medium": {
-					"x": 0.3,
-					"y": 0.5,
-					"z": 0.5
-				},
-				"*-large": {
-					"x": -0.3,
-					"y": 0.4,
-					"z": 1
-				}
-			},
-			"rotationByType": {
-				"*-small": {
-					"x": -10,
-					"y": 0,
-					"z": -10
-				},
-				"*-medium": {
-					"x": -10,
-					"y": -5,
-					"z": -10
-				},
-				"*-large": {
-					"x": -10,
-					"y": -10,
-					"z": -10
-				}
-			},
-			"scaleByType": {
-				"@.*-(small|medium)": 0.9,
-				"*-large": 1.1
-			}
-		},
-		"pourAnimationSpeedByType": { "*-large": 0.75 }
+		"pourAnimationPrepareByType": {
+			"*-large": 0.65,
+			"*": 0.5
+		}
 	},
 	"heldTpIdleAnimation": "holdunderarm",
 	"textures": {
@@ -203,62 +136,6 @@
 			"z": 0.5
 		},
 		"scale": 0.4
-	},
-	"fpHandTransformByType": {
-		"*-large": {
-			"translation": {
-				"x": -0.5,
-				"y": 0.1,
-				"z": -1.25
-			},
-			"rotation": {
-				"x": -170,
-				"y": -20,
-				"z": 170
-			},
-			"origin": {
-				"x": 0.5,
-				"y": 0.2,
-				"z": 0.5
-			},
-			"scale": 1.75
-		},
-		"*-medium": {
-			"translation": {
-				"x": -0.45,
-				"y": 0.3,
-				"z": -0.4
-			},
-			"rotation": {
-				"x": -170,
-				"y": -22,
-				"z": 170
-			},
-			"origin": {
-				"x": 0.5,
-				"y": 0.2,
-				"z": 0.5
-			},
-			"scale": 1.4
-		},
-		"*-small": {
-			"translation": {
-				"x": -0.3,
-				"y": 0.4,
-				"z": -0.5
-			},
-			"rotation": {
-				"x": -170,
-				"y": -15,
-				"z": 170
-			},
-			"origin": {
-				"x": 0.5,
-				"y": 0.2,
-				"z": 0.5
-			},
-			"scale": 1.3
-		}
 	},
 	"guiTransform": {
 		"rotation": {

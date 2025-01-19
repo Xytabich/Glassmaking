@@ -8,13 +8,13 @@
 	"textureSizes": {
 	},
 	"textures": {
-		"brick": "game:block/clay/brick/fire2"
+		"brick": "game:block/clay/brick/four/running/fire2"
 	},
 	"elements": [
 		{
 			"name": "Face14",
-			"from": [ 0.0, 0.0, 0.0 ], 
-			"to": [ 16.0, 16.0, 16.0 ], 
+			"from": [ 0.0, 0.0, 0.0 ],
+			"to": [ 16.0, 16.0, 16.0 ],
 			"faces": {
 				"north": { "texture": "#brick", "uv": [ 0.0, 0.0, 16.0, 16.0 ], "enabled": false },
 				"east": { "texture": "#brick", "uv": [ 0.0, 0.0, 16.0, 16.0 ], "enabled": false },
@@ -26,8 +26,8 @@
 			"children": [
 				{
 					"name": "Face13",
-					"from": [ 5.0, 0.0, 5.0 ], 
-					"to": [ 5.0, 0.0, 5.0 ], 
+					"from": [ 5.0, 0.0, 5.0 ],
+					"to": [ 5.0, 0.0, 5.0 ],
 					"rotationOrigin": [ 5.0, 0.0, 5.0 ],
 					"rotationY": 67.5,
 					"faces": {
@@ -41,8 +41,8 @@
 					"children": [
 						{
 							"name": "Cube13",
-							"from": [ -12.0, 0.0, 0.0 ], 
-							"to": [ 0.0, 3.0, 6.0 ], 
+							"from": [ -12.0, 0.0, 0.0 ],
+							"to": [ 0.0, 3.0, 6.0 ],
 							"rotationOrigin": [ 0.0, 0.0, 0.0 ],
 							"rotationX": 1.0,
 							"faces": {
@@ -58,8 +58,8 @@
 				},
 				{
 					"name": "Face12",
-					"from": [ 5.0, 0.0, 5.0 ], 
-					"to": [ 5.0, 0.0, 5.0 ], 
+					"from": [ 5.0, 0.0, 5.0 ],
+					"to": [ 5.0, 0.0, 5.0 ],
 					"rotationOrigin": [ 5.0, 0.0, 5.0 ],
 					"rotationY": 22.5,
 					"faces": {
@@ -73,8 +73,8 @@
 					"children": [
 						{
 							"name": "Cube12",
-							"from": [ 0.0, 0.0, 0.0 ], 
-							"to": [ 12.0, 3.0, 6.0 ], 
+							"from": [ 0.0, 0.0, 0.0 ],
+							"to": [ 12.0, 3.0, 6.0 ],
 							"rotationOrigin": [ 0.0, 0.0, 0.0 ],
 							"rotationX": 1.0,
 							"faces": {
@@ -90,8 +90,8 @@
 				},
 				{
 					"name": "Face16",
-					"from": [ 6.5, 3.0, 6.5 ], 
-					"to": [ 6.5, 3.0, 6.5 ], 
+					"from": [ 6.5, 3.0, 6.5 ],
+					"to": [ 6.5, 3.0, 6.5 ],
 					"rotationOrigin": [ 6.5, 3.0, 6.5 ],
 					"rotationY": 22.5,
 					"faces": {
@@ -105,8 +105,8 @@
 					"children": [
 						{
 							"name": "Cube17",
-							"from": [ 0.0, 0.0, 0.0 ], 
-							"to": [ 7.5, 3.0, 5.0 ], 
+							"from": [ 0.0, 0.0, 0.0 ],
+							"to": [ 7.5, 3.0, 5.0 ],
 							"rotationOrigin": [ 0.0, 0.0, 0.0 ],
 							"rotationX": 1.0,
 							"faces": {
@@ -122,8 +122,8 @@
 				},
 				{
 					"name": "Face18",
-					"from": [ 6.5, 3.0, 6.5 ], 
-					"to": [ 6.5, 3.0, 6.5 ], 
+					"from": [ 6.5, 3.0, 6.5 ],
+					"to": [ 6.5, 3.0, 6.5 ],
 					"rotationOrigin": [ 6.5, 3.0, 6.5 ],
 					"rotationY": 67.5,
 					"faces": {
@@ -137,8 +137,8 @@
 					"children": [
 						{
 							"name": "Cube19",
-							"from": [ -7.5, 0.0, 0.0 ], 
-							"to": [ 0.0, 3.0, 5.0 ], 
+							"from": [ -7.5, 0.0, 0.0 ],
+							"to": [ 0.0, 3.0, 5.0 ],
 							"rotationOrigin": [ 0.0, 0.0, 0.0 ],
 							"rotationX": 1.0,
 							"faces": {
@@ -154,8 +154,8 @@
 				},
 				{
 					"name": "Face26",
-					"from": [ 7.5, 6.0, 7.5 ], 
-					"to": [ 7.5, 6.0, 7.5 ], 
+					"from": [ 7.5, 6.0, 7.5 ],
+					"to": [ 7.5, 6.0, 7.5 ],
 					"rotationOrigin": [ 7.5, 6.0, 7.5 ],
 					"rotationY": 22.5,
 					"faces": {
@@ -169,8 +169,8 @@
 					"children": [
 						{
 							"name": "Cube27",
-							"from": [ 0.0, 0.0, 0.0 ], 
-							"to": [ 7.0, 3.0, 5.0 ], 
+							"from": [ 0.0, 0.0, 0.0 ],
+							"to": [ 7.0, 3.0, 5.0 ],
 							"rotationOrigin": [ 0.0, 0.0, 0.0 ],
 							"rotationX": 1.0,
 							"faces": {
@@ -186,8 +186,8 @@
 				},
 				{
 					"name": "Face28",
-					"from": [ 7.5, 6.0, 7.5 ], 
-					"to": [ 7.5, 6.0, 7.5 ], 
+					"from": [ 7.5, 6.0, 7.5 ],
+					"to": [ 7.5, 6.0, 7.5 ],
 					"rotationOrigin": [ 7.5, 6.0, 7.5 ],
 					"rotationY": 67.5,
 					"faces": {
@@ -201,8 +201,8 @@
 					"children": [
 						{
 							"name": "Cube29",
-							"from": [ -7.0, 0.0, 0.0 ], 
-							"to": [ 0.0, 3.0, 5.0 ], 
+							"from": [ -7.0, 0.0, 0.0 ],
+							"to": [ 0.0, 3.0, 5.0 ],
 							"rotationOrigin": [ 0.0, 0.0, 0.0 ],
 							"rotationX": 1.0,
 							"faces": {
@@ -218,8 +218,8 @@
 				},
 				{
 					"name": "Face30",
-					"from": [ 8.5, 9.0, 8.5 ], 
-					"to": [ 8.5, 9.0, 8.5 ], 
+					"from": [ 8.5, 9.0, 8.5 ],
+					"to": [ 8.5, 9.0, 8.5 ],
 					"rotationOrigin": [ 8.5, 9.0, 8.5 ],
 					"rotationY": 22.5,
 					"faces": {
@@ -233,8 +233,8 @@
 					"children": [
 						{
 							"name": "Cube31",
-							"from": [ 0.0, 0.0, 0.0 ], 
-							"to": [ 7.0, 3.0, 5.0 ], 
+							"from": [ 0.0, 0.0, 0.0 ],
+							"to": [ 7.0, 3.0, 5.0 ],
 							"rotationOrigin": [ 0.0, 0.0, 0.0 ],
 							"rotationX": 1.0,
 							"faces": {
@@ -250,8 +250,8 @@
 				},
 				{
 					"name": "Face32",
-					"from": [ 8.5, 9.0, 8.5 ], 
-					"to": [ 8.5, 9.0, 8.5 ], 
+					"from": [ 8.5, 9.0, 8.5 ],
+					"to": [ 8.5, 9.0, 8.5 ],
 					"rotationOrigin": [ 8.5, 9.0, 8.5 ],
 					"rotationY": 67.5,
 					"faces": {
@@ -265,8 +265,8 @@
 					"children": [
 						{
 							"name": "Cube33",
-							"from": [ -7.0, 0.0, 0.0 ], 
-							"to": [ 0.0, 3.0, 5.0 ], 
+							"from": [ -7.0, 0.0, 0.0 ],
+							"to": [ 0.0, 3.0, 5.0 ],
 							"rotationOrigin": [ 0.0, 0.0, 0.0 ],
 							"rotationX": 1.0,
 							"faces": {
@@ -282,8 +282,8 @@
 				},
 				{
 					"name": "Face34",
-					"from": [ 10.0, 12.0, 10.0 ], 
-					"to": [ 10.0, 12.0, 10.0 ], 
+					"from": [ 10.0, 12.0, 10.0 ],
+					"to": [ 10.0, 12.0, 10.0 ],
 					"rotationOrigin": [ 10.0, 12.0, 10.0 ],
 					"rotationY": 22.5,
 					"faces": {
@@ -297,8 +297,8 @@
 					"children": [
 						{
 							"name": "Cube35",
-							"from": [ 0.0, 0.0, 0.0 ], 
-							"to": [ 7.0, 3.0, 5.0 ], 
+							"from": [ 0.0, 0.0, 0.0 ],
+							"to": [ 7.0, 3.0, 5.0 ],
 							"rotationOrigin": [ 0.0, 0.0, 0.0 ],
 							"rotationX": 1.0,
 							"faces": {
@@ -314,8 +314,8 @@
 				},
 				{
 					"name": "Face36",
-					"from": [ 10.0, 12.0, 10.0 ], 
-					"to": [ 10.0, 12.0, 10.0 ], 
+					"from": [ 10.0, 12.0, 10.0 ],
+					"to": [ 10.0, 12.0, 10.0 ],
 					"rotationOrigin": [ 10.0, 12.0, 10.0 ],
 					"rotationY": 67.5,
 					"faces": {
@@ -329,8 +329,8 @@
 					"children": [
 						{
 							"name": "Cube37",
-							"from": [ -7.0, 0.0, 0.0 ], 
-							"to": [ 0.0, 3.0, 5.0 ], 
+							"from": [ -7.0, 0.0, 0.0 ],
+							"to": [ 0.0, 3.0, 5.0 ],
 							"rotationOrigin": [ 0.0, 0.0, 0.0 ],
 							"rotationX": 1.0,
 							"faces": {

@@ -1,0 +1,3 @@
+*        text=crlf
+
+*.cs     text diff=csharp

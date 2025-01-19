@@ -8,14 +8,14 @@
 	"textureSizes": {
 	},
 	"textures": {
-		"brick": "game:block/clay/brick/fire2",
+		"brick": "game:block/clay/brick/four/running/fire2",
 		"fireclay": "game:block/clay/fireclay"
 	},
 	"elements": [
 		{
 			"name": "Cube1",
-			"from": [ 0.0, 0.0, 0.0 ], 
-			"to": [ 16.0, 16.0, 16.0 ], 
+			"from": [ 0.0, 0.0, 0.0 ],
+			"to": [ 16.0, 16.0, 16.0 ],
 			"faces": {
 				"north": { "texture": "#brick", "uv": [ 0.0, 0.0, 16.0, 16.0 ] },
 				"east": { "texture": "#brick", "uv": [ 0.0, 0.0, 16.0, 16.0 ] },
@@ -27,8 +27,8 @@
 			"children": [
 				{
 					"name": "Face",
-					"from": [ 0.0, 16.0, 0.0 ], 
-					"to": [ 8.0, 16.0, 16.0 ], 
+					"from": [ 0.0, 16.0, 0.0 ],
+					"to": [ 8.0, 16.0, 16.0 ],
 					"rotationOrigin": [ 0.0, 16.0, 0.0 ],
 					"rotationZ": -45.0,
 					"faces": {
@@ -42,8 +42,8 @@
 				},
 				{
 					"name": "Face3",
-					"from": [ 0.0, 16.0, 0.0 ], 
-					"to": [ 16.0, 16.0, 8.0 ], 
+					"from": [ 0.0, 16.0, 0.0 ],
+					"to": [ 16.0, 16.0, 8.0 ],
 					"rotationOrigin": [ 0.0, 16.0, 0.0 ],
 					"rotationX": 45.0,
 					"faces": {
@@ -57,8 +57,8 @@
 				},
 				{
 					"name": "Face4",
-					"from": [ 8.0, 16.0, 0.0 ], 
-					"to": [ 16.0, 16.0, 16.0 ], 
+					"from": [ 8.0, 16.0, 0.0 ],
+					"to": [ 16.0, 16.0, 16.0 ],
 					"rotationOrigin": [ 16.0, 16.0, 0.0 ],
 					"rotationZ": 45.0,
 					"faces": {
@@ -72,8 +72,8 @@
 				},
 				{
 					"name": "Face5",
-					"from": [ 0.0, 16.0, 8.0 ], 
-					"to": [ 16.0, 16.0, 16.0 ], 
+					"from": [ 0.0, 16.0, 8.0 ],
+					"to": [ 16.0, 16.0, 16.0 ],
 					"rotationOrigin": [ 0.0, 16.0, 16.0 ],
 					"rotationX": -45.0,
 					"faces": {
@@ -87,8 +87,8 @@
 				},
 				{
 					"name": "Face6",
-					"from": [ 5.5, 10.5, 5.5 ], 
-					"to": [ 10.5, 10.5, 10.5 ], 
+					"from": [ 5.5, 10.5, 5.5 ],
+					"to": [ 10.5, 10.5, 10.5 ],
 					"rotationOrigin": [ 5.5, 10.5, 5.5 ],
 					"faces": {
 						"north": { "texture": "#brick", "uv": [ 0.0, 0.0, 5.0, 0.5 ], "enabled": false },

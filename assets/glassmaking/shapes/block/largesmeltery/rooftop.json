@@ -8,13 +8,13 @@
 	"textureSizes": {
 	},
 	"textures": {
-		"brick": "game:block/clay/brick/fire2"
+		"brick": "game:block/clay/brick/four/running/fire2"
 	},
 	"elements": [
 		{
 			"name": "Face47",
-			"from": [ 0.0, 0.0, 0.0 ], 
-			"to": [ 16.0, 16.0, 16.0 ], 
+			"from": [ 0.0, 0.0, 0.0 ],
+			"to": [ 16.0, 16.0, 16.0 ],
 			"faces": {
 				"north": { "texture": "#brick", "uv": [ 0.0, 0.0, 16.0, 16.0 ], "enabled": false },
 				"east": { "texture": "#brick", "uv": [ 0.0, 0.0, 16.0, 16.0 ], "enabled": false },
@@ -26,8 +26,8 @@
 			"children": [
 				{
 					"name": "Face68",
-					"from": [ 12.0, -1.0, 12.0 ], 
-					"to": [ 12.0, -1.0, 12.0 ], 
+					"from": [ 12.0, -1.0, 12.0 ],
+					"to": [ 12.0, -1.0, 12.0 ],
 					"rotationOrigin": [ 12.0, -1.0, 12.0 ],
 					"rotationY": 22.5,
 					"faces": {
@@ -41,8 +41,8 @@
 					"children": [
 						{
 							"name": "Cube69",
-							"from": [ 0.0, 0.0, 0.0 ], 
-							"to": [ 8.0, 3.0, 5.0 ], 
+							"from": [ 0.0, 0.0, 0.0 ],
+							"to": [ 8.0, 3.0, 5.0 ],
 							"rotationOrigin": [ 0.0, 0.0, 0.0 ],
 							"rotationX": 1.0,
 							"faces": {
@@ -58,8 +58,8 @@
 				},
 				{
 					"name": "Face70",
-					"from": [ 12.0, -1.0, 12.0 ], 
-					"to": [ 12.0, -1.0, 12.0 ], 
+					"from": [ 12.0, -1.0, 12.0 ],
+					"to": [ 12.0, -1.0, 12.0 ],
 					"rotationOrigin": [ 12.0, -1.0, 12.0 ],
 					"rotationY": 67.5,
 					"faces": {
@@ -73,8 +73,8 @@
 					"children": [
 						{
 							"name": "Cube71",
-							"from": [ -8.0, 0.0, 0.0 ], 
-							"to": [ 0.0, 3.0, 5.0 ], 
+							"from": [ -8.0, 0.0, 0.0 ],
+							"to": [ 0.0, 3.0, 5.0 ],
 							"rotationOrigin": [ 0.0, 0.0, 0.0 ],
 							"rotationX": 1.0,
 							"faces": {
@@ -90,8 +90,8 @@
 				},
 				{
 					"name": "Face72",
-					"from": [ 14.0, 2.0, 14.0 ], 
-					"to": [ 14.0, 2.0, 14.0 ], 
+					"from": [ 14.0, 2.0, 14.0 ],
+					"to": [ 14.0, 2.0, 14.0 ],
 					"rotationOrigin": [ 14.0, 2.0, 14.0 ],
 					"rotationY": 22.5,
 					"faces": {
@@ -105,8 +105,8 @@
 					"children": [
 						{
 							"name": "Cube73",
-							"from": [ 0.0, 0.0, 0.0 ], 
-							"to": [ 8.0, 3.0, 5.0 ], 
+							"from": [ 0.0, 0.0, 0.0 ],
+							"to": [ 8.0, 3.0, 5.0 ],
 							"rotationOrigin": [ 0.0, 0.0, 0.0 ],
 							"rotationX": 1.0,
 							"faces": {
@@ -122,8 +122,8 @@
 				},
 				{
 					"name": "Face74",
-					"from": [ 14.0, 2.0, 14.0 ], 
-					"to": [ 14.0, 2.0, 14.0 ], 
+					"from": [ 14.0, 2.0, 14.0 ],
+					"to": [ 14.0, 2.0, 14.0 ],
 					"rotationOrigin": [ 14.0, 2.0, 14.0 ],
 					"rotationY": 67.5,
 					"faces": {
@@ -137,8 +137,8 @@
 					"children": [
 						{
 							"name": "Cube75",
-							"from": [ -8.0, 0.0, 0.0 ], 
-							"to": [ 0.0, 3.0, 5.0 ], 
+							"from": [ -8.0, 0.0, 0.0 ],
+							"to": [ 0.0, 3.0, 5.0 ],
 							"rotationOrigin": [ 0.0, 0.0, 0.0 ],
 							"rotationX": 1.0,
 							"faces": {
