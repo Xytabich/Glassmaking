@@ -14,12 +14,12 @@ namespace GlassMaking.Handbook
 
 		public AllowedLiquidsList()
 		{
-			HandbookItemInfoEvent.onGetHandbookInfo += GetHandbookInfo;
+			HandbookItemInfoEvent.OnGetHandbookInfo += GetHandbookInfo;
 		}
 
 		public void Dispose()
 		{
-			HandbookItemInfoEvent.onGetHandbookInfo -= GetHandbookInfo;
+			HandbookItemInfoEvent.OnGetHandbookInfo -= GetHandbookInfo;
 		}
 
 		private void GetHandbookInfo(ItemSlot inSlot, ICoreClientAPI capi, ItemStack[] allStacks, ActionConsumable<string> openDetailPageFor, HandbookItemInfoSection section, List<RichTextComponentBase> outComponents)
@@ -29,7 +29,7 @@ namespace GlassMaking.Handbook
 			{
 				outComponents.Add(new ClearFloatTextComponent(capi, 7f));
 				outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:Allowed liquids") + "\n", CairoFont.WhiteSmallText().WithWeight(FontWeight.Bold)));
-				foreach(var liquid in container.allowedLiquids)
+				foreach(var liquid in container.AllowedLiquids)
 				{
 					var element = new ItemstackTextComponent(capi, liquid, 40.0, 8, EnumFloat.Inline,
 						cs => openDetailPageFor(GuiHandbookItemStackPage.PageCodeForStack(cs)));

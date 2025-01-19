@@ -1,4 +1,5 @@
-﻿using GlassMaking.Items;
+﻿using System.Diagnostics.CodeAnalysis;
+using GlassMaking.Items;
 using GlassMaking.Items.Behavior;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
@@ -9,10 +10,10 @@ namespace GlassMaking.GlassblowingTools
 {
 	public abstract class GlassblowingToolBehavior : CollectibleBehavior
 	{
-		public string ToolCode;
+		public string ToolCode = default!;
 
-		protected GlassMakingMod mod;
-		protected ICoreAPI api;
+		protected GlassMakingMod mod = default!;
+		protected ICoreAPI api = default!;
 
 		public GlassblowingToolBehavior(CollectibleObject collObj) : base(collObj)
 		{
@@ -28,12 +29,12 @@ namespace GlassMaking.GlassblowingTools
 		public override void Initialize(JsonObject properties)
 		{
 			base.Initialize(properties);
-			ToolCode = properties?["tool"].AsString();
+			ToolCode = properties["tool"].AsString();
 		}
 
-		protected bool TryGetRecipeStep(ItemSlot slot, EntityAgent byEntity, out ToolRecipeStep stepInfo, bool workingTemperatureRequired = true, bool showWarning = false)
+		protected bool TryGetRecipeStep(ItemSlot slot, EntityAgent byEntity, [NotNullWhen(true)] out ToolRecipeStep? stepInfo, bool workingTemperatureRequired = true, bool showWarning = false)
 		{
-			ItemSlot pipeSlot = null;
+			ItemSlot? pipeSlot = null;
 			if(slot.Itemstack.Collectible is ItemGlassworkPipe)
 			{
 				pipeSlot = slot;
@@ -81,11 +82,11 @@ namespace GlassMaking.GlassblowingTools
 			public int Index;
 			public ItemSlot PipeSlot;
 			public GlassBlowingRecipe Recipe;
-			public JsonObject StepAttributes;
+			public JsonObject? StepAttributes;
 
 			private bool isComplete = false;
 
-			public ToolRecipeStep(int index, ItemSlot pipeSlot, GlassBlowingRecipe recipe, JsonObject stepAttributes)
+			public ToolRecipeStep(int index, ItemSlot pipeSlot, GlassBlowingRecipe recipe, JsonObject? stepAttributes)
 			{
 				Index = index;
 				PipeSlot = pipeSlot;

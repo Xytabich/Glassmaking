@@ -1,7 +1,6 @@
 ﻿using System;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
-using Vintagestory.API.MathTools;
 
 namespace GlassMaking.GlassblowingTools
 {
@@ -9,7 +8,7 @@ namespace GlassMaking.GlassblowingTools
 	{
 		public int minTier;
 
-		private string animation;
+		private string animation = default!;
 
 		public ToolUse(CollectibleObject collObj) : base(collObj)
 		{
@@ -46,7 +45,7 @@ namespace GlassMaking.GlassblowingTools
 			{
 				if(step.ContinueStep())
 				{
-					float time = step.StepAttributes["time"].AsFloat(1);
+					float time = step.StepAttributes!["time"].AsFloat(1);
 					if(api.Side == EnumAppSide.Client)
 					{
 						step.SetProgress(Math.Max(secondsUsed - 1f, 0f) / time);

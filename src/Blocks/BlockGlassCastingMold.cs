@@ -9,9 +9,9 @@ namespace GlassMaking.Blocks
 {
 	public class BlockGlassCastingMold : Block, IGlassCastingMold
 	{
-		public CastingMoldRecipe[] Recipes = null;
+		public CastingMoldRecipe[] Recipes = default!;
 
-		private WorldInteraction[] interactions;
+		private WorldInteraction[] interactions = default!;
 
 		public override void OnLoaded(ICoreAPI api)
 		{
@@ -23,7 +23,8 @@ namespace GlassMaking.Blocks
 				var recipes = new List<CastingMoldRecipe>();
 
 				var attrib = Attributes["glassmaking:castingmold"];
-				foreach(var recipe in (attrib.IsArray() ? attrib.AsObject<CastingMoldRecipe[]>(null, Code.Domain) : new CastingMoldRecipe[] { attrib.AsObject<CastingMoldRecipe>(null, Code.Domain) }))
+				foreach(var recipe in (attrib.IsArray() ? attrib.AsObject<CastingMoldRecipe[]?>(null, Code.Domain)!
+					: new CastingMoldRecipe[] { attrib.AsObject<CastingMoldRecipe?>(null, Code.Domain)! }))
 				{
 					if(recipe != null && recipe.Enabled)
 					{
@@ -119,12 +120,9 @@ namespace GlassMaking.Blocks
 
 			BlockEntity be = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position.AddCopy(blockSel.Face.Opposite));
 
-			IPlayer byPlayer = null;
-			if(byEntity is EntityPlayer) byPlayer = byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID);
-
-			if(byPlayer != null && be is BlockEntityGlassCastingMold)
+			var byPlayer = Utils.GetPlayerFromEntity(byEntity);
+			if(byPlayer != null && be is BlockEntityGlassCastingMold beim)
 			{
-				BlockEntityGlassCastingMold beim = (BlockEntityGlassCastingMold)be;
 				if(beim.OnPlayerInteract(byPlayer, blockSel.Face, blockSel.HitPosition))
 				{
 					handHandling = EnumHandHandling.PreventDefault;
@@ -136,9 +134,11 @@ namespace GlassMaking.Blocks
 		{
 			if(blockSel == null) return false;
 
-			BlockEntityGlassCastingMold be = world.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityGlassCastingMold;
 
-			if(be != null) be.OnPlayerInteract(byPlayer, blockSel.Face, blockSel.HitPosition);
+			if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BlockEntityGlassCastingMold be)
+			{
+				be.OnPlayerInteract(byPlayer, blockSel.Face, blockSel.HitPosition);
+			}
 
 			return true;
 		}
@@ -180,9 +180,7 @@ namespace GlassMaking.Blocks
 
 			stacks.Add(new ItemStack(this));
 
-			BlockEntityGlassCastingMold be = world.BlockAccessor.GetBlockEntity(pos) as BlockEntityGlassCastingMold;
-
-			if(be != null)
+			if(world.BlockAccessor.GetBlockEntity(pos) is BlockEntityGlassCastingMold be)
 			{
 				var outstack = be.GetDrops();
 				if(outstack != null) stacks.AddRange(outstack);

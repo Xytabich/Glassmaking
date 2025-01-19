@@ -22,10 +22,10 @@ namespace GlassMaking.ItemRender
 			where TRenderer : IItemRenderer<TData>, new() where TData : struct
 		{
 			var idProp = itemStack.TempAttributes.TryGetInt("glassmaking:tmpMeshId");
-			RendererContainer container;
+			RendererContainer? container;
 			if(idProp.HasValue && containers.TryGetValue(idProp.Value, out container))
 			{
-				if(container.renderer is TRenderer)
+				if(container.Renderer is TRenderer)
 				{
 					container.Postpone();
 				}
@@ -44,14 +44,14 @@ namespace GlassMaking.ItemRender
 			{
 				int id = counter++;
 				container = new RendererContainer(this, id);
-				container.tmpHandle = pool.AllocateHandle(container);
-				container.renderer = new TRenderer();
+				container.TmpHandle = pool.AllocateHandle(container);
+				container.Renderer = new TRenderer();
 
 				itemStack.TempAttributes.SetInt("glassmaking:tmpMeshId", id);
 				containers[id] = container;
 			}
 
-			var renderer = (TRenderer)container.renderer;
+			var renderer = (TRenderer)container.Renderer;
 			renderer.UpdateIfChanged(capi, itemStack, data);
 			renderer.SetRenderInfo(capi, itemStack, ref renderInfo);
 		}
@@ -72,11 +72,11 @@ namespace GlassMaking.ItemRender
 
 		internal class RendererContainer : IDisposable
 		{
-			internal IDisposableHandle tmpHandle;
-			internal IDisposable renderer;
+			internal IDisposableHandle TmpHandle = default!;
+			internal IDisposable Renderer = default!;
 			internal int id;
 
-			private CachedItemRenderer manager;
+			private readonly CachedItemRenderer manager;
 
 			public RendererContainer(CachedItemRenderer manager, int id)
 			{
@@ -86,18 +86,18 @@ namespace GlassMaking.ItemRender
 
 			public void Postpone()
 			{
-				tmpHandle.Postpone();
+				TmpHandle.Postpone();
 			}
 
 			public void OnRemoved()
 			{
-				tmpHandle.Dispose();
-				renderer.Dispose();
+				TmpHandle.Dispose();
+				Renderer.Dispose();
 			}
 
 			void IDisposable.Dispose()
 			{
-				renderer.Dispose();
+				Renderer.Dispose();
 				manager.containers.Remove(id);
 			}
 		}

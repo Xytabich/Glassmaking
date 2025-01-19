@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
@@ -12,7 +13,7 @@ namespace GlassMaking.Blocks
 		public double tempIncreasePerHour;
 		public double tempDecreasePerHour;
 
-		private WorldInteraction[] interactions;
+		private WorldInteraction[] interactions = default!;
 
 		public override void OnLoaded(ICoreAPI api)
 		{
@@ -22,7 +23,7 @@ namespace GlassMaking.Blocks
 			tempDecreasePerHour = Attributes["coolingRate"].AsDouble();
 
 			if(api.Side != EnumAppSide.Client) return;
-			ICoreClientAPI capi = api as ICoreClientAPI;
+			ICoreClientAPI capi = (ICoreClientAPI)api;
 
 			interactions = ObjectCacheUtil.GetOrCreate(api, "glassmaking:blockhelp-firebox", () => {
 				List<ItemStack> fuelStacklist = new List<ItemStack>();
@@ -77,14 +78,15 @@ namespace GlassMaking.Blocks
 			ItemStack itemstack = slot.Itemstack;
 			if(itemstack != null)
 			{
-				BlockEntityFirebox be = world.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityFirebox;
-				if(be != null)
+				if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BlockEntityFirebox be)
 				{
 					if(itemstack.Class == EnumItemClass.Block && itemstack.Block is IHeaterPlaceableBlock block)
 					{
 						if(block.TryPlaceBlock(world, byPlayer, new BlockSelection { Position = blockSel.Position.UpCopy(), Face = BlockFacing.UP }, itemstack, Variant["side"]))
 						{
-							world.PlaySoundAt(itemstack.Block.GetSounds(world.BlockAccessor, blockSel.Position.UpCopy(), itemstack)?.Place,
+							var upCopy = blockSel.Clone();
+							blockSel.Position.Up();
+							world.PlaySoundAt(itemstack.Block.GetSounds(world.BlockAccessor, upCopy, itemstack)?.Place,
 								blockSel.Position.X + 0.5, blockSel.Position.Y + 1, blockSel.Position.Z + 0.5, byPlayer, true, 16f);
 							if(byPlayer.WorldData.CurrentGameMode != EnumGameMode.Creative)
 							{
@@ -98,7 +100,7 @@ namespace GlassMaking.Blocks
 					{
 						if(world.Side == EnumAppSide.Client)
 						{
-							(byPlayer as IClientPlayer).TriggerFpAnimation(EnumHandInteract.HeldItemInteract);
+							(byPlayer as IClientPlayer)?.TriggerFpAnimation(EnumHandInteract.HeldItemInteract);
 						}
 						return true;
 					}
@@ -109,7 +111,7 @@ namespace GlassMaking.Blocks
 
 		public virtual EnumIgniteState OnTryIgniteBlock(EntityAgent byEntity, BlockPos pos, float secondsIgniting)
 		{
-			if(!(byEntity.World.BlockAccessor.GetBlockEntity(pos) as BlockEntityFirebox).CanIgnite())
+			if(!((BlockEntityFirebox)byEntity.World.BlockAccessor.GetBlockEntity(pos)).CanIgnite())
 			{
 				return EnumIgniteState.NotIgnitablePreventDefault;
 			}
@@ -128,7 +130,7 @@ namespace GlassMaking.Blocks
 
 		public virtual EnumIgniteState OnTryIgniteStack(EntityAgent byEntity, BlockPos pos, ItemSlot slot, float secondsIgniting)
 		{
-			if(!(byEntity.World.BlockAccessor.GetBlockEntity(pos) as BlockEntityFirebox).CanIgnite())
+			if(!((BlockEntityFirebox)byEntity.World.BlockAccessor.GetBlockEntity(pos)).CanIgnite())
 			{
 				return EnumIgniteState.NotIgnitablePreventDefault;
 			}
@@ -164,7 +166,7 @@ namespace GlassMaking.Blocks
 			var items = base.GetDrops(world, pos, byPlayer, dropQuantityMultiplier);
 			if(items == null) items = new ItemStack[0];
 			var be = world.BlockAccessor.GetBlockEntity(pos) as BlockEntityFirebox;
-			if(be != null) items = items.Append(be.GetDropItems() ?? new ItemStack[0]);
+			if(be != null) items = items.Append(be.GetDropItems() ?? Array.Empty<ItemStack>());
 			return items;
 		}
 
@@ -186,7 +188,7 @@ namespace GlassMaking.Blocks
 			return interactions.Append(base.GetPlacedBlockInteractionHelp(world, selection, forPlayer));
 		}
 
-		private ItemStack[] GetMatchingFuel(WorldInteraction wi, BlockSelection blockSelection, EntitySelection entitySelection)
+		private ItemStack[]? GetMatchingFuel(WorldInteraction wi, BlockSelection blockSelection, EntitySelection entitySelection)
 		{
 			if(wi.Itemstacks.Length == 0) return null;
 			var be = api.World.BlockAccessor.GetBlockEntity(blockSelection.Position) as BlockEntityFirebox;
@@ -199,7 +201,7 @@ namespace GlassMaking.Blocks
 			return new ItemStack[] { stack };
 		}
 
-		private ItemStack[] GetMatchingIgnitor(WorldInteraction wi, BlockSelection blockSelection, EntitySelection entitySelection)
+		private ItemStack[]? GetMatchingIgnitor(WorldInteraction wi, BlockSelection blockSelection, EntitySelection entitySelection)
 		{
 			if(wi.Itemstacks.Length == 0) return null;
 			var be = api.World.BlockAccessor.GetBlockEntity(blockSelection.Position) as BlockEntityFirebox;

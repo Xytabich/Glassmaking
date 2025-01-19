@@ -13,7 +13,7 @@ namespace GlassMaking.Items
 		private int amount;
 		private TemperatureState temperature;
 
-		private MultiTextureMeshRef meshRef = null;
+		private MultiTextureMeshRef? meshRef = null;
 
 		public void UpdateIfChanged(ICoreClientAPI capi, ItemStack itemStack, Data data)
 		{
@@ -28,7 +28,7 @@ namespace GlassMaking.Items
 
 			var item = (ItemGlassLadle)itemStack.Item;
 			UpdateMeshRef(capi, itemStack.Item, capi.Tesselator.GetTextureSource(itemStack.Item),
-				(float)amount / item.maxGlassAmount, GlassRenderUtil.StateToGlow(temperature), item.glassTransform);
+				(float)amount / item.maxGlassAmount, GlassRenderUtil.StateToGlow(temperature), item.GlassTransform);
 		}
 
 		public void SetRenderInfo(ICoreClientAPI capi, ItemStack itemStack, ref ItemRenderInfo renderInfo)

@@ -8,10 +8,10 @@ namespace GlassMaking.Common
 	{
 		public Size2i AtlasSize => atlas.Size;
 
-		private ICoreClientAPI capi;
-		private ITextureAtlasAPI atlas;
-		private CollectibleObject collectible;
-		private Shape shape;
+		private readonly ICoreClientAPI capi;
+		private readonly ITextureAtlasAPI atlas;
+		private CollectibleObject collectible = default!;
+		private Shape shape = default!;
 
 		public AtlasTexSource(ICoreClientAPI capi, ITextureAtlasAPI atlas)
 		{
@@ -23,9 +23,9 @@ namespace GlassMaking.Common
 		{
 			get
 			{
-				var textures = collectible is Item item ? item.Textures : (collectible as Block).Textures;
-				AssetLocation texturePath = null;
-				CompositeTexture tex;
+				var textures = collectible is Item item ? item.Textures : ((Block)collectible).Textures;
+				AssetLocation? texturePath = null;
+				CompositeTexture? tex;
 
 				// Prio 1: Get from collectible textures
 				if(textures.TryGetValue(textureCode, out tex))

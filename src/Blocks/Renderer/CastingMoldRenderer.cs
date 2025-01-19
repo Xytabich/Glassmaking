@@ -14,7 +14,7 @@ namespace GlassMaking.Blocks
 
 		public float Temperature = 0;
 
-		public AssetLocation TextureName = null;
+		public AssetLocation? TextureName = null;
 
 		internal Cuboidf[] fillQuadsByLevel;
 
@@ -27,11 +27,12 @@ namespace GlassMaking.Blocks
 
 		private MeshRef[] quadModelRefs;
 
-		public CastingMoldRenderer(BlockPos pos, ICoreClientAPI api, Cuboidf[] fillQuadsByLevel = null)
+		public CastingMoldRenderer(BlockPos pos, ICoreClientAPI api, Cuboidf[]? fillQuadsByLevel = null)
 		{
 			this.pos = pos;
 			this.api = api;
 
+			fillQuadsByLevel ??= Array.Empty<Cuboidf>();
 			this.fillQuadsByLevel = fillQuadsByLevel;
 
 			quadModelRefs = new MeshRef[fillQuadsByLevel.Length];

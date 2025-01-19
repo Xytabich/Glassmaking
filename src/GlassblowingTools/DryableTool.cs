@@ -2,13 +2,12 @@
 using System;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
-using Vintagestory.API.MathTools;
 
 namespace GlassMaking.GlassblowingTools
 {
 	public class DryableTool : GlassblowingToolBehavior
 	{
-		private string animation;
+		private string animation = default!;
 
 		public DryableTool(CollectibleObject collObj) : base(collObj)
 		{
@@ -24,7 +23,7 @@ namespace GlassMaking.GlassblowingTools
 		{
 			if(firstEvent && TryGetRecipeStep(slot, byEntity, out var step, true, true) && slot.Itemstack.Collectible is IWettable wettable)
 			{
-				if(wettable.GetHumidity(slot.Itemstack, byEntity.World) >= step.StepAttributes["consume"].AsFloat(0) && step.BeginStep())
+				if(wettable.GetHumidity(slot.Itemstack, byEntity.World) >= step.StepAttributes!["consume"].AsFloat(0) && step.BeginStep())
 				{
 					if(api.Side == EnumAppSide.Client) step.SetProgress(0);
 
@@ -42,7 +41,7 @@ namespace GlassMaking.GlassblowingTools
 		{
 			if(TryGetRecipeStep(slot, byEntity, out var step) && slot.Itemstack.Collectible is IWettable wettable)
 			{
-				if(step.ContinueStep() && wettable.GetHumidity(slot.Itemstack, byEntity.World) >= step.StepAttributes["consume"].AsFloat(0))
+				if(step.ContinueStep() && wettable.GetHumidity(slot.Itemstack, byEntity.World) >= step.StepAttributes!["consume"].AsFloat(0))
 				{
 					float time = step.StepAttributes["time"].AsFloat(1);
 					if(api.Side == EnumAppSide.Client)

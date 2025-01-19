@@ -1,6 +1,7 @@
 ﻿using GlassMaking.GenericItemAction;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
@@ -146,7 +147,7 @@ namespace GlassMaking.Items.Behavior
 									item.StackSize *= quantity;
 									if(!entity.TryGiveItemStack(item))
 									{
-										entity.World.SpawnItemEntity(item, byPlayer.Entity.Pos.XYZ.Add(0.0, 0.5, 0.0));
+										entity.World.SpawnItemEntity(item, byPlayer!.Entity.Pos.XYZ.Add(0.0, 0.5, 0.0));
 									}
 								}
 							}
@@ -177,7 +178,7 @@ namespace GlassMaking.Items.Behavior
 			return glassworkPipe.GetActiveCraft(item) != null;
 		}
 
-		bool IItemCrafter.TryGetRecipeOutputs(IClientPlayer player, ItemStack item, out KeyValuePair<IAttribute, ItemStack>[] recipeOutputs)
+		bool IItemCrafter.TryGetRecipeOutputs(IClientPlayer player, ItemStack item, [NotNullWhen(true)] out KeyValuePair<IAttribute, ItemStack>[]? recipeOutputs)
 		{
 			var recipes = glassMaking.GetGlassBlowingRecipes();
 			recipeOutputs = default;
@@ -192,11 +193,11 @@ namespace GlassMaking.Items.Behavior
 			return index > 0;
 		}
 
-		bool IGenericHeldItemAction.GenericHeldItemAction(IPlayer player, string action, ITreeAttribute attributes)
+		bool IGenericHeldItemAction.GenericHeldItemAction(IPlayer player, string action, ITreeAttribute? attributes)
 		{
 			if(action == "recipe")
 			{
-				var code = attributes.GetString("key");
+				var code = attributes?.GetString("key");
 				if(!string.IsNullOrEmpty(code))
 				{
 					var recipe = glassMaking.GetGlassBlowingRecipe(code);

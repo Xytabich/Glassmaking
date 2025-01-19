@@ -7,6 +7,6 @@ namespace GlassMaking.Workbench.ToolDescriptors
 {
 	public interface IWorkbenchToolDescriptor
 	{
-		void GetStepInfoForHandbook(ICoreClientAPI capi, ItemStack item, WorkbenchRecipe recipe, int stepIndex, JsonObject data, ActionConsumable<string> openDetailPageFor, List<RichTextComponentBase> outComponents);
+		void GetStepInfoForHandbook(ICoreClientAPI capi, ItemStack item, WorkbenchRecipe recipe, int stepIndex, JsonObject? data, ActionConsumable<string> openDetailPageFor, List<RichTextComponentBase> outComponents);
 	}
 }

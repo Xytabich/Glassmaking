@@ -12,12 +12,12 @@ namespace GlassMaking.Handbook
 	{
 		public MultiblockPlanMaterials()
 		{
-			HandbookItemInfoEvent.onGetHandbookInfo += GetHandbookInfo;
+			HandbookItemInfoEvent.OnGetHandbookInfo += GetHandbookInfo;
 		}
 
 		public void Dispose()
 		{
-			HandbookItemInfoEvent.onGetHandbookInfo -= GetHandbookInfo;
+			HandbookItemInfoEvent.OnGetHandbookInfo -= GetHandbookInfo;
 		}
 
 		private void GetHandbookInfo(ItemSlot inSlot, ICoreClientAPI capi, ItemStack[] allStacks, ActionConsumable<string> openDetailPageFor, HandbookItemInfoSection section, List<RichTextComponentBase> outComponents)
@@ -43,7 +43,7 @@ namespace GlassMaking.Handbook
 								{
 									if(planBlock.replacement != null)
 									{
-										var item = (planBlock.replacement.requirement ?? planBlock.replacement.block)?.ResolvedItemstack;
+										var item = (planBlock.replacement.Requirement ?? planBlock.replacement.Block)?.ResolvedItemstack;
 										if(item != null)
 										{
 											int index = items.FindIndex(itm => itm.Equals(capi.World, item, GlobalConstants.IgnoredStackAttributes));

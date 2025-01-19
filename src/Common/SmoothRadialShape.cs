@@ -13,9 +13,9 @@ namespace GlassMaking
 		[JsonProperty(Required = Required.Always)]
 		public int Segments;
 		[JsonProperty, JsonConverter(typeof(ShapePartConverter))]
-		public ShapePart[] Inner = null;
+		public ShapePart[]? Inner = null;
 		[JsonProperty(Required = Required.Always), JsonConverter(typeof(ShapePartConverter))]
-		public ShapePart[] Outer;
+		public ShapePart[] Outer = default!;
 
 		public void ToBytes(BinaryWriter writer)
 		{
@@ -141,8 +141,8 @@ namespace GlassMaking
 
 		private static int AddLerpedVertex(MeshData mesh, FastList<FastVec2f> tmpList, Func<MeshData, FastVec2f, bool, int> vecCallback, bool isOuter, SmoothRadialShape from, SmoothRadialShape to, float at, float bt, float t)
 		{
-			var a = LerpParts(isOuter ? from.Outer : from.Inner, tmpList, from.Segments, at);
-			var b = LerpParts(isOuter ? to.Outer : to.Inner, tmpList, to.Segments, bt);
+			var a = LerpParts(isOuter ? from.Outer : from.Inner!, tmpList, from.Segments, at);
+			var b = LerpParts(isOuter ? to.Outer : to.Inner!, tmpList, to.Segments, bt);
 			return vecCallback.Invoke(mesh, FastVec2f.Lerp(a, b, t), isOuter);
 		}
 
@@ -179,7 +179,7 @@ namespace GlassMaking
 			[JsonProperty(Required = Required.Always)]
 			public int Segments;
 			[JsonProperty(Required = Required.Always)]
-			public float[][] Vertices;
+			public float[][] Vertices = default!;
 
 			public void Interpolate(FastList<FastVec2f> tmpList, float t)
 			{
@@ -224,16 +224,11 @@ namespace GlassMaking
 			}
 		}
 
-		private class ShapePartConverter : JsonConverter
+		private class ShapePartConverter : JsonConverter<ShapePart[]>
 		{
 			public override bool CanWrite => false;
 
-			public override bool CanConvert(Type objectType)
-			{
-				return objectType == typeof(ShapePart[]);
-			}
-
-			public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+			public override ShapePart[]? ReadJson(JsonReader reader, Type objectType, ShapePart[]? existingValue, bool hasExistingValue, JsonSerializer serializer)
 			{
 				if(reader.TokenType == JsonToken.Null) return null;
 				var arr = JArray.Load(reader);
@@ -243,12 +238,12 @@ namespace GlassMaking
 					{
 						return arr.ToObject<ShapePart[]>();
 					}
-					return new ShapePart[] { new ShapePart() { Vertices = arr.ToObject<float[][]>() } };
+					return new ShapePart[] { new ShapePart() { Vertices = arr.ToObject<float[][]>()! } };
 				}
 				return new ShapePart[0];
 			}
 
-			public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+			public override void WriteJson(JsonWriter writer, ShapePart[]? value, JsonSerializer serializer)
 			{
 				throw new NotImplementedException();
 			}

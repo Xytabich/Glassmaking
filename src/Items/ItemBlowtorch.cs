@@ -15,7 +15,7 @@ namespace GlassMaking.Items
 		public override bool CanDrinkFrom => false;
 		public override bool AllowHeldLiquidTransfer => true;
 
-		protected Cuboidf[] toolBoundingBoxes = null;
+		protected Cuboidf[] toolBoundingBoxes = null!;
 
 		public override void OnLoaded(ICoreAPI api)
 		{
@@ -26,7 +26,7 @@ namespace GlassMaking.Items
 
 		public Cuboidf[] GetToolBoundingBoxes(IWorldAccessor world, ItemStack itemStack)
 		{
-			return toolBoundingBoxes ?? (toolBoundingBoxes = Attributes?["workbenchToolBounds"].AsObject<Cuboidf[]>());
+			return toolBoundingBoxes ??= Attributes?["workbenchToolBounds"].AsObject<Cuboidf[]>()!;
 		}
 
 		public WorkbenchMountedToolBehavior CreateToolBehavior(IWorldAccessor world, ItemStack itemStack, BlockEntity blockentity)
@@ -39,7 +39,7 @@ namespace GlassMaking.Items
 			return BlowtorchToolBehavior.CODE;
 		}
 
-		public override FoodNutritionProperties GetNutritionProperties(IWorldAccessor world, ItemStack itemstack, Entity forEntity)
+		public override FoodNutritionProperties? GetNutritionProperties(IWorldAccessor world, ItemStack itemstack, Entity forEntity)
 		{
 			// disallow drink
 			return null;

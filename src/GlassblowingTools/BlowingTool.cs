@@ -9,7 +9,7 @@ namespace GlassMaking.GlassblowingTools
 	{
 		public double Priority => 2;
 
-		private string animation;
+		private string animation = default!;
 
 		public BlowingTool(CollectibleObject collObj) : base(collObj)
 		{
@@ -45,7 +45,7 @@ namespace GlassMaking.GlassblowingTools
 			{
 				if(step.ContinueStep())
 				{
-					float time = step.StepAttributes["time"].AsFloat(1);
+					float time = step.StepAttributes!["time"].AsFloat(1);
 					if(api.Side == EnumAppSide.Client)
 					{
 						step.SetProgress(Math.Max(secondsUsed - 1f, 0f) / time);

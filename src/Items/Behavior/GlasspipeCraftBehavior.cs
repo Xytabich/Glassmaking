@@ -7,8 +7,8 @@ namespace GlassMaking.Items.Behavior
 		/// <inheritdoc/>
 		public abstract double Priority { get; }
 
-		protected ICoreAPI api;
-		protected GlassMakingMod glassMaking;
+		protected ICoreAPI api = default!;
+		protected GlassMakingMod glassMaking = default!;
 		protected readonly ItemGlassworkPipe glassworkPipe;
 
 		public GlasspipeCraftBehavior(CollectibleObject collObj) : base(collObj)

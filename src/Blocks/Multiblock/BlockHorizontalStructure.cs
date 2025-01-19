@@ -10,15 +10,15 @@ namespace GlassMaking.Blocks.Multiblock
 	public class BlockHorizontalStructure : Block
 	{
 		//These values are provided by the main block
-		public Vec3i mainOffset = null;
+		public Vec3i mainOffset = default!;
 		public bool isSurrogate = false;
 
 		private int loadStep = 0;
 
-		protected Vec3i structureOffset = null;
-		protected internal Block[,,] structure = null;
+		protected Vec3i structureOffset = default!;
+		protected internal Block?[,,] structure = default!;
 
-		protected JsonItemStack handbookStack = null;
+		protected JsonItemStack? handbookStack = null;
 
 		public sealed override void OnLoaded(ICoreAPI api)
 		{
@@ -27,9 +27,9 @@ namespace GlassMaking.Blocks.Multiblock
 			if(Attributes != null && Attributes.KeyExists("structure"))
 			{
 				mainOffset = Vec3i.Zero;
-				var codes = Attributes["structure"].AsObject<Structure>(null, Code.Domain).GetRotated();
+				var codes = Attributes["structure"].AsObject<Structure>(null!, Code.Domain).GetRotated();
 				int sx = codes.GetLength(0), sy = codes.GetLength(1), sz = codes.GetLength(2);
-				structure = new Block[sx, sy, sz];
+				structure = new Block?[sx, sy, sz];
 				for(int x = 0; x < sx; x++)
 				{
 					for(int y = 0; y < sy; y++)
@@ -38,14 +38,14 @@ namespace GlassMaking.Blocks.Multiblock
 						{
 							if(codes[x, y, z] != null)
 							{
-								if(string.IsNullOrWhiteSpace(codes[x, y, z].Path))
+								if(string.IsNullOrWhiteSpace(codes[x, y, z]!.Path))
 								{
 									codes[x, y, z] = null;
 								}
 								else
 								{
 									structure[x, y, z] = api.World.GetBlock(codes[x, y, z]);
-									if(structure[x, y, z].Id == Id)
+									if(structure[x, y, z]!.Id == Id)
 									{
 										if(structureOffset != null)
 										{
@@ -99,7 +99,7 @@ namespace GlassMaking.Blocks.Multiblock
 			OnStepLoaded();
 		}
 
-		public override List<ItemStack> GetHandBookStacks(ICoreClientAPI capi)
+		public override List<ItemStack>? GetHandBookStacks(ICoreClientAPI capi)
 		{
 			if(isSurrogate)
 			{
@@ -112,7 +112,7 @@ namespace GlassMaking.Blocks.Multiblock
 			return base.GetHandBookStacks(capi);
 		}
 
-		public override ItemStack OnPickBlock(IWorldAccessor world, BlockPos pos)
+		public override ItemStack? OnPickBlock(IWorldAccessor world, BlockPos pos)
 		{
 			if(isSurrogate)
 			{
@@ -129,7 +129,7 @@ namespace GlassMaking.Blocks.Multiblock
 			}
 		}
 
-		public override ItemStack[] GetDrops(IWorldAccessor world, BlockPos pos, IPlayer byPlayer, float dropQuantityMultiplier = 1)
+		public override ItemStack[]? GetDrops(IWorldAccessor world, BlockPos pos, IPlayer byPlayer, float dropQuantityMultiplier = 1)
 		{
 			if(isSurrogate) return null;
 			var items = new List<ItemStack>(base.GetDrops(world, pos, byPlayer, dropQuantityMultiplier));
@@ -141,7 +141,7 @@ namespace GlassMaking.Blocks.Multiblock
 				{
 					for(int z = 0; z < sz; z++)
 					{
-						if(structure[x, y, z] == null || structure[x, y, z].Id == Id) continue;
+						if(structure[x, y, z] == null || structure[x, y, z]!.Id == Id) continue;
 
 						offset.Set(x + structureOffset.X, y + structureOffset.Y, z + structureOffset.Z);
 						var spos = pos.AddCopy(offset);
@@ -200,11 +200,11 @@ namespace GlassMaking.Blocks.Multiblock
 				{
 					for(int z = 0; z < sz; z++)
 					{
-						if(structure[x, y, z] == null || structure[x, y, z].Id == Id) continue;
+						if(structure[x, y, z] == null || structure[x, y, z]!.Id == Id) continue;
 
 						var sel = blockSel.Clone();
 						sel.Position = blockSel.Position.AddCopy(x + structureOffset.X, y + structureOffset.Y, z + structureOffset.Z);
-						if(!structure[x, y, z].CanPlaceBlock(world, byPlayer, sel, ref failureCode))
+						if(!structure[x, y, z]!.CanPlaceBlock(world, byPlayer, sel, ref failureCode))
 						{
 							return false;
 						}
@@ -228,12 +228,12 @@ namespace GlassMaking.Blocks.Multiblock
 					{
 						for(int z = 0; z < sz; z++)
 						{
-							if(structure[x, y, z] == null || structure[x, y, z].Id == Id) continue;
+							if(structure[x, y, z] == null || structure[x, y, z]!.Id == Id) continue;
 
 							sel.Position.SetAll(blockSel.Position);
 							sel.Position.Add(x + structureOffset.X, y + structureOffset.Y, z + structureOffset.Z);
 							var pos = sel.Position.Copy();
-							structure[x, y, z].DoPlaceBlock(world, byPlayer, sel, byItemStack);
+							structure[x, y, z]!.DoPlaceBlock(world, byPlayer, sel, byItemStack);
 							world.BlockAccessor.TriggerNeighbourBlockUpdate(pos);
 						}
 					}
@@ -271,7 +271,7 @@ namespace GlassMaking.Blocks.Multiblock
 					{
 						for(int z = 0; z < sz; z++)
 						{
-							if(structure[x, y, z] == null || structure[x, y, z].Id == Id) continue;
+							if(structure[x, y, z] == null || structure[x, y, z]!.Id == Id) continue;
 
 							offset.Set(x + structureOffset.X, y + structureOffset.Y, z + structureOffset.Z);
 							var spos = pos.AddCopy(offset);
@@ -338,7 +338,7 @@ namespace GlassMaking.Blocks.Multiblock
 					{
 						for(int z = 0; z < sz; z++)
 						{
-							if(structure[x, y, z] == null || structure[x, y, z].Id == Id) continue;
+							if(structure[x, y, z] == null || structure[x, y, z]!.Id == Id) continue;
 
 							offset.Set(x + structureOffset.X, y + structureOffset.Y, z + structureOffset.Z);
 							var spos = pos.AddCopy(offset);
@@ -438,7 +438,7 @@ namespace GlassMaking.Blocks.Multiblock
 			return pos;
 		}
 
-		public Block GetStructureBlock(Vec3i offset)
+		public Block? GetStructureBlock(Vec3i offset)
 		{
 			if(isSurrogate) throw new Exception("GetStructureBlock called on surrogate");
 			int x = offset.X - structureOffset.X;
@@ -490,7 +490,7 @@ namespace GlassMaking.Blocks.Multiblock
 		{
 			if(api.Side == EnumAppSide.Client)
 			{
-				handbookStack = Attributes?["handbookStack"].AsObject<JsonItemStack>(null, Code.Domain);
+				handbookStack = Attributes?["handbookStack"].AsObject<JsonItemStack?>(null, Code.Domain);
 				if(handbookStack != null)
 				{
 					if(!handbookStack.Resolve(api.World, "structure handbook stack"))
@@ -501,7 +501,7 @@ namespace GlassMaking.Blocks.Multiblock
 			}
 		}
 
-		protected virtual ItemStack[] GetSurrogateDrops(IWorldAccessor world, BlockPos pos, IPlayer byPlayer, float dropQuantityMultiplier = 1)
+		protected virtual ItemStack[] GetSurrogateDrops(IWorldAccessor world, BlockPos pos, IPlayer? byPlayer, float dropQuantityMultiplier = 1)
 		{
 			return base.GetDrops(world, pos, byPlayer, dropQuantityMultiplier);
 		}
@@ -531,17 +531,17 @@ namespace GlassMaking.Blocks.Multiblock
 		[JsonObject]
 		private class Structure
 		{
-			public AssetLocation[,,] codes = default;
+			public AssetLocation?[,,] codes = default!;
 			public int rotateY = default;
 
-			public AssetLocation[,,] GetRotated()
+			public AssetLocation?[,,] GetRotated()
 			{
 				switch(rotateY)
 				{
 					case 90:
 						{
 							int sx = codes.GetLength(0), sy = codes.GetLength(1), sz = codes.GetLength(2);
-							var arr = new AssetLocation[sz, sy, sx];
+							var arr = new AssetLocation?[sz, sy, sx];
 							sx--;
 							sy--;
 							sz--;
@@ -560,7 +560,7 @@ namespace GlassMaking.Blocks.Multiblock
 					case 180:
 						{
 							int sx = codes.GetLength(0), sy = codes.GetLength(1), sz = codes.GetLength(2);
-							var arr = new AssetLocation[sx, sy, sz];
+							var arr = new AssetLocation?[sx, sy, sz];
 							sx--;
 							sy--;
 							sz--;
@@ -579,7 +579,7 @@ namespace GlassMaking.Blocks.Multiblock
 					case 270:
 						{
 							int sx = codes.GetLength(0), sy = codes.GetLength(1), sz = codes.GetLength(2);
-							var arr = new AssetLocation[sz, sy, sx];
+							var arr = new AssetLocation?[sz, sy, sx];
 							for(int x = 0; x < sx; x++)
 							{
 								for(int y = 0; y < sy; y++)

@@ -5,6 +5,6 @@ namespace GlassMaking.GenericItemAction
 {
 	public interface IGenericHeldItemAction
 	{
-		bool GenericHeldItemAction(IPlayer player, string action, ITreeAttribute attributes);
+		bool GenericHeldItemAction(IPlayer player, string action, ITreeAttribute? attributes);
 	}
 }

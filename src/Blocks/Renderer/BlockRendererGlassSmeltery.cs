@@ -16,7 +16,7 @@ namespace GlassMaking.Blocks
 		private BlockPos pos;
 		private ICoreClientAPI api;
 
-		private MeshRef meshRef = null;
+		private MeshRef? meshRef = null;
 
 		private float percent = 0;
 		private float height = 0;

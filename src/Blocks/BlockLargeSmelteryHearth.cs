@@ -9,14 +9,14 @@ namespace GlassMaking.Blocks
 {
 	public class BlockLargeSmelteryHearth : BlockHorizontalStructure
 	{
-		private WorldInteraction[] interactions;
+		private WorldInteraction[] interactions = default!;
 
 		protected override void OnStructureLoaded()
 		{
 			base.OnStructureLoaded();
 
 			if(api.Side != EnumAppSide.Client) return;
-			interactions = BlockGlassSmeltery.GetSmelteryInteractions(api as ICoreClientAPI, "glassmaking:blockhelp-largesmeltery", GetMatchingBlends);
+			interactions = BlockGlassSmeltery.GetSmelteryInteractions((ICoreClientAPI)api, "glassmaking:blockhelp-largesmeltery", GetMatchingBlends);
 		}
 
 		public override bool OnBlockInteractStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)
@@ -32,7 +32,7 @@ namespace GlassMaking.Blocks
 					{
 						if(world.Side == EnumAppSide.Client)
 						{
-							(byPlayer as IClientPlayer).TriggerFpAnimation(EnumHandInteract.HeldItemInteract);
+							(byPlayer as IClientPlayer)?.TriggerFpAnimation(EnumHandInteract.HeldItemInteract);
 						}
 						return true;
 					}
@@ -60,7 +60,7 @@ namespace GlassMaking.Blocks
 			return interactions.Append(base.GetPlacedBlockInteractionHelp(world, selection, forPlayer));
 		}
 
-		private ItemStack[] GetMatchingBlends(WorldInteraction wi, BlockSelection blockSelection, EntitySelection entitySelection)
+		private ItemStack[]? GetMatchingBlends(WorldInteraction wi, BlockSelection blockSelection, EntitySelection entitySelection)
 		{
 			if(wi.Itemstacks.Length == 0) return null;
 			var be = api.World.BlockAccessor.GetBlockEntity(blockSelection.Position) as BlockEntityLargeSmelteryHearth;
@@ -71,7 +71,7 @@ namespace GlassMaking.Blocks
 			List<ItemStack> list = new List<ItemStack>();
 			foreach(var stack in wi.Itemstacks)
 			{
-				var blend = GlassBlend.FromJson(stack);
+				var blend = GlassBlend.FromJson(stack)!;
 				if(blend.Code.Equals(code) && blend.Amount * stack.StackSize <= canAddAmount)
 				{
 					list.Add(stack);

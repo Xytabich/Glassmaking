@@ -12,7 +12,7 @@ namespace GlassMaking.Common
 		public const string PROPERTY_NAME = "glassmaking:glassblend";
 
 		[JsonProperty(Required = Required.DisallowNull)]
-		public AssetLocation Code;
+		public AssetLocation Code = default!;
 		[JsonProperty(Required = Required.Always)]
 		public int Amount;
 
@@ -37,19 +37,19 @@ namespace GlassMaking.Common
 			return code.Clone().WithPathPrefixOnce("glassblend-").ToString();
 		}
 
-		public static GlassBlend FromTreeAttributes(ITreeAttribute tree)
+		public static GlassBlend? FromTreeAttributes(ITreeAttribute tree)
 		{
 			if(tree == null) return null;
 			return new GlassBlend(new AssetLocation(tree.GetString("code")), tree.GetInt("amount"));
 		}
 
-		public static GlassBlend FromJson(CollectibleObject collectible)
+		public static GlassBlend? FromJson(CollectibleObject collectible)
 		{
 			if(collectible.Attributes == null) return null;
-			return collectible.Attributes[PROPERTY_NAME].AsObject<GlassBlend>(null, collectible.Code.Domain);
+			return collectible.Attributes[PROPERTY_NAME].AsObject<GlassBlend?>(null, collectible.Code.Domain);
 		}
 
-		public static GlassBlend FromJson(ItemStack stack)
+		public static GlassBlend? FromJson(ItemStack stack)
 		{
 			return FromJson(stack.Collectible);
 		}

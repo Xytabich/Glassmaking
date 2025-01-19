@@ -8,8 +8,8 @@ namespace GlassMaking.Blocks
 		public float FuelRateModifier => smelteryCore?.FuelRateModifier ?? 1;
 		public float TemperatureModifier => smelteryCore?.TemperatureModifier ?? 1;
 
-		private BlockEntityLargeSmelteryCore smelteryCore = null;
-		private ITimeBasedHeatSourceControl heatSource = null;
+		private BlockEntityLargeSmelteryCore? smelteryCore = null;
+		private ITimeBasedHeatSourceControl? heatSource = null;
 
 		public override void Initialize(ICoreAPI api)
 		{
@@ -22,7 +22,7 @@ namespace GlassMaking.Blocks
 			return smelteryCore?.TryAdd(byPlayer, slot, multiplier) ?? false;
 		}
 
-		public void GetGlassFillState(out int canAddAmount, out AssetLocation code)
+		public void GetGlassFillState(out int canAddAmount, out AssetLocation? code)
 		{
 			if(smelteryCore == null)
 			{
@@ -50,13 +50,13 @@ namespace GlassMaking.Blocks
 		}
 
 		// Used if Initialize is called at different times, or the core block is unloaded or loaded in a neighboring chunk
-		public void OnCoreUpdated(BlockEntityLargeSmelteryCore smelteryCore)
+		public void OnCoreUpdated(BlockEntityLargeSmelteryCore? smelteryCore)
 		{
 			this.smelteryCore = smelteryCore;
 			smelteryCore?.SetHeater(BlockFacing.FromCode(Block.Variant["side"]).HorizontalAngleIndex, heatSource);
 		}
 
-		void ITimeBasedHeatReceiver.SetHeatSource(ITimeBasedHeatSourceControl heatSource)
+		void ITimeBasedHeatReceiver.SetHeatSource(ITimeBasedHeatSourceControl? heatSource)
 		{
 			this.heatSource = heatSource;
 			smelteryCore?.SetHeater(BlockFacing.FromCode(Block.Variant["side"]).HorizontalAngleIndex, heatSource);
@@ -77,19 +77,19 @@ namespace GlassMaking.Blocks
 			return smelteryCore?.GetGlassAmount() ?? 0;
 		}
 
-		AssetLocation IGlassmeltSource.GetGlassCode()
+		AssetLocation? IGlassmeltSource.GetGlassCode()
 		{
 			return smelteryCore?.GetGlassCode();
 		}
 
 		void IGlassmeltSource.RemoveGlass(int amount)
 		{
-			smelteryCore.RemoveGlass(amount);
+			smelteryCore!.RemoveGlass(amount);
 		}
 
-		void IGlassmeltSource.SpawnMeltParticles(IWorldAccessor world, BlockSelection blockSel, IPlayer byPlayer, float quantity)
+		void IGlassmeltSource.SpawnMeltParticles(IWorldAccessor world, BlockSelection blockSel, IPlayer? byPlayer, float quantity)
 		{
-			smelteryCore.SpawnMeltParticles(world, blockSel, byPlayer, quantity);
+			smelteryCore!.SpawnMeltParticles(world, blockSel, byPlayer, quantity);
 		}
 	}
 }

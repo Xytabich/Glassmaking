@@ -9,13 +9,13 @@ namespace GlassMaking.Blocks
 
 		public int RenderRange => 24;
 
-		private TextureAtlasPosition unlitTexture, litTexture;
-		private Matrixf ModelMat = new Matrixf();
+		private readonly TextureAtlasPosition unlitTexture, litTexture;
+		private readonly Matrixf modelMat = new Matrixf();
 
-		private BlockPos pos;
-		private ICoreClientAPI api;
+		private readonly BlockPos pos;
+		private readonly ICoreClientAPI api;
 
-		private MeshRef meshRef = null;
+		private MeshRef? meshRef = null;
 
 		private int contentHeight = 0;
 
@@ -63,7 +63,7 @@ namespace GlassMaking.Blocks
 				IRenderAPI render = api.Render;
 				Vec3d cameraPos = api.World.Player.Entity.CameraPos;
 				render.BindTexture2d(isBurning ? litTexture.atlasTextureId : unlitTexture.atlasTextureId);
-				standardShaderProgram.ModelMatrix = ModelMat.Identity().Translate((0.5f + pos.X) - cameraPos.X, pos.Y - cameraPos.Y + contentHeight / 48f, (0.5f + pos.Z) - cameraPos.Z).Values;
+				standardShaderProgram.ModelMatrix = modelMat.Identity().Translate((0.5f + pos.X) - cameraPos.X, pos.Y - cameraPos.Y + contentHeight / 48f, (0.5f + pos.Z) - cameraPos.Z).Values;
 				standardShaderProgram.ViewMatrix = render.CameraMatrixOriginf;
 				standardShaderProgram.ProjectionMatrix = render.CurrentProjectionMatrix;
 				render.RenderMesh(meshRef);

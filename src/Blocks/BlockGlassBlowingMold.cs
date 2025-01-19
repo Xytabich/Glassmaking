@@ -1,4 +1,5 @@
 ﻿using GlassMaking.Items;
+using System;
 using System.Collections.Generic;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
@@ -9,9 +10,9 @@ namespace GlassMaking.Blocks
 {
 	public class BlockGlassBlowingMold : Block, IGlassBlowingMold
 	{
-		public BlowingMoldRecipe[] Recipes = null;
+		public BlowingMoldRecipe[] Recipes = default!;
 
-		private WorldInteraction[] interactions;
+		private WorldInteraction[] interactions = default!;
 
 		public override void OnLoaded(ICoreAPI api)
 		{
@@ -24,7 +25,8 @@ namespace GlassMaking.Blocks
 
 				var tmpList = new List<BlowingMoldRecipe>();
 				var attrib = Attributes["glassmaking:glassmold"];
-				foreach(var recipe in (attrib.IsArray() ? attrib.AsObject<BlowingMoldRecipe[]>(null, Code.Domain) : new BlowingMoldRecipe[] { attrib.AsObject<BlowingMoldRecipe>(null, Code.Domain) }))
+				foreach(var recipe in (attrib.IsArray() ? attrib.AsObject<BlowingMoldRecipe[]>(null!, Code.Domain)
+					: new BlowingMoldRecipe[] { attrib.AsObject<BlowingMoldRecipe>(null!, Code.Domain) }))
 				{
 					if(recipe != null && recipe.Enabled)
 					{
@@ -160,7 +162,7 @@ namespace GlassMaking.Blocks
 			var items = base.GetDrops(world, pos, byPlayer, dropQuantityMultiplier);
 			if(items == null) items = new ItemStack[0];
 			var be = world.BlockAccessor.GetBlockEntity(pos) as BlockEntityGlassBlowingMold;
-			if(be != null) items = items.Append(be.GetDropItems() ?? new ItemStack[0]);
+			if(be != null) items = items.Append(be.GetDropItems() ?? Array.Empty<ItemStack>());
 			return items;
 		}
 

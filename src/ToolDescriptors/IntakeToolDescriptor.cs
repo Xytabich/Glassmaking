@@ -43,7 +43,7 @@ namespace GlassMaking.ToolDescriptors
 		{
 			var step = recipe.Steps[stepIndex];
 			outComponents.Add(new RichTextComponent(capi, "• " + Lang.Get("glassmaking:Step {0}: {1}", stepIndex + 1,
-				Lang.Get("glassmaking:Take {0} units of {1} glass", step.Attributes["amount"].AsInt(),
+				Lang.Get("glassmaking:Take {0} units of {1} glass", step.Attributes!["amount"].AsInt(),
 				Lang.Get(GlassBlend.GetBlendNameCode(new AssetLocation(step.Attributes["code"].AsString()))))) + "\n", CairoFont.WhiteSmallText()));
 
 			outComponents.Add(new SlideshowItemstackTextComponent(capi, items, 40.0, EnumFloat.Inline,
@@ -54,7 +54,7 @@ namespace GlassMaking.ToolDescriptors
 		public override void GetStepInfoForHeldItem(IWorldAccessor world, ItemStack item, GlassBlowingRecipe recipe, int stepIndex, StringBuilder dsc, bool withDebugInfo)
 		{
 			var step = recipe.Steps[stepIndex];
-			dsc.AppendLine("• " + Lang.Get("glassmaking:Take {0} units of {1} glass", step.Attributes["amount"].AsInt(),
+			dsc.AppendLine("• " + Lang.Get("glassmaking:Take {0} units of {1} glass", step.Attributes!["amount"].AsInt(),
 				Lang.Get(GlassBlend.GetBlendNameCode(new AssetLocation(step.Attributes["code"].AsString())))));
 		}
 
@@ -72,7 +72,7 @@ namespace GlassMaking.ToolDescriptors
 			{
 				if(toolCodes.Contains(steps[i].Tool))
 				{
-					var info = mod.GetGlassTypeInfo(new AssetLocation(steps[i].Attributes["code"].AsString()));
+					var info = mod.GetGlassTypeInfo(new AssetLocation(steps[i].Attributes!["code"].AsString()));
 					temperature = Math.Max((info?.MeltingPoint ?? 0) * 0.8f, temperature);
 				}
 			}
@@ -88,7 +88,7 @@ namespace GlassMaking.ToolDescriptors
 				int intake = itemStack.Attributes.GetInt("glassmaking:toolIntakeAmount", 0);
 				if(intake > 0)
 				{
-					amountByCode[steps[currentStepIndex].Attributes["code"].AsString()] = intake;
+					amountByCode[steps[currentStepIndex].Attributes!["code"].AsString()] = intake;
 				}
 			}
 
@@ -96,9 +96,9 @@ namespace GlassMaking.ToolDescriptors
 			{
 				if(toolCodes.Contains(steps[i].Tool))
 				{
-					var code = steps[i].Attributes["code"].AsString();
+					var code = steps[i].Attributes!["code"].AsString();
 					if(!amountByCode.TryGetValue(code, out var amount)) amount = 0;
-					amountByCode[code] = amount + steps[i].Attributes["amount"].AsInt();
+					amountByCode[code] = amount + steps[i].Attributes!["amount"].AsInt();
 				}
 			}
 			if(amountByCode.Count == 0) return;

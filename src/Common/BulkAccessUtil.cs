@@ -2,10 +2,10 @@
 
 namespace GlassMaking
 {
-	internal struct BulkAccessUtil
+	internal readonly struct BulkAccessUtil
 	{
-		private IBulkBlockAccessor blockAccessor;
-		private bool readFromStagedByDefault;
+		private readonly IBulkBlockAccessor blockAccessor;
+		private readonly bool readFromStagedByDefault;
 
 		private BulkAccessUtil(IBulkBlockAccessor blockAccessor, bool readFromStagedByDefault)
 		{
@@ -13,7 +13,7 @@ namespace GlassMaking
 			this.readFromStagedByDefault = readFromStagedByDefault;
 		}
 
-		public void RollbackValue()
+		public readonly void RollbackValue()
 		{
 			blockAccessor.ReadFromStagedByDefault = readFromStagedByDefault;
 		}

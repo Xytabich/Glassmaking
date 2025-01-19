@@ -1,4 +1,5 @@
-﻿using Vintagestory.API.Client;
+﻿using System.Diagnostics.CodeAnalysis;
+using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
 
@@ -75,7 +76,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 			}
 		}
 
-		public override WorldInteraction[] GetBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer, WorkbenchRecipe recipe, int step)
+		public override WorldInteraction[]? GetBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer, WorkbenchRecipe? recipe, int step)
 		{
 			if(recipe != null && recipe.Steps[step].Tools.TryGetValue(ToolCode, out var json))
 			{
@@ -91,9 +92,9 @@ namespace GlassMaking.Workbench.ToolBehaviors
 			return base.GetBlockInteractionHelp(world, selection, forPlayer, recipe, step);
 		}
 
-		private bool TryGetIngredient(IWorldAccessor world, JsonObject json, AssetLocation recipeCode, out CraftingRecipeIngredient ingredient)
+		private bool TryGetIngredient(IWorldAccessor world, JsonObject? json, AssetLocation recipeCode, [NotNullWhen(true)] out CraftingRecipeIngredient? ingredient)
 		{
-			ingredient = json?.AsObject<CraftingRecipeIngredient>(null, recipeCode.Domain);
+			ingredient = json?.AsObject<CraftingRecipeIngredient?>(null, recipeCode.Domain);
 			if(ingredient == null)
 			{
 				world.Logger.Log(EnumLogType.Warning, "Unable to use item in workbench recipe '{0}' because json is malformed", recipeCode);
@@ -102,9 +103,9 @@ namespace GlassMaking.Workbench.ToolBehaviors
 			return ingredient.Resolve(world, "workbench recipe item");
 		}
 
-		private bool TryGetItemSlot(IPlayer byPlayer, CraftingRecipeIngredient required, out ItemSlot slot)
+		private bool TryGetItemSlot(IPlayer byPlayer, CraftingRecipeIngredient required, [NotNullWhen(true)] out ItemSlot? slot)
 		{
-			ItemStack item;
+			ItemStack? item;
 			if(isOther)
 			{
 				slot = byPlayer.Entity?.RightHandItemSlot;

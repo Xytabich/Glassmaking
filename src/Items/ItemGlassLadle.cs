@@ -12,15 +12,15 @@ namespace GlassMaking.Items
 {
 	public class ItemGlassLadle : ItemGlassContainer
 	{
-		public ModelTransform glassTransform;
+		public ModelTransform GlassTransform = default!;
 		public int maxGlassAmount;
 
-		private GlassMakingMod mod;
+		private GlassMakingMod mod = default!;
 		private int amountThreshold;
-		private WorldInteraction[] interactions;
+		private WorldInteraction[] interactions = default!;
 
-		private string pourAnimation;
-		private string takeAnimation;
+		private string pourAnimation = default!;
+		private string takeAnimation = default!;
 		private float pourAnimationPrepare;
 
 		public override void OnLoaded(ICoreAPI api)
@@ -35,8 +35,8 @@ namespace GlassMaking.Items
 
 			if(api.Side == EnumAppSide.Client)
 			{
-				glassTransform = Attributes["glassTransform"].AsObject<ModelTransform>();
-				glassTransform.EnsureDefaultValues();
+				GlassTransform = Attributes["glassTransform"].AsObject<ModelTransform>();
+				GlassTransform.EnsureDefaultValues();
 
 				interactions = new WorldInteraction[] {
 					new WorldInteraction() {
@@ -121,11 +121,7 @@ namespace GlassMaking.Items
 									byEntity.World.RegisterCallback((world, pos, dt) => {
 										if(byEntity.Controls.HandUse == EnumHandInteract.HeldItemInteract)
 										{
-											IPlayer dualCallByPlayer = null;
-											if(byEntity is EntityPlayer)
-											{
-												dualCallByPlayer = byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID);
-											}
+											var dualCallByPlayer = Utils.GetPlayerFromEntity(byEntity);
 											world.PlaySoundAt(new AssetLocation("sounds/sizzle"), byEntity, dualCallByPlayer);
 										}
 									}, blockSel.Position, 666);
@@ -149,7 +145,7 @@ namespace GlassMaking.Items
 					{
 						int amount = source.GetGlassAmount();
 						bool isTooCold = false;
-						if(amount > amountThreshold && CanTakeGlass(byEntity.World, itemstack, source.GetGlassCode(), out isTooCold))
+						if(amount > amountThreshold && CanTakeGlass(byEntity.World, itemstack, source.GetGlassCode()!, out isTooCold))
 						{
 							handling = EnumHandHandling.PreventDefault;
 							byEntity.StartAnimation(takeAnimation);
@@ -233,8 +229,7 @@ namespace GlassMaking.Items
 										glassmelt.SetInt("amount", amount);
 									}
 
-									IPlayer byPlayer = null;
-									if(byEntity is EntityPlayer) byPlayer = byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID);
+									var byPlayer = Utils.GetPlayerFromEntity(byEntity);
 									// Smoke on the mold
 									Vec3d blockpos = blockSel.Position.ToVec3d().Add(0.5, 0.2, 0.5);
 									float y2 = 0;
@@ -271,7 +266,7 @@ namespace GlassMaking.Items
 					bool glassFlag = itemstack.TempAttributes.HasAttribute("glassmaking:glassFlag");
 
 					int amount = source.GetGlassAmount();
-					if(glassFlag || amount > amountThreshold && CanTakeGlass(byEntity.World, itemstack, source.GetGlassCode(), out _))
+					if(glassFlag || amount > amountThreshold && CanTakeGlass(byEntity.World, itemstack, source.GetGlassCode()!, out _))
 					{
 						const float useTime = 3f;
 						const float addTime = 1.5f;
@@ -281,7 +276,7 @@ namespace GlassMaking.Items
 							{
 								itemstack.TempAttributes.SetBool("glassmaking:glassFlag", true);
 
-								AddGlass(byEntity, slot, amount - amountThreshold, source.GetGlassCode(), source.GetTemperature(), out int consumed);
+								AddGlass(byEntity, slot, amount - amountThreshold, source.GetGlassCode()!, source.GetTemperature(), out int consumed);
 								source.RemoveGlass(consumed);
 								slot.MarkDirty();
 							}
@@ -292,8 +287,7 @@ namespace GlassMaking.Items
 						}
 						if(secondsUsed > 1f)
 						{
-							IPlayer byPlayer = null;
-							if(byEntity is EntityPlayer) byPlayer = byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID);
+							var byPlayer = Utils.GetPlayerFromEntity(byEntity);
 							source.SpawnMeltParticles(byEntity.World, blockSel, byPlayer);
 						}
 						return true;
@@ -397,7 +391,7 @@ namespace GlassMaking.Items
 			var glassmelt = item.Attributes.GetTreeAttribute("glassmelt");
 			if(glassmelt == null) return 0;
 
-			return mod.GetGlassTypeInfo(new AssetLocation(glassmelt.GetString("code"))).MeltingPoint;
+			return mod.GetGlassTypeInfo(new AssetLocation(glassmelt.GetString("code")))!.MeltingPoint;
 		}
 
 		private bool CanTakeGlass(IWorldAccessor world, ItemStack itemStack, AssetLocation code, out bool isTooCold)

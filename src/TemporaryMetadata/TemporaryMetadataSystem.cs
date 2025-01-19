@@ -7,8 +7,8 @@ namespace GlassMaking.TemporaryMetadata
 {
 	public class TemporaryMetadataSystem : ModSystem
 	{
-		private ICoreClientAPI capi = null;
-		private List<ITemporaryMetadataPool> pools = null;
+		private ICoreClientAPI? capi = null;
+		private List<ITemporaryMetadataPool>? pools = null;
 		private long tickListenerId;
 
 		public override void StartClientSide(ICoreClientAPI api)
@@ -55,7 +55,7 @@ namespace GlassMaking.TemporaryMetadata
 
 		private class TmpPool<T> : ITemporaryMetadataPool<T>, ITemporaryMetadataPool where T : IDisposable
 		{
-			private TimeSpan keepTime;
+			private readonly TimeSpan keepTime;
 
 			private Queue<Handle> queue = new Queue<Handle>();
 
@@ -70,7 +70,7 @@ namespace GlassMaking.TemporaryMetadata
 				{
 					handle.Dispose(true);
 				}
-				queue = null;
+				queue = null!;
 			}
 
 			IDisposableHandle ITemporaryMetadataPool<T>.AllocateHandle(T disposable)

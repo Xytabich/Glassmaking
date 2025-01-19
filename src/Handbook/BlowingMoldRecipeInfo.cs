@@ -13,12 +13,12 @@ namespace GlassMaking.Handbook
 	{
 		public BlowingMoldRecipeInfo()
 		{
-			HandbookItemInfoEvent.onGetHandbookInfo += GetHandbookInfo;
+			HandbookItemInfoEvent.OnGetHandbookInfo += GetHandbookInfo;
 		}
 
 		public void Dispose()
 		{
-			HandbookItemInfoEvent.onGetHandbookInfo -= GetHandbookInfo;
+			HandbookItemInfoEvent.OnGetHandbookInfo -= GetHandbookInfo;
 		}
 
 		private void GetHandbookInfo(ItemSlot inSlot, ICoreClientAPI capi, ItemStack[] allStacks, ActionConsumable<string> openDetailPageFor, HandbookItemInfoSection section, List<RichTextComponentBase> outComponents)

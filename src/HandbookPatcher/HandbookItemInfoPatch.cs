@@ -16,7 +16,7 @@ namespace GlassMaking
 		{
 			var insts = new List<CodeInstruction>(instructions);
 			var body = original.GetMethodBody();
-			var locals = body.LocalVariables;
+			var locals = body!.LocalVariables;
 
 			const BindingFlags flags = BindingFlags.Instance | BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.NonPublic;
 			var addGeneralInfoMethod = typeof(CollectibleBehaviorHandbookTextAndExtraInfo).GetMethod("addGeneralInfo", flags);
@@ -86,7 +86,7 @@ namespace GlassMaking
 			index++;
 			insts.Insert(index, new CodeInstruction(OpCodes.Ldloc, listLocIndex));
 			index++;
-			insts.Insert(index, CodeInstruction.Call(() => HandbookItemInfoEvent.GetHandbookInfo(default, default, default, default, default, default)));
+			insts.Insert(index, CodeInstruction.Call(() => HandbookItemInfoEvent.GetHandbookInfo(default!, default!, default!, default!, default, default!)));
 			index++;
 		}
 	}

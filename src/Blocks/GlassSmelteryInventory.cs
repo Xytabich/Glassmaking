@@ -19,11 +19,11 @@ namespace GlassMaking.Blocks
 		{
 		}
 
-		public GlassSmelteryInventory(string inventoryID, ICoreAPI api) : base(inventoryID, api)
+		public GlassSmelteryInventory(string? inventoryID, ICoreAPI? api) : base(inventoryID, api)
 		{
 		}
 
-		public override ItemSlot this[int slotId]
+		public override ItemSlot? this[int slotId]
 		{
 			get
 			{
@@ -105,12 +105,12 @@ namespace GlassMaking.Blocks
 			tree["slots"] = treeAttribute;
 		}
 
-		public override ItemSlot GetAutoPullFromSlot(BlockFacing atBlockFace)
+		public override ItemSlot? GetAutoPullFromSlot(BlockFacing atBlockFace)
 		{
 			return null;
 		}
 
-		public override ItemSlot GetAutoPushIntoSlot(BlockFacing atBlockFace, ItemSlot fromSlot)
+		public override ItemSlot? GetAutoPushIntoSlot(BlockFacing atBlockFace, ItemSlot fromSlot)
 		{
 			return null;
 		}

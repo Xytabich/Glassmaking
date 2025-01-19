@@ -9,16 +9,16 @@ namespace GlassMaking.Blocks.Renderer
 
 		public int RenderRange => 16;
 
-		Matrixf IWorkpieceRenderer.itemTransform => itemMat;
+		Matrixf IWorkpieceRenderer.ItemTransform => itemMat;
 
-		private ICoreClientAPI api;
+		private readonly ICoreClientAPI api;
 
-		private BlockPos pos;
-		private float rotation;
+		private readonly BlockPos pos;
+		private readonly float rotation;
 
-		private ItemRenderInfo renderInfo = null;
-		private Matrixf modelMat = new Matrixf();
-		private Matrixf itemMat = new Matrixf().Identity();
+		private ItemRenderInfo? renderInfo = null;
+		private readonly Matrixf modelMat = new Matrixf();
+		private readonly Matrixf itemMat = new Matrixf().Identity();
 
 		public WorkbenchWorkpieceRenderer(ICoreClientAPI api, BlockPos pos, float rotation)
 		{
@@ -28,7 +28,7 @@ namespace GlassMaking.Blocks.Renderer
 			api.Event.RegisterRenderer(this, EnumRenderStage.Opaque, "glassmaking:workpiece");
 		}
 
-		public void SetItemRenderInfo(ItemRenderInfo renderInfo)
+		public void SetItemRenderInfo(ItemRenderInfo? renderInfo)
 		{
 			this.renderInfo = renderInfo;
 		}

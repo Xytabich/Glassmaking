@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
@@ -9,6 +10,6 @@ namespace GlassMaking
 	{
 		bool PreventRecipeAssignment(IClientPlayer player, ItemStack item);
 
-		bool TryGetRecipeOutputs(IClientPlayer player, ItemStack item, out KeyValuePair<IAttribute, ItemStack>[] recipeOutputs);
+		bool TryGetRecipeOutputs(IClientPlayer player, ItemStack item, [NotNullWhen(true)] out KeyValuePair<IAttribute, ItemStack>[]? recipeOutputs);
 	}
 }

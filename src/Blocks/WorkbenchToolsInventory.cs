@@ -19,7 +19,7 @@ namespace GlassMaking.Blocks
 		private readonly int toolsCount;
 		private readonly IAttribute?[] cachedAttributes;
 
-		public WorkbenchToolsInventory(int quantitySlots, string className, string instanceID, ICoreAPI api, BlockEntity blockentity) : base(className, instanceID, api)
+		public WorkbenchToolsInventory(int quantitySlots, string className, string instanceID, ICoreAPI? api, BlockEntity blockentity) : base(className, instanceID, api)
 		{
 			this.blockentity = blockentity;
 			slots = GenEmptySlots(quantitySlots);
@@ -28,7 +28,7 @@ namespace GlassMaking.Blocks
 			behaviors = new WorkbenchMountedToolBehavior[toolsCount];
 		}
 
-		public WorkbenchToolsInventory(int quantitySlots, string inventoryID, ICoreAPI api, BlockEntity blockentity) : base(inventoryID, api)
+		public WorkbenchToolsInventory(int quantitySlots, string inventoryID, ICoreAPI? api, BlockEntity blockentity) : base(inventoryID, api)
 		{
 			this.blockentity = blockentity;
 			slots = GenEmptySlots(quantitySlots);
@@ -62,7 +62,7 @@ namespace GlassMaking.Blocks
 			return behaviors[slotId];
 		}
 
-		public void SetItem(int slotId, ItemStack itemStack)
+		public void SetItem(int slotId, ItemStack? itemStack)
 		{
 			if(behaviors[slotId] != null)
 			{

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Diagnostics.CodeAnalysis;
+using Newtonsoft.Json;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
@@ -43,20 +44,20 @@ namespace GlassMaking.Workbench.ToolBehaviors
 
 			if(TryGetItemSlot(byPlayer, ingredient, out var slot, out var source))
 			{
-				int quantity = (int)(source.GetContentProps(slot.Itemstack).ItemsPerLitre * ingredient.requiresLitres);
+				int quantity = (int)(source.GetContentProps(slot.Itemstack).ItemsPerLitre * ingredient.RequiresLitres);
 				source.TryTakeContent(slot.Itemstack, quantity);
 				slot.MarkDirty();
 			}
 		}
 
-		public override WorldInteraction[] GetBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer, WorkbenchRecipe recipe, int step)
+		public override WorldInteraction[]? GetBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer, WorkbenchRecipe? recipe, int step)
 		{
 			if(recipe != null && recipe.Steps[step].Tools.TryGetValue(ToolCode, out var json))
 			{
 				if(TryGetIngredient(world, json, recipe.Code, out var ingredient))
 				{
-					var itemStack = ingredient.type == EnumItemClass.Item ? new ItemStack(world.GetItem(ingredient.code)) : new ItemStack(world.GetBlock(ingredient.code));
-					itemStack.StackSize = (int)(BlockLiquidContainerBase.GetContainableProps(itemStack).ItemsPerLitre * ingredient.requiresLitres);
+					var itemStack = ingredient.Type == EnumItemClass.Item ? new ItemStack(world.GetItem(ingredient.Code)) : new ItemStack(world.GetBlock(ingredient.Code));
+					itemStack.StackSize = (int)(BlockLiquidContainerBase.GetContainableProps(itemStack).ItemsPerLitre * ingredient.RequiresLitres);
 					return new WorldInteraction[] { new WorldInteraction() {
 						Itemstacks = new ItemStack[] { itemStack },
 						MouseButton = EnumMouseButton.Right,
@@ -67,9 +68,9 @@ namespace GlassMaking.Workbench.ToolBehaviors
 			return base.GetBlockInteractionHelp(world, selection, forPlayer, recipe, step);
 		}
 
-		private bool TryGetIngredient(IWorldAccessor world, JsonObject json, AssetLocation recipeCode, out RequiredLiquid ingredient)
+		private bool TryGetIngredient(IWorldAccessor world, JsonObject? json, AssetLocation recipeCode, [NotNullWhen(true)] out RequiredLiquid? ingredient)
 		{
-			ingredient = json?.AsObject<RequiredLiquid>(null, recipeCode.Domain);
+			ingredient = json?.AsObject<RequiredLiquid?>(null, recipeCode.Domain);
 			if(ingredient == null)
 			{
 				world.Logger.Log(EnumLogType.Warning, "Unable to use liquid in workbench recipe '{0}' because json is malformed", recipeCode);
@@ -78,16 +79,16 @@ namespace GlassMaking.Workbench.ToolBehaviors
 			return true;
 		}
 
-		private bool TryGetItemSlot(IPlayer byPlayer, RequiredLiquid required, out ItemSlot slot, out ILiquidSource source)
+		private bool TryGetItemSlot(IPlayer byPlayer, RequiredLiquid required, [NotNullWhen(true)] out ItemSlot? slot, [NotNullWhen(true)] out ILiquidSource? source)
 		{
 			slot = byPlayer.InventoryManager?.ActiveHotbarSlot;
 			var item = slot?.Itemstack;
 			if(item != null && (source = item.Collectible as ILiquidSource) != null)
 			{
 				var content = source.GetContent(item);
-				if(content != null && content.Collectible.Code.Equals(required.code) && content.Class == required.type)
+				if(content != null && content.Collectible.Code.Equals(required.Code) && content.Class == required.Type)
 				{
-					return source.GetCurrentLitres(item) >= required.requiresLitres;
+					return source.GetCurrentLitres(item) >= required.RequiresLitres;
 				}
 			}
 
@@ -100,12 +101,12 @@ namespace GlassMaking.Workbench.ToolBehaviors
 		public sealed class RequiredLiquid
 		{
 			[JsonProperty(Required = Required.Always)]
-			public AssetLocation code;
+			public AssetLocation Code = default!;
 
-			public EnumItemClass type = EnumItemClass.Item;
+			public EnumItemClass Type = EnumItemClass.Item;
 
 			[JsonProperty(Required = Required.Always)]
-			public float requiresLitres;
+			public float RequiresLitres;
 		}
 	}
 }

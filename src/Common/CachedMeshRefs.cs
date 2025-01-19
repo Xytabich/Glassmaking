@@ -21,7 +21,7 @@ namespace GlassMaking.Common
 			if(containers.TryGetValue(key, out var container))
 			{
 				container.Postpone();
-				handle = new RefHandle(container.meshRef, container);
+				handle = new RefHandle(container.MeshRef, container);
 				return true;
 			}
 
@@ -38,7 +38,7 @@ namespace GlassMaking.Common
 			}
 
 			container = new RefContainer(this, key, meshRef);
-			container.tmpHandle = pool.AllocateHandle(container);
+			container.TmpHandle = pool.AllocateHandle(container);
 			containers[key] = container;
 
 			return new RefHandle(meshRef, container);
@@ -46,35 +46,35 @@ namespace GlassMaking.Common
 
 		internal class RefContainer : IDisposable
 		{
-			internal IDisposableHandle tmpHandle;
-			internal MultiTextureMeshRef meshRef;
+			internal IDisposableHandle TmpHandle = default!;
+			internal MultiTextureMeshRef MeshRef;
 			internal object key;
 
-			private CachedMeshRefs manager;
+			private readonly CachedMeshRefs manager;
 
 			public RefContainer(CachedMeshRefs manager, object key, MultiTextureMeshRef meshRef)
 			{
 				this.manager = manager;
 				this.key = key;
-				this.meshRef = meshRef;
+				this.MeshRef = meshRef;
 			}
 
 			public void Postpone()
 			{
-				tmpHandle.Postpone();
+				TmpHandle.Postpone();
 			}
 
 			public void OnRemoved()
 			{
-				tmpHandle.Dispose();
-				meshRef.Dispose();
-				meshRef = null;
+				TmpHandle.Dispose();
+				MeshRef.Dispose();
+				MeshRef = null!;
 			}
 
 			void IDisposable.Dispose()
 			{
-				meshRef.Dispose();
-				meshRef = null;
+				MeshRef.Dispose();
+				MeshRef = null!;
 				manager.containers.Remove(key);
 			}
 		}

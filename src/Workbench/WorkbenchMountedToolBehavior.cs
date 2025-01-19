@@ -49,7 +49,7 @@ namespace GlassMaking.Workbench
 		/// </summary>
 		/// <param name="recipe">Current recipe value, may be null</param>
 		/// <param name="step">Current recipe step</param>
-		public virtual void OnIdleStop(IWorldAccessor world, WorkbenchRecipe recipe, int step)
+		public virtual void OnIdleStop(IWorldAccessor world, WorkbenchRecipe? recipe, int step)
 		{
 		}
 

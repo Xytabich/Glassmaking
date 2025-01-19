@@ -20,9 +20,9 @@ namespace GlassMaking.Items.Behavior
 		public override double Priority => 0.5;
 
 		private int maxGlassAmount;
-		private string blowAnimation;
-		private string intakeAnimation;
-		private GlassMakingMod mod;
+		private string blowAnimation = default!;
+		private string intakeAnimation = default!;
+		private GlassMakingMod mod = default!;
 
 		public GlasspipeMoldBehavior(CollectibleObject collObj) : base(collObj)
 		{
@@ -255,7 +255,7 @@ namespace GlassMaking.Items.Behavior
 							{
 								if(!entity.TryGiveItemStack(item))
 								{
-									entity.World.SpawnItemEntity(item, byPlayer.Entity.Pos.XYZ.Add(0.0, 0.5, 0.0));
+									entity.World.SpawnItemEntity(item, byPlayer!.Entity.Pos.XYZ.Add(0.0, 0.5, 0.0));
 								}
 							}
 						}
@@ -279,13 +279,13 @@ namespace GlassMaking.Items.Behavior
 			var glasslayers = itemStack.Attributes.GetTreeAttribute(ATTRIB_KEY);
 			if(glasslayers == null) return 0;
 
-			var codesAttrib = glasslayers["code"] as StringArrayAttribute;
+			var codesAttrib = (StringArrayAttribute)glasslayers["code"];
 			if(codesAttrib.value.Length == 0) return 0;
 
 			float point = 0f;
 			foreach(var code in codesAttrib.value)
 			{
-				point += glassMaking.GetGlassTypeInfo(new AssetLocation(code)).MeltingPoint;
+				point += glassMaking.GetGlassTypeInfo(new AssetLocation(code))!.MeltingPoint;
 			}
 			return point / codesAttrib.value.Length * 0.8f;
 		}
@@ -297,19 +297,15 @@ namespace GlassMaking.Items.Behavior
 			{
 				if(IsWorkingTemperature(byEntity.World, itemstack))
 				{
-					var codesAttrib = glasslayers["code"] as StringArrayAttribute;
-					var amountsAttrib = glasslayers["amount"] as IntArrayAttribute;
-					if(mold.CanReceiveGlass(codesAttrib.value, amountsAttrib.value, out _))
+					var codes = ((StringArrayAttribute)glasslayers["code"]).value;
+					var amounts = ((IntArrayAttribute)glasslayers["amount"]).value;
+					if(mold.CanReceiveGlass(codes, amounts, out _))
 					{
 						byEntity.AnimManager.StartAnimation(blowAnimation);
 						byEntity.World.RegisterCallback((world, pos, dt) => {
 							if(byEntity.Controls.HandUse == EnumHandInteract.HeldItemInteract)
 							{
-								IPlayer dualCallByPlayer = null;
-								if(byEntity is EntityPlayer)
-								{
-									dualCallByPlayer = byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID);
-								}
+								var dualCallByPlayer = Utils.GetPlayerFromEntity(byEntity);
 								world.PlaySoundAt(new AssetLocation("sounds/sizzle"), byEntity, dualCallByPlayer);
 							}
 						}, blockSel.Position, 666);
@@ -332,8 +328,8 @@ namespace GlassMaking.Items.Behavior
 			{
 				if(IsWorkingTemperature(byEntity.World, itemstack))
 				{
-					var codesAttrib = glasslayers["code"] as StringArrayAttribute;
-					var amountsAttrib = glasslayers["amount"] as IntArrayAttribute;
+					var codesAttrib = (StringArrayAttribute)glasslayers["code"];
+					var amountsAttrib = (IntArrayAttribute)glasslayers["amount"];
 					if(mold.CanReceiveGlass(codesAttrib.value, amountsAttrib.value, out float fillTime))
 					{
 						const float speed = 1.5f;
@@ -365,8 +361,7 @@ namespace GlassMaking.Items.Behavior
 						}
 						if(secondsUsed > 1f / speed)
 						{
-							IPlayer byPlayer = null;
-							if(byEntity is EntityPlayer) byPlayer = byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID);
+							var byPlayer = Utils.GetPlayerFromEntity(byEntity);
 							// Smoke on the mold
 							Vec3d blockpos = blockSel.Position.ToVec3d().Add(0.5, 0.2, 0.5);
 							float y2 = 0;
@@ -434,7 +429,7 @@ namespace GlassMaking.Items.Behavior
 							if(itemstack.TempAttributes.GetFloat(ADDTIME_ATTRIB) + useTime <= secondsUsed)
 							{
 								itemstack.TempAttributes.SetFloat(ADDTIME_ATTRIB, (float)Math.Floor(secondsUsed));
-								AddGlass(byEntity, slot, amount, source.GetGlassCode(), byEntity.Controls.Sneak ? 5 : 1, source.GetTemperature(), out int consumed);
+								AddGlass(byEntity, slot, amount, source.GetGlassCode()!, byEntity.Controls.Sneak ? 5 : 1, source.GetTemperature(), out int consumed);
 								source.RemoveGlass(consumed);
 								slot.MarkDirty();
 								return true;
@@ -442,8 +437,7 @@ namespace GlassMaking.Items.Behavior
 						}
 						if(secondsUsed > 1f / speed)
 						{
-							IPlayer byPlayer = null;
-							if(byEntity is EntityPlayer) byPlayer = byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID);
+							var byPlayer = Utils.GetPlayerFromEntity(byEntity);
 							source.SpawnMeltParticles(byEntity.World, blockSel, byPlayer);
 						}
 						return true;
@@ -462,7 +456,7 @@ namespace GlassMaking.Items.Behavior
 			var amountsAttrib = glasslayers["amount"] as IntArrayAttribute;
 
 			int count = 0;
-			foreach(int amount in amountsAttrib.value)
+			foreach(int amount in amountsAttrib!.value)
 			{
 				count += amount;
 			}
@@ -496,7 +490,7 @@ namespace GlassMaking.Items.Behavior
 			}
 
 			int currentAmount = 0;
-			foreach(var c in amountsAttrib.value)
+			foreach(var c in amountsAttrib!.value)
 			{
 				currentAmount += c;
 			}

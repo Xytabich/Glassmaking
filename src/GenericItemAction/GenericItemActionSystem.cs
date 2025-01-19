@@ -8,7 +8,7 @@ namespace GlassMaking.GenericItemAction
 {
 	public class GenericItemActionSystem : ModSystem
 	{
-		private IClientNetworkChannel clientChannel = null;
+		private IClientNetworkChannel clientChannel = default!;
 
 		public override void Start(ICoreAPI api)
 		{
@@ -32,16 +32,16 @@ namespace GlassMaking.GenericItemAction
 		public void SendActionMessage(CollectibleObject item, string action, ITreeAttribute attributes)
 		{
 			var msg = new HeldItemActionMessage();
-			msg.itemId = item.Id;
-			msg.itemClass = item.ItemClass;
-			msg.action = action;
-			msg.attributes = null;
+			msg.ItemId = item.Id;
+			msg.ItemClass = item.ItemClass;
+			msg.Action = action;
+			msg.Attributes = null;
 			if(attributes != null)
 			{
 				using(var stream = new MemoryStream())
 				{
 					attributes.ToBytes(new BinaryWriter(stream));
-					msg.attributes = stream.ToArray();
+					msg.Attributes = stream.ToArray();
 				}
 			}
 
@@ -51,27 +51,28 @@ namespace GlassMaking.GenericItemAction
 		private void OnHeldAction(IServerPlayer fromPlayer, HeldItemActionMessage msg)
 		{
 			var itemstack = fromPlayer.InventoryManager.ActiveHotbarSlot.Itemstack;
-			if(itemstack != null && itemstack.Class == msg.itemClass && itemstack.Id == msg.itemId)
+			if(itemstack != null && itemstack.Class == msg.ItemClass && itemstack.Id == msg.ItemId)
 			{
-				ITreeAttribute attributes = null;
-				if(msg.attributes != null)
+				ITreeAttribute? attributes = null;
+				if(msg.Attributes != null)
 				{
-					using(var stream = new MemoryStream(msg.attributes))
+					using(var stream = new MemoryStream(msg.Attributes))
 					{
 						attributes = new TreeAttribute();
 						attributes.FromBytes(new BinaryReader(stream));
 					}
 				}
-				IGenericHeldItemAction heldAction;
-				if((heldAction = itemstack.Collectible as IGenericHeldItemAction) != null)
 				{
-					if(heldAction.GenericHeldItemAction(fromPlayer, msg.action, attributes)) return;
+					if(itemstack.Collectible is IGenericHeldItemAction heldAction)
+					{
+						if(heldAction.GenericHeldItemAction(fromPlayer, msg.Action, attributes)) return;
+					}
 				}
 				foreach(var behavior in itemstack.Collectible.CollectibleBehaviors)
 				{
-					if((heldAction = behavior as IGenericHeldItemAction) != null)
+					if(behavior is IGenericHeldItemAction heldAction)
 					{
-						if(heldAction.GenericHeldItemAction(fromPlayer, msg.action, attributes)) return;
+						if(heldAction.GenericHeldItemAction(fromPlayer, msg.Action, attributes)) return;
 					}
 				}
 			}

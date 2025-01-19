@@ -9,12 +9,12 @@ namespace GlassMaking
 	public class CastingMoldRecipe : IRecipeBase<CastingMoldRecipe>
 	{
 		[JsonProperty(Required = Required.DisallowNull)]
-		public CraftingRecipeIngredient Output;
+		public CraftingRecipeIngredient Output = default!;
 		[JsonProperty(Required = Required.Always)]
-		public GlassAmount Recipe;
+		public GlassAmount Recipe = default!;
 
 		[JsonProperty]
-		public AssetLocation Name { get; set; }
+		public AssetLocation? Name { get; set; }
 
 		public bool Enabled { get; set; } = true;
 		public IRecipeIngredient[] Ingredients => new IRecipeIngredient[] { Recipe };
@@ -69,10 +69,13 @@ namespace GlassMaking
 		public class GlassAmount : IRecipeIngredient
 		{
 			public string Name => "type";
-			[JsonProperty]
-			public string[] AllowedVariants;
+
 			[JsonProperty(Required = Required.DisallowNull)]
-			public AssetLocation Code { get; set; }
+			public AssetLocation Code { get; set; } = default!;
+
+			[JsonProperty]
+			public string[]? AllowedVariants;
+
 			[JsonProperty(Required = Required.Always)]
 			public int Amount;
 
@@ -81,7 +84,7 @@ namespace GlassMaking
 				return new GlassAmount() {
 					Code = Code.Clone(),
 					Amount = Amount,
-					AllowedVariants = (string[])(AllowedVariants?.Clone())
+					AllowedVariants = (string[]?)(AllowedVariants?.Clone())
 				};
 			}
 		}

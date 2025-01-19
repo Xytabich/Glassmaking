@@ -7,12 +7,12 @@ namespace GlassMaking.GenericItemAction
 	public class HeldItemActionMessage
 	{
 		[ProtoMember(1, IsRequired = true)]
-		public int itemId;
+		public int ItemId;
 		[ProtoMember(2, IsRequired = true, IsPacked = true)]
-		public EnumItemClass itemClass;
+		public EnumItemClass ItemClass;
 		[ProtoMember(3)]
-		public string action;
+		public string Action = default!;
 		[ProtoMember(4)]
-		public byte[] attributes;
+		public byte[]? Attributes;
 	}
 }

@@ -7,7 +7,7 @@ namespace GlassMaking.Items.Behavior
 {
 	public class ItemBehaviorWorkbenchTool : CollectibleBehaviorWorkbenchTool
 	{
-		private string toolCode;
+		private string toolCode = default!;
 		private bool isTool;
 
 		public ItemBehaviorWorkbenchTool(CollectibleObject collObj) : base(collObj)

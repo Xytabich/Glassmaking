@@ -5,7 +5,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 {
 	public class SimpleToolBehavior : WorkbenchMountedToolBehavior
 	{
-		private AdvancedParticleProperties[] workParticles = null;
+		private AdvancedParticleProperties[]? workParticles = null;
 		private long tickerId;
 
 		protected bool isUsing = false;
@@ -19,7 +19,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 			base.OnLoaded(api, slot);
 			if(api.Side == EnumAppSide.Client)
 			{
-				workParticles = slot.Itemstack.Collectible.Attributes?["workbenchParticles"].AsObject<AdvancedParticleProperties[]>(null, slot.Itemstack.Collectible.Code.Domain);
+				workParticles = slot.Itemstack.Collectible.Attributes?["workbenchParticles"].AsObject<AdvancedParticleProperties[]?>(null, slot.Itemstack.Collectible.Code.Domain);
 
 				if(workParticles != null)
 				{

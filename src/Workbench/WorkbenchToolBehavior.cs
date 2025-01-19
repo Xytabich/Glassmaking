@@ -10,13 +10,13 @@ namespace GlassMaking.Workbench
 	/// </summary>
 	public abstract class WorkbenchToolBehavior
 	{
-		public ICoreAPI Api;
+		public ICoreAPI Api = default!;
 
 		public abstract string ToolCode { get; }
 
 		public virtual void OnLoaded(ICoreAPI api)
 		{
-			this.Api = api;
+			Api = api;
 		}
 
 		public virtual void OnUnloaded()
@@ -61,7 +61,7 @@ namespace GlassMaking.Workbench
 		/// Returns hints for using this tool.
 		/// This method will be called on a "embedded" tool, as long as it is part of a recipe.
 		/// </summary>
-		public virtual WorldInteraction[] GetBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer, WorkbenchRecipe recipe = null, int step = 0)
+		public virtual WorldInteraction[]? GetBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer, WorkbenchRecipe? recipe = null, int step = 0)
 		{
 			return null;
 		}

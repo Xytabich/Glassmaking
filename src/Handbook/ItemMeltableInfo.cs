@@ -15,19 +15,19 @@ namespace GlassMaking.Handbook
 		public ItemMeltableInfo(GlassMakingMod mod)
 		{
 			this.mod = mod;
-			HandbookItemInfoEvent.onGetHandbookInfo += GetHandbookInfo;
+			HandbookItemInfoEvent.OnGetHandbookInfo += GetHandbookInfo;
 		}
 
 		public void Dispose()
 		{
-			HandbookItemInfoEvent.onGetHandbookInfo -= GetHandbookInfo;
+			HandbookItemInfoEvent.OnGetHandbookInfo -= GetHandbookInfo;
 		}
 
 		private void GetHandbookInfo(ItemSlot inSlot, ICoreClientAPI capi, ItemStack[] allStacks, ActionConsumable<string> openDetailPageFor, HandbookItemInfoSection section, List<RichTextComponentBase> outComponents)
 		{
 			if(section != HandbookItemInfoSection.AfterItemHeader) return;
 
-			GlassBlend blend = GlassBlend.FromJson(inSlot.Itemstack);
+			GlassBlend? blend = GlassBlend.FromJson(inSlot.Itemstack);
 			if(blend == null) blend = GlassBlend.FromTreeAttributes(inSlot.Itemstack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
 			if(blend != null && blend.Amount > 0)
 			{

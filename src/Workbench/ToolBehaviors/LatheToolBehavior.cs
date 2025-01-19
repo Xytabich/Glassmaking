@@ -15,17 +15,17 @@ namespace GlassMaking.Workbench.ToolBehaviors
 	{
 		public const string CODE = "lathe";
 
-		private AnimatorBase animator;
-		private BlockAnimatableRenderer renderer;
-		private LatheAnimatorUpdater updater;
+		private AnimatorBase animator = default!;
+		private BlockAnimatableRenderer renderer = default!;
+		private LatheAnimatorUpdater updater = default!;
 
-		private float[] localTransform;
+		private float[] localTransform = default!;
 
-		private IWorkbenchRenderInfo workbenchRender;
+		private readonly IWorkbenchRenderInfo workbenchRender;
 
 		public LatheToolBehavior(BlockEntity blockentity, Cuboidf[] boundingBoxes) : base(CODE, blockentity, boundingBoxes)
 		{
-			workbenchRender = blockentity as IWorkbenchRenderInfo;
+			workbenchRender = (blockentity as IWorkbenchRenderInfo)!;
 			if(workbenchRender == null) throw new NullReferenceException("Blockentity must implement IWorkbenchRenderInfo");
 		}
 
@@ -44,22 +44,21 @@ namespace GlassMaking.Workbench.ToolBehaviors
 				var transform = slot.Itemstack.Collectible.Attributes?["workbenchToolTransform"].AsObject<ModelTransform>().EnsureDefaultValues();
 				renderer = new BlockAnimatableRenderer(capi, Blockentity.Pos, new Vec3f(0, Blockentity.Block.Shape.rotateY, 0), transform, animator, meshRef, false);
 
-				localTransform = Mat4f.Create();
-				transform.CopyTo(localTransform);
-				updater.localTransform = localTransform;
+				(transform ?? ModelTransform.NoTransform).CopyTo(updater.LocalTransform);
+				localTransform = updater.LocalTransform;
 			}
 		}
 
 		public override void OnIdleStart(IWorldAccessor world, WorkbenchRecipe recipe, int step)
 		{
-			SetupRenderer(recipe.Steps[step].Tools[CODE]);
+			SetupRenderer(recipe.Steps[step].Tools[CODE]!);
 		}
 
-		public override void OnIdleStop(IWorldAccessor world, WorkbenchRecipe recipe, int step)
+		public override void OnIdleStop(IWorldAccessor world, WorkbenchRecipe? recipe, int step)
 		{
 			updater.SetJawSpacing(null);
 
-			updater.targetItemTransform = null;
+			updater.TargetItemTransform = null;
 		}
 
 		public override bool OnUseStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, WorkbenchRecipe recipe, int step)
@@ -70,7 +69,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 				if(useTime.HasValue)
 				{
 					var latheInfo = recipe.Steps[step].Tools[CODE];
-					updater.SetRotationSpeed(latheInfo["rpm"].AsFloat(15));
+					updater.SetRotationSpeed(latheInfo!["rpm"].AsFloat(15));
 					SetupRenderer(latheInfo);
 				}
 			}
@@ -84,7 +83,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 				updater.SetRotationSpeed(null);
 				updater.SetJawSpacing(null);
 
-				updater.targetItemTransform = null;
+				updater.TargetItemTransform = null;
 			}
 			base.OnUseComplete(secondsUsed, world, byPlayer, blockSel, recipe, step);
 		}
@@ -96,7 +95,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 				updater.SetRotationSpeed(null);
 				updater.SetJawSpacing(null);
 
-				updater.targetItemTransform = null;
+				updater.TargetItemTransform = null;
 			}
 			base.OnUseCancel(secondsUsed, world, byPlayer, blockSel, recipe, step);
 		}
@@ -127,7 +126,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 				var mat = latheInfo["transform"].AsObject<ModelTransform>().EnsureDefaultValues();
 				updater.SetItemTransform(mat);
 
-				updater.targetItemTransform = workbenchRender.workpieceRenderer.itemTransform.Values;
+				updater.TargetItemTransform = workbenchRender.WorkpieceRenderer.ItemTransform.Values;
 				updater.ForceUpdate();
 			}
 		}
@@ -147,20 +146,20 @@ namespace GlassMaking.Workbench.ToolBehaviors
 
 			public int RenderRange => 99;
 
-			public float[] targetItemTransform = null;
-			public float[] localTransform;
+			public float[]? TargetItemTransform = null;
+			public readonly float[] LocalTransform = Mat4f.Create();
 
 			private AnimatorBase animator;
 
 			private float? jawSpacing = null;
 			private float? prevJawSpacing = null;
-			private RunningAnimation jawsState = null;
+			private RunningAnimation? jawsState = null;
 			private float jawsFrame;
 
-			private float[] itemTransform = Mat4f.Create();
-			private AttachmentPointAndPose itemAttachmentPoint;
+			private readonly float[] itemTransform = Mat4f.Create();
+			private readonly AttachmentPointAndPose itemAttachmentPoint;
 
-			private Dictionary<string, AnimationMetaData> activeAnimationsByAnimCode = new Dictionary<string, AnimationMetaData>();
+			private readonly Dictionary<string, AnimationMetaData> activeAnimationsByAnimCode = new();
 
 			public LatheAnimatorUpdater(AnimatorBase animator)
 			{
@@ -241,13 +240,13 @@ namespace GlassMaking.Workbench.ToolBehaviors
 						jawsState.EasingFactor = Math.Min(1f, jawsState.EasingFactor + (1f - jawsState.EasingFactor) * deltaTime * jawsState.meta.EaseInSpeed);
 						jawsState.CurrentFrame = jawsFrame;
 					}
-					if(targetItemTransform != null)
+					if(TargetItemTransform != null)
 					{
-						itemTransform.CopyTo(targetItemTransform, 0);
+						itemTransform.CopyTo(TargetItemTransform, 0);
 
-						Mat4f.Mul(targetItemTransform, itemAttachmentPoint.AnimModelMatrix, targetItemTransform);
+						Mat4f.Mul(TargetItemTransform, itemAttachmentPoint.AnimModelMatrix, TargetItemTransform);
 
-						Mat4f.Mul(targetItemTransform, localTransform, targetItemTransform);
+						Mat4f.Mul(TargetItemTransform, LocalTransform, TargetItemTransform);
 					}
 				}
 			}

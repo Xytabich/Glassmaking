@@ -19,7 +19,7 @@ namespace GlassMaking.ToolDescriptors
 		{
 			var step = recipe.Steps[stepIndex];
 			outComponents.Add(new RichTextComponent(capi, "• " + Lang.Get("glassmaking:Step {0}: {1}", stepIndex + 1, Lang.Get("glassmaking:{0} for {1} seconds",
-				Lang.Get("glassmaking:glassblowingtool-" + step.Tool), step.Attributes["time"].AsFloat(1).ToString("G", CultureInfo.InvariantCulture))) + "\n", CairoFont.WhiteSmallText()));
+				Lang.Get("glassmaking:glassblowingtool-" + step.Tool), step.Attributes!["time"].AsFloat(1).ToString("G", CultureInfo.InvariantCulture))) + "\n", CairoFont.WhiteSmallText()));
 
 			float consume = step.Attributes["consume"].AsFloat(0);
 			if(consume > 0)
@@ -36,7 +36,7 @@ namespace GlassMaking.ToolDescriptors
 		{
 			var step = recipe.Steps[stepIndex];
 			dsc.AppendLine("• " + Lang.Get("glassmaking:{0} for {1} seconds", Lang.Get("glassmaking:glassblowingtool-" + step.Tool),
-				step.Attributes["time"].AsFloat(1).ToString("G", CultureInfo.InvariantCulture)));
+				step.Attributes!["time"].AsFloat(1).ToString("G", CultureInfo.InvariantCulture)));
 		}
 	}
 }

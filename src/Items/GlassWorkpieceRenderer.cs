@@ -1,5 +1,6 @@
 ﻿using GlassMaking.Common;
 using GlassMaking.ItemRender;
+using System;
 using System.Collections.Generic;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
@@ -10,35 +11,35 @@ namespace GlassMaking.Items
 {
 	internal class GlassWorkpieceRenderer : IItemRenderer<GlassWorkpieceRenderer.Data>, ITexPositionSource
 	{
-		public Size2i AtlasSize => curAtlas.Size;
+		public Size2i AtlasSize => curAtlas!.Size;
 
-		private string code;
+		private string? code;
 		private int step;
 
 		private CachedMeshRefs.RefHandle meshRefHandle = default;
 
-		private ICoreClientAPI capi;
-		private ITextureAtlasAPI curAtlas;
-		private IDictionary<string, CompositeTexture> nowTesselatingTextures;
-		private Shape nowTesselatingShape;
+		private ICoreClientAPI? capi;
+		private ITextureAtlasAPI? curAtlas;
+		private IDictionary<string, CompositeTexture>? nowTesselatingTextures;
+		private Shape? nowTesselatingShape;
 
 		public virtual TextureAtlasPosition this[string textureCode]
 		{
 			get
 			{
-				AssetLocation texturePath = null;
+				AssetLocation? texturePath = null;
 
 				if(nowTesselatingTextures != null && nowTesselatingTextures.TryGetValue(textureCode, out var comp))
 				{
 					texturePath = comp.Base;
 				}
 
-				if(texturePath == null && !nowTesselatingShape.Textures.TryGetValue(textureCode, out texturePath))
+				if(texturePath == null && !nowTesselatingShape!.Textures.TryGetValue(textureCode, out texturePath))
 				{
 					texturePath = new AssetLocation(textureCode);
 				}
 
-				return AtlasTexSource.GetOrCreateTexPos(capi, curAtlas, texturePath, "Worpiece");
+				return AtlasTexSource.GetOrCreateTexPos(capi!, curAtlas!, texturePath, "Worpiece");
 			}
 		}
 
@@ -79,7 +80,7 @@ namespace GlassMaking.Items
 			this.capi = capi;
 			curAtlas = targetAtlas;
 			nowTesselatingTextures = null;
-			CompositeShape shape = null;
+			CompositeShape? shape = null;
 			for(int i = step - 1; i >= 0; i--)
 			{
 				if(nowTesselatingTextures == null)
@@ -142,10 +143,10 @@ namespace GlassMaking.Items
 			}
 		}
 
-		private struct WorkpieceMeshKey
+		private readonly struct WorkpieceMeshKey : IEquatable<WorkpieceMeshKey>
 		{
-			private AssetLocation code;
-			private int step;
+			private readonly AssetLocation code;
+			private readonly int step;
 
 			public WorkpieceMeshKey(AssetLocation code, int step)
 			{
@@ -153,11 +154,14 @@ namespace GlassMaking.Items
 				this.step = step;
 			}
 
-			public override bool Equals(object obj)
+			public override bool Equals(object? obj)
 			{
-				return obj is WorkpieceMeshKey key &&
-					   EqualityComparer<AssetLocation>.Default.Equals(code, key.code) &&
-					   step == key.step;
+				return obj is WorkpieceMeshKey key && Equals(key);
+			}
+
+			public bool Equals(WorkpieceMeshKey other)
+			{
+				return EqualityComparer<AssetLocation>.Default.Equals(code, other.code) && step == other.step;
 			}
 
 			public override int GetHashCode()

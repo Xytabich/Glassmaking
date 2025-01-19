@@ -49,7 +49,7 @@ namespace GlassMaking
 
 			if(!cache.TryGetValue(cacheKey, out var meshInfo))
 			{
-				var collShape = collectible.ItemClass == EnumItemClass.Item ? (collectible as Item).Shape : (collectible as Block).Shape;
+				var collShape = collectible.ItemClass == EnumItemClass.Item ? ((Item)collectible).Shape : ((Block)collectible).Shape;
 				shape = capi.TesselatorManager.GetCachedShape(collShape.Base);
 
 				shape.ResolveReferences(capi.World.Logger, cacheKey);

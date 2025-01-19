@@ -7,7 +7,7 @@ namespace GlassMaking.Items
 {
 	public class ItemGlassWorkpiece : Item
 	{
-		private GlassMakingMod mod;
+		private GlassMakingMod mod = default!;
 
 		public override void OnLoaded(ICoreAPI api)
 		{

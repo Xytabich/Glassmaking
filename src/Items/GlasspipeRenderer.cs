@@ -16,7 +16,7 @@ namespace GlassMaking.Items
 		private int lastLayerSize;
 		private TemperatureState temperature;
 
-		private MultiTextureMeshRef meshRef = null;
+		private MultiTextureMeshRef? meshRef = null;
 		private MeshData mesh;
 
 		public PipeLayersRenderer()
@@ -42,7 +42,7 @@ namespace GlassMaking.Items
 			UpdateGlasslayersMesh(amounts, GlassRenderUtil.StateToGlow(temperature));
 
 			bool reupload = prevVertices != mesh.VerticesCount || prevIndices != mesh.IndicesCount;
-			UpdateMeshRef(capi, itemStack.Item, capi.Tesselator.GetTextureSource(itemStack.Item), ((ItemGlassworkPipe)itemStack.Item).glassTransform, reupload);
+			UpdateMeshRef(capi, itemStack.Item, capi.Tesselator.GetTextureSource(itemStack.Item), ((ItemGlassworkPipe)itemStack.Item).GlassTransform, reupload);
 		}
 
 		public void SetRenderInfo(ICoreClientAPI capi, ItemStack itemStack, ref ItemRenderInfo renderInfo)
@@ -123,13 +123,13 @@ namespace GlassMaking.Items
 	{
 		MeshData IMeshContainer.Mesh => mesh;
 
-		private string recipeCode;
+		private string? recipeCode;
 		private int recipeStep;
 		private float recipeProgress;
 		private TemperatureState temperature;
 
-		private MultiTextureMeshRef meshRef = null;
-		private MeshData mesh;
+		private MultiTextureMeshRef? meshRef = null;
+		private readonly MeshData mesh;
 
 		public PipeRecipeRenderer()
 		{
@@ -156,7 +156,7 @@ namespace GlassMaking.Items
 			data.recipe.UpdateMesh(data.recipeAttribute, this, GlassRenderUtil.StateToGlow(temperature));
 
 			bool reupload = prevVertices != mesh.VerticesCount || prevIndices != mesh.IndicesCount;
-			UpdateMeshRef(capi, itemStack.Item, capi.Tesselator.GetTextureSource(itemStack.Item), ((ItemGlassworkPipe)itemStack.Item).glassTransform, reupload);
+			UpdateMeshRef(capi, itemStack.Item, capi.Tesselator.GetTextureSource(itemStack.Item), ((ItemGlassworkPipe)itemStack.Item).GlassTransform, reupload);
 		}
 
 		public void SetRenderInfo(ICoreClientAPI capi, ItemStack itemStack, ref ItemRenderInfo renderInfo)

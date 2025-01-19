@@ -20,11 +20,11 @@ namespace GlassMaking
 
 		private int prevSlotOver = -1;
 
-		private CollectibleObject item;
-		private KeyValuePair<IAttribute, ItemStack>[] recipeOutputs;
-		private List<SkillItem> skillItems;
+		private CollectibleObject item = default!;
+		private KeyValuePair<IAttribute, ItemStack>[] recipeOutputs = default!;
+		private List<SkillItem> skillItems = default!;
 
-		private BlockSelection blockPos;
+		private BlockSelection? blockPos;
 
 		public GuiDialogItemRecipeSelector(ICoreClientAPI capi) : base(capi) { }
 
@@ -46,7 +46,7 @@ namespace GlassMaking
 			if((source = itemstack.Collectible as IItemCrafter) != null)
 			{
 				if(source.PreventRecipeAssignment(player!, itemstack)) return false;
-				if(source.TryGetRecipeOutputs(player!, itemstack, out recipeOutputs))
+				if(source.TryGetRecipeOutputs(player!, itemstack, out recipeOutputs!))
 				{
 					sourceSelected = true;
 				}
@@ -58,7 +58,7 @@ namespace GlassMaking
 					if((source = behavior as IItemCrafter) != null)
 					{
 						if(source.PreventRecipeAssignment(player!, itemstack)) return false;
-						if(source.TryGetRecipeOutputs(player!, itemstack, out recipeOutputs))
+						if(source.TryGetRecipeOutputs(player!, itemstack, out recipeOutputs!))
 						{
 							sourceSelected = true;
 							break;
@@ -173,7 +173,7 @@ namespace GlassMaking
 			{
 				var attributes = new TreeAttribute();
 				attributes["key"] = recipeOutputs[index].Key;
-				DoItemAction(capi.World.Player, item, "recipe", attributes);
+				DoItemAction(capi.World.Player!, item, "recipe", attributes);
 			}
 
 			TryClose();
@@ -186,8 +186,8 @@ namespace GlassMaking
 
 		public override bool TryClose()
 		{
-			item = null;
-			recipeOutputs = null;
+			item = null!;
+			recipeOutputs = null!;
 			return base.TryClose();
 		}
 	}

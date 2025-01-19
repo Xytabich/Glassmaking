@@ -18,6 +18,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using Vintagestory.API.Client;
@@ -360,7 +361,7 @@ namespace GlassMaking
 			return null;
 		}
 
-		public bool TryGetBlowingMoldsForItem(CollectibleObject item, out Block[]? molds)
+		public bool TryGetBlowingMoldsForItem(CollectibleObject item, [NotNullWhen(true)] out Block[]? molds)
 		{
 			if(blowingMoldsOutput == null) throw new Exception("The client side of the glassmaking mod is still not loaded");
 			if(blowingMoldsOutput.Contains(item.Code))
@@ -384,7 +385,7 @@ namespace GlassMaking
 			return false;
 		}
 
-		public bool TryGetCastingMoldsForItem(CollectibleObject item, out Block[]? molds)
+		public bool TryGetCastingMoldsForItem(CollectibleObject item, [NotNullWhen(true)] out Block[]? molds)
 		{
 			if(castingMoldsOutput == null) throw new Exception("The client side of the glassmaking mod is still not loaded");
 			if(castingMoldsOutput.Contains(item.Code))
@@ -408,7 +409,7 @@ namespace GlassMaking
 			return false;
 		}
 
-		public bool TryGetMaterialsForAnneal(ItemStack forOutputItem, out CollectibleObject[]? materials)
+		public bool TryGetMaterialsForAnneal(ItemStack forOutputItem, [NotNullWhen(true)] out CollectibleObject[]? materials)
 		{
 			if(annealOutputs == null) throw new Exception("The client side of the glassmaking mod is still not loaded");
 			if(annealOutputs.Contains(forOutputItem.Collectible.Code))
@@ -482,8 +483,8 @@ namespace GlassMaking
 				var properties = collectible.Attributes["glassmaking:anneal"];
 				try
 				{
-					var output = properties["output"].AsObject<JsonItemStack>(null!, collectible.Code.Domain);
-					if(output.Resolve(capi.World, "recipes collect"))
+					var output = properties["output"].AsObject<JsonItemStack?>(null, collectible.Code.Domain);
+					if(output!.Resolve(capi.World, "recipes collect"))
 					{
 						var outputItem = output.ResolvedItemstack;
 						annealRecipes!.Add((collectible.ItemClass, collectible.Id), outputItem);

@@ -9,10 +9,10 @@ namespace GlassMaking.Workbench.ToolDescriptors
 {
 	public class ItemUseDescriptor : IWorkbenchToolDescriptor
 	{
-		public void GetStepInfoForHandbook(ICoreClientAPI capi, ItemStack item, WorkbenchRecipe recipe, int stepIndex, JsonObject json,
+		public void GetStepInfoForHandbook(ICoreClientAPI capi, ItemStack item, WorkbenchRecipe recipe, int stepIndex, JsonObject? json,
 			ActionConsumable<string> openDetailPageFor, List<RichTextComponentBase> outComponents)
 		{
-			var ingredient = json?.AsObject<CraftingRecipeIngredient>(null, recipe.Code.Domain);
+			var ingredient = json?.AsObject<CraftingRecipeIngredient?>(null, recipe.Code.Domain);
 			if(ingredient == null)
 			{
 				capi.World.Logger.Log(EnumLogType.Warning, "Unable to use item in workbench recipe '{0}' because json is malformed", recipe.Code);

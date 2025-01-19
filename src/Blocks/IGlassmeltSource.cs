@@ -10,10 +10,10 @@ namespace GlassMaking.Blocks
 
 		int GetGlassAmount();
 
-		AssetLocation GetGlassCode();
+		AssetLocation? GetGlassCode();
 
 		void RemoveGlass(int amount);
 
-		void SpawnMeltParticles(IWorldAccessor world, BlockSelection blockSel, IPlayer byPlayer, float quantity = 1f);
+		void SpawnMeltParticles(IWorldAccessor world, BlockSelection blockSel, IPlayer? byPlayer, float quantity = 1f);
 	}
 }

@@ -364,8 +364,7 @@ namespace GlassMaking.Items
 
 			if(AllowHeldLiquidTransfer)
 			{
-				IPlayer? byPlayer = (byEntity as EntityPlayer)?.Player;
-
+				var byPlayer = Utils.GetPlayerFromEntity(byEntity);
 				ItemStack? contentStack = GetContent(itemslot.Itemstack);
 				WaterTightContainableProps? props = contentStack == null ? null : GetContentProps(contentStack);
 
@@ -421,7 +420,7 @@ namespace GlassMaking.Items
 
 		protected override void tryEatStop(float secondsUsed, ItemSlot slot, EntityAgent byEntity)
 		{
-			FoodNutritionProperties nutriProps = GetNutritionProperties(byEntity.World, slot.Itemstack, byEntity);
+			FoodNutritionProperties? nutriProps = GetNutritionProperties(byEntity.World, slot.Itemstack, byEntity);
 
 			if(byEntity.World is IServerWorldAccessor && nutriProps != null && secondsUsed >= 0.95f)
 			{
@@ -441,12 +440,7 @@ namespace GlassMaking.Items
 
 				byEntity.ReceiveSaturation(nutriProps.Satiety * satLossMul, nutriProps.FoodCategory);
 
-				IPlayer? player = null;
-				if(byEntity is EntityPlayer entityPlayer)
-				{
-					player = byEntity.World.PlayerByUid(entityPlayer.PlayerUID);
-				}
-
+				var player = Utils.GetPlayerFromEntity(byEntity);
 				SplitStackAndPerformAction(byEntity, slot, (stack) => TryTakeLiquid(stack, litresToDrink)?.StackSize ?? 0);
 
 				float healthChange = nutriProps.Health * healthLossMul;
@@ -464,7 +458,7 @@ namespace GlassMaking.Items
 			}
 		}
 
-		public override FoodNutritionProperties GetNutritionProperties(IWorldAccessor world, ItemStack itemstack, Entity forEntity)
+		public override FoodNutritionProperties? GetNutritionProperties(IWorldAccessor world, ItemStack itemstack, Entity forEntity)
 		{
 			ItemStack? contentStack = GetContent(itemstack);
 			WaterTightContainableProps? props = contentStack == null ? null : GetContainableProps(contentStack);
@@ -488,7 +482,7 @@ namespace GlassMaking.Items
 
 		public bool TryFillFromBlock(ItemSlot itemslot, EntityAgent byEntity, BlockPos pos)
 		{
-			IPlayer? byPlayer = (byEntity as EntityPlayer)?.Player;
+			var byPlayer = Utils.GetPlayerFromEntity(byEntity);
 			IBlockAccessor blockAcc = byEntity.World.BlockAccessor;
 
 			Block block = blockAcc.GetBlock(pos);
@@ -544,7 +538,7 @@ namespace GlassMaking.Items
 		private bool SpillContents(ItemSlot containerSlot, EntityAgent byEntity, BlockSelection blockSel)
 		{
 			BlockPos pos = blockSel.Position;
-			IPlayer? byPlayer = (byEntity as EntityPlayer)?.Player;
+			var byPlayer = Utils.GetPlayerFromEntity(byEntity);
 			IBlockAccessor blockAcc = byEntity.World.BlockAccessor;
 			BlockPos secondPos = blockSel.Position.AddCopy(blockSel.Face);
 			var contentStack = GetContent(containerSlot.Itemstack)!;

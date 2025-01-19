@@ -13,9 +13,9 @@ namespace GlassMaking.Blocks
 		public double processHoursPerUnit;
 		public double bubblingProcessMultiplier;
 
-		public ModelTransform smokeTransform;
+		public ModelTransform SmokeTransform = default!;
 
-		private WorldInteraction[] interactions;
+		private WorldInteraction[] interactions = default!;
 
 		public override void OnLoaded(ICoreAPI api)
 		{
@@ -25,9 +25,9 @@ namespace GlassMaking.Blocks
 			bubblingProcessMultiplier = Attributes["bubblingMult"].AsDouble();
 
 			if(api.Side != EnumAppSide.Client) return;
-			ICoreClientAPI capi = api as ICoreClientAPI;
+			ICoreClientAPI capi = (ICoreClientAPI)api;
 
-			smokeTransform = Attributes?["smokeTransform"].AsObject<ModelTransform>() ?? ModelTransform.NoTransform;
+			SmokeTransform = Attributes?["smokeTransform"].AsObject<ModelTransform>() ?? ModelTransform.NoTransform;
 
 			interactions = GetSmelteryInteractions(capi, "glassmaking:blockhelp-smeltery", GetMatchingBlends);
 		}
@@ -45,7 +45,7 @@ namespace GlassMaking.Blocks
 					{
 						if(world.Side == EnumAppSide.Client)
 						{
-							(byPlayer as IClientPlayer).TriggerFpAnimation(EnumHandInteract.HeldItemInteract);
+							(byPlayer as IClientPlayer)?.TriggerFpAnimation(EnumHandInteract.HeldItemInteract);
 						}
 						return true;
 					}
@@ -82,7 +82,7 @@ namespace GlassMaking.Blocks
 			return interactions.Append(base.GetPlacedBlockInteractionHelp(world, selection, forPlayer));
 		}
 
-		private ItemStack[] GetMatchingBlends(WorldInteraction wi, BlockSelection blockSelection, EntitySelection entitySelection)
+		private ItemStack[]? GetMatchingBlends(WorldInteraction wi, BlockSelection blockSelection, EntitySelection entitySelection)
 		{
 			if(wi.Itemstacks.Length == 0) return null;
 			var be = api.World.BlockAccessor.GetBlockEntity(blockSelection.Position) as BlockEntityGlassSmeltery;
@@ -93,7 +93,7 @@ namespace GlassMaking.Blocks
 			List<ItemStack> list = new List<ItemStack>();
 			foreach(var stack in wi.Itemstacks)
 			{
-				var blend = GlassBlend.FromJson(stack);
+				var blend = GlassBlend.FromJson(stack)!;
 				if(blend.Code.Equals(code) && blend.Amount * stack.StackSize <= canAddAmount)
 				{
 					list.Add(stack);

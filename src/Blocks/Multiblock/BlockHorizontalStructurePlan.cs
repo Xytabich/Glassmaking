@@ -8,9 +8,9 @@ namespace GlassMaking.Blocks.Multiblock
 {
 	public class BlockHorizontalStructurePlan : BlockHorizontalStructure
 	{
-		protected internal ReplacementInfo replacement;
+		protected internal ReplacementInfo replacement = default!;
 
-		private WorldInteraction[] interactions;
+		private WorldInteraction[] interactions = default!;
 
 		protected override void OnStructureLoaded()
 		{
@@ -18,13 +18,13 @@ namespace GlassMaking.Blocks.Multiblock
 
 			if(isSurrogate)
 			{
-				replacement = Attributes["replacement"].AsObject<ReplacementInfo>(null, Code.Domain);
+				replacement = Attributes["replacement"].AsObject<ReplacementInfo>(null!, Code.Domain);
 				replacement.Resolve(api.World);
-				if(replacement.block.Type != EnumItemClass.Block)
+				if(replacement.Block.Type != EnumItemClass.Block)
 				{
 					throw new Exception("The replacement must be a block");
 				}
-				if(replacement.block.ResolvedItemstack.Block is BlockHorizontalStructure structure)
+				if(replacement.Block.ResolvedItemstack.Block is BlockHorizontalStructure structure)
 				{
 					structure.isSurrogate = isSurrogate;
 					structure.mainOffset = mainOffset;
@@ -38,7 +38,7 @@ namespace GlassMaking.Blocks.Multiblock
 							ActionLangCode = "glassmaking:blockhelp-plan-put",
 							HotKeyCode = null,
 							MouseButton = EnumMouseButton.Right,
-							Itemstacks = new ItemStack[] { (replacement.requirement ?? replacement.block).ResolvedItemstack }
+							Itemstacks = new ItemStack[] { (replacement.Requirement ?? replacement.Block).ResolvedItemstack }
 						}
 					};
 				}
@@ -55,15 +55,15 @@ namespace GlassMaking.Blocks.Multiblock
 			var itemStack = byPlayer.InventoryManager.ActiveHotbarSlot.Itemstack;
 			if(itemStack != null)
 			{
-				var requirement = (replacement.requirement ?? replacement.block);
+				var requirement = replacement.Requirement ?? replacement.Block;
 				if(requirement.Matches(world, itemStack) && itemStack.StackSize >= requirement.ResolvedItemstack.StackSize)
 				{
 					var item = byPlayer.InventoryManager.ActiveHotbarSlot.TakeOut(requirement.ResolvedItemstack.StackSize);
 					RemoveSurrogateBlock(world.BlockAccessor, blockSel.Position);
 
-					var block = replacement.block.ResolvedItemstack.Block;
-					var stack = replacement.block == requirement ? item : replacement.block.ResolvedItemstack;
-					world.PlaySoundAt(block.GetSounds(world.BlockAccessor, blockSel.Position, stack)?.Place,
+					var block = replacement.Block.ResolvedItemstack.Block;
+					var stack = replacement.Block == requirement ? item : replacement.Block.ResolvedItemstack;
+					world.PlaySoundAt(block.GetSounds(world.BlockAccessor, blockSel, stack)?.Place,
 						blockSel.Position.X + 0.5, blockSel.Position.Y + 0.5, blockSel.Position.Z + 0.5, byPlayer, true, 16f);
 
 					block.DoPlaceBlock(world, byPlayer, blockSel, stack);
@@ -87,13 +87,13 @@ namespace GlassMaking.Blocks.Multiblock
 		protected internal class ReplacementInfo
 		{
 			[JsonProperty(Required = Required.Always)]
-			public JsonItemStack block;
-			public JsonItemStack requirement = null;
+			public JsonItemStack Block = default!;
+			public JsonItemStack? Requirement = null;
 
 			public void Resolve(IWorldAccessor world)
 			{
-				block.Resolve(world, "structure plan");
-				requirement?.Resolve(world, "structure plan requirement");
+				Block.Resolve(world, "structure plan");
+				Requirement?.Resolve(world, "structure plan requirement");
 			}
 		}
 	}

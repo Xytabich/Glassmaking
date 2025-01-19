@@ -13,12 +13,12 @@ namespace GlassMaking.Items
 {
 	public class ItemWettable : Item, IWettable
 	{
-		private AssetLocation waterCode = new AssetLocation("waterportion");
+		private readonly AssetLocation waterCode = new AssetLocation("waterportion");
 
 		private float capacity;
 		private float evaporation;
 
-		private WorldInteraction[] interactions;
+		private WorldInteraction[] interactions = default!;
 
 		public override void OnLoaded(ICoreAPI api)
 		{
@@ -135,7 +135,7 @@ namespace GlassMaking.Items
 			}
 		}
 
-		public override TransitionState[] UpdateAndGetTransitionStates(IWorldAccessor world, ItemSlot inslot)
+		public override TransitionState[]? UpdateAndGetTransitionStates(IWorldAccessor world, ItemSlot inslot)
 		{
 			ItemStack itemstack = inslot.Itemstack;
 
@@ -175,9 +175,9 @@ namespace GlassMaking.Items
 			}
 			else
 			{
-				freshHours = (attr["freshHours"] as FloatArrayAttribute).value;
-				transitionHours = (attr["transitionHours"] as FloatArrayAttribute).value;
-				transitionedHours = (attr["transitionedHours"] as FloatArrayAttribute).value;
+				freshHours = ((FloatArrayAttribute)attr["freshHours"]).value;
+				transitionHours = ((FloatArrayAttribute)attr["transitionHours"]).value;
+				transitionedHours = ((FloatArrayAttribute)attr["transitionedHours"]).value;
 			}
 
 			if(transitionHours[0] <= 0)

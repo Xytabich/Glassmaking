@@ -10,9 +10,9 @@ namespace GlassMaking.Blocks
 		public double processHoursPerUnit;
 		public double bubblingProcessMultiplier;
 
-		public ModelTransform smokeTransform;
-		public Vec3i[] hearthOffsets;
-		public Vec3i lightOffset;
+		public ModelTransform SmokeTransform = default!;
+		public Vec3i[] HearthOffsets = default!;
+		public Vec3i LightOffset = default!;
 
 		protected override void OnStructureLoaded()
 		{
@@ -20,9 +20,9 @@ namespace GlassMaking.Blocks
 
 			if(api.Side == EnumAppSide.Client)
 			{
-				smokeTransform = Attributes?["smokeTransform"].AsObject<ModelTransform>() ?? ModelTransform.NoTransform;
+				SmokeTransform = Attributes["smokeTransform"].AsObject<ModelTransform>() ?? ModelTransform.NoTransform;
 			}
-			hearthOffsets = new Vec3i[4];
+			HearthOffsets = new Vec3i[4];
 			int sx = structure.GetLength(0), sy = structure.GetLength(1), sz = structure.GetLength(2);
 			int index = 0;
 			for(int x = 0; x < sx; x++)
@@ -33,12 +33,12 @@ namespace GlassMaking.Blocks
 					{
 						if(structure[x, y, z] is BlockHorizontalStructurePlan plan && plan.Variant.TryGetValue("sides", out var type) && type == "hearth")
 						{
-							hearthOffsets[index] = -plan.mainOffset;
+							HearthOffsets[index] = -plan.mainOffset;
 							index++;
 						}
 						else if(structure[x, y, z] is BlockHorizontalStructure block && block.Variant.ContainsKey("light"))
 						{
-							lightOffset = -block.mainOffset;
+							LightOffset = -block.mainOffset;
 						}
 					}
 				}

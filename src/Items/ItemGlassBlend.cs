@@ -12,18 +12,18 @@ namespace GlassMaking.Items
 {
 	public class ItemGlassBlend : Item, IContainedMeshSource, ITexPositionSource
 	{
-		public Size2i AtlasSize => curAtlas.Size;
+		public Size2i AtlasSize => curAtlas!.Size;
 
-		private ITextureAtlasAPI curAtlas;
-		private Shape nowTesselatingShape;
-		private GlassBlend curBlend;
+		private ITextureAtlasAPI? curAtlas;
+		private Shape? nowTesselatingShape;
+		private GlassBlend? curBlend;
 
 		public virtual TextureAtlasPosition this[string textureCode]
 		{
 			get
 			{
-				AssetLocation texturePath = null;
-				CompositeTexture tex;
+				AssetLocation? texturePath = null;
+				CompositeTexture? tex;
 
 				// Prio 1: Get from collectible textures
 				if(Textures.TryGetValue(textureCode, out tex))
@@ -54,7 +54,7 @@ namespace GlassMaking.Items
 					texturePath = new AssetLocation(textureCode);
 				}
 
-				return AtlasTexSource.GetOrCreateTexPos(api as ICoreClientAPI, curAtlas, texturePath, "Item " + Code);
+				return AtlasTexSource.GetOrCreateTexPos((ICoreClientAPI)api, curAtlas!, texturePath, "Item " + Code);
 			}
 		}
 
@@ -77,7 +77,7 @@ namespace GlassMaking.Items
 		public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
 		{
 			base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
-			GlassBlend blend = GlassBlend.FromJson(inSlot.Itemstack);
+			GlassBlend? blend = GlassBlend.FromJson(inSlot.Itemstack);
 			if(blend == null) blend = GlassBlend.FromTreeAttributes(inSlot.Itemstack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
 			if(blend != null && blend.Amount > 0)
 			{
@@ -87,7 +87,7 @@ namespace GlassMaking.Items
 
 		public override string GetHeldItemName(ItemStack itemStack)
 		{
-			GlassBlend blend = GlassBlend.FromJson(itemStack);
+			GlassBlend? blend = GlassBlend.FromJson(itemStack);
 			if(blend == null) blend = GlassBlend.FromTreeAttributes(itemStack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
 			if(blend != null)
 			{
@@ -98,13 +98,13 @@ namespace GlassMaking.Items
 
 		public override void OnBeforeRender(ICoreClientAPI capi, ItemStack itemstack, EnumItemRenderTarget target, ref ItemRenderInfo renderinfo)
 		{
-			GlassBlend blend = GlassBlend.FromTreeAttributes(itemstack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
+			GlassBlend? blend = GlassBlend.FromTreeAttributes(itemstack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
 			if(blend == null) return;
 
 			var blendMeshrefs = ObjectCacheUtil.GetOrCreate(capi, "glassmaking:blendMeshRefs", () => new Dictionary<string, MultiTextureMeshRef>());
 			string key = GetItemBaseCode(Code) + "|" + blend.Code.ToString();
 
-			MultiTextureMeshRef meshRef;
+			MultiTextureMeshRef? meshRef;
 			if(!blendMeshrefs.TryGetValue(key, out meshRef))
 			{
 				var mesh = GenMesh(itemstack, capi.ItemTextureAtlas);
@@ -114,17 +114,17 @@ namespace GlassMaking.Items
 			renderinfo.ModelRef = meshRef;
 		}
 
-		public MeshData GenMesh(ItemStack itemstack, ITextureAtlasAPI targetAtlas, BlockPos forBlockPos = null)
+		public MeshData GenMesh(ItemStack itemstack, ITextureAtlasAPI targetAtlas, BlockPos? forBlockPos = null)
 		{
 			curAtlas = targetAtlas;
-			MeshData mesh = GenMesh(api as ICoreClientAPI, itemstack);
+			MeshData mesh = GenMesh((ICoreClientAPI)api, itemstack);
 			mesh.RenderPassesAndExtraBits.Fill((short)EnumChunkRenderPass.BlendNoCull);
 			return mesh;
 		}
 
 		public string GetMeshCacheKey(ItemStack itemstack)
 		{
-			GlassBlend blend = GlassBlend.FromTreeAttributes(itemstack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
+			GlassBlend? blend = GlassBlend.FromTreeAttributes(itemstack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
 			if(blend != null)
 			{
 				return GetItemBaseCode(Code) + "|" + blend.Code.ToString();

@@ -6,13 +6,13 @@ namespace GlassMaking
 {
 	public static class HandbookItemInfoEvent
 	{
-		public delegate void OnGetHandbookInfo(ItemSlot inSlot, ICoreClientAPI capi, ItemStack[] allStacks, ActionConsumable<string> openDetailPageFor, HandbookItemInfoSection section, List<RichTextComponentBase> outComponents);
+		public delegate void OnGetHandbookInfoDelegate(ItemSlot inSlot, ICoreClientAPI capi, ItemStack[] allStacks, ActionConsumable<string> openDetailPageFor, HandbookItemInfoSection section, List<RichTextComponentBase> outComponents);
 
-		public static event OnGetHandbookInfo onGetHandbookInfo;
+		public static event OnGetHandbookInfoDelegate? OnGetHandbookInfo;
 
 		internal static void GetHandbookInfo(ItemSlot inSlot, ICoreClientAPI capi, ItemStack[] allStacks, ActionConsumable<string> openDetailPageFor, HandbookItemInfoSection section, List<RichTextComponentBase> components)
 		{
-			onGetHandbookInfo?.Invoke(inSlot, capi, allStacks, openDetailPageFor, section, components);
+			OnGetHandbookInfo?.Invoke(inSlot, capi, allStacks, openDetailPageFor, section, components);
 		}
 	}
 }

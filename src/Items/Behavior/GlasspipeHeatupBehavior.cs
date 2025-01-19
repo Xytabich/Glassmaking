@@ -14,10 +14,10 @@ namespace GlassMaking.Items.Behavior
 
 		public double Priority => 0.3;
 
-		private ICoreAPI api;
-		private GlassMakingMod glassMaking;
+		private ICoreAPI api = default!;
+		private GlassMakingMod glassMaking = default!;
 		private readonly ItemGlassworkPipe glassworkPipe;
-		private string animation;
+		private string animation = default!;
 
 		public GlasspipeHeatupBehavior(CollectibleObject collObj) : base(collObj)
 		{
@@ -107,19 +107,6 @@ namespace GlassMaking.Items.Behavior
 					{
 						if(activeCraft.IsHeated(byEntity.World, itemstack))
 						{
-							if(api.Side == EnumAppSide.Client)
-							{
-								const float speed = 1.5f;
-								ModelTransform modelTransform = new ModelTransform();
-								modelTransform.EnsureDefaultValues();
-								modelTransform.Origin.Set(0f, 0f, 0f);
-								modelTransform.Translation.Set(-Math.Min(0.5f, speed * secondsUsed), -Math.Min(0.5f, speed * secondsUsed), Math.Min(0.5f, speed * secondsUsed));
-								modelTransform.Scale = 1f - Math.Min(0.1f, speed * secondsUsed / 4f);
-								modelTransform.Rotation.X = -Math.Min(10f, secondsUsed * 45f * speed);
-								modelTransform.Rotation.Y = -Math.Min(15f, secondsUsed * 45f * speed) + GameMath.FastSin(secondsUsed * 1.5f);
-								modelTransform.Rotation.Z = secondsUsed * 90f % 360f;
-								byEntity.Controls.UsingHeldItemTransformBefore = modelTransform;
-							}
 							if(api.Side == EnumAppSide.Server && itemstack.TempAttributes.GetFloat(LASTHEAT_ATTRIB) + 1f <= secondsUsed)
 							{
 								itemstack.TempAttributes.SetFloat(LASTHEAT_ATTRIB, (float)Math.Floor(secondsUsed));

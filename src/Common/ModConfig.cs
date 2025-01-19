@@ -1,4 +1,5 @@
-﻿using ProtoBuf;
+﻿using System;
+using ProtoBuf;
 using Vintagestory.API.Common;
 
 namespace GlassMaking.Common
@@ -12,7 +13,7 @@ namespace GlassMaking.Common
 		public (AssetLocation code, EnumItemClass type, int amount)[] Shards => shards;
 
 		[ProtoMember(1)]
-		private (AssetLocation, EnumItemClass, int)[] shards;
+		private (AssetLocation, EnumItemClass, int)[] shards = default!;
 
 		public ModConfig() { }
 
@@ -23,7 +24,7 @@ namespace GlassMaking.Common
 
 		public static ModConfig CreateEmpty()
 		{
-			return new ModConfig(new (AssetLocation, EnumItemClass, int)[0]);
+			return new ModConfig(Array.Empty<(AssetLocation, EnumItemClass, int)>());
 		}
 	}
 
@@ -40,7 +41,7 @@ namespace GlassMaking.Common
 
 		internal class ShardInfo
 		{
-			public AssetLocation Code { get; set; }
+			public AssetLocation Code { get; set; } = default!;
 			public EnumItemClass Type { get; set; }
 			public int Amount { get; set; }
 

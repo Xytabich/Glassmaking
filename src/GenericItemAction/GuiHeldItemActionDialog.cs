@@ -15,18 +15,19 @@ namespace GlassMaking.GenericItemAction
 
 		protected void DoItemAction(IPlayer player, CollectibleObject item, string action, ITreeAttribute attributes)
 		{
-			IGenericHeldItemAction heldAction;
-			if((heldAction = item as IGenericHeldItemAction) != null)
 			{
-				if(heldAction.GenericHeldItemAction(player, action, attributes))
+				if(item is IGenericHeldItemAction heldAction)
 				{
-					system.SendActionMessage(item, action, attributes);
-					return;
+					if(heldAction.GenericHeldItemAction(player, action, attributes))
+					{
+						system.SendActionMessage(item, action, attributes);
+						return;
+					}
 				}
 			}
 			foreach(var behavior in item.CollectibleBehaviors)
 			{
-				if((heldAction = behavior as IGenericHeldItemAction) != null)
+				if(behavior is IGenericHeldItemAction heldAction)
 				{
 					if(heldAction.GenericHeldItemAction(player, action, attributes))
 					{

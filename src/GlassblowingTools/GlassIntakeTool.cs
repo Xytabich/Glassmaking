@@ -11,7 +11,7 @@ namespace GlassMaking.GlassblowingTools
 	{
 		public double Priority => 2;
 
-		private string animation;
+		private string animation = default!;
 
 		public GlassIntakeTool(CollectibleObject collObj) : base(collObj)
 		{
@@ -32,7 +32,7 @@ namespace GlassMaking.GlassblowingTools
 				{
 					int sourceAmount = source.GetGlassAmount();
 					var sourceGlassCode = source.GetGlassCode();
-					if(sourceAmount > 0 && sourceGlassCode.Equals(new AssetLocation(step.StepAttributes["code"].AsString())))
+					if(sourceAmount > 0 && sourceGlassCode!.Equals(new AssetLocation(step.StepAttributes!["code"].AsString())))
 					{
 						if(step.BeginStep())
 						{
@@ -68,7 +68,7 @@ namespace GlassMaking.GlassblowingTools
 					{
 						int sourceAmount = source.GetGlassAmount();
 						var sourceGlassCode = source.GetGlassCode();
-						if(sourceAmount > 0 && sourceGlassCode.Equals(new AssetLocation(step.StepAttributes["code"].AsString())))
+						if(sourceAmount > 0 && sourceGlassCode!.Equals(new AssetLocation(step.StepAttributes!["code"].AsString())))
 						{
 							int intake = slot.Itemstack.Attributes.GetInt("glassmaking:toolIntakeAmount", 0);
 							int amount = step.StepAttributes["amount"].AsInt();
@@ -106,8 +106,7 @@ namespace GlassMaking.GlassblowingTools
 								}
 								if(secondsUsed > 1f / speed)
 								{
-									IPlayer byPlayer = null;
-									if(byEntity is EntityPlayer) byPlayer = byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID);
+									var byPlayer = Utils.GetPlayerFromEntity(byEntity);
 									source.SpawnMeltParticles(byEntity.World, blockSel, byPlayer);
 								}
 								handling = EnumHandling.PreventSubsequent;
@@ -154,7 +153,7 @@ namespace GlassMaking.GlassblowingTools
 			{
 				if(steps[i].Tool == ToolCode)
 				{
-					amount += steps[i].Attributes["amount"].AsInt();
+					amount += steps[i].Attributes!["amount"].AsInt();
 				}
 			}
 			return amount;

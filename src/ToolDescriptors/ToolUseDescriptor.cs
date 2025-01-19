@@ -19,7 +19,7 @@ namespace GlassMaking.ToolDescriptors
 		{
 			var step = recipe.Steps[stepIndex];
 			outComponents.Add(new RichTextComponent(capi, "• " + Lang.Get("glassmaking:Step {0}: {1}", stepIndex + 1, Lang.Get("glassmaking:{0} for {1} seconds",
-				Lang.Get("glassmaking:glassblowingtool-" + step.Tool), step.Attributes["time"].AsFloat(1).ToString("G", CultureInfo.InvariantCulture))) + "\n", CairoFont.WhiteSmallText()));
+				Lang.Get("glassmaking:glassblowingtool-" + step.Tool), step.Attributes!["time"].AsFloat(1).ToString("G", CultureInfo.InvariantCulture))) + "\n", CairoFont.WhiteSmallText()));
 			outComponents.Add(new SlideshowItemstackTextComponent(capi, handbookItemsByType[step.Tool], 40.0, EnumFloat.Inline,
 				cs => openDetailPageFor(GuiHandbookItemStackPage.PageCodeForStack(cs))));
 			outComponents.Add(new ClearFloatTextComponent(capi));
@@ -28,7 +28,7 @@ namespace GlassMaking.ToolDescriptors
 		public override void GetStepInfoForHeldItem(IWorldAccessor world, ItemStack item, GlassBlowingRecipe recipe, int stepIndex, StringBuilder dsc, bool withDebugInfo)
 		{
 			var step = recipe.Steps[stepIndex];
-			dsc.AppendLine("• " + Lang.Get("glassmaking:{0} for {1} seconds", Lang.Get("glassmaking:glassblowingtool-" + step.Tool), step.Attributes["time"].AsFloat(1).ToString("G", CultureInfo.InvariantCulture)));
+			dsc.AppendLine("• " + Lang.Get("glassmaking:{0} for {1} seconds", Lang.Get("glassmaking:glassblowingtool-" + step.Tool), step.Attributes!["time"].AsFloat(1).ToString("G", CultureInfo.InvariantCulture)));
 		}
 
 		protected override bool IsSuitableBehavior(CollectibleObject item, CollectibleBehavior beh)

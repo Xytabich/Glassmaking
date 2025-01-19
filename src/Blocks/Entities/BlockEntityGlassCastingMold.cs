@@ -17,23 +17,23 @@ namespace GlassMaking.Blocks
 
 		public float Temperature { get { return temperature.GetTemperature(Api.World); } }
 
-		public bool IsHardened { get { return Temperature < 0.45f * mod.GetGlassTypeInfo(glassCode).MeltingPoint; } }
+		public bool IsHardened { get { return Temperature < 0.45f * mod.GetGlassTypeInfo(glassCode!)!.MeltingPoint; } }
 
-		public bool IsLiquid { get { return Temperature > mod.GetGlassTypeInfo(glassCode).MeltingPoint; } }
+		public bool IsLiquid { get { return Temperature > mod.GetGlassTypeInfo(glassCode!)!.MeltingPoint; } }
 
 		public bool IsFull { get { return fillLevel >= requiredUnits; } }
 
 		public bool IsEmpty { get { return glassCode == null; } }
 
-		private Cuboidf[] fillQuadsByLevel = null;
+		private Cuboidf[]? fillQuadsByLevel = null;
 		private int requiredUnits = 100;
 		private float fillHeight = 1;
 
-		private AssetLocation glassCode = null;
+		private AssetLocation? glassCode = null;
 		private TemperatureContainer temperature = new TemperatureContainer();
 
-		private CastingMoldRenderer renderer = null;
-		private GlassMakingMod mod;
+		private CastingMoldRenderer? renderer = null;
+		private GlassMakingMod mod = default!;
 
 		public override void Initialize(ICoreAPI api)
 		{
@@ -161,7 +161,7 @@ namespace GlassMaking.Blocks
 			renderer = null;
 		}
 
-		public IEnumerable<ItemStack> GetDrops()
+		public IEnumerable<ItemStack>? GetDrops()
 		{
 			if(glassCode == null) return null;
 			if(fillLevel < requiredUnits || !IsHardened)
@@ -171,7 +171,7 @@ namespace GlassMaking.Blocks
 			return GetReadyMoldedStacks();
 		}
 
-		public ItemStack[] GetReadyMoldedStacks()
+		public ItemStack[]? GetReadyMoldedStacks()
 		{
 			if(glassCode == null) return null;
 			if(fillLevel < requiredUnits || !IsHardened) return null;
@@ -231,7 +231,7 @@ namespace GlassMaking.Blocks
 
 				if(Api is ICoreServerAPI)
 				{
-					ItemStack[] outstacks = GetReadyMoldedStacks();
+					ItemStack[]? outstacks = GetReadyMoldedStacks();
 
 					if(outstacks != null)
 					{
@@ -258,7 +258,7 @@ namespace GlassMaking.Blocks
 			return false;
 		}
 
-		private CastingMoldRecipe FindRecipe(AssetLocation glassCode)
+		private CastingMoldRecipe? FindRecipe(AssetLocation glassCode)
 		{
 			var recipes = ((BlockGlassCastingMold)Block).GetRecipes();
 			if(recipes == null || recipes.Length == 0) return null;

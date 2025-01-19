@@ -16,30 +16,30 @@ namespace GlassMaking.Blocks
 		private static AssetLocation openSound = new AssetLocation("sounds/block/vesselopen");
 		private static AssetLocation closeSound = new AssetLocation("sounds/block/vesselclose");
 
-		public Size2i AtlasSize => capi.BlockTextureAtlas.Size;
+		public Size2i AtlasSize => capi!.BlockTextureAtlas.Size;
 		public string AttributeTransformCode => "onDisplayTransform";
 
 		public bool CanTakeItem => contents != null && (splittable ? (!hasContentsTransform || Block.Variant["state"] == "opened") : hasContentsTransform);
 		public bool CanBeFilled => contents == null && (!splittable || Block.Variant["state"] != "opened");
 
-		private CollectibleObject nowTesselatingObj;
-		private Shape nowTesselatingShape;
-		private ICoreClientAPI capi;
+		private CollectibleObject? nowTesselatingObj;
+		private Shape? nowTesselatingShape;
+		private ICoreClientAPI? capi;
 
 		private bool splittable = false;
-		private ItemStack contents = null;
+		private ItemStack? contents = null;
 
 		private bool hasContentsTransform = false;
-		private ModelTransform contentsTransform = null;
-		private MeshData contentsMesh = null;
+		private ModelTransform? contentsTransform = null;
+		private MeshData? contentsMesh = null;
 
 		public TextureAtlasPosition this[string textureCode]
 		{
 			get
 			{
-				var textures = nowTesselatingObj is Item item ? item.Textures : ((Block)nowTesselatingObj).Textures;
-				AssetLocation texturePath = null;
-				CompositeTexture tex;
+				var textures = nowTesselatingObj is Item item ? item.Textures : ((Block)nowTesselatingObj!).Textures;
+				AssetLocation? texturePath = null;
+				CompositeTexture? tex;
 
 				// Prio 1: Get from collectible textures
 				if(textures.TryGetValue(textureCode, out tex))
@@ -65,7 +65,7 @@ namespace GlassMaking.Blocks
 					texturePath = new AssetLocation(textureCode);
 				}
 
-				return AtlasTexSource.GetOrCreateTexPos(capi, capi.BlockTextureAtlas, texturePath, "For render in block " + Block.Code + ", item " + nowTesselatingObj.Code);
+				return AtlasTexSource.GetOrCreateTexPos(capi!, capi!.BlockTextureAtlas, texturePath, "For render in block " + Block.Code + ", item " + nowTesselatingObj.Code);
 			}
 		}
 
@@ -182,7 +182,7 @@ namespace GlassMaking.Blocks
 			}
 		}
 
-		public ItemStack[] GetDropItems()
+		public ItemStack[]? GetDropItems()
 		{
 			if(contents != null) return new ItemStack[] { contents.Clone() };
 			return null;
@@ -278,7 +278,7 @@ namespace GlassMaking.Blocks
 			MeshData mesh;
 			if(stack.Class == EnumItemClass.Block)
 			{
-				mesh = capi.TesselatorManager.GetDefaultBlockMesh(stack.Block).Clone();
+				mesh = capi!.TesselatorManager.GetDefaultBlockMesh(stack.Block).Clone();
 			}
 			else
 			{
@@ -286,9 +286,9 @@ namespace GlassMaking.Blocks
 				nowTesselatingShape = null;
 				if(stack.Item.Shape != null)
 				{
-					nowTesselatingShape = capi.TesselatorManager.GetCachedShape(stack.Item.Shape.Base);
+					nowTesselatingShape = capi!.TesselatorManager.GetCachedShape(stack.Item.Shape.Base);
 				}
-				capi.Tesselator.TesselateItem(stack.Item, out mesh, this);
+				capi!.Tesselator.TesselateItem(stack.Item, out mesh, this);
 
 				mesh.RenderPassesAndExtraBits.Fill((short)EnumChunkRenderPass.BlendNoCull);
 			}

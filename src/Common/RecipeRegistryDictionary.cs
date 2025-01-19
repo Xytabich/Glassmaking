@@ -6,8 +6,8 @@ namespace GlassMaking.Common
 {
 	public class RecipeRegistryDictionary<T> : RecipeRegistryBase where T : IByteSerializable, IRecipeBase, new()
 	{
-		public List<T> Recipes;
-		public Dictionary<string, T> Pairs;
+		public readonly List<T> Recipes;
+		public readonly Dictionary<string, T> Pairs;
 
 		public RecipeRegistryDictionary()
 		{

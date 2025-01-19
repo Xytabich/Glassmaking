@@ -4,11 +4,11 @@ namespace GlassMaking.Blocks
 {
 	public interface IWorkbenchRenderInfo
 	{
-		IWorkpieceRenderer workpieceRenderer { get; }
+		IWorkpieceRenderer WorkpieceRenderer { get; }
 	}
 
 	public interface IWorkpieceRenderer
 	{
-		Matrixf itemTransform { get; }
+		Matrixf ItemTransform { get; }
 	}
 }

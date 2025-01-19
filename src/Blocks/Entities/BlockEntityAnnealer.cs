@@ -18,13 +18,13 @@ namespace GlassMaking.Blocks
 		public override string InventoryClassName => "glassmaking:annealer";
 		public override string AttributeTransformCode => "annealerTransform";
 
-		protected virtual int itemCapacity => 9;
+		protected virtual int ItemCapacity => 9;
 
-		private InventoryGeneric inventory;
-		private ItemStack lastRemoved = null;
+		private readonly InventoryGeneric inventory;
+		private ItemStack? lastRemoved = null;
 
-		private ITimeBasedHeatSourceControl heatSource = null;
-		private ItemProcessInfo[] processes;
+		private ITimeBasedHeatSourceControl? heatSource = null;
+		private readonly ItemProcessInfo?[] processes;
 
 		private int gridSize = 0;
 		private float gridCellSize;
@@ -33,12 +33,12 @@ namespace GlassMaking.Blocks
 
 		public BlockEntityAnnealer()
 		{
-			inventory = new InventoryGeneric(itemCapacity, InventoryClassName + "-" + Pos, null);
-			for(int i = itemCapacity - 1; i >= 0; i--)
+			inventory = new InventoryGeneric(ItemCapacity, InventoryClassName + "-" + Pos, null);
+			for(int i = ItemCapacity - 1; i >= 0; i--)
 			{
 				inventory[i].MaxSlotStackSize = 1;
 			}
-			processes = new ItemProcessInfo[itemCapacity];
+			processes = new ItemProcessInfo[ItemCapacity];
 		}
 
 		public override void Initialize(ICoreAPI api)
@@ -60,16 +60,17 @@ namespace GlassMaking.Blocks
 			if(!inventory.Empty)
 			{
 				dsc.AppendLine(Lang.Get("Contents:"));
-				for(int i = 0; i < itemCapacity; i++)
+				for(int i = 0; i < ItemCapacity; i++)
 				{
 					if(!inventory[i].Empty)
 					{
 						dsc.Append(inventory[i].GetStackName());
 						float temperature = (inventory[i].Itemstack.Attributes["temperature"] as ITreeAttribute)?.GetFloat("temperature", 20f) ?? 20f;
 						dsc.Append("  ").AppendLine(Lang.Get("Temperature: {0}°C", temperature.ToString("0")));
-						if(processes[i] != null && processes[i].isHeated)
+						var process = processes[i];
+						if(process != null && process.IsHeated)
 						{
-							dsc.AppendLine(Lang.Get("glassmaking:Annealing: {0}", (Math.Min(processes[i].time / processes[i].annealTime, 1) * 100).ToString("0")));
+							dsc.AppendLine(Lang.Get("glassmaking:Annealing: {0}", (Math.Min(process.Time / process.AnnealTime, 1) * 100).ToString("0")));
 						}
 					}
 				}
@@ -123,7 +124,7 @@ namespace GlassMaking.Blocks
 							{
 								inventory[i].Itemstack = slot.TakeOut(1);
 								lastRemoved = null;
-								processes[i] = new ItemProcessInfo() { isHeated = false, time = 0 };
+								processes[i] = new ItemProcessInfo() { IsHeated = false, Time = 0 };
 								ResolveProcessInfo(i);
 								if(Api.Side == EnumAppSide.Client) updateMeshes();
 								MarkDirty(true);
@@ -152,7 +153,7 @@ namespace GlassMaking.Blocks
 						}
 						inventory[0].Itemstack = slot.TakeOut(1);
 						lastRemoved = null;
-						processes[0] = new ItemProcessInfo() { isHeated = false, time = 0 };
+						processes[0] = new ItemProcessInfo() { IsHeated = false, Time = 0 };
 						ResolveProcessInfo(0);
 						if(Api.Side == EnumAppSide.Client) updateMeshes();
 						MarkDirty(true);
@@ -169,11 +170,12 @@ namespace GlassMaking.Blocks
 			inventory.ToTreeAttributes(tree);
 			for(int i = 0; i < processes.Length; i++)
 			{
-				if(!inventory[i].Empty && processes[i] != null)
+				var process = processes[i];
+				if(!inventory[i].Empty && process != null)
 				{
 					var attrib = tree.GetOrAddTreeAttribute("process" + i);
-					attrib.SetBool("isHeated", processes[i].isHeated);
-					attrib.SetDouble("time", processes[i].time);
+					attrib.SetBool("isHeated", process.IsHeated);
+					attrib.SetDouble("time", process.Time);
 				}
 			}
 		}
@@ -189,8 +191,8 @@ namespace GlassMaking.Blocks
 				if(attrib != null)
 				{
 					processes[i] = new ItemProcessInfo() {
-						isHeated = attrib.GetBool("isHeated"),
-						time = attrib.GetDouble("time")
+						IsHeated = attrib.GetBool("isHeated"),
+						Time = attrib.GetDouble("time")
 					};
 				}
 				else
@@ -214,7 +216,7 @@ namespace GlassMaking.Blocks
 			int len = DisplayedItems;
 			float[][] tfMatrices = new float[len][];
 			var tmpMat = new Matrixf();
-			var transform = ((BlockAnnealer)Block).contentTransform;
+			var transform = ((BlockAnnealer)Block).ContentTransform;
 			for(int i = 0; i < len; i++)
 			{
 				tmpMat.Identity();
@@ -236,7 +238,7 @@ namespace GlassMaking.Blocks
 			base.updateMeshes();
 		}
 
-		void ITimeBasedHeatReceiver.SetHeatSource(ITimeBasedHeatSourceControl heatSource)
+		void ITimeBasedHeatReceiver.SetHeatSource(ITimeBasedHeatSourceControl? heatSource)
 		{
 			this.heatSource = heatSource;
 		}
@@ -249,7 +251,7 @@ namespace GlassMaking.Blocks
 			{
 				var totalHours = Api.World.Calendar.TotalHours;
 				var graph = heatSource.CalcHeatGraph();
-				for(int i = 0; i < itemCapacity; i++)
+				for(int i = 0; i < ItemCapacity; i++)
 				{
 					var slot = inventory[i];
 					if(!slot.Empty)
@@ -259,28 +261,28 @@ namespace GlassMaking.Blocks
 						if(process != null)
 						{
 							double timeOffset = 0;
-							if(!process.isHeated)
+							if(!process.IsHeated)
 							{
 								if(Api.Side == EnumAppSide.Server)
 								{
 									double? time;
-									if(temperature >= process.annealTemperature.max) time = 0;
-									else time = graph.ReachValue(temperature, process.annealTemperature.max, 1000f, 90f);
+									if(temperature >= process.AnnealTemperature.Max) time = 0;
+									else time = graph.ReachValue(temperature, process.AnnealTemperature.Max, 1000f, 90f);
 									if(time.HasValue)
 									{
-										process.isHeated = true;
+										process.IsHeated = true;
 										timeOffset = time.Value;
 										MarkDirty(true);
 									}
 								}
 							}
-							if(process.isHeated)
+							if(process.IsHeated)
 							{
-								process.time += Math.Max(0, Math.Min((temperature - process.annealTemperature.min) / 90f, totalHours - heatSource.GetLastTickTime()) - timeOffset);
-								if(process.time >= process.annealTime && Api.Side == EnumAppSide.Server)
+								process.Time += Math.Max(0, Math.Min((temperature - process.AnnealTemperature.Min) / 90f, totalHours - heatSource.GetLastTickTime()) - timeOffset);
+								if(process.Time >= process.AnnealTime && Api.Side == EnumAppSide.Server)
 								{
 									processes[i] = null;
-									slot.Itemstack = process.output.Clone();
+									slot.Itemstack = process.Output.Clone();
 									MarkDirty(true);
 								}
 							}
@@ -305,12 +307,12 @@ namespace GlassMaking.Blocks
 			var properties = stack.Collectible.Attributes?["glassmaking:anneal"];
 			if(properties != null && properties.Exists)
 			{
-				var output = properties["output"].AsObject<JsonItemStack>(null, stack.Collectible.Code.Domain);
-				if(output.Resolve(Api.World, "annealer"))
+				var output = properties["output"].AsObject<JsonItemStack?>(null, stack.Collectible.Code.Domain);
+				if(output!.Resolve(Api.World, "annealer"))
 				{
-					processes[index].annealTemperature = properties["temperature"].AsObject<MinMaxFloat>();
-					processes[index].annealTime = properties["time"].AsInt() / 3600.0;
-					processes[index].output = output.ResolvedItemstack;
+					processes[index]!.AnnealTemperature = properties["temperature"].AsObject<MinMaxFloat>();
+					processes[index]!.AnnealTime = properties["time"].AsInt() / 3600.0;
+					processes[index]!.Output = output.ResolvedItemstack;
 					return;
 				}
 			}
@@ -321,7 +323,7 @@ namespace GlassMaking.Blocks
 		{
 			float maxSize = 0f;
 			int itemsCount = 0;
-			for(int i = 0; i < itemCapacity; i++)
+			for(int i = 0; i < ItemCapacity; i++)
 			{
 				var slot = inventory[i];
 				if(!slot.Empty)
@@ -356,7 +358,7 @@ namespace GlassMaking.Blocks
 		{
 			if(Api.World.Rand.Next(5) > 0)
 			{
-				var transform = ((BlockAnnealer)Block).smokeTransform;
+				var transform = ((BlockAnnealer)Block).SmokeTransform;
 				smokeParticles.MinPos.Set(Pos.X + transform.Translation.X, Pos.Y + transform.Translation.Y, Pos.Z + transform.Translation.Z);
 				smokeParticles.AddPos.Set(transform.ScaleXYZ.X, 0.0, transform.ScaleXYZ.Z);
 				Api.World.SpawnParticles(smokeParticles);
@@ -373,11 +375,11 @@ namespace GlassMaking.Blocks
 
 		private class ItemProcessInfo
 		{
-			internal MinMaxFloat annealTemperature;
-			internal double annealTime;
-			internal ItemStack output;
-			internal bool isHeated;
-			internal double time;
+			public MinMaxFloat AnnealTemperature = default!;
+			public double AnnealTime;
+			public ItemStack Output = default!;
+			public bool IsHeated;
+			public double Time;
 		}
 	}
 }

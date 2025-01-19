@@ -25,7 +25,7 @@ namespace GlassMaking.Blocks.Renderer
 		private Vec3f blockRot;
 		private Matrixf transformMat = new Matrixf();
 
-		public BlockAnimatableRenderer(ICoreClientAPI capi, BlockPos blockPos, Vec3f blockRot, ModelTransform transform, AnimatorBase animator, MeshRef meshref, bool disposeMesh = true)
+		public BlockAnimatableRenderer(ICoreClientAPI capi, BlockPos blockPos, Vec3f blockRot, ModelTransform? transform, AnimatorBase animator, MeshRef meshref, bool disposeMesh = true)
 		{
 			this.capi = capi;
 			this.blockPos = blockPos;

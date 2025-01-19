@@ -18,18 +18,18 @@ namespace GlassMaking
 		public int RecipeId;
 
 		[JsonProperty]
-		public AssetLocation Code;
+		public AssetLocation Code = default!;
 
 		[JsonProperty]
-		public CraftingRecipeIngredient Input;
+		public CraftingRecipeIngredient Input = default!;
 
 		[JsonProperty]
-		public JsonItemStack Output;
+		public JsonItemStack Output = default!;
 
 		[JsonProperty]
-		public WorkbenchRecipeStep[] Steps;
+		public WorkbenchRecipeStep[] Steps = default!;
 
-		public AssetLocation Name { get; set; }
+		public AssetLocation Name { get; set; } = default!;
 
 		public bool Enabled { get; set; } = true;
 
@@ -41,9 +41,9 @@ namespace GlassMaking
 
 		AssetLocation IRecipeBase.Code => Code;
 
-		private CraftingRecipeIngredient[] ingredients = null;
+		private CraftingRecipeIngredient[]? ingredients = null;
 
-		private PlaceholderFiller filler;
+		private readonly PlaceholderFiller filler;
 
 		public WorkbenchRecipe()
 		{
@@ -218,16 +218,16 @@ namespace GlassMaking
 	public sealed class WorkbenchRecipeStep
 	{
 		[JsonProperty]
-		public CompositeShape Shape = null;
+		public CompositeShape? Shape = null;
 
 		[JsonProperty]
-		public Dictionary<string, CompositeTexture> Textures = null;
+		public Dictionary<string, CompositeTexture>? Textures = null;
 
 		[JsonProperty(Required = Required.Always, ItemConverterType = typeof(JsonAttributesConverter))]
-		public Dictionary<string, JsonObject> Tools;
+		public Dictionary<string, JsonObject?> Tools = default!;
 
 		[JsonProperty]
-		public ModelTransform WorkpieceTransform = null;
+		public ModelTransform? WorkpieceTransform = null;
 
 		[JsonProperty]
 		public float? UseTime = null;
@@ -315,11 +315,11 @@ namespace GlassMaking
 			}
 
 			count = reader.ReadInt32();
-			Tools = new Dictionary<string, JsonObject>(count);
+			Tools = new Dictionary<string, JsonObject?>(count);
 			for(int i = 0; i < count; i++)
 			{
 				var tool = reader.ReadString().ToLowerInvariant();
-				JsonObject attribs = null;
+				JsonObject? attribs = null;
 				if(reader.ReadBoolean())
 				{
 					attribs = new JsonObject(JToken.Parse(reader.ReadString()));
@@ -350,8 +350,8 @@ namespace GlassMaking
 		{
 			return new WorkbenchRecipeStep() {
 				Shape = Shape?.Clone(),
-				Textures = Textures?.Select(pair => new KeyValuePair<string, CompositeTexture>(pair.Key, pair.Value?.Clone())).ToDictionary(pair => pair.Key, pair => pair.Value),
-				Tools = Tools.Select(pair => new KeyValuePair<string, JsonObject>(pair.Key, pair.Value?.Clone())).ToDictionary(pair => pair.Key, pair => pair.Value),
+				Textures = Textures?.ToDictionary(pair => pair.Key, pair => pair.Value.Clone()),
+				Tools = Tools.Select(pair => new KeyValuePair<string, JsonObject?>(pair.Key, pair.Value?.Clone())).ToDictionary(pair => pair.Key, pair => pair.Value),
 				WorkpieceTransform = WorkpieceTransform?.Clone(),
 				UseTime = UseTime
 			};
@@ -359,7 +359,7 @@ namespace GlassMaking
 
 		public void Initialize()
 		{
-			Tools = Tools.Select(pair => new KeyValuePair<string, JsonObject>(pair.Key.ToLowerInvariant(), pair.Value)).ToDictionary(pair => pair.Key, pair => pair.Value);
+			Tools = Tools.ToDictionary(pair => pair.Key.ToLowerInvariant(), pair => pair.Value);
 			WorkpieceTransform?.EnsureDefaultValues();
 		}
 	}

@@ -6,6 +6,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
+using Vintagestory.API.Common.Entities;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Util;
@@ -95,7 +96,7 @@ namespace GlassMaking
 			}
 		}
 
-		public static void FixIdMappingOrClear(ref ItemStack itemStack, Dictionary<int, AssetLocation> oldBlockIdMapping, Dictionary<int, AssetLocation> oldItemIdMapping, IWorldAccessor worldForNewMappings, bool resolveImports)
+		public static void FixIdMappingOrClear(ref ItemStack? itemStack, Dictionary<int, AssetLocation> oldBlockIdMapping, Dictionary<int, AssetLocation> oldItemIdMapping, IWorldAccessor worldForNewMappings, bool resolveImports)
 		{
 			if(itemStack != null)
 			{
@@ -178,7 +179,18 @@ namespace GlassMaking
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static void AddHandbookBoldRichText(this List<RichTextComponentBase> components, ICoreClientAPI capi, string text, ActionConsumable<string> openDetailPageFor = null)
+		public static IPlayer? GetPlayerFromEntity(Entity entity)
+		{
+			// IPlayer? player = null;
+			// if(entity is EntityPlayer entityPlayer)
+			// {
+			// 	player = entity.World.PlayerByUid(entityPlayer.PlayerUID);
+			// }
+			return (entity as EntityPlayer)?.Player;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void AddHandbookBoldRichText(this List<RichTextComponentBase> components, ICoreClientAPI capi, string text, ActionConsumable<string>? openDetailPageFor = null)
 		{
 			components.AddRange(VtmlUtil.Richtextify(capi, text, CairoFont.WhiteSmallText().WithWeight(FontWeight.Bold), r => openDetailPageFor?.Invoke(r.Href)));
 		}

@@ -22,15 +22,15 @@ namespace GlassMaking
 		public int RecipeId;
 
 		[JsonProperty]
-		public AssetLocation Code;
+		public AssetLocation Code = default!;
 
 		[JsonProperty]
-		public JsonItemStack Output;
+		public JsonItemStack Output = default!;
 
 		[JsonProperty]
-		public GlassBlowingRecipeStep[] Steps;
+		public GlassBlowingRecipeStep[] Steps = default!;
 
-		public AssetLocation Name { get; set; }
+		public AssetLocation Name { get; set; } = default!;
 
 		public bool Enabled { get; set; } = true;
 
@@ -40,7 +40,7 @@ namespace GlassMaking
 
 		AssetLocation IRecipeBase.Code => Code;
 
-		private PlaceholderFiller filler;
+		private readonly PlaceholderFiller filler;
 
 		public GlassBlowingRecipe()
 		{
@@ -220,7 +220,7 @@ namespace GlassMaking
 			string code = recipeAttribute.GetString("code");
 			GetStepAndProgress(recipeAttribute, out int step, out float t);
 
-			SmoothRadialShape prevShape = null;
+			SmoothRadialShape? prevShape = null;
 			for(int i = step - 1; i >= 0; i--)
 			{
 				if(Steps[i].Shape != null)
@@ -242,7 +242,7 @@ namespace GlassMaking
 
 			if(prevShape == null) prevShape = EmptyShape;
 			container.BeginMeshChange();
-			SmoothRadialShape.BuildLerpedMesh(container.Mesh, prevShape, Steps[step].Shape, EmptyShape, t,
+			SmoothRadialShape.BuildLerpedMesh(container.Mesh, prevShape, Steps[step].Shape!, EmptyShape, t,
 				(m, i, o) => GlasspipeRenderUtil.GenerateRadialVertices(m, i, o, glow), GlasspipeRenderUtil.GenerateRadialFaces);
 			container.EndMeshChange();
 		}
@@ -286,7 +286,7 @@ namespace GlassMaking
 			};
 		}
 
-		private static GlasspipeRecipeBehavior GetRecipeBehavior(CollectibleObject collectible)
+		private static GlasspipeRecipeBehavior? GetRecipeBehavior(CollectibleObject collectible)
 		{
 			foreach(var beh in collectible.CollectibleBehaviors)
 			{
@@ -321,14 +321,14 @@ namespace GlassMaking
 	public sealed class GlassBlowingRecipeStep
 	{
 		[JsonProperty(Required = Required.Always)]
-		public string Tool;
+		public string Tool = default!;
 
 		[JsonProperty]
-		public SmoothRadialShape Shape;
+		public SmoothRadialShape? Shape = null;
 
 		[JsonProperty]
 		[JsonConverter(typeof(JsonAttributesConverter))]
-		public JsonObject Attributes;
+		public JsonObject? Attributes;
 
 		public void ToBytes(BinaryWriter writer)
 		{
@@ -357,7 +357,7 @@ namespace GlassMaking
 		{
 			return new GlassBlowingRecipeStep() {
 				Tool = Tool,
-				Shape = Shape.Clone(),
+				Shape = Shape?.Clone(),
 				Attributes = Attributes?.Clone()
 			};
 		}

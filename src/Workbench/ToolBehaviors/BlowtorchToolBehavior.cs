@@ -18,7 +18,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 			if(useTime.HasValue)
 			{
 				var item = (ItemBlowtorch)Slot.Itemstack.Item;
-				if(recipe.Steps[step].Tools[CODE]["temperature"].AsFloat() <= item.flameTemperature)
+				if(recipe.Steps[step].Tools[CODE]!["temperature"].AsFloat() <= item.flameTemperature)
 				{
 					isUsing = true;
 					var useLitres = item.consumptionPerSecond;
@@ -35,7 +35,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 			if(useTime.HasValue)
 			{
 				var item = (ItemBlowtorch)Slot.Itemstack.Item;
-				if(recipe.Steps[step].Tools[CODE]["temperature"].AsFloat() <= item.flameTemperature)
+				if(recipe.Steps[step].Tools[CODE]!["temperature"].AsFloat() <= item.flameTemperature)
 				{
 					var useLitres = item.consumptionPerSecond;
 					return item.GetCurrentLitres(Slot.Itemstack) >= useLitres * useTime.Value;

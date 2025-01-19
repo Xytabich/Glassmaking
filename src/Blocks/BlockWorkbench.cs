@@ -9,14 +9,14 @@ namespace GlassMaking.Blocks
 {
 	public class BlockWorkbench : BlockHorizontalStructure
 	{
-		public ModelTransform defaultWorkpieceTransform;
+		public ModelTransform DefaultWorkpieceTransform = default!;
 
 		protected override void OnStructureLoaded()
 		{
 			base.OnStructureLoaded();
 			if(!isSurrogate && api.Side == EnumAppSide.Client)
 			{
-				defaultWorkpieceTransform = Attributes["workpieceTransform"].AsObject<ModelTransform>().EnsureDefaultValues();
+				DefaultWorkpieceTransform = Attributes["workpieceTransform"].AsObject<ModelTransform>().EnsureDefaultValues();
 			}
 		}
 

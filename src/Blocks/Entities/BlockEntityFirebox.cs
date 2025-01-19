@@ -16,19 +16,19 @@ namespace GlassMaking.Blocks
 		private static SimpleParticleProperties smokeParticles;
 		private static AdvancedParticleProperties fireParticles;
 
-		protected virtual int maxFuelCount => 16;
+		protected virtual int MaxFuelCount => 16;
 
 		private ItemStack contents => inventory[0].Itemstack;
 		private ItemSlot contentsSlot => inventory[0];
 		private InventoryGeneric inventory = new InventoryGeneric(1, "firebox-1", null);
 
-		private BlockFirebox fireboxBlock;
-		private BlockRendererFirebox renderer = null;
+		private BlockFirebox fireboxBlock = default!;
+		private BlockRendererFirebox? renderer = null;
 
-		private ITimeBasedHeatReceiver receiver = null;
-		private IHeatSourceModifier modifier = null;
+		private ITimeBasedHeatReceiver? receiver = null;
+		private IHeatSourceModifier? modifier = null;
 
-		private ILoadedSound ambientSound = null;
+		private ILoadedSound? ambientSound = null;
 
 		private bool burning = false;
 		private float temperature = 20;
@@ -138,36 +138,33 @@ namespace GlassMaking.Blocks
 			return fuelTemperature > 20f ? Math.Max((temperature - 20f) / (fuelTemperature - 20f) * 8f, 0f) : 0f;
 		}
 
-		public void SetReceiver(ITimeBasedHeatReceiver receiver)
+		public void SetReceiver(ITimeBasedHeatReceiver? receiver)
 		{
 			if(this.receiver != receiver)
 			{
-				if(this.receiver != null)
-				{
-					this.receiver.SetHeatSource(null);
-				}
+				this.receiver?.SetHeatSource(null);
 
 				this.receiver = receiver;
 				modifier = receiver as IHeatSourceModifier;
-				if(receiver != null) receiver.SetHeatSource(this);
+				receiver?.SetHeatSource(this);
 
 				MarkDirty(true);
 			}
 		}
 
-		public ItemStack[] GetDropItems()
+		public ItemStack[]? GetDropItems()
 		{
 			if(contentsSlot.StackSize < 1) return null;
 			return new ItemStack[] { contents.Clone() };
 		}
 
-		public void GetFuelStackState(out int canAddAmount, out ItemStack stack)
+		public void GetFuelStackState(out int canAddAmount, out ItemStack? stack)
 		{
 			stack = null;
-			canAddAmount = maxFuelCount;
+			canAddAmount = MaxFuelCount;
 			if(contents != null)
 			{
-				canAddAmount = maxFuelCount - GetFuelCount();
+				canAddAmount = MaxFuelCount - GetFuelCount();
 				stack = contents;
 			}
 		}
@@ -177,7 +174,7 @@ namespace GlassMaking.Blocks
 			var combustibleProps = slot.Itemstack.Collectible.CombustibleProps;
 			if(combustibleProps == null || combustibleProps.BurnTemperature < 100) return false;
 
-			int consume = Math.Min(maxFuelCount - GetFuelCount(), Math.Min(slot.Itemstack.StackSize, count));
+			int consume = Math.Min(MaxFuelCount - GetFuelCount(), Math.Min(slot.Itemstack.StackSize, count));
 			if(consume > 0)
 			{
 				if(slot.TryPutInto(byPlayer.Entity.World, contentsSlot, consume) > 0)
@@ -495,7 +492,7 @@ namespace GlassMaking.Blocks
 
 		private void UpdateRendererParameters()
 		{
-			renderer.SetParameters(burning, Math.Min(128, (int)((temperature * temperatureModifier / 1500f) * 128)));
+			renderer?.SetParameters(burning, Math.Min(128, (int)((temperature * temperatureModifier / 1500f) * 128)));
 		}
 
 		private void EmitParticles()

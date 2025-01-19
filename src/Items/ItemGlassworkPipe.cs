@@ -13,22 +13,22 @@ namespace GlassMaking.Items
 	{
 		public GlasspipeCraftBehavior[] GlasspipeBehaviors => glasspipeBehaviors;
 
-		internal ModelTransform glassTransform;
+		internal ModelTransform GlassTransform = default!;
 
-		private GlassMakingMod mod;
-		private CollectibleBehavior[] prioritizedBehaviors;
-		private GlasspipeCraftBehavior[] glasspipeBehaviors;
+		private GlassMakingMod mod = default!;
+		private CollectibleBehavior[] prioritizedBehaviors = default!;
+		private GlasspipeCraftBehavior[] glasspipeBehaviors = default!;
 
 		public override void OnLoaded(ICoreAPI api)
 		{
 			base.OnLoaded(api);
 			prioritizedBehaviors = (CollectibleBehavior[])CollectibleBehaviors.Clone();
 			SortBehaviors(prioritizedBehaviors);
-			glasspipeBehaviors = prioritizedBehaviors.Select(b => b as GlasspipeCraftBehavior).Where(b => b != null).ToArray();
+			glasspipeBehaviors = prioritizedBehaviors.Select(b => b as GlasspipeCraftBehavior).Where(b => b != null).ToArray()!;
 
 			mod = api.ModLoader.GetModSystem<GlassMakingMod>();
-			glassTransform = Attributes["glassTransform"].AsObject<ModelTransform>();
-			glassTransform.EnsureDefaultValues();
+			GlassTransform = Attributes["glassTransform"].AsObject<ModelTransform>();
+			GlassTransform.EnsureDefaultValues();
 		}
 
 #nullable enable

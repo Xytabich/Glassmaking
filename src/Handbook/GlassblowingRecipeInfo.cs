@@ -13,19 +13,19 @@ namespace GlassMaking.Handbook
 		public GlassblowingRecipeInfo(GlassMakingMod mod)
 		{
 			this.mod = mod;
-			HandbookItemInfoEvent.onGetHandbookInfo += GetHandbookInfo;
+			HandbookItemInfoEvent.OnGetHandbookInfo += GetHandbookInfo;
 		}
 
 		public void Dispose()
 		{
-			HandbookItemInfoEvent.onGetHandbookInfo -= GetHandbookInfo;
+			HandbookItemInfoEvent.OnGetHandbookInfo -= GetHandbookInfo;
 		}
 
 		private void GetHandbookInfo(ItemSlot inSlot, ICoreClientAPI capi, ItemStack[] allStacks, ActionConsumable<string> openDetailPageFor, HandbookItemInfoSection section, List<RichTextComponentBase> outComponents)
 		{
 			if(section != HandbookItemInfoSection.BeforeExtraSections) return;
 			var itemstack = inSlot.Itemstack;
-			List<GlassBlowingRecipe> recipes = null;
+			List<GlassBlowingRecipe>? recipes = null;
 			foreach(var recipe in mod.GetGlassBlowingRecipes())
 			{
 				if(recipe.Value.Output.ResolvedItemstack != null && recipe.Value.Output.ResolvedItemstack.Equals(capi.World, itemstack, GlobalConstants.IgnoredStackAttributes))

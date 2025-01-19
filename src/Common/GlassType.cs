@@ -8,7 +8,7 @@ namespace GlassMaking.Common
 {
 	public class GlassTypeRegistry : RecipeRegistryBase
 	{
-		public Dictionary<AssetLocation, GlassTypeVariant> GlassTypes = new Dictionary<AssetLocation, GlassTypeVariant>();
+		public readonly Dictionary<AssetLocation, GlassTypeVariant> GlassTypes = new Dictionary<AssetLocation, GlassTypeVariant>();
 
 		public override void FromBytes(IWorldAccessor resolver, int quantity, byte[] data)
 		{
