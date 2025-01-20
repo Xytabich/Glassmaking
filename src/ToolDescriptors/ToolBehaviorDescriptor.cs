@@ -75,6 +75,8 @@ namespace GlassMaking.ToolDescriptors
 
 		public abstract void GetStepInfoForHeldItem(IWorldAccessor world, ItemStack item, GlassBlowingRecipe recipe, int stepIndex, StringBuilder dsc, bool withDebugInfo);
 
+		public abstract void GetInteractionHelp(IWorldAccessor world, ItemStack item, GlassBlowingRecipe recipe, int stepIndex, List<WorldInteraction> interactions);
+
 		protected virtual bool IsSuitableBehavior(CollectibleObject item, CollectibleBehavior beh)
 		{
 			return beh.GetType() == typeof(T);

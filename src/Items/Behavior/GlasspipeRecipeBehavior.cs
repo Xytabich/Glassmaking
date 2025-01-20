@@ -42,20 +42,11 @@ namespace GlassMaking.Items.Behavior
 				}
 				else if(beh == this && IsHeated(api.World, inSlot.Itemstack))
 				{
-					var sources = Utils.GetGlassmeltSources(api);
-					return new WorldInteraction[] {
-						new WorldInteraction() {
-							ActionLangCode = "glassmaking:heldhelp-glasspipe-intake",
-							MouseButton = EnumMouseButton.Right,
-							Itemstacks = sources
-						},
-						new WorldInteraction() {
-							ActionLangCode = "glassmaking:heldhelp-glasspipe-intake",
-							MouseButton = EnumMouseButton.Right,
-							HotKeyCode = "sneak",
-							Itemstacks = sources
-						}
-					};
+					var interactions = new List<WorldInteraction>();
+					var itemStack = inSlot.Itemstack;
+					var recipe = GetRecipe(itemStack, out var recipeAttribute);
+					recipe?.GetInteractionHelp(itemStack, recipeAttribute, interactions, api.World, glassMaking);
+					return interactions.ToArray();
 				}
 			}
 			return Array.Empty<WorldInteraction>();
@@ -64,49 +55,41 @@ namespace GlassMaking.Items.Behavior
 		public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
 		{
 			base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
-			var itemstack = inSlot.Itemstack;
-			var recipeAttribute = itemstack.Attributes.GetTreeAttribute(ATTRIB_KEY);
-			if(recipeAttribute != null)
+			var itemStack = inSlot.Itemstack;
+			var recipe = GetRecipe(itemStack, out var recipeAttribute);
+			if(recipe != null)
 			{
-				var recipe = glassMaking.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
-				if(recipe != null)
+				recipe.GetRecipeInfo(itemStack, recipeAttribute, dsc, world, withDebugInfo);
+
+				dsc.AppendLine(Lang.Get("Temperature: {0}°C", glassworkPipe.GetGlassTemperature(world, itemStack).ToString("0")));
+
+				var items = new List<ItemStack>();
+				recipe.GetBreakDrops(itemStack, recipeAttribute, world, items);
+				if(items.Count > 0)
 				{
-					recipe.GetRecipeInfo(itemstack, recipeAttribute, dsc, world, withDebugInfo);
-
-					dsc.AppendLine(Lang.Get("Temperature: {0}°C", glassworkPipe.GetGlassTemperature(world, itemstack).ToString("0")));
-
-					var items = new List<ItemStack>();
-					recipe.GetBreakDrops(itemstack, recipeAttribute, world, items);
-					if(items.Count > 0)
+					dsc.AppendLine();
+					dsc.AppendLine(Lang.Get("glassmaking:Break down to receive:"));
+					foreach(var item in items)
 					{
-						dsc.AppendLine();
-						dsc.AppendLine(Lang.Get("glassmaking:Break down to receive:"));
-						foreach(var item in items)
-						{
-							dsc.AppendFormat("• {0}x {1}", item.StackSize, item.GetName()).AppendLine();
-						}
+						dsc.AppendFormat("• {0}x {1}", item.StackSize, item.GetName()).AppendLine();
 					}
 				}
 			}
 		}
 
-		public void OnBeforeRender(ICoreClientAPI capi, ItemStack itemstack, EnumItemRenderTarget target, ref ItemRenderInfo renderinfo, ref EnumHandling handling)
+		public void OnBeforeRender(ICoreClientAPI capi, ItemStack itemStack, EnumItemRenderTarget target, ref ItemRenderInfo renderinfo, ref EnumHandling handling)
 		{
-			var recipeAttribute = itemstack.Attributes.GetTreeAttribute(ATTRIB_KEY);
-			if(recipeAttribute != null)
+			var recipe = GetRecipe(itemStack, out var recipeAttribute);
+			if(recipe != null)
 			{
-				var recipe = glassMaking.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
-				if(recipe != null)
-				{
-					var temperature = GlassRenderUtil.TemperatureToState(glassworkPipe.GetGlassTemperature(capi.World, itemstack), GetWorkingTemperature(capi.World, itemstack));
-					glassMaking.itemsRenderer.RenderItem<PipeRecipeRenderer, PipeRecipeRenderer.Data>(
-						capi,
-						itemstack,
-						new PipeRecipeRenderer.Data(temperature, recipe, recipeAttribute),
-						ref renderinfo
-					);
-					handling = EnumHandling.PreventSubsequent;
-				}
+				var temperature = GlassRenderUtil.TemperatureToState(glassworkPipe.GetGlassTemperature(capi.World, itemStack), GetWorkingTemperature(capi.World, itemStack));
+				glassMaking.itemsRenderer.RenderItem<PipeRecipeRenderer, PipeRecipeRenderer.Data>(
+					capi,
+					itemStack,
+					new PipeRecipeRenderer.Data(temperature, recipe, recipeAttribute),
+					ref renderinfo
+				);
+				handling = EnumHandling.PreventSubsequent;
 			}
 		}
 
@@ -128,27 +111,23 @@ namespace GlassMaking.Items.Behavior
 			{
 				if(api.Side == EnumAppSide.Server)
 				{
-					var itemstack = stackInSlot.Itemstack;
-					var recipeAttribute = itemstack.Attributes.GetTreeAttribute(ATTRIB_KEY);
-					if(recipeAttribute != null)
+					var itemStack = stackInSlot.Itemstack;
+					var recipe = GetRecipe(itemStack, out var recipeAttribute);
+					if(recipe != null)
 					{
-						var recipe = glassMaking.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
-						if(recipe != null)
-						{
-							handling = EnumHandling.Handled;
+						handling = EnumHandling.Handled;
 
-							var entity = byPlayer?.Entity;
-							if(entity != null)
+						var entity = byPlayer?.Entity;
+						if(entity != null)
+						{
+							var items = new List<ItemStack>();
+							recipe.GetBreakDrops(itemStack, recipeAttribute, entity.World, items);
+							foreach(var item in items)
 							{
-								var items = new List<ItemStack>();
-								recipe.GetBreakDrops(itemstack, recipeAttribute, entity.World, items);
-								foreach(var item in items)
+								item.StackSize *= quantity;
+								if(!entity.TryGiveItemStack(item))
 								{
-									item.StackSize *= quantity;
-									if(!entity.TryGiveItemStack(item))
-									{
-										entity.World.SpawnItemEntity(item, byPlayer!.Entity.Pos.XYZ.Add(0.0, 0.5, 0.0));
-									}
+									entity.World.SpawnItemEntity(item, byPlayer!.Entity.Pos.XYZ.Add(0.0, 0.5, 0.0));
 								}
 							}
 						}
@@ -231,16 +210,17 @@ namespace GlassMaking.Items.Behavior
 
 		private float GetWorkingTemperature(IWorldAccessor world, ItemStack itemStack)
 		{
-			var recipeAttribute = itemStack.Attributes.GetTreeAttribute(ATTRIB_KEY);
+			return GetRecipe(itemStack, out var recipeAttribute)?.GetWorkingTemperature(itemStack, recipeAttribute, world) ?? 0;
+		}
+
+		private GlassBlowingRecipe? GetRecipe(ItemStack itemStack, out ITreeAttribute recipeAttribute)
+		{
+			recipeAttribute = itemStack.Attributes.GetTreeAttribute(ATTRIB_KEY);
 			if(recipeAttribute != null)
 			{
-				var recipe = glassMaking.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
-				if(recipe != null)
-				{
-					return recipe.GetWorkingTemperature(itemStack, recipeAttribute, world);
-				}
+				return glassMaking.GetGlassBlowingRecipe(recipeAttribute.GetString("code"));
 			}
-			return 0;
+			return null;
 		}
 	}
 }

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
@@ -108,6 +109,14 @@ namespace GlassMaking
 			{
 				descriptor.GetStepInfoForHeldItem(world, item, this, step, dsc, withDebugInfo);
 			}
+		}
+
+		public void GetInteractionHelp(ItemStack item, ITreeAttribute recipeAttribute, List<WorldInteraction> interactions,
+			IWorldAccessor world, GlassMakingMod glassMaking)
+		{
+			int step = recipeAttribute.GetInt("step", 0);
+			var descriptor = glassMaking.GetPipeToolDescriptor(Steps[step].Tool);
+			descriptor?.GetInteractionHelp(world, item, this, step, interactions);
 		}
 
 		public void GetBreakDrops(ItemStack itemStack, ITreeAttribute recipeAttribute, IWorldAccessor world, List<ItemStack> outList)

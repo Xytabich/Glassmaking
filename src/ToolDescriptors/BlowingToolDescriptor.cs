@@ -42,5 +42,15 @@ namespace GlassMaking.ToolDescriptors
 			dsc.AppendLine("• " + Lang.Get("glassmaking:{0} for {1} seconds", Lang.Get("glassmaking:glassblowingtool-" + step.Tool),
 				step.Attributes!["time"].AsFloat(1).ToString("G", CultureInfo.InvariantCulture)));
 		}
+
+		public override void GetInteractionHelp(IWorldAccessor world, ItemStack item, GlassBlowingRecipe recipe, int stepIndex, List<WorldInteraction> interactions)
+		{
+			var step = recipe.Steps[stepIndex];
+			interactions.Add(new WorldInteraction() {
+				ActionLangCode = "glassmaking:glassblowingtool-" + step.Tool,
+				MouseButton = EnumMouseButton.Right,
+				HotKeyCode = "sneak"
+			});
+		}
 	}
 }

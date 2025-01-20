@@ -58,6 +58,22 @@ namespace GlassMaking.ToolDescriptors
 				Lang.Get(GlassBlend.GetBlendNameCode(new AssetLocation(step.Attributes["code"].AsString())))));
 		}
 
+		public override void GetInteractionHelp(IWorldAccessor world, ItemStack item, GlassBlowingRecipe recipe, int stepIndex, List<WorldInteraction> interactions)
+		{
+			var sources = Utils.GetGlassmeltSources(world.Api);
+			interactions.Add(new WorldInteraction() {
+				ActionLangCode = "glassmaking:heldhelp-glasspipe-intake",
+				MouseButton = EnumMouseButton.Right,
+				Itemstacks = sources
+			});
+			interactions.Add(new WorldInteraction() {
+				ActionLangCode = "glassmaking:heldhelp-glasspipe-intake",
+				MouseButton = EnumMouseButton.Right,
+				HotKeyCode = "sneak",
+				Itemstacks = sources
+			});
+		}
+
 		public override bool TryGetWorkingTemperature(IWorldAccessor world, ItemStack itemStack, GlassBlowingRecipe recipe, int currentStepIndex, out float temperature)
 		{
 			var steps = recipe.Steps;

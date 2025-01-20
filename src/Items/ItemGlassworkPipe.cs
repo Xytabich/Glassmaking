@@ -31,7 +31,6 @@ namespace GlassMaking.Items
 			GlassTransform.EnsureDefaultValues();
 		}
 
-#nullable enable
 		public GlasspipeCraftBehavior? GetActiveCraft(ItemStack itemStack)
 		{
 			foreach(var beh in glasspipeBehaviors)
@@ -40,7 +39,6 @@ namespace GlassMaking.Items
 			}
 			return null;
 		}
-#nullable disable
 
 		public override bool MatchesForCrafting(ItemStack inputStack, GridRecipe gridRecipe, CraftingRecipeIngredient ingredient)
 		{
@@ -160,7 +158,7 @@ namespace GlassMaking.Items
 			}
 		}
 
-		public override string GetHeldTpUseAnimation(ItemSlot activeHotbarSlot, Entity forEntity)
+		public override string? GetHeldTpUseAnimation(ItemSlot activeHotbarSlot, Entity forEntity)
 		{
 			return null;
 		}
