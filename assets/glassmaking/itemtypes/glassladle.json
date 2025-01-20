@@ -93,10 +93,7 @@
 			}
 		},
 		"takeAnimation": "glassladletake",
-		"pourAnimationByType": {
-			"*-large": "glassladlepourslow",
-			"*": "glassladlepour"
-		},
+		"pourAnimation": "glassladlepour",
 		"pourAnimationPrepareByType": {
 			"*-large": 0.65,
 			"*": 0.5

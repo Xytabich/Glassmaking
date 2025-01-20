@@ -1,4 +1,4 @@
-﻿using GlassMaking.Common;
+using GlassMaking.Common;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,7 +13,7 @@ namespace GlassMaking.Blocks
 {
 	public class BlockEntityGlassSmeltery : BlockEntity, IBlockEntityContainer, ITimeBasedHeatReceiver, IHeatSourceModifier, IGlassmeltSource
 	{
-		private static SimpleParticleProperties smokeParticles;
+		private static readonly SimpleParticleProperties smokeParticles;
 
 		float IHeatSourceModifier.FuelRateModifier => 1f;
 		float IHeatSourceModifier.TemperatureModifier => 1.1f;
@@ -21,7 +21,7 @@ namespace GlassMaking.Blocks
 		IInventory IBlockEntityContainer.Inventory => inventory;
 		string IBlockEntityContainer.InventoryClassName => inventory.ClassName;
 
-		protected virtual int maxGlassAmount => 1000;
+		protected virtual int MaxGlassAmount => 1000;
 
 		private BlockRendererGlassSmeltery? renderer = null;
 
@@ -179,11 +179,11 @@ namespace GlassMaking.Blocks
 		public void GetGlassFillState(out int canAddAmount, out AssetLocation? code)
 		{
 			code = null;
-			canAddAmount = maxGlassAmount;
+			canAddAmount = MaxGlassAmount;
 			if(glassCode != null)
 			{
 				code = glassCode;
-				canAddAmount = maxGlassAmount - glassAmount;
+				canAddAmount = MaxGlassAmount - glassAmount;
 			}
 		}
 
@@ -206,10 +206,10 @@ namespace GlassMaking.Blocks
 		{
 			if(heatSource == null) return false;
 
-			if(glassAmount >= maxGlassAmount) return false;
+			if(glassAmount >= MaxGlassAmount) return false;
 			GlassBlend? blend = GlassBlend.FromJson(slot.Itemstack);
 			if(blend == null) blend = GlassBlend.FromTreeAttributes(slot.Itemstack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
-			if(blend != null && blend.Amount > 0 && (blend.Amount + glassAmount) <= maxGlassAmount &&
+			if(blend != null && blend.Amount > 0 && (blend.Amount + glassAmount) <= MaxGlassAmount &&
 				(glassCode == null && mod.GetGlassTypeInfo(blend.Code) != null || glassCode!.Equals(blend.Code)))
 			{
 				if(Api.Side == EnumAppSide.Server)
@@ -231,7 +231,7 @@ namespace GlassMaking.Blocks
 							state = SmelteryState.ContainsMix;
 						}
 					}
-					int consume = Math.Min(Math.Min(multiplier, slot.Itemstack.StackSize), (maxGlassAmount - glassAmount) / blend.Amount);
+					int consume = Math.Min(Math.Min(multiplier, slot.Itemstack.StackSize), (MaxGlassAmount - glassAmount) / blend.Amount);
 					var item = slot.TakeOut(consume);
 					if(state == SmelteryState.Empty || state == SmelteryState.ContainsMix)
 					{
@@ -420,7 +420,7 @@ namespace GlassMaking.Blocks
 		{
 			if(Api != null && Api.Side == EnumAppSide.Client && renderer != null)
 			{
-				renderer.SetHeight((float)glassAmount / maxGlassAmount);
+				renderer.SetHeight((float)glassAmount / MaxGlassAmount);
 				UpdateRendererParameters();
 			}
 		}
