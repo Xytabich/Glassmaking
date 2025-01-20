@@ -11,7 +11,6 @@ namespace GlassMaking.Handbook
 {
 	public class AllowedLiquidsList : IDisposable
 	{
-
 		public AllowedLiquidsList()
 		{
 			HandbookItemInfoEvent.OnGetHandbookInfo += GetHandbookInfo;
