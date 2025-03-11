@@ -1,4 +1,5 @@
 ﻿using GlassMaking.Blocks.Multiblock;
+using System;
 using System.Runtime.CompilerServices;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
@@ -108,6 +109,11 @@ namespace GlassMaking.Blocks
 				return capi.World.BlockAccessor.GetBlock(pos).GetRandomColor(capi, pos, facing, rndIndex);
 			}
 			return base.GetRandomColor(capi, pos, facing, rndIndex);
+		}
+
+		protected override ItemStack[] GetSurrogateDrops(IWorldAccessor world, BlockPos pos, IPlayer? byPlayer, float dropQuantityMultiplier = 1)
+		{
+			return Array.Empty<ItemStack>();
 		}
 
 		public override Cuboidf[] GetSelectionBoxes(IBlockAccessor blockAccessor, BlockPos pos)

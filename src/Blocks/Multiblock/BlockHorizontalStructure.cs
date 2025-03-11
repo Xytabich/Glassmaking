@@ -153,8 +153,8 @@ namespace GlassMaking.Blocks.Multiblock
 							offset.Z = -offset.Z;
 							if(sblock.mainOffset.Equals(offset))
 							{
-								var drops = sblock.GetSurrogateDrops(world, pos, byPlayer, dropQuantityMultiplier);
-								if(drops != null) items.AddRange(drops);
+								var drops = sblock.GetSurrogateDrops(world, spos, byPlayer, dropQuantityMultiplier);
+								if((drops?.Length ?? 0) != 0) items.AddRange(drops!);
 							}
 						}
 					}
@@ -191,27 +191,32 @@ namespace GlassMaking.Blocks.Multiblock
 
 		public override bool CanPlaceBlock(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, ref string failureCode)
 		{
-			if(isSurrogate) return base.CanPlaceBlock(world, byPlayer, blockSel, ref failureCode);
-
-			int sx = structure.GetLength(0), sy = structure.GetLength(1), sz = structure.GetLength(2);
-			for(int x = 0; x < sx; x++)
+			if(base.CanPlaceBlock(world, byPlayer, blockSel, ref failureCode))
 			{
-				for(int y = 0; y < sy; y++)
-				{
-					for(int z = 0; z < sz; z++)
-					{
-						if(structure[x, y, z] == null || structure[x, y, z]!.Id == Id) continue;
+				if(isSurrogate) return true;
 
-						var sel = blockSel.Clone();
-						sel.Position = blockSel.Position.AddCopy(x + structureOffset.X, y + structureOffset.Y, z + structureOffset.Z);
-						if(!structure[x, y, z]!.CanPlaceBlock(world, byPlayer, sel, ref failureCode))
+				var sel = blockSel.Clone();
+				int sx = structure.GetLength(0), sy = structure.GetLength(1), sz = structure.GetLength(2);
+				for(int x = 0; x < sx; x++)
+				{
+					for(int y = 0; y < sy; y++)
+					{
+						for(int z = 0; z < sz; z++)
 						{
-							return false;
+							if(structure[x, y, z] == null || structure[x, y, z]!.Id == Id) continue;
+
+							sel.Position.SetAll(blockSel.Position);
+							sel.Position.Add(x + structureOffset.X, y + structureOffset.Y, z + structureOffset.Z);
+							if(!structure[x, y, z]!.CanPlaceBlock(world, byPlayer, sel, ref failureCode))
+							{
+								return false;
+							}
 						}
 					}
 				}
+				return true;
 			}
-			return true;
+			return false;
 		}
 
 		public override bool DoPlaceBlock(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, ItemStack byItemStack)
@@ -233,6 +238,7 @@ namespace GlassMaking.Blocks.Multiblock
 							sel.Position.SetAll(blockSel.Position);
 							sel.Position.Add(x + structureOffset.X, y + structureOffset.Y, z + structureOffset.Z);
 							var pos = sel.Position.Copy();
+							var block = world.BlockAccessor.GetBlock(sel.Position);
 							structure[x, y, z]!.DoPlaceBlock(world, byPlayer, sel, byItemStack);
 							world.BlockAccessor.TriggerNeighbourBlockUpdate(pos);
 						}
@@ -356,9 +362,9 @@ namespace GlassMaking.Blocks.Multiblock
 									{
 										ItemStack[] drops = sblock.GetSurrogateDrops(world, spos, null);
 
-										if(drops != null)
+										if((drops?.Length ?? 0) != 0)
 										{
-											for(int i = 0; i < drops.Length; i++)
+											for(int i = 0; i < drops!.Length; i++)
 											{
 												if(SplitDropStacks)
 												{
@@ -476,13 +482,17 @@ namespace GlassMaking.Blocks.Multiblock
 									var block = api.World.GetBlock(CodeWithVariant(pair.Key, v));
 									if(block is BlockHorizontalStructure part)
 									{
-										part.InitStructurePart(api, isSurrogate, mainOffset, true);
+										part.InitStructurePart(api, true, mainOffset, true);
 									}
 								}
 							}
 						}
 					}
 				}
+			}
+			if(isSurrogate)
+			{
+				ShapeInventory = DefaultCubeShape;
 			}
 		}
 

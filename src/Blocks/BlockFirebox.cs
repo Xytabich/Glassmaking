@@ -80,7 +80,7 @@ namespace GlassMaking.Blocks
 			{
 				if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BlockEntityFirebox be)
 				{
-					if(itemstack.Class == EnumItemClass.Block && itemstack.Block is IHeaterPlaceableBlock block)
+					if(world.Api.Side == EnumAppSide.Server && itemstack.Class == EnumItemClass.Block && itemstack.Block is IHeaterPlaceableBlock block)
 					{
 						if(block.TryPlaceBlock(world, byPlayer, new BlockSelection { Position = blockSel.Position.UpCopy(), Face = BlockFacing.UP }, itemstack, Variant["side"]))
 						{
@@ -104,6 +104,7 @@ namespace GlassMaking.Blocks
 						}
 						return true;
 					}
+					return true;
 				}
 			}
 			return false;
