@@ -1,6 +1,7 @@
 [
 	{
 		"ingredient": {
+			"name": "metal",
 			"type": "item",
 			"code": "game:ingot-*",
 			"allowedVariants": [ "steel" ]
@@ -65,6 +66,7 @@
 	},
 	{
 		"ingredient": {
+			"name": "metal",
 			"type": "item",
 			"code": "game:ingot-*",
 			"allowedVariants": [ "steel" ]
@@ -111,6 +113,7 @@
 	},
 	{
 		"ingredient": {
+			"name": "metal",
 			"type": "item",
 			"code": "game:ingot-*",
 			"allowedVariants": [ "steel" ]
@@ -146,6 +149,7 @@
 	},
 	{
 		"ingredient": {
+			"name": "metal",
 			"type": "item",
 			"code": "game:ingot-*",
 			"allowedVariants": [ "steel" ]

@@ -1,39 +1,41 @@
 [
-    {
-        "ingredient": {
-            "type": "item",
-            "code": "game:ingot-*",
-            "allowedVariants": [ "steel" ]
-        },
-        "pattern": [
-            [
-                "############",
-                "#___________",
-                "############"
-            ]
-        ],
-        "output": {
-            "type": "item",
-            "code": "jacks"
-        }
-    },
-    {
-        "ingredient": {
-            "type": "item",
-            "code": "game:ingot-*",
-            "allowedVariants": [ "steel" ]
-        },
-        "pattern": [
-            [
-                "###########_",
-                "#__________#",
-                "#__________#",
-                "###########_"
-            ]
-        ],
-        "output": {
-            "type": "item",
-            "code": "tweezers"
-        }
-    }
+	{
+		"ingredient": {
+			"name": "metal",
+			"type": "item",
+			"code": "game:ingot-*",
+			"allowedVariants": [ "steel" ]
+		},
+		"pattern": [
+			[
+				"############",
+				"#___________",
+				"############"
+			]
+		],
+		"output": {
+			"type": "item",
+			"code": "jacks"
+		}
+	},
+	{
+		"ingredient": {
+			"name": "metal",
+			"type": "item",
+			"code": "game:ingot-*",
+			"allowedVariants": [ "steel" ]
+		},
+		"pattern": [
+			[
+				"###########_",
+				"#__________#",
+				"#__________#",
+				"###########_"
+			]
+		],
+		"output": {
+			"type": "item",
+			"code": "tweezers"
+		}
+	}
 ]

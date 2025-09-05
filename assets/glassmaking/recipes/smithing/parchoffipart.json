@@ -1,20 +1,21 @@
 {
-    "ingredient": {
-        "type": "item",
-        "code": "game:ingot-*",
-        "allowedVariants": [ "steel" ]
-    },
-    "pattern": [
-        [
-            "#######_______",
-            "#______#######",
-            "#######______#",
-            "_______#######"
-        ]
-    ],
-    "output": {
-        "type": "item",
-        "code": "parchoffipart",
-        "quantity": 2
-    }
+	"ingredient": {
+		"name": "metal",
+		"type": "item",
+		"code": "game:ingot-*",
+		"allowedVariants": [ "steel" ]
+	},
+	"pattern": [
+		[
+			"#######_______",
+			"#______#######",
+			"#######______#",
+			"_______#######"
+		]
+	],
+	"output": {
+		"type": "item",
+		"code": "parchoffipart",
+		"quantity": 2
+	}
 }

@@ -45,6 +45,14 @@ namespace GlassMaking
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void Write(this BinaryWriter writer, in FastVec3f value)
+		{
+			writer.Write(value.X);
+			writer.Write(value.Y);
+			writer.Write(value.Z);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static Vec3f ReadVec3f(this BinaryReader reader)
 		{
 			float x = reader.ReadSingle();
@@ -125,6 +133,22 @@ namespace GlassMaking
 				}
 				itemSlot.Itemstack.Collectible.OnStoreCollectibleMappings(world, itemSlot, blockIdMapping, itemIdMapping);
 			}
+		}
+
+		public static FastVec3f Lerp(this FastVec3f self, in FastVec3f target, float t)
+		{
+			self.X += (target.X - self.X) * t;
+			self.Y += (target.Y - self.Y) * t;
+			self.Z += (target.Z - self.Z) * t;
+			return self;
+		}
+
+		public static FastVec3f LerpDelta(this FastVec3f self, in FastVec3f delta, float t)
+		{
+			self.X += delta.X * t;
+			self.Y += delta.Y * t;
+			self.Z += delta.Z * t;
+			return self;
 		}
 
 		public static Vec3f Lerp(this Vec3f self, Vec3f target, float t)

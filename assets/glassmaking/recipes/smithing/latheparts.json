@@ -1,6 +1,7 @@
 [
 	{
 		"ingredient": {
+			"name": "metal",
 			"type": "item",
 			"code": "game:ingot-*",
 			"allowedVariants": [ "iron", "meteoriciron", "steel" ]
@@ -32,6 +33,7 @@
 	},
 	{
 		"ingredient": {
+			"name": "metal",
 			"type": "item",
 			"code": "game:ingot-*",
 			"allowedVariants": [ "steel" ]

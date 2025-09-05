@@ -7,7 +7,6 @@ using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
-using Vintagestory.GameContent;
 
 namespace GlassMaking.Workbench.ToolBehaviors
 {
@@ -36,7 +35,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 			{
 				var capi = (ICoreClientAPI)api;
 				AnimUtil.GetAnimatableMesh(capi, slot.Itemstack.Collectible, new AtlasTexSource(capi, capi.BlockTextureAtlas), out var meshRef, out var shape);
-				animator = BlockEntityAnimationUtil.GetAnimator(api, "glassmaking:lathe|" + slot.Itemstack.Collectible.Code.ToString(), shape);
+				animator = AnimationUtil.GetAnimator(api, "glassmaking:lathe|" + slot.Itemstack.Collectible.Code.ToString(), shape);
 
 				updater = new LatheAnimatorUpdater(animator);
 				capi.Event.RegisterRenderer(updater, EnumRenderStage.Opaque, "glassmaking:lathe");
@@ -140,7 +139,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 			}
 		}
 
-		private class LatheAnimatorUpdater : IRenderer
+		private class LatheAnimatorUpdater : IRenderer//TODO: animations not working anymore
 		{
 			public double RenderOrder => 1.0;
 
@@ -169,7 +168,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 
 			public void ForceUpdate()
 			{
-				animator.OnFrame(activeAnimationsByAnimCode, 0f);
+				OnRenderFrame(0f, EnumRenderStage.Opaque);
 			}
 
 			public void SetItemTransform(ModelTransform mat)

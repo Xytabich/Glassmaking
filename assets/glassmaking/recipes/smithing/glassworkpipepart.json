@@ -1,21 +1,22 @@
 {
-    "ingredient": {
-        "type": "item",
-        "code": "game:ingot-*",
-        "allowedVariants": [ "steel" ]
-    },
-    "pattern": [
-        [
-            "###############",
-            "###############"
-        ],
-        [
-            "###############",
-            "###############"
-        ]
-    ],
-    "output": {
-        "type": "item",
-        "code": "glassworkpipepart"
-    }
+	"ingredient": {
+		"name": "metal",
+		"type": "item",
+		"code": "game:ingot-*",
+		"allowedVariants": [ "steel" ]
+	},
+	"pattern": [
+		[
+			"###############",
+			"###############"
+		],
+		[
+			"###############",
+			"###############"
+		]
+	],
+	"output": {
+		"type": "item",
+		"code": "glassworkpipepart"
+	}
 }

@@ -1,6 +1,5 @@
 ﻿using Vintagestory.API.Client;
 using Vintagestory.API.Common;
-using Vintagestory.API.Config;
 using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Blocks.Renderer
@@ -17,15 +16,14 @@ namespace GlassMaking.Blocks.Renderer
 		private ICoreClientAPI capi;
 		private AnimatorBase animator;
 
-		private MeshRef meshref;
+		private MultiTextureMeshRef meshref;
 		private bool disposeMesh;
-		private int textureId;
 
 		private BlockPos blockPos;
 		private Vec3f blockRot;
 		private Matrixf transformMat = new Matrixf();
 
-		public BlockAnimatableRenderer(ICoreClientAPI capi, BlockPos blockPos, Vec3f blockRot, ModelTransform? transform, AnimatorBase animator, MeshRef meshref, bool disposeMesh = true)
+		public BlockAnimatableRenderer(ICoreClientAPI capi, BlockPos blockPos, Vec3f blockRot, ModelTransform? transform, AnimatorBase animator, MultiTextureMeshRef meshref, bool disposeMesh = true)
 		{
 			this.capi = capi;
 			this.blockPos = blockPos;
@@ -37,8 +35,6 @@ namespace GlassMaking.Blocks.Renderer
 			if(blockRot == null) this.blockRot = new Vec3f();
 
 			(transform ?? ModelTransform.NoTransform).CopyTo(transformMat);
-
-			textureId = capi.BlockTextureAtlas.AtlasTextures[0].TextureId;
 
 			capi.Event.EnqueueMainThreadTask(() => {
 				capi.Event.RegisterRenderer(this, EnumRenderStage.Opaque, "glassmaking:blockanimatable");
@@ -87,7 +83,6 @@ namespace GlassMaking.Blocks.Renderer
 				prog.Uniform("glitchEffectStrength", 0f);
 			}
 
-			prog.BindTexture2D("entityTex", textureId, 0);
 			prog.UniformMatrix("projectionMatrix", rpi.CurrentProjectionMatrix);
 
 			prog.Uniform("addRenderFlags", 0);
@@ -98,7 +93,7 @@ namespace GlassMaking.Blocks.Renderer
 			// 	capi.Render.GlDisableCullFace();
 			// }
 
-			capi.Render.RenderMesh(meshref);
+			capi.Render.RenderMultiTextureMesh(meshref, "entityTex");
 
 			// if((stage == EnumRenderStage.Opaque || stage == EnumRenderStage.ShadowNear) && !backfaceCulling)
 			// {

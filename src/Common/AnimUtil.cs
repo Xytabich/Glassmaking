@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
+using Vintagestory.API.MathTools;
 using Vintagestory.API.Util;
 
 namespace GlassMaking
@@ -42,7 +43,7 @@ namespace GlassMaking
 		/// Returns a reference to a mesh and shape that can be used for animation.
 		/// Should only be called in main thread.
 		/// </summary>
-		public static void GetAnimatableMesh(ICoreClientAPI capi, CollectibleObject collectible, AtlasTexSource texSource, out MeshRef meshRef, out Shape shape)
+		public static void GetAnimatableMesh(ICoreClientAPI capi, CollectibleObject collectible, AtlasTexSource texSource, out MultiTextureMeshRef meshRef, out Shape shape)
 		{
 			var cache = ObjectCacheUtil.GetOrCreate(capi, "glassmaking:animmeshcache", () => new Dictionary<string, MeshInfo>());
 			var cacheKey = collectible.Code.ToString();
@@ -56,8 +57,16 @@ namespace GlassMaking
 				CacheInvTransforms(shape.Elements);
 				shape.ResolveAndFindJoints(capi.Logger, cacheKey);
 				texSource.Init(collectible, shape);
-				capi.Tesselator.TesselateShapeWithJointIds("blockanim", shape, out var modeldata, texSource, null, collShape.QuantityElements, collShape.SelectiveElements);
-				meshRef = capi.Render.UploadMesh(modeldata);
+				capi.Tesselator.TesselateShape(new TesselationMetaData {
+					TexSource = texSource,
+					WithJointIds = true,
+					WithDamageEffect = true,
+					TypeForLogging = "blockanim",
+					Rotation = Vec3f.Zero,
+					QuantityElements = collShape.QuantityElements,
+					SelectiveElements = collShape.SelectiveElements,
+				}, shape, out var modeldata);
+				meshRef = capi.Render.UploadMultiTextureMesh(modeldata);
 
 				meshInfo = new MeshInfo() { shape = shape, meshRef = meshRef };
 				cache[cacheKey] = meshInfo;
@@ -93,7 +102,7 @@ namespace GlassMaking
 
 		private struct MeshInfo
 		{
-			public MeshRef meshRef;
+			public MultiTextureMeshRef meshRef;
 			public Shape shape;
 		}
 	}
