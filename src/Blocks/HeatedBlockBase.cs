@@ -14,7 +14,7 @@ namespace GlassMaking.Blocks
 			return false;
 		}
 
-		public override void OnBlockExploded(IWorldAccessor world, BlockPos pos, BlockPos explosionCenter, EnumBlastType blastType)
+		public override void OnBlockExploded(IWorldAccessor world, BlockPos pos, BlockPos explosionCenter, EnumBlastType blastType, string ignitedByPlayerUid)
 		{
 			var handle = BulkAccessUtil.SetReadFromStagedByDefault(world.BulkBlockAccessor, true);
 			var id = world.BulkBlockAccessor.GetBlockId(pos);
@@ -22,7 +22,7 @@ namespace GlassMaking.Blocks
 			// Since the firebox can destroy this block during the explosion, it is necessary to first check if it was destroyed
 			if(id != Id) return;
 
-			base.OnBlockExploded(world, pos, explosionCenter, blastType);
+			base.OnBlockExploded(world, pos, explosionCenter, blastType, ignitedByPlayerUid);
 		}
 	}
 }

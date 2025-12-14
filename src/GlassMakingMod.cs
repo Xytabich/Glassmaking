@@ -132,6 +132,12 @@ namespace GlassMaking
 			AddWorkbenchToolBehavior(new LiquidUseBehavior());
 		}
 
+		public override double ExecuteOrder()
+		{
+			// After blocks and items
+			return 0.3;
+		}
+
 		public override void StartServerSide(ICoreServerAPI api)
 		{
 			base.StartServerSide(api);
@@ -195,6 +201,12 @@ namespace GlassMaking
 		{
 			if(api.Side == EnumAppSide.Server)
 			{
+				// Initializing descriptors before loading recipes
+				foreach(var descriptor in descriptors)
+				{
+					descriptor.OnLoaded(api);
+				}
+
 				foreach(var pair in api.Assets.GetMany<JToken>(api.Logger, "worldproperties/abstract/glasstype.json"))
 				{
 					try
@@ -446,10 +458,6 @@ namespace GlassMaking
 		{
 			if(api.Side == EnumAppSide.Server)
 			{
-				foreach(var descriptor in descriptors)
-				{
-					descriptor.OnLoaded(api);
-				}
 				InitWorkbenchTools();
 			}
 		}
@@ -472,7 +480,7 @@ namespace GlassMaking
 		private void CollectAnnealRecipes()
 		{
 			var annealSources = new ConcurrentBag<CollectibleObject>();
-			Parallel.ForEach(capi.World.Collectibles, collectible => {
+			Parallel.ForEach(capi.World.BlockItemEnumerator(), collectible => {
 				if(collectible.Attributes != null && collectible.Attributes.KeyExists("glassmaking:anneal"))
 				{
 					annealSources.Add(collectible);

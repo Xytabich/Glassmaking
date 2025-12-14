@@ -84,7 +84,7 @@ namespace GlassMaking.Blocks
 				UpdateRendererFull();
 			}
 
-			RegisterGameTickListener(OnCommonTick, 200);
+			RegisterGameTickListener(OnCommonTick, 1000);
 		}
 
 		public void SetHeater(int index, ITimeBasedHeatSourceControl? heatSource)
@@ -276,7 +276,7 @@ namespace GlassMaking.Blocks
 		public ItemStack[] GetDropItems()
 		{
 			var items = inventory.CollectItems();
-			if(glassAmount > 0 && glassCode != null)
+			if(glassAmount > 0 && glassCode != null && state != SmelteryState.ContainsMix)
 			{
 				foreach(var item in mod.GetShardsList(Api.World, glassCode, glassAmount))
 				{

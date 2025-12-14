@@ -44,7 +44,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 
 			if(TryGetItemSlot(byPlayer, ingredient, out var slot, out var source))
 			{
-				int quantity = (int)(source.GetContentProps(slot.Itemstack).ItemsPerLitre * ingredient.RequiresLitres);
+				int quantity = (int)(source.GetContentProps(slot.Itemstack)!.ItemsPerLitre * ingredient.RequiresLitres);
 				source.TryTakeContent(slot.Itemstack, quantity);
 				slot.MarkDirty();
 			}
@@ -57,7 +57,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 				if(TryGetIngredient(world, json, recipe.Code, out var ingredient))
 				{
 					var itemStack = ingredient.Type == EnumItemClass.Item ? new ItemStack(world.GetItem(ingredient.Code)) : new ItemStack(world.GetBlock(ingredient.Code));
-					itemStack.StackSize = (int)(BlockLiquidContainerBase.GetContainableProps(itemStack).ItemsPerLitre * ingredient.RequiresLitres);
+					itemStack.StackSize = (int)(BlockLiquidContainerBase.GetContainableProps(itemStack)!.ItemsPerLitre * ingredient.RequiresLitres);
 					return new WorldInteraction[] { new WorldInteraction() {
 						Itemstacks = new ItemStack[] { itemStack },
 						MouseButton = EnumMouseButton.Right,

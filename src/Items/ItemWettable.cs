@@ -13,7 +13,7 @@ namespace GlassMaking.Items
 {
 	public class ItemWettable : Item, IWettable
 	{
-		private readonly AssetLocation waterCode = new AssetLocation("waterportion");
+		public static readonly AssetLocation WaterCode = new AssetLocation("waterportion");
 
 		private float capacity;
 		private float evaporation;
@@ -29,7 +29,7 @@ namespace GlassMaking.Items
 			{
 				interactions = ObjectCacheUtil.GetOrCreate(api, "glassmaking:heldhelp-wettable", () => {
 					var capi = (ICoreClientAPI)api;
-					var containers = api.World.GetItem(waterCode).GetHandBookStacks(capi) ?? new List<ItemStack>();
+					var containers = api.World.GetItem(WaterCode).GetHandBookStacks(capi) ?? new List<ItemStack>();
 					return new WorldInteraction[] {
 						new WorldInteraction() {
 							ActionLangCode = "glassmaking:heldhelp-wettable-wet",
@@ -56,7 +56,7 @@ namespace GlassMaking.Items
 					if(container.IsTopOpened)
 					{
 						var stack = container.GetContent(blockSel.Position);
-						if(stack != null && stack.Collectible.Code.Equals(waterCode))
+						if(stack != null && stack.Collectible.Code.Equals(WaterCode))
 						{
 							var props = BlockLiquidContainerBase.GetContainableProps(stack);
 							if(props != null)

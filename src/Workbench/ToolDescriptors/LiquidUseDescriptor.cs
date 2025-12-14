@@ -21,7 +21,7 @@ namespace GlassMaking.Workbench.ToolDescriptors
 			else
 			{
 				var itemStack = ingredient.Type == EnumItemClass.Item ? new ItemStack(capi.World.GetItem(ingredient.Code)) : new ItemStack(capi.World.GetBlock(ingredient.Code));
-				itemStack.StackSize = (int)(BlockLiquidContainerBase.GetContainableProps(itemStack).ItemsPerLitre * ingredient.RequiresLitres);
+				itemStack.StackSize = (int)(BlockLiquidContainerBase.GetContainableProps(itemStack)!.ItemsPerLitre * ingredient.RequiresLitres);
 
 				var element = new SlideshowItemstackTextComponent(capi, new ItemStack[] { itemStack }, 40.0, EnumFloat.Inline,
 					cs => openDetailPageFor(GuiHandbookItemStackPage.PageCodeForStack(cs)));

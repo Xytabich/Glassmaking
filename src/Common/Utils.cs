@@ -1,5 +1,7 @@
 ﻿using Cairo;
 using GlassMaking.Blocks;
+using GlassMaking.Common;
+using GlassMaking.Items;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -199,6 +201,35 @@ namespace GlassMaking
 					}
 				}
 				return list.ToArray();
+			});
+		}
+
+		public static IReadOnlyDictionary<AssetLocation, ItemStack[]> GetGlassBlends(ICoreClientAPI api)
+		{
+			return ObjectCacheUtil.GetOrCreate(api, "glassmaking:glassblends", () => {
+				var blends = new Dictionary<AssetLocation, List<ItemStack>>();
+				foreach(Item item in api.World.Items)
+				{
+					if(item is ItemGlassBlend && GlassBlend.FromJson(item) is GlassBlend blend)
+					{
+						List<ItemStack> stacks = item.GetHandBookStacks(api);
+						if(stacks != null)
+						{
+							if(!blends.TryGetValue(blend.Code, out var list))
+							{
+								blends[blend.Code] = list = new();
+							}
+							list.AddRange(stacks);
+						}
+					}
+				}
+
+				var result = new Dictionary<AssetLocation, ItemStack[]>(blends.Count);
+				foreach(var pair in blends)
+				{
+					result[pair.Key] = pair.Value.ToArray();
+				}
+				return result;
 			});
 		}
 

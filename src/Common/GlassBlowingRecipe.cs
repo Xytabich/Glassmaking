@@ -35,7 +35,7 @@ namespace GlassMaking
 
 		public bool Enabled { get; set; } = true;
 
-		public IRecipeIngredient[] Ingredients { get; } = new IRecipeIngredient[0];
+		public IRecipeIngredient[] Ingredients => Steps;
 
 		IRecipeOutput IRecipeBase<GlassBlowingRecipe>.Output => filler;
 
@@ -50,7 +50,14 @@ namespace GlassMaking
 
 		public Dictionary<string, string[]> GetNameToCodeMapping(IWorldAccessor world)
 		{
-			return new Dictionary<string, string[]>();
+			var map = new Dictionary<string, string[]>();
+			var mod = world.Api.ModLoader.GetModSystem<GlassMakingMod>();
+			for(int i = 0; i < Steps.Length; i++)
+			{
+				var descriptor = mod.GetPipeToolDescriptor(Steps[i].Tool);
+				descriptor?.GetWildcardMapping(world, this, i, map);
+			}
+			return map;
 		}
 
 		public int GetStepIndex(ITreeAttribute recipeAttribute)
@@ -326,8 +333,8 @@ namespace GlassMaking
 		}
 	}
 
-	[JsonObject]
-	public sealed class GlassBlowingRecipeStep
+	[JsonObject(MemberSerialization.OptIn)]
+	public sealed class GlassBlowingRecipeStep : IRecipeIngredient
 	{
 		[JsonProperty(Required = Required.Always)]
 		public string Tool = default!;
@@ -339,9 +346,19 @@ namespace GlassMaking
 		[JsonConverter(typeof(JsonAttributesConverter))]
 		public JsonObject? Attributes;
 
+		[JsonProperty]
+		public string Name { get; set; } = "";
+
+		/// <summary>
+		/// This property is initialized and used by some tools
+		/// </summary>
+		public AssetLocation? Code { get; set; } = null;
+
 		public void ToBytes(BinaryWriter writer)
 		{
 			writer.Write(Tool);
+			writer.Write(Code != null);
+			if(Code != null) writer.Write(Code.ToShortString());
 			writer.Write(Shape != null);
 			if(Shape != null) Shape.ToBytes(writer);
 			writer.Write(Attributes != null);
@@ -351,6 +368,10 @@ namespace GlassMaking
 		public void FromBytes(BinaryReader reader)
 		{
 			Tool = reader.ReadString().ToLowerInvariant();
+			if(reader.ReadBoolean())
+			{
+				Code = new AssetLocation(reader.ReadString());
+			}
 			if(reader.ReadBoolean())
 			{
 				Shape = new SmoothRadialShape();
@@ -366,6 +387,8 @@ namespace GlassMaking
 		{
 			return new GlassBlowingRecipeStep() {
 				Tool = Tool,
+				Name = Name,
+				Code = Code?.Clone(),
 				Shape = Shape?.Clone(),
 				Attributes = Attributes?.Clone()
 			};

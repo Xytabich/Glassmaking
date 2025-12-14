@@ -105,15 +105,10 @@ namespace GlassMaking.Blocks
 		public static WorldInteraction[] GetSmelteryInteractions(ICoreClientAPI capi, string key, InteractionStacksDelegate getMatchingStacks)
 		{
 			return ObjectCacheUtil.GetOrCreate(capi, key, () => {
-				List<ItemStack> blends = new List<ItemStack>();
-
-				foreach(Item item in capi.World.Items)
+				var blends = new List<ItemStack>();
+				foreach(var list in Utils.GetGlassBlends(capi).Values)
 				{
-					if(item is ItemGlassBlend && item.Attributes?.KeyExists(GlassBlend.PROPERTY_NAME) == true)
-					{
-						List<ItemStack> stacks = item.GetHandBookStacks(capi);
-						if(stacks != null) blends.AddRange(stacks);
-					}
+					blends.AddRange(list);
 				}
 
 				return new WorldInteraction[] {

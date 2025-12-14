@@ -52,7 +52,7 @@ namespace GlassMaking.Blocks
 			}
 			UpdateGrid();
 			if(Api.Side == EnumAppSide.Client) updateMeshes();
-			RegisterGameTickListener(OnCommonTick, 200);
+			RegisterGameTickListener(OnCommonTick, 1000);
 		}
 
 		public override void GetBlockInfo(IPlayer forPlayer, StringBuilder dsc)

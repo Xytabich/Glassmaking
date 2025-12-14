@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GlassMaking.Common;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
@@ -29,7 +30,7 @@ namespace GlassMaking.Blocks
 				List<ItemStack> fuelStacklist = new List<ItemStack>();
 				List<ItemStack> canIgniteStacks = new List<ItemStack>();
 
-				foreach(CollectibleObject obj in api.World.Collectibles)
+				foreach(CollectibleObject obj in api.World.BlockItemEnumerator())
 				{
 					if(obj.CombustibleProps?.BurnTemperature >= 100)
 					{
@@ -84,15 +85,14 @@ namespace GlassMaking.Blocks
 					{
 						if(block.TryPlaceBlock(world, byPlayer, new BlockSelection { Position = blockSel.Position.UpCopy(), Face = BlockFacing.UP }, itemstack, Variant["side"]))
 						{
-							var upCopy = blockSel.Clone();
-							blockSel.Position.Up();
-							world.PlaySoundAt(itemstack.Block.GetSounds(world.BlockAccessor, upCopy, itemstack)?.Place,
-								blockSel.Position.X + 0.5, blockSel.Position.Y + 1, blockSel.Position.Z + 0.5, byPlayer, true, 16f);
+							var upPos = blockSel.Position.UpCopy();
+							world.PlaySoundAt(itemstack.Block.GetSounds(world.BlockAccessor, blockSel, itemstack)?.Place,
+								upPos.X + 0.5, upPos.Y + 1, upPos.Z + 0.5, byPlayer, true, 16f);
 							if(byPlayer.WorldData.CurrentGameMode != EnumGameMode.Creative)
 							{
 								byPlayer.InventoryManager.ActiveHotbarSlot.TakeOut(1);
 							}
-							be.SetReceiver(world.BlockAccessor.GetBlockEntity(blockSel.Position.UpCopy()) as ITimeBasedHeatReceiver);
+							be.SetReceiver(world.BlockAccessor.GetBlockEntity(upPos) as ITimeBasedHeatReceiver);
 							return true;
 						}
 					}
@@ -150,16 +150,16 @@ namespace GlassMaking.Blocks
 			base.OnBlockBroken(world, pos, byPlayer, dropQuantityMultiplier);
 		}
 
-		public override void OnBlockExploded(IWorldAccessor world, BlockPos pos, BlockPos explosionCenter, EnumBlastType blastType)
+		public override void OnBlockExploded(IWorldAccessor world, BlockPos pos, BlockPos explosionCenter, EnumBlastType blastType, string ignitedByPlayerUid)
 		{
 			var upPos = pos.UpCopy();
 			var handle = BulkAccessUtil.SetReadFromStagedByDefault(world.BulkBlockAccessor, true);
 			var block = world.BulkBlockAccessor.GetBlock(upPos);
 			handle.RollbackValue();
 
-			if(block is IHeaterPlaceableBlock) block.OnBlockExploded(world, pos, explosionCenter, blastType);
+			if(block is IHeaterPlaceableBlock) block.OnBlockExploded(world, pos, explosionCenter, blastType, ignitedByPlayerUid);
 
-			base.OnBlockExploded(world, pos, explosionCenter, blastType);
+			base.OnBlockExploded(world, pos, explosionCenter, blastType, ignitedByPlayerUid);
 		}
 
 		public override ItemStack[] GetDrops(IWorldAccessor world, BlockPos pos, IPlayer byPlayer, float dropQuantityMultiplier = 1)

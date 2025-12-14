@@ -1,4 +1,5 @@
-﻿using GlassMaking.Workbench;
+﻿using GlassMaking.Common;
+using GlassMaking.Workbench;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -100,7 +101,7 @@ namespace GlassMaking.Handbook
 		{
 			return ObjectCacheUtil.GetOrCreate(capi, "glassmaking:workbench-toolitemsbycode", () => {
 				var itemsByToolCode = new Dictionary<string, IReadOnlyList<ItemStack>>();
-				foreach(var obj in capi.World.Collectibles)
+				foreach(var obj in capi.World.BlockItemEnumerator())
 				{
 					if(WorkbenchToolUtils.IsTool(obj))
 					{

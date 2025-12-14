@@ -72,7 +72,7 @@ namespace GlassMaking.Blocks
 					bathSource["inside"].atlasTextureId, 0.1875f, -0.1875f, 0.625f, 0.625f);
 				UpdateRendererFull();
 			}
-			RegisterGameTickListener(OnCommonTick, 200);
+			RegisterGameTickListener(OnCommonTick, 1000);
 		}
 
 		public override void GetBlockInfo(IPlayer forPlayer, StringBuilder dsc)
@@ -250,7 +250,7 @@ namespace GlassMaking.Blocks
 		public ItemStack[] GetDropItems()
 		{
 			var items = inventory.CollectItems();
-			if(glassAmount > 0 && glassCode != null)
+			if(glassAmount > 0 && glassCode != null && state != SmelteryState.ContainsMix)
 			{
 				foreach(var item in mod.GetShardsList(Api.World, glassCode, glassAmount))
 				{

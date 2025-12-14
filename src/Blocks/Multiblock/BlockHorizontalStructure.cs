@@ -300,7 +300,7 @@ namespace GlassMaking.Blocks.Multiblock
 			}
 		}
 
-		public override void OnBlockExploded(IWorldAccessor world, BlockPos pos, BlockPos explosionCenter, EnumBlastType blastType)
+		public override void OnBlockExploded(IWorldAccessor world, BlockPos pos, BlockPos explosionCenter, EnumBlastType blastType, string ignitedByPlayerUid)
 		{
 			if(isSurrogate)
 			{
@@ -309,7 +309,7 @@ namespace GlassMaking.Blocks.Multiblock
 				if(world.BulkBlockAccessor.GetBlock(mainPos) is BlockHorizontalStructure mainBlock)
 				{
 					handle.RollbackValue();
-					mainBlock.OnBlockExploded(world, mainPos, explosionCenter, blastType);
+					mainBlock.OnBlockExploded(world, mainPos, explosionCenter, blastType, ignitedByPlayerUid);
 				}
 				else
 				{

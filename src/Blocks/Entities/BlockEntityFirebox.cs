@@ -63,7 +63,7 @@ namespace GlassMaking.Blocks
 				UpdateRendererFull();
 				ToggleAmbientSounds(burning);
 			}
-			RegisterGameTickListener(OnCommonTick, 200);
+			RegisterGameTickListener(OnCommonTick, 1000);
 		}
 
 		public override void GetBlockInfo(IPlayer forPlayer, StringBuilder dsc)

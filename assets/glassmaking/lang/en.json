@@ -94,6 +94,7 @@
 	"glassmaking:Take {0} units of {1} glass": "Take {0} units of {1} glass",
 	"glassmaking:Consumes {0} humidity": "Consumes {0}L humidity",
 	"glassmaking:{0}/{4} units of {1} {2} glass ({3})": "{0}/{4} units of {1} {2} glass ({3})",
+	"glassmaking:{0} units": "({0}u)",
 	"block-firebox-*": "Firebox",
 	"block-smeltery-*": "Small glass smeltery",
 	"block-largesmeltery-main": "Large glass smeltery",

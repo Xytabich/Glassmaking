@@ -108,24 +108,38 @@ namespace GlassMaking
 			int rows = (int)Math.Ceiling(cnt / (float)cols);
 
 			double innerWidth = Math.Max(300, cols * size);
-			ElementBounds skillGridBounds = ElementBounds.Fixed(0, 30, innerWidth, rows * size);
+			double pad = GuiElementItemSlotGridBase.unscaledSlotPadding;
+			ElementBounds slotGridBounds = ElementStdBounds.SlotGrid(EnumDialogArea.None, pad, pad, cols, 7)
+				.WithFixedOffset(0.0, 30.0);
+			ElementBounds fullGridBounds = ElementStdBounds.SlotGrid(EnumDialogArea.None, 3.0, 0.0, 6, rows);
+			ElementBounds clippingBounds = slotGridBounds.CopyOffsetedSibling();
 
-			ElementBounds textBounds = ElementBounds.Fixed(0, rows * size + 50, innerWidth, 33);
+			ElementBounds textBounds = ElementBounds.Fixed(0, 7 * size + 50, innerWidth, 33);
 
 			ElementBounds bgBounds = ElementBounds.Fill.WithFixedPadding(GuiStyle.ElementToDialogPadding);
 			bgBounds.BothSizing = ElementSizing.FitToChildren;
+
+			ElementBounds insetBounds = slotGridBounds.ForkBoundingParent(3.0, 3.0, 3.0, 3.0);
+			ElementBounds scrollBarBounds = ElementStdBounds.VerticalScrollbar(insetBounds).WithParent(bgBounds);
+			scrollBarBounds.fixedOffsetX -= 2.0;
+			scrollBarBounds.fixedWidth = 15.0;
 
 			SingleComposer = capi.Gui.CreateCompo("toolmodeselect", ElementStdBounds.AutosizedMainDialog)
 				.AddShadedDialogBG(bgBounds, true)
 				.AddDialogTitleBar(Lang.Get("Select Recipe"), OnTitleBarClose)
 				.BeginChildElements(bgBounds)
-					.AddSkillItemGrid(skillItems, cols, rows, OnSlotClick, skillGridBounds, "skillitemgrid")
+					.AddVerticalScrollbar(OnGridScroll, scrollBarBounds, "scrollbar")
+					.AddInset(insetBounds, 3)
+					.BeginClip(clippingBounds)
+						.AddRecipeItemGrid(skillItems, cols, rows, OnSlotClick, fullGridBounds, "skillitemgrid")
+					.EndClip()
 					.AddDynamicText("", CairoFont.WhiteSmallishText(), textBounds, "name")
 					.AddDynamicText("", CairoFont.WhiteDetailText(), textBounds.BelowCopy(0, 10, 0, 0), "desc")
 				.EndChildElements()
 				.Compose();
 
-			SingleComposer.GetSkillItemGrid("skillitemgrid").OnSlotOver = OnSlotOver;
+			SingleComposer.GetRecipeItemGrid("skillitemgrid").OnSlotOver = OnSlotOver;
+			SingleComposer.GetScrollbar("scrollbar").SetHeights((float)slotGridBounds.fixedHeight, (float)(fullGridBounds.fixedHeight + pad));
 		}
 
 		public override void OnRenderGUI(float deltaTime)
@@ -146,6 +160,16 @@ namespace GlassMaking
 				SingleComposer.Bounds.absMarginY = 0.0;
 			}
 			base.OnRenderGUI(deltaTime);
+		}
+
+		private void OnGridScroll(float value)
+		{
+			if(IsOpened())
+			{
+				ElementBounds bounds = SingleComposer.GetRecipeItemGrid("skillitemgrid").Bounds;
+				bounds.fixedY = 10.0 - GuiElementItemSlotGridBase.unscaledSlotPadding - value;
+				bounds.CalcWorldBounds();
+			}
 		}
 
 		private string GetCraftDescKey(ItemStack stack)

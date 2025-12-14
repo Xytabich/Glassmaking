@@ -16,5 +16,7 @@ namespace GlassMaking.ToolDescriptors
 		bool TryGetWorkingTemperature(IWorldAccessor world, ItemStack item, GlassBlowingRecipe recipe, int currentStepIndex, out float temperature);
 
 		void GetBreakDrops(IWorldAccessor world, ItemStack item, GlassBlowingRecipe recipe, int currentStepIndex, List<ItemStack> outList);
+
+		void GetWildcardMapping(IWorldAccessor world, GlassBlowingRecipe recipe, int stepIndex, Dictionary<string, string[]> outMap);
 	}
 }

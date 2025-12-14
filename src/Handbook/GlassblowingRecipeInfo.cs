@@ -48,10 +48,14 @@ namespace GlassMaking.Handbook
 					var steps = recipe.Steps;
 					for(int j = 0; j < steps.Length; j++)
 					{
+						if(j != 0)
+						{
+							outComponents.Add(new IconComponent(capi, "right", null, CairoFont.WhiteSmallText()));
+						}
 						var descriptor = mod.GetPipeToolDescriptor(steps[j].Tool);
 						if(descriptor == null)
 						{
-							outComponents.Add(new RichTextComponent(capi, "• " + Lang.Get("glassmaking:Step {0} tool: {1}", j + 1,
+							outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:Step {0} tool: {1}", j + 1,
 								Lang.Get("glassmaking:glassblowingtool-" + steps[j].Tool)) + "\n", CairoFont.WhiteSmallText()));
 						}
 						else

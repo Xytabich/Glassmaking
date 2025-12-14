@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using GlassMaking.Common;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
@@ -58,7 +59,7 @@ namespace GlassMaking.Items
 					EnumItemClass contentClass = contentType == "block" ? EnumItemClass.Block : EnumItemClass.Item;
 					List<ItemStack> lstacks = new List<ItemStack>();
 					var loc = AssetLocation.Create(contentCode, Code.Domain);
-					foreach(var obj in api.World.Collectibles)
+					foreach(var obj in api.World.BlockItemEnumerator())
 					{
 						if(obj.ItemClass == contentClass && WildcardUtil.Match(loc, obj.Code))
 						{
