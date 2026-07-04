@@ -4,6 +4,7 @@ using GlassMaking.Common;
 using GlassMaking.Items;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.CompilerServices;
 using Vintagestory.API.Client;
@@ -24,6 +25,20 @@ namespace GlassMaking
 			target.Y = source.Y;
 			target.Z = source.Z;
 			target.dimension = source.dimension;
+		}
+
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[return: NotNullIfNotNull(nameof(defaultValue))]
+		public static T?[]? AsArrayOrSingle<T>(this JsonObject json, T[]? defaultValue = null, string defaultDomain = "game")
+		{
+			if(json.IsArray())
+			{
+				return json.AsArray(defaultValue, defaultDomain);
+			}
+			var value = json.AsObject<T>(default, defaultDomain);
+			if(value == null) return defaultValue;
+			return [value];
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -73,10 +88,16 @@ namespace GlassMaking
 				int count = points.Count - 1;
 				for(int i = 0; i < count; i++)
 				{
-					points[i] = FastVec2f.Lerp(points[i], points[i + 1], t);
+					points[i] = Lerp(points[i], points[i + 1], t);
 				}
 				points.RemoveAt(count);
 			}
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static FastVec2f Lerp(FastVec2f a, FastVec2f b, float t)
+		{
+			return a * (1 - t) + b * t;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -204,13 +225,13 @@ namespace GlassMaking
 			});
 		}
 
-		public static IReadOnlyDictionary<AssetLocation, ItemStack[]> GetGlassBlends(ICoreClientAPI api)
+		public static IReadOnlyDictionary<AssetLocation, ItemStack[]> GetBlendStacks(ICoreClientAPI api)
 		{
-			return ObjectCacheUtil.GetOrCreate(api, "glassmaking:glassblends", () => {
+			return ObjectCacheUtil.GetOrCreate(api, "glassmaking:blendstacks", () => {
 				var blends = new Dictionary<AssetLocation, List<ItemStack>>();
 				foreach(Item item in api.World.Items)
 				{
-					if(item is ItemGlassBlend && GlassBlend.FromJson(item) is GlassBlend blend)
+					if(item is ItemGlassBlend && GlassBlend.FromItemAttribute(item) is GlassBlend blend)
 					{
 						List<ItemStack> stacks = item.GetHandBookStacks(api);
 						if(stacks != null)
@@ -231,6 +252,21 @@ namespace GlassMaking
 				}
 				return result;
 			});
+		}
+
+		public static HashSet<string> WildcardMatches(AssetLocation wildcard, IEnumerable<AssetLocation> codes, string[]? allowedVariants = null)
+		{
+			int wildcardPos = wildcard.Path.IndexOf('*');
+			int wildcardOffset = wildcard.Path.Length - (wildcardPos + 1);
+			var list = new HashSet<string>();
+			foreach(var code in codes)
+			{
+				if(WildcardUtil.Match(wildcard, code, allowedVariants))
+				{
+					list.Add(code.Path[wildcardPos..^wildcardOffset]);
+				}
+			}
+			return list;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

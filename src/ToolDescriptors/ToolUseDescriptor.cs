@@ -25,7 +25,8 @@ namespace GlassMaking.ToolDescriptors
 		public override void GetStepInfoForHeldItem(IWorldAccessor world, ItemStack item, GlassBlowingRecipe recipe, int stepIndex, StringBuilder dsc, bool withDebugInfo)
 		{
 			var step = recipe.Steps[stepIndex];
-			dsc.AppendLine("• " + Lang.Get("glassmaking:{0} for {1} seconds", Lang.Get("glassmaking:glassblowingtool-" + step.Tool), step.Attributes!["time"].AsFloat(1).ToString("G", CultureInfo.InvariantCulture)));
+			dsc.AppendLine("• " + Lang.Get("glassmaking:{0} for {1} seconds", Lang.Get("glassmaking:glassblowingtool-" + step.Tool),
+				(step.RecipeAttributes?["time"].AsFloat(1) ?? 1).ToString("G", CultureInfo.InvariantCulture)));
 		}
 
 		public override void GetInteractionHelp(IWorldAccessor world, ItemStack item, GlassBlowingRecipe recipe, int stepIndex, List<WorldInteraction> interactions)
@@ -42,7 +43,7 @@ namespace GlassMaking.ToolDescriptors
 		{
 			if(base.IsSuitableBehavior(item, beh))
 			{
-				return item.ToolTier >= ((ToolUse)beh).minTier;
+				return item.ToolTier >= ((ToolUse)beh).MinTier;
 			}
 			return false;
 		}

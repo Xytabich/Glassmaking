@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
+using System.Runtime.CompilerServices;
 using Vintagestory.API.Client;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
@@ -143,7 +144,7 @@ namespace GlassMaking
 		{
 			var a = LerpParts(isOuter ? from.Outer : from.Inner!, tmpList, from.Segments, at);
 			var b = LerpParts(isOuter ? to.Outer : to.Inner!, tmpList, to.Segments, bt);
-			return vecCallback.Invoke(mesh, FastVec2f.Lerp(a, b, t), isOuter);
+			return vecCallback.Invoke(mesh, Utils.Lerp(a, b, t), isOuter);
 		}
 
 		private static FastVec2f LerpParts(ShapePart[] parts, FastList<FastVec2f> tmpList, float full, float t)
@@ -184,12 +185,15 @@ namespace GlassMaking
 			public void Interpolate(FastList<FastVec2f> tmpList, float t)
 			{
 				if(Vertices.Length == 0) tmpList.Add(new FastVec2f(0, 0));
-				if(Vertices.Length == 1) tmpList.Add(new FastVec2f(Vertices[0]));
+				if(Vertices.Length == 1) tmpList.Add(Vec2FromArr(Vertices[0]));
 				for(int i = 0; i < Vertices.Length; i++)
 				{
-					tmpList.Add(new FastVec2f(Vertices[i]));
+					tmpList.Add(Vec2FromArr(Vertices[i]));
 				}
 				Utils.InterpolateBezier(tmpList, t);
+
+				[MethodImpl(MethodImplOptions.AggressiveInlining)]
+				static FastVec2f Vec2FromArr(float[] arr) => new(arr[0], arr[1]);
 			}
 
 			public void ToBytes(BinaryWriter writer)

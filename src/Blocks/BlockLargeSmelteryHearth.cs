@@ -22,11 +22,10 @@ namespace GlassMaking.Blocks
 		public override bool OnBlockInteractStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)
 		{
 			ItemSlot slot = byPlayer.InventoryManager.ActiveHotbarSlot;
-			ItemStack itemstack = slot.Itemstack;
+			ItemStack? itemstack = slot.Itemstack;
 			if(itemstack != null)
 			{
-				var be = world.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityLargeSmelteryHearth;
-				if(be != null)
+				if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BlockEntityLargeSmelteryHearth be)
 				{
 					if(be.TryAdd(byPlayer, slot, byPlayer.Entity.Controls.Sneak ? (byPlayer.Entity.Controls.Sprint ? 20 : 5) : 1))
 					{
@@ -71,7 +70,7 @@ namespace GlassMaking.Blocks
 			List<ItemStack> list = new List<ItemStack>();
 			foreach(var stack in wi.Itemstacks)
 			{
-				var blend = GlassBlend.FromJson(stack)!;
+				var blend = GlassBlend.FromItemAttribute(stack)!;
 				if(blend.Code.Equals(code) && blend.Amount * stack.StackSize <= canAddAmount)
 				{
 					list.Add(stack);

@@ -29,7 +29,7 @@ namespace GlassMaking.Items
 			{
 				interactions = ObjectCacheUtil.GetOrCreate(api, "glassmaking:heldhelp-wettable", () => {
 					var capi = (ICoreClientAPI)api;
-					var containers = api.World.GetItem(WaterCode).GetHandBookStacks(capi) ?? new List<ItemStack>();
+					var containers = api.World.GetItem(WaterCode)!.GetHandBookStacks(capi) ?? new List<ItemStack>();
 					return new WorldInteraction[] {
 						new WorldInteraction() {
 							ActionLangCode = "glassmaking:heldhelp-wettable-wet",
@@ -61,14 +61,14 @@ namespace GlassMaking.Items
 							var props = BlockLiquidContainerBase.GetContainableProps(stack);
 							if(props != null)
 							{
-								var value = GetHumidity(slot.Itemstack, byEntity.World);
+								var value = GetHumidity(slot.Itemstack!, byEntity.World);
 								int takeAmount = (int)Math.Ceiling((capacity - value) * props.ItemsPerLitre);
 								if(takeAmount > 0)
 								{
 									stack = container.TryTakeContent(blockSel.Position, takeAmount);
 									if(stack != null)
 									{
-										SetHumidity(slot.Itemstack, Math.Min(capacity, value + stack.StackSize / props.ItemsPerLitre));
+										SetHumidity(slot.Itemstack!, Math.Min(capacity, value + stack.StackSize / props.ItemsPerLitre));
 										slot.MarkDirty();
 										handling = EnumHandHandling.PreventDefault;
 									}
@@ -96,10 +96,10 @@ namespace GlassMaking.Items
 			SetHumidity(itemStack, GetHumidity(itemStack, world) - value);
 		}
 
-		public override void OnCreatedByCrafting(ItemSlot[] allInputslots, ItemSlot outputSlot, GridRecipe byRecipe)
+		public override void OnCreatedByCrafting(ItemSlot[] allInputSlots, ItemSlot outputSlot, Vintagestory.API.Common.IRecipeBase byRecipe)
 		{
-			base.OnCreatedByCrafting(allInputslots, outputSlot, byRecipe);
-			SetHumidity(outputSlot.Itemstack, 0);
+			base.OnCreatedByCrafting(allInputSlots, outputSlot, byRecipe);
+			SetHumidity(outputSlot.Itemstack!, 0);
 		}
 
 		public override string GetHeldItemName(ItemStack itemStack)
@@ -114,7 +114,7 @@ namespace GlassMaking.Items
 		public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
 		{
 			base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
-			var value = GetHumidity(inSlot.Itemstack, world);
+			var value = GetHumidity(inSlot.Itemstack!, world);
 			if(value >= 0.01) dsc.AppendLine(Lang.Get("Humidity: {0}", value));
 		}
 
@@ -137,14 +137,11 @@ namespace GlassMaking.Items
 
 		public override TransitionState[]? UpdateAndGetTransitionStates(IWorldAccessor world, ItemSlot inslot)
 		{
-			ItemStack itemstack = inslot.Itemstack;
+			ItemStack itemstack = inslot.Itemstack!;
 
-			if(itemstack.Attributes == null)
-			{
-				itemstack.Attributes = new TreeAttribute();
-			}
+			itemstack.Attributes ??= new TreeAttribute();
 
-			if(!(itemstack.Attributes["transitionstate"] is ITreeAttribute))
+			if(itemstack.Attributes["transitionstate"] is not ITreeAttribute)
 			{
 				return null;
 			}

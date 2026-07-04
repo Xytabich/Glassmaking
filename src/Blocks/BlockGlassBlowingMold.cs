@@ -1,6 +1,7 @@
 ﻿using GlassMaking.Items;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
@@ -23,65 +24,12 @@ namespace GlassMaking.Blocks
 				var world = api.World;
 				var recipes = new List<BlowingMoldRecipe>();
 
-				var tmpList = new List<BlowingMoldRecipe>();
 				var attrib = Attributes["glassmaking:glassmold"];
-				foreach(var recipe in (attrib.IsArray() ? attrib.AsObject<BlowingMoldRecipe[]>(null!, Code.Domain)
-					: new BlowingMoldRecipe[] { attrib.AsObject<BlowingMoldRecipe>(null!, Code.Domain) }))
+				foreach(var recipe in attrib.AsArrayOrSingle<BlowingMoldRecipe>([]))
 				{
 					if(recipe != null && recipe.Enabled)
 					{
-						var nameToCodeMapping = recipe.GetNameToCodeMapping(world);
-						if(nameToCodeMapping.Count > 0)
-						{
-							int qCombs = 0;
-							bool first = true;
-							foreach(var pair in nameToCodeMapping)
-							{
-								if(first) qCombs = pair.Value.Length;
-								else qCombs *= pair.Value.Length;
-								first = false;
-							}
-							if(qCombs > 0)
-							{
-								tmpList.Clear();
-								for(int i = 0; i < qCombs; i++)
-								{
-									tmpList.Add(recipe.Clone());
-								}
-								foreach(var pair in nameToCodeMapping)
-								{
-									string variantCode = pair.Key;
-									string[] variants = pair.Value;
-
-									for(int i = 0; i < qCombs; i++)
-									{
-										var rec = tmpList[i];
-
-										if(rec.Ingredients != null)
-										{
-											foreach(var ingred in rec.Ingredients)
-											{
-												if(ingred.Name == variantCode)
-												{
-													ingred.Code = ingred.Code.CopyWithPath(ingred.Code.Path.Replace("*", variants[i % variants.Length]));
-												}
-											}
-										}
-
-										rec.Output.FillPlaceHolder(variantCode, variants[i % variants.Length]);
-									}
-								}
-								recipes.AddRange(tmpList);
-							}
-							else
-							{
-								api.World.Logger.Warning("{0} mold make uses of wildcards, but no blocks or item matching those wildcards were found.", Code);
-							}
-						}
-						else
-						{
-							recipes.Add(recipe);
-						}
+						recipes.AddRange(recipe.GenerateRecipesForAllIngredientCombinations(world).Select(r => (BlowingMoldRecipe)r));
 					}
 				}
 

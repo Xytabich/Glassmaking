@@ -47,8 +47,8 @@ namespace GlassMaking.Blocks
 			this.offset = offset;
 			this.frustumMin = frustumMin;
 			this.frustumMax = frustumMax;
-			mixTexture = tex["mix"];
-			meltTexture = tex["melt"];
+			mixTexture = tex["mix"]!;
+			meltTexture = tex["melt"]!;
 			api.Event.RegisterRenderer(this, renderStage, "glassmaking:smeltery");
 		}
 

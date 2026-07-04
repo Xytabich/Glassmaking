@@ -6,7 +6,7 @@ namespace GlassMaking.GlassblowingTools
 {
 	public class ToolUse : GlassblowingToolBehavior
 	{
-		public int minTier;
+		public int MinTier { get; private set; }
 
 		private string animation = default!;
 
@@ -17,13 +17,13 @@ namespace GlassMaking.GlassblowingTools
 		public override void Initialize(JsonObject properties)
 		{
 			base.Initialize(properties);
-			minTier = properties["minTier"].AsInt(5);
-			animation = properties["animation"].AsString();
+			MinTier = properties["minTier"].AsInt(0);
+			animation = properties["animation"].AsString("");
 		}
 
 		public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling, ref EnumHandling handling)
 		{
-			if(firstEvent && slot.Itemstack.Collectible.ToolTier >= minTier && TryGetRecipeStep(slot, byEntity, out var step, true, true))
+			if(firstEvent && slot.Itemstack!.Collectible.ToolTier >= MinTier && TryGetRecipeStep(slot, byEntity, out var step, true, true))
 			{
 				if(step.BeginStep())
 				{
@@ -41,18 +41,18 @@ namespace GlassMaking.GlassblowingTools
 
 		public override bool OnHeldInteractStep(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, ref EnumHandling handling)
 		{
-			if(slot.Itemstack.Collectible.ToolTier >= minTier && TryGetRecipeStep(slot, byEntity, out var step))
+			if(slot.Itemstack!.Collectible.ToolTier >= MinTier && TryGetRecipeStep(slot, byEntity, out var step))
 			{
 				if(step.ContinueStep())
 				{
-					float time = step.StepAttributes!["time"].AsFloat(1);
+					float time = step.Ingredient.RecipeAttributes?["time"].AsFloat(1) ?? 1;
 					if(api.Side == EnumAppSide.Client)
 					{
 						step.SetProgress(Math.Max(secondsUsed - 1f, 0f) / time);
 					}
 					if(byEntity.Api.Side == EnumAppSide.Server && secondsUsed >= time)
 					{
-						int damage = step.StepAttributes["damage"].AsInt(1);
+						int damage = step.Ingredient.ToolDurabilityCost;
 						if(damage > 0)
 						{
 							slot.Itemstack.Item.DamageItem(byEntity.World, byEntity, slot, damage);

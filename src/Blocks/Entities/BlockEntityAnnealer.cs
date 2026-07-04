@@ -65,7 +65,7 @@ namespace GlassMaking.Blocks
 					if(!inventory[i].Empty)
 					{
 						dsc.Append(inventory[i].GetStackName());
-						float temperature = (inventory[i].Itemstack.Attributes["temperature"] as ITreeAttribute)?.GetFloat("temperature", 20f) ?? 20f;
+						float temperature = (inventory[i].Itemstack!.Attributes["temperature"] as ITreeAttribute)?.GetFloat("temperature", 20f) ?? 20f;
 						dsc.Append("  ").AppendLine(Lang.Get("Temperature: {0}°C", temperature.ToString("0")));
 						var process = processes[i];
 						if(process != null && process.IsHeated)
@@ -87,7 +87,7 @@ namespace GlassMaking.Blocks
 					if(!inventory[i].Empty && (processes[i] == null || byPlayer.Entity.Controls.Sneak))
 					{
 						inventory[i].TryPutInto(Api.World, slot, 1);
-						lastRemoved = slot.Itemstack.Clone();
+						lastRemoved = slot.Itemstack!.Clone();
 						processes[i] = null;
 						removed = true;
 						break;
@@ -303,16 +303,19 @@ namespace GlassMaking.Blocks
 
 		private void ResolveProcessInfo(int index)
 		{
-			var stack = inventory[index].Itemstack;
+			var process = processes[index];
+			if(process == null) return;
+
+			var stack = inventory[index].Itemstack!;
 			var properties = stack.Collectible.Attributes?["glassmaking:anneal"];
 			if(properties != null && properties.Exists)
 			{
 				var output = properties["output"].AsObject<JsonItemStack?>(null, stack.Collectible.Code.Domain);
 				if(output!.Resolve(Api.World, "annealer"))
 				{
-					processes[index]!.AnnealTemperature = properties["temperature"].AsObject<MinMaxFloat>();
-					processes[index]!.AnnealTime = properties["time"].AsInt() / 3600.0;
-					processes[index]!.Output = output.ResolvedItemstack;
+					process.AnnealTemperature = properties["temperature"].AsObject<MinMaxFloat>()!;
+					process.AnnealTime = properties["time"].AsInt() / 3600.0;
+					process.Output = output.ResolvedItemStack!;
 					return;
 				}
 			}

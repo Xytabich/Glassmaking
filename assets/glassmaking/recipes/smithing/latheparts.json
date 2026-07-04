@@ -1,5 +1,6 @@
 [
 	{
+		"code": "lathepart-chuckbody-{metal}",
 		"ingredient": {
 			"name": "metal",
 			"type": "item",
@@ -32,6 +33,7 @@
 		}
 	},
 	{
+		"code": "lathepart-chuckjaw-{metal}",
 		"ingredient": {
 			"name": "metal",
 			"type": "item",

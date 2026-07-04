@@ -1,8 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Newtonsoft.Json;
+using System.Runtime.CompilerServices;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
-using Vintagestory.API.Datastructures;
 using Vintagestory.GameContent;
 
 namespace GlassMaking.Workbench.ToolBehaviors
@@ -15,80 +14,53 @@ namespace GlassMaking.Workbench.ToolBehaviors
 
 		public override bool OnUseStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, WorkbenchRecipe recipe, int step)
 		{
-			if(!TryGetIngredient(world, recipe.Steps[step].Tools[ToolCode], recipe.Code, out var item))
-			{
-				return false;
-			}
-
-			return TryGetItemSlot(byPlayer, item, out _, out _);
+			return TryGetItemSlot(byPlayer, recipe.Steps[step].Tools[ToolCode]!, out _, out _);
 		}
 
 		public override bool OnUseStep(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, WorkbenchRecipe recipe, int step)
 		{
-			if(!TryGetIngredient(world, recipe.Steps[step].Tools[ToolCode], recipe.Code, out var item))
-			{
-				return false;
-			}
-
-			return TryGetItemSlot(byPlayer, item, out _, out _);
+			return TryGetItemSlot(byPlayer, recipe.Steps[step].Tools[ToolCode]!, out _, out _);
 		}
 
 		public override void OnUseComplete(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, WorkbenchRecipe recipe, int step)
 		{
 			if(Api.Side == EnumAppSide.Client) return;
 
-			if(!TryGetIngredient(world, recipe.Steps[step].Tools[ToolCode], recipe.Code, out var ingredient))
-			{
-				return;
-			}
+			var ingredient = recipe.Steps[step].Tools[ToolCode]!;
 
 			if(TryGetItemSlot(byPlayer, ingredient, out var slot, out var source))
 			{
-				int quantity = (int)(source.GetContentProps(slot.Itemstack)!.ItemsPerLitre * ingredient.RequiresLitres);
-				source.TryTakeContent(slot.Itemstack, quantity);
+				int quantity = (int)(source.GetContentProps(slot.Itemstack!)!.ItemsPerLitre * RequiresLitres(ingredient));
+				source.TryTakeContent(slot.Itemstack!, quantity);
 				slot.MarkDirty();
 			}
 		}
 
 		public override WorldInteraction[]? GetBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer, WorkbenchRecipe? recipe, int step)
 		{
-			if(recipe != null && recipe.Steps[step].Tools.TryGetValue(ToolCode, out var json))
+			if(recipe != null && recipe.Steps[step].Tools.TryGetValue(ToolCode, out var ingredient))
 			{
-				if(TryGetIngredient(world, json, recipe.Code, out var ingredient))
-				{
-					var itemStack = ingredient.Type == EnumItemClass.Item ? new ItemStack(world.GetItem(ingredient.Code)) : new ItemStack(world.GetBlock(ingredient.Code));
-					itemStack.StackSize = (int)(BlockLiquidContainerBase.GetContainableProps(itemStack)!.ItemsPerLitre * ingredient.RequiresLitres);
-					return new WorldInteraction[] { new WorldInteraction() {
-						Itemstacks = new ItemStack[] { itemStack },
-						MouseButton = EnumMouseButton.Right,
-						ActionLangCode = "glassmaking:workbench-tool-liquid-use"
-					} };
-				}
+				var itemStack = ingredient!.ResolvedItemStack!.Clone();
+				itemStack.StackSize = (int)(BlockLiquidContainerBase.GetContainableProps(itemStack)!.ItemsPerLitre * RequiresLitres(ingredient));
+				return [ new WorldInteraction() {
+					Itemstacks = [itemStack],
+					MouseButton = EnumMouseButton.Right,
+					ActionLangCode = "glassmaking:workbench-tool-liquid-use"
+				} ];
 			}
 			return base.GetBlockInteractionHelp(world, selection, forPlayer, recipe, step);
 		}
 
-		private bool TryGetIngredient(IWorldAccessor world, JsonObject? json, AssetLocation recipeCode, [NotNullWhen(true)] out RequiredLiquid? ingredient)
-		{
-			ingredient = json?.AsObject<RequiredLiquid?>(null, recipeCode.Domain);
-			if(ingredient == null)
-			{
-				world.Logger.Log(EnumLogType.Warning, "Unable to use liquid in workbench recipe '{0}' because json is malformed", recipeCode);
-				return false;
-			}
-			return true;
-		}
-
-		private bool TryGetItemSlot(IPlayer byPlayer, RequiredLiquid required, [NotNullWhen(true)] out ItemSlot? slot, [NotNullWhen(true)] out ILiquidSource? source)
+		private bool TryGetItemSlot(IPlayer byPlayer, CraftingRecipeIngredient ingredient, [NotNullWhen(true)] out ItemSlot? slot, [NotNullWhen(true)] out ILiquidSource? source)
 		{
 			slot = byPlayer.InventoryManager?.ActiveHotbarSlot;
 			var item = slot?.Itemstack;
 			if(item != null && (source = item.Collectible as ILiquidSource) != null)
 			{
 				var content = source.GetContent(item);
-				if(content != null && content.Collectible.Code.Equals(required.Code) && content.Class == required.Type)
+				if(content != null && content.Collectible.Code.Equals(ingredient.Code) && content.Class == ingredient.Type)
 				{
-					return source.GetCurrentLitres(item) >= required.RequiresLitres;
+					return source.GetCurrentLitres(item) >= RequiresLitres(ingredient);
 				}
 			}
 
@@ -97,16 +69,10 @@ namespace GlassMaking.Workbench.ToolBehaviors
 			return false;
 		}
 
-		[JsonObject]
-		public sealed class RequiredLiquid
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static float RequiresLitres(CraftingRecipeIngredient ingredient)
 		{
-			[JsonProperty(Required = Required.Always)]
-			public AssetLocation Code = default!;
-
-			public EnumItemClass Type = EnumItemClass.Item;
-
-			[JsonProperty(Required = Required.Always)]
-			public float RequiresLitres;
+			return ingredient.RecipeAttributes!["requiresLitres"].AsFloat();
 		}
 	}
 }

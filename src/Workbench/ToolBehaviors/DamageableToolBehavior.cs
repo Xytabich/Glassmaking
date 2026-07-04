@@ -1,4 +1,5 @@
-﻿using Vintagestory.API.Common;
+﻿using System.Runtime.CompilerServices;
+using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Workbench.ToolBehaviors
@@ -11,8 +12,8 @@ namespace GlassMaking.Workbench.ToolBehaviors
 
 		public override bool OnUseStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, WorkbenchRecipe recipe, int step)
 		{
-			int cost = recipe.Steps[step].Tools[ToolCode]!["toolDurabilityCost"].AsInt(1);
-			if(Slot.Itemstack.Attributes.GetInt("durability", Slot.Itemstack.Collectible.GetMaxDurability(Slot.Itemstack)) < cost)
+			int cost = ToolDurabilityCost(recipe.Steps[step].Tools[ToolCode]);
+			if(Slot.Itemstack!.Collectible.GetRemainingDurability(Slot.Itemstack) < cost)
 			{
 				return false;
 			}
@@ -21,8 +22,8 @@ namespace GlassMaking.Workbench.ToolBehaviors
 
 		public override bool OnUseStep(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, WorkbenchRecipe recipe, int step)
 		{
-			int cost = recipe.Steps[step].Tools[ToolCode]!["toolDurabilityCost"].AsInt(1);
-			if(Slot.Itemstack.Attributes.GetInt("durability", Slot.Itemstack.Collectible.GetMaxDurability(Slot.Itemstack)) < cost)
+			int cost = ToolDurabilityCost(recipe.Steps[step].Tools[ToolCode]);
+			if(Slot.Itemstack!.Collectible.GetRemainingDurability(Slot.Itemstack) < cost)
 			{
 				return false;
 			}
@@ -33,10 +34,16 @@ namespace GlassMaking.Workbench.ToolBehaviors
 		{
 			if(world.Api.Side == EnumAppSide.Server)
 			{
-				int cost = recipe.Steps[step].Tools[ToolCode]!["toolDurabilityCost"].AsInt(1);
-				Slot.Itemstack.Collectible.DamageItem(world, byPlayer.Entity, Slot, cost);
+				int cost = ToolDurabilityCost(recipe.Steps[step].Tools[ToolCode]);
+				Slot.Itemstack!.Collectible.DamageItem(world, byPlayer.Entity, Slot, cost);
 			}
 			base.OnUseComplete(secondsUsed, world, byPlayer, blockSel, recipe, step);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static int ToolDurabilityCost(CraftingRecipeIngredient? ingredient)
+		{
+			return ingredient?.ToolDurabilityCost ?? 1;
 		}
 	}
 }

@@ -13,6 +13,8 @@ namespace GlassMaking.Blocks
 {
 	public class BlockEntityGlassCastingMold : BlockEntity, IGlassmeltSink
 	{
+		private const float COOLING_PER_HOUR = 360f;
+
 		public int fillLevel = 0;
 
 		public float Temperature { get { return temperature.GetTemperature(Api.World); } }
@@ -46,7 +48,7 @@ namespace GlassMaking.Blocks
 			var block = (BlockGlassCastingMold)Block;
 			if(block.Recipes == null || block.Recipes.Length == 0) return;
 
-			requiredUnits = block.Recipes[0].Recipe.Amount;
+			requiredUnits = block.Recipes[0].Recipe.Quantity;
 
 			if(api is ICoreClientAPI)
 			{
@@ -54,7 +56,7 @@ namespace GlassMaking.Blocks
 
 				if(Block.Attributes["fillQuadsByLevel"].Exists)
 				{
-					fillQuadsByLevel = Array.ConvertAll(Block.Attributes["fillQuadsByLevel"].AsObject<RotatableCube[]>(), c => c.RotatedCopy());
+					fillQuadsByLevel = Array.ConvertAll(Block.Attributes["fillQuadsByLevel"].AsObject<RotatableCube[]>()!, c => c.RotatedCopy());
 				}
 
 				if(fillQuadsByLevel == null)
@@ -133,7 +135,7 @@ namespace GlassMaking.Blocks
 
 						if(Block.Sounds?.Place != null)
 						{
-							Api.World.PlaySoundAt(Block.Sounds.Place, Pos.X, Pos.Y, Pos.Z, byPlayer, false);
+							Api.World.PlaySoundAt(Block.Sounds.Place.Location, Pos.X, Pos.Y, Pos.Z, byPlayer, randomizePitch: false);
 						}
 
 						handled = true;
@@ -179,7 +181,7 @@ namespace GlassMaking.Blocks
 			var recipe = FindRecipe(glassCode);
 			if(recipe == null) return null;
 
-			return new ItemStack[] { recipe.Output.ResolvedItemstack.Clone() };
+			return [recipe.Output.ResolvedItemStack!.Clone()];
 		}
 
 		public override void FromTreeAttributes(ITreeAttribute tree, IWorldAccessor worldForResolve)
@@ -264,7 +266,7 @@ namespace GlassMaking.Blocks
 			if(recipes == null || recipes.Length == 0) return null;
 			for(int i = 0; i < recipes.Length; i++)
 			{
-				if(recipes[i].Recipe?.Code.Equals(glassCode) == true)
+				if(recipes[i].Recipe?.Code!.Equals(glassCode) == true)
 				{
 					return recipes[i];
 				}
@@ -312,7 +314,7 @@ namespace GlassMaking.Blocks
 				double lastUpdate = this.lastUpdate;
 				if(totalHours - lastUpdate > 1.0 / 85)
 				{
-					float temperature = Math.Max(20f, this.temperature - Math.Max(0f, (float)(totalHours - lastUpdate) * 180f));
+					float temperature = Math.Max(20f, this.temperature - Math.Max(0f, (float)(totalHours - lastUpdate) * COOLING_PER_HOUR));
 					SetTemperature(world, temperature);
 					return temperature;
 				}

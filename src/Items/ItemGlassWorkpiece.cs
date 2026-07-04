@@ -18,7 +18,7 @@ namespace GlassMaking.Items
 		public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
 		{
 			base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
-			var recipeInfo = inSlot.Itemstack.Attributes.GetTreeAttribute("glassmaking:recipe");
+			var recipeInfo = inSlot.Itemstack!.Attributes.GetTreeAttribute("glassmaking:recipe");
 			if(recipeInfo != null)
 			{
 				var recipe = mod.GetWorkbenchRecipe(recipeInfo.GetString("code"));
@@ -37,7 +37,9 @@ namespace GlassMaking.Items
 				var recipe = mod.GetWorkbenchRecipe(recipeInfo.GetString("code"));
 				if(recipe != null)
 				{
-					return Lang.Get("glassmaking:{0} (Workpiece)", recipe.Output.ResolvedItemstack.Collectible.GetHeldItemName(recipe.Output.ResolvedItemstack));
+					return Lang.Get("glassmaking:{0} (Workpiece)",
+						recipe.Output.ResolvedItemStack!.Collectible.GetHeldItemName(recipe.Output.ResolvedItemStack)
+					);
 				}
 			}
 			return base.GetHeldItemName(itemStack);

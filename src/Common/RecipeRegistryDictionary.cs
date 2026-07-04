@@ -55,17 +55,12 @@ namespace GlassMaking.Common
 
 		public bool AddRecipe(T rec)
 		{
-			var code = rec.Code.ToShortString();
+			var code = rec.Name!.ToShortString();
 			if(Pairs.ContainsKey(code)) return false;
 
 			Recipes.Add(rec);
 			Pairs[code] = rec;
 			return true;
 		}
-	}
-
-	public interface IRecipeBase
-	{
-		AssetLocation Code { get; }
 	}
 }

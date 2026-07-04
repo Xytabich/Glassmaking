@@ -24,11 +24,11 @@ namespace GlassMaking.Handbook
 		private void GetHandbookInfo(ItemSlot inSlot, ICoreClientAPI capi, ItemStack[] allStacks, ActionConsumable<string> openDetailPageFor, HandbookItemInfoSection section, List<RichTextComponentBase> outComponents)
 		{
 			if(section != HandbookItemInfoSection.BeforeExtraSections) return;
-			var itemstack = inSlot.Itemstack;
+			var itemstack = inSlot.Itemstack!;
 			List<GlassBlowingRecipe>? recipes = null;
 			foreach(var recipe in mod.GetGlassBlowingRecipes())
 			{
-				if(recipe.Value.Output.ResolvedItemstack != null && recipe.Value.Output.ResolvedItemstack.Equals(capi.World, itemstack, GlobalConstants.IgnoredStackAttributes))
+				if(recipe.Value.Output.ResolvedItemStack != null && recipe.Value.Output.ResolvedItemStack.Equals(capi.World, itemstack, GlobalConstants.IgnoredStackAttributes))
 				{
 					if(recipes == null) recipes = new List<GlassBlowingRecipe>();
 					recipes.Add(recipe.Value);

@@ -75,15 +75,14 @@ namespace GlassMaking
 			shape = meshInfo.shape;
 		}
 
-		public static void CacheInvTransforms(ShapeElement[] elements)
+		public static void CacheInvTransforms(ShapeElement[]? elements)
 		{
-			if(elements != null)
+			if(elements == null) return;
+
+			for(int i = 0; i < elements.Length; i++)
 			{
-				for(int i = 0; i < elements.Length; i++)
-				{
-					elements[i].CacheInverseTransformMatrix();
-					CacheInvTransforms(elements[i].Children);
-				}
+				elements[i].CacheInverseTransformMatrix();
+				CacheInvTransforms(elements[i].Children);
 			}
 		}
 

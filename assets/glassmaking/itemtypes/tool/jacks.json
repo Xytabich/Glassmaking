@@ -6,7 +6,6 @@
 			"name": "glassmaking:gbt-tooluse",
 			"properties": {
 				"tool": "flare",
-				"minTier": 0,
 				"animation": "gwtoolflare"
 			}
 		},
@@ -14,7 +13,6 @@
 			"name": "glassmaking:gbt-tooluse",
 			"properties": {
 				"tool": "recess",
-				"minTier": 0,
 				"animation": "gwtoolrecess"
 			}
 		}

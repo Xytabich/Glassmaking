@@ -27,7 +27,7 @@ namespace GlassMaking.Items
 			glasspipeBehaviors = prioritizedBehaviors.Select(b => b as GlasspipeCraftBehavior).Where(b => b != null).ToArray()!;
 
 			mod = api.ModLoader.GetModSystem<GlassMakingMod>();
-			GlassTransform = Attributes["glassTransform"].AsObject<ModelTransform>();
+			GlassTransform = Attributes["glassTransform"].AsObject<ModelTransform>()!;
 			GlassTransform.EnsureDefaultValues();
 		}
 
@@ -40,56 +40,62 @@ namespace GlassMaking.Items
 			return null;
 		}
 
-		public override bool MatchesForCrafting(ItemStack inputStack, GridRecipe gridRecipe, CraftingRecipeIngredient ingredient)
+		public override bool MatchesForCrafting(ItemStack inputStack, IRecipeBase recipe, IRecipeIngredient ingredient)
 		{
-			EnumHandling handling;
-			bool preventDefault = false;
-			foreach(var beh in prioritizedBehaviors)
+			if(recipe is GridRecipe gridRecipe)
 			{
-				if(beh is ICraftingGridBehavior behavior)
+				EnumHandling handling;
+				bool preventDefault = false;
+				foreach(var beh in prioritizedBehaviors)
 				{
-					handling = EnumHandling.PassThrough;
-					bool result = behavior.MatchesForCrafting(inputStack, gridRecipe, ingredient, ref handling);
-					if(handling != EnumHandling.PassThrough)
+					if(beh is ICraftingGridBehavior behavior)
 					{
-						if(result) return true;
+						handling = EnumHandling.PassThrough;
+						bool result = behavior.MatchesForCrafting(inputStack, gridRecipe, (CraftingRecipeIngredient)ingredient, ref handling);
+						if(handling != EnumHandling.PassThrough)
+						{
+							if(result) return true;
+							if(handling == EnumHandling.PreventDefault)
+							{
+								preventDefault = true;
+							}
+							else if(handling == EnumHandling.PreventSubsequent)
+							{
+								return false;
+							}
+						}
+					}
+				}
+				if(preventDefault) return false;
+			}
+			return base.MatchesForCrafting(inputStack, recipe, ingredient);
+		}
+
+		public override void OnConsumedByCrafting(ItemSlot[] allInputSlots, ItemSlot stackInSlot, IRecipeBase recipe, IRecipeIngredient fromIngredient, IPlayer byPlayer, int quantity)
+		{
+			if(recipe is GridRecipe gridRecipe)
+			{
+				EnumHandling handling;
+				bool preventDefault = false;
+				foreach(var beh in prioritizedBehaviors)
+				{
+					if(beh is ICraftingGridBehavior behavior)
+					{
+						handling = EnumHandling.PassThrough;
+						behavior.OnConsumedByCrafting(allInputSlots, stackInSlot, gridRecipe, (CraftingRecipeIngredient)fromIngredient, byPlayer, quantity, ref handling);
 						if(handling == EnumHandling.PreventDefault)
 						{
 							preventDefault = true;
 						}
 						else if(handling == EnumHandling.PreventSubsequent)
 						{
-							return false;
+							return;
 						}
 					}
 				}
+				if(preventDefault) return;
 			}
-			if(preventDefault) return false;
-			return base.MatchesForCrafting(inputStack, gridRecipe, ingredient);
-		}
-
-		public override void OnConsumedByCrafting(ItemSlot[] allInputSlots, ItemSlot stackInSlot, GridRecipe gridRecipe, CraftingRecipeIngredient fromIngredient, IPlayer byPlayer, int quantity)
-		{
-			EnumHandling handling;
-			bool preventDefault = false;
-			foreach(var beh in prioritizedBehaviors)
-			{
-				if(beh is ICraftingGridBehavior behavior)
-				{
-					handling = EnumHandling.PassThrough;
-					behavior.OnConsumedByCrafting(allInputSlots, stackInSlot, gridRecipe, fromIngredient, byPlayer, quantity, ref handling);
-					if(handling == EnumHandling.PreventDefault)
-					{
-						preventDefault = true;
-					}
-					else if(handling == EnumHandling.PreventSubsequent)
-					{
-						return;
-					}
-				}
-			}
-			if(preventDefault) return;
-			base.OnConsumedByCrafting(allInputSlots, stackInSlot, gridRecipe, fromIngredient, byPlayer, quantity);
+			base.OnConsumedByCrafting(allInputSlots, stackInSlot, recipe, fromIngredient, byPlayer, quantity);
 		}
 
 		public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling)

@@ -26,7 +26,7 @@ namespace GlassMaking.Handbook
 		private void GetHandbookInfo(ItemSlot inSlot, ICoreClientAPI capi, ItemStack[] allStacks, ActionConsumable<string> openDetailPageFor, HandbookItemInfoSection section, List<RichTextComponentBase> outComponents)
 		{
 			if(section != HandbookItemInfoSection.BeforeExtraSections) return;
-			if(mod.TryGetMaterialsForAnneal(inSlot.Itemstack, out var materials))
+			if(mod.TryGetMaterialsForAnneal(inSlot.Itemstack!, out var materials))
 			{
 				outComponents.Add(new ClearFloatTextComponent(capi, 7f));
 				outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:Obtained by annealing") + "\n", CairoFont.WhiteSmallText().WithWeight(FontWeight.Bold)));

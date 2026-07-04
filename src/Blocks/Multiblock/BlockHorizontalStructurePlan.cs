@@ -24,7 +24,7 @@ namespace GlassMaking.Blocks.Multiblock
 				{
 					throw new Exception("The replacement must be a block");
 				}
-				if(replacement.Block.ResolvedItemstack.Block is BlockHorizontalStructure structure)
+				if(replacement.Block.ResolvedItemStack!.Block is BlockHorizontalStructure structure)
 				{
 					structure.isSurrogate = isSurrogate;
 					structure.mainOffset = mainOffset;
@@ -38,7 +38,7 @@ namespace GlassMaking.Blocks.Multiblock
 							ActionLangCode = "glassmaking:blockhelp-plan-put",
 							HotKeyCode = null,
 							MouseButton = EnumMouseButton.Right,
-							Itemstacks = new ItemStack[] { (replacement.Requirement ?? replacement.Block).ResolvedItemstack }
+							Itemstacks = [(replacement.Requirement ?? replacement.Block).ResolvedItemStack!]
 						}
 					};
 				}
@@ -56,14 +56,14 @@ namespace GlassMaking.Blocks.Multiblock
 			if(itemStack != null)
 			{
 				var requirement = replacement.Requirement ?? replacement.Block;
-				if(requirement.Matches(world, itemStack) && itemStack.StackSize >= requirement.ResolvedItemstack.StackSize)
+				if(requirement.Matches(world, itemStack) && itemStack.StackSize >= requirement.ResolvedItemStack!.StackSize)
 				{
-					var item = byPlayer.InventoryManager.ActiveHotbarSlot.TakeOut(requirement.ResolvedItemstack.StackSize);
+					var item = byPlayer.InventoryManager.ActiveHotbarSlot.TakeOut(requirement.ResolvedItemStack.StackSize);
 					RemoveSurrogateBlock(world.BlockAccessor, blockSel.Position);
 
-					var block = replacement.Block.ResolvedItemstack.Block;
-					var stack = replacement.Block == requirement ? item : replacement.Block.ResolvedItemstack;
-					world.PlaySoundAt(block.GetSounds(world.BlockAccessor, blockSel, stack)?.Place,
+					var block = replacement.Block.ResolvedItemStack!.Block;
+					var stack = replacement.Block == requirement ? item : replacement.Block.ResolvedItemStack;
+					world.PlaySoundAt(block.GetSounds(world.BlockAccessor, blockSel, stack)?.Place.Location,
 						blockSel.Position.X + 0.5, blockSel.Position.Y + 0.5, blockSel.Position.Z + 0.5, byPlayer, true, 16f);
 
 					block.DoPlaceBlock(world, byPlayer, blockSel, stack);

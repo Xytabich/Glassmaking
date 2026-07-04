@@ -26,7 +26,7 @@ namespace GlassMaking.Handbook
 		private void GetHandbookInfo(ItemSlot inSlot, ICoreClientAPI capi, ItemStack[] allStacks, ActionConsumable<string> openDetailPageFor, HandbookItemInfoSection section, List<RichTextComponentBase> outComponents)
 		{
 			if(section != HandbookItemInfoSection.BeforeExtraSections) return;
-			if(mod.TryGetBlowingMoldsForItem(inSlot.Itemstack.Collectible, out var blocks))
+			if(mod.TryGetBlowingMoldsForItem(inSlot.Itemstack!.Collectible, out var blocks))
 			{
 				outComponents.Add(new ClearFloatTextComponent(capi, 7f));
 				outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:Blown in a glass mold") + "\n", CairoFont.WhiteSmallText().WithWeight(FontWeight.Bold)));

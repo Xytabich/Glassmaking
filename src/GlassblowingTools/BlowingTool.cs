@@ -18,7 +18,7 @@ namespace GlassMaking.GlassblowingTools
 		public override void Initialize(JsonObject properties)
 		{
 			base.Initialize(properties);
-			animation = properties["animation"].AsString();
+			animation = properties["animation"].AsString("");
 		}
 
 		public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling, ref EnumHandling handling)
@@ -45,7 +45,7 @@ namespace GlassMaking.GlassblowingTools
 			{
 				if(step.ContinueStep())
 				{
-					float time = step.StepAttributes!["time"].AsFloat(1);
+					float time = step.Ingredient.RecipeAttributes?["time"].AsFloat(1) ?? 1;
 					if(api.Side == EnumAppSide.Client)
 					{
 						step.SetProgress(Math.Max(secondsUsed - 1f, 0f) / time);

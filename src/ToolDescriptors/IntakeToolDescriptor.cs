@@ -2,7 +2,6 @@
 using GlassMaking.GlassblowingTools;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Text;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
@@ -44,27 +43,40 @@ namespace GlassMaking.ToolDescriptors
 			}
 		}
 
+		public override bool ResolveIngredient(IWorldAccessor world, GlassBlowingRecipe recipe, int stepIndex, string sourceForErrorLogging)
+		{
+			var code = recipe.Steps[stepIndex].Code;
+			if(code == null || !world.Api.ModLoader.GetModSystem<GlassMakingMod>().GetGlassTypes().ContainsKey(code))
+			{
+				world.Logger.Warning("Failed resolving a glass type with code '{0}' in {1}", code, sourceForErrorLogging);
+				return false;
+			}
+			return true;
+		}
+
 		public override void GetStepInfoForHandbook(ICoreClientAPI capi, ItemStack item, GlassBlowingRecipe recipe, int stepIndex, ActionConsumable<string> openDetailPageFor, List<RichTextComponentBase> outComponents)
 		{
 			outComponents.Add(new SlideshowItemstackTextComponent(capi, items, 40.0, EnumFloat.Inline,
 				cs => openDetailPageFor(GuiHandbookItemStackPage.PageCodeForStack(cs))));
 
 			var step = recipe.Steps[stepIndex];
-			var code = step.Code ?? new AssetLocation(step.Attributes!["code"].AsString());
-			if(Utils.GetGlassBlends(capi).TryGetValue(code, out var blends))
+			if(Utils.GetBlendStacks(capi).TryGetValue(step.Code!, out var blends))
 			{
 				outComponents.Add(new SlideshowItemstackTextComponent(capi, blends, 40.0, EnumFloat.Inline,
 					cs => openDetailPageFor(GuiHandbookItemStackPage.PageCodeForStack(cs))));
-				outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:{0} units", step.Attributes!["amount"].AsInt()), CairoFont.WhiteSmallText()));
+				outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:{0} units", step.Quantity), CairoFont.WhiteSmallText()));
+			}
+			else
+			{
+				outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:{0} glass {1} units", Lang.Get(GlassBlend.GetBlendNameCode(step.Code!)), step.Quantity), CairoFont.WhiteSmallText()));
 			}
 		}
 
 		public override void GetStepInfoForHeldItem(IWorldAccessor world, ItemStack item, GlassBlowingRecipe recipe, int stepIndex, StringBuilder dsc, bool withDebugInfo)
 		{
 			var step = recipe.Steps[stepIndex];
-			var code = step.Code ?? new AssetLocation(step.Attributes!["code"].AsString());
-			dsc.AppendLine("• " + Lang.Get("glassmaking:Take {0} units of {1} glass", step.Attributes!["amount"].AsInt(),
-				Lang.Get(GlassBlend.GetBlendNameCode(code))));
+			dsc.AppendLine("• " + Lang.Get("glassmaking:Take {0} units of {1} glass", step.Quantity,
+				Lang.Get(GlassBlend.GetBlendNameCode(step.Code!))));
 		}
 
 		public override void GetInteractionHelp(IWorldAccessor world, ItemStack item, GlassBlowingRecipe recipe, int stepIndex, List<WorldInteraction> interactions)
@@ -97,8 +109,7 @@ namespace GlassMaking.ToolDescriptors
 			{
 				if(toolCodes.Contains(steps[i].Tool))
 				{
-					var code = steps[i].Code ?? new AssetLocation(steps[i].Attributes!["code"].AsString());
-					var info = mod.GetGlassTypeInfo(code);
+					var info = mod.GetGlassTypeInfo(steps[i].Code!);
 					temperature = Math.Max((info?.MeltingPoint ?? 0) * 0.8f, temperature);
 				}
 			}
@@ -114,7 +125,7 @@ namespace GlassMaking.ToolDescriptors
 				int intake = itemStack.Attributes.GetInt("glassmaking:toolIntakeAmount", 0);
 				if(intake > 0)
 				{
-					amountByCode[GetCodeString(steps[currentStepIndex])] = intake;
+					amountByCode[steps[currentStepIndex].Code!.ToShortString()] = intake;
 				}
 			}
 
@@ -122,9 +133,9 @@ namespace GlassMaking.ToolDescriptors
 			{
 				if(toolCodes.Contains(steps[i].Tool))
 				{
-					var code = GetCodeString(steps[i]);
+					var code = steps[i].Code!.ToShortString();
 					if(!amountByCode.TryGetValue(code, out var amount)) amount = 0;
-					amountByCode[code] = amount + steps[i].Attributes!["amount"].AsInt();
+					amountByCode[code] = amount + steps[i].Quantity;
 				}
 			}
 			if(amountByCode.Count == 0) return;
@@ -135,40 +146,27 @@ namespace GlassMaking.ToolDescriptors
 			}
 		}
 
-		public override void GetWildcardMapping(IWorldAccessor world, GlassBlowingRecipe recipe, int stepIndex, Dictionary<string, string[]> outMap)
+		public override void GetWildcardMapping(IWorldAccessor world, GlassBlowingRecipe recipe, int stepIndex, Dictionary<string, HashSet<string>> outMap)
 		{
-			var name = recipe.Steps[stepIndex].Name;
-			if(string.IsNullOrEmpty(name)) return;
+			var step = recipe.Steps[stepIndex];
+			if(step.MatchingType != EnumRecipeMatchType.NamedWildcard) return;
 
-			var attributes = recipe.Steps[stepIndex].Attributes!;
-			var code = new AssetLocation(attributes["code"].AsString());
-			int wildcardPos = code.Path.IndexOf('*');
-			if(wildcardPos >= 0)
+			var types = world.Api.ModLoader.GetModSystem<GlassMakingMod>().GetGlassTypes();
+			var list = Utils.WildcardMatches(step.Code!, types.Keys, step.AllowedVariants);
+			if(list.Count != 0)
 			{
-				recipe.Steps[stepIndex].Code = code;
-
-				var types = world.Api.ModLoader.GetModSystem<GlassMakingMod>().GetGlassTypes();
-				var allowedVariants = attributes["allowedVariants"].AsArray<string>();
-				int wildcardOffset = code.Path.Length - (wildcardPos + 1);
-				var list = new List<string>();
-				foreach(var glass in types.Keys)
-				{
-					if(WildcardUtil.Match(code, glass, allowedVariants))
-					{
-						list.Add(glass.Path[wildcardPos..^wildcardOffset]);
-					}
-				}
-				if(list.Count != 0)
-				{
-					outMap[name] = list.ToArray();
-				}
+				outMap[step.Name!] = list;
 			}
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private static string GetCodeString(GlassBlowingRecipeStep step)
+		public override void FillWildcardPlaceholder(GlassBlowingRecipe recipe, int stepIndex, string variantCode, string currentVariant)
 		{
-			return step.Code?.ToShortString() ?? step.Attributes!["name"].AsString();
+			var step = recipe.Steps[stepIndex];
+			if(step.MatchingType == EnumRecipeMatchType.NamedWildcard && step.Name == variantCode)
+			{
+				step.Code = step.Code!.CopyWithPath(step.Code.Path.Replace("*", currentVariant));
+			}
+			recipe.Steps[stepIndex].FillPlaceHolder(variantCode, currentVariant);
 		}
 	}
 }

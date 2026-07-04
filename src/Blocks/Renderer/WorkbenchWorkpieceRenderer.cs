@@ -58,8 +58,6 @@ namespace GlassMaking.Blocks.Renderer
 					prog.Tex2dOverlay2D = renderInfo.OverlayTexture.TextureId;
 					prog.OverlayTextureSize = new Vec2f(renderInfo.OverlayTexture.Width, renderInfo.OverlayTexture.Height);
 					prog.BaseTextureSize = new Vec2f(renderInfo.TextureSize.Width, renderInfo.TextureSize.Height);
-					//TextureAtlasPosition texPos = rapi.GetTextureAtlasPosition(entityitem.Itemstack);//TODO: how to get..?
-					//prog.BaseUvOrigin = new Vec2f(texPos.x1, texPos.y1);
 				}
 
 				prog.ExtraGlow = 0;

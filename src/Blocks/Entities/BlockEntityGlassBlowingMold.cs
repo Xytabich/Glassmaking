@@ -166,7 +166,7 @@ namespace GlassMaking.Blocks
 			}
 			if(Api.Side == EnumAppSide.Server)
 			{
-				var item = recipe.Output.ResolvedItemstack;
+				var item = recipe.Output.ResolvedItemStack!;
 				if(splittable || hasContentsTransform)
 				{
 					contents = item.Clone();
@@ -256,7 +256,7 @@ namespace GlassMaking.Blocks
 			int layerIndex = layersCode.Length - 1;
 			for(int i = layers.Length - 1; i >= 0; i--)
 			{
-				if(!string.Equals(layers[i].Code.ToShortString(), layersCode[layerIndex], StringComparison.InvariantCulture)) return false;
+				if(!string.Equals(layers[i].Code!.ToShortString(), layersCode[layerIndex], StringComparison.InvariantCulture)) return false;
 				if(!layers[i].IsSuitable(layersAmount[layerIndex])) return false;
 				layerIndex--;
 			}

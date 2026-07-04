@@ -30,7 +30,7 @@ namespace GlassMaking.Items
 			containerStack.Attributes["contents"] = stacksTree;
 		}
 
-		public virtual ItemStack?[] GetContents(IWorldAccessor world, ItemStack itemstack)
+		public virtual ItemStack?[] GetContents(IWorldAccessor world, ItemStack? itemstack)
 		{
 			ITreeAttribute? treeAttr = itemstack?.Attributes?.GetTreeAttribute("contents");
 			if(treeAttr == null)
@@ -85,11 +85,11 @@ namespace GlassMaking.Items
 			var loc = AssetLocation.Create(stackAttr.GetString("code"), domain);
 			if(stackAttr.GetString("type") == "item")
 			{
-				collObj = world.GetItem(loc);
+				collObj = world.GetItem(loc)!;
 			}
 			else
 			{
-				collObj = world.GetBlock(loc);
+				collObj = world.GetBlock(loc)!;
 			}
 
 			ItemStack stack = new ItemStack(collObj, stackAttr.GetInt("quantity"));
@@ -100,7 +100,7 @@ namespace GlassMaking.Items
 		}
 
 
-		public bool IsEmpty(ItemStack itemstack)
+		public bool IsEmpty(ItemStack? itemstack)
 		{
 			ITreeAttribute? treeAttr = itemstack?.Attributes?.GetTreeAttribute("contents");
 
@@ -163,7 +163,7 @@ namespace GlassMaking.Items
 				}
 			}
 
-			SetContents(inslot.Itemstack, stacks);
+			SetContents(inslot.Itemstack!, stacks);
 
 			return base.UpdateAndGetTransitionStates(world, inslot);
 		}

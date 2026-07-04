@@ -1,5 +1,6 @@
 ﻿using GlassMaking.Workbench;
 using GlassMaking.Workbench.ToolBehaviors;
+using GlassMaking.Workbench.ToolDescriptors;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
 
@@ -17,7 +18,7 @@ namespace GlassMaking.Items.Behavior
 		public override void Initialize(JsonObject properties)
 		{
 			base.Initialize(properties);
-			toolCode = properties["code"].AsString();
+			toolCode = properties["code"].AsString("");
 			isTool = properties["isTool"].AsBool(false);
 		}
 
@@ -29,6 +30,7 @@ namespace GlassMaking.Items.Behavior
 				api.World.Logger.Warning(string.Format("Item {0} does not contain a tool code, specify it for the tool to work correctly.", collObj.Code));
 				toolCode = collObj.Code.ToShortString();
 			}
+			api.ModLoader.GetModSystem<GlassMakingMod>().AddWorkbenchToolDescriptor(toolCode, new ItemToolDescriptor(toolCode));
 		}
 
 		public override string GetToolCode(IWorldAccessor world, ItemStack itemStack)

@@ -1,5 +1,6 @@
 ﻿using GlassMaking.Common;
 using Vintagestory.API.Common;
+using Vintagestory.API.Server;
 using Vintagestory.ServerMods;
 
 namespace GlassMaking
@@ -29,27 +30,29 @@ namespace GlassMaking
 		{
 			if(api.Side == EnumAppSide.Server)
 			{
-				var recLoader = api.ModLoader.GetModSystem<RecipeLoader>();
-				recLoader.LoadRecipes<GlassBlowingRecipe>("glassblowing recipe", "recipes/glassblowing", RegisterGlassblowingRecipe);
-				recLoader.LoadRecipes<WorkbenchRecipe>("glassworkbench recipe", "recipes/glassworkbench", RegisterWorkbenchRecipe);
+				var sapi = (ICoreServerAPI)api;
+				RecipeLoader.LoadRecipes<GlassBlowingRecipe>(sapi, "glassblowing recipe", "recipes/glassblowing", false, RegisterGlassblowingRecipe);
+				RecipeLoader.LoadRecipes<WorkbenchRecipe>(sapi, "glassworkbench recipe", "recipes/glassworkbench", false, RegisterWorkbenchRecipe);
 			}
 		}
 
-		private void RegisterGlassblowingRecipe(GlassBlowingRecipe r)
+		private void RegisterGlassblowingRecipe(IRecipeBase r)
 		{
-			r.RecipeId = glassblowingRecipes.Recipes.Count;
-			if(!glassblowingRecipes.AddRecipe(r))
+			var recipe = (GlassBlowingRecipe)r;
+			recipe.RecipeId = glassblowingRecipes.Recipes.Count;
+			if(!glassblowingRecipes.AddRecipe(recipe))
 			{
-				api.Logger.Error("Unable to add glassblowing recipe {0} with output {1} as a similar recipe has already been added", r.Code, r.Output.Code);
+				api.Logger.Error("Unable to add glassblowing recipe {0} with output {1} as a similar recipe has already been added", recipe.Name, recipe.Output.Code);
 			}
 		}
 
-		private void RegisterWorkbenchRecipe(WorkbenchRecipe r)
+		private void RegisterWorkbenchRecipe(IRecipeBase r)
 		{
-			r.RecipeId = workbenchRecipes.Recipes.Count;
-			if(!workbenchRecipes.AddRecipe(r))
+			var recipe = (WorkbenchRecipe)r;
+			recipe.RecipeId = workbenchRecipes.Recipes.Count;
+			if(!workbenchRecipes.AddRecipe(recipe))
 			{
-				api.Logger.Error("Unable to add workbench recipe {0} with output {1} as a similar recipe has already been added", r.Code, r.Output.Code);
+				api.Logger.Error("Unable to add workbench recipe {0} with output {1} as a similar recipe has already been added", recipe.Name, recipe.Output.Code);
 			}
 		}
 	}

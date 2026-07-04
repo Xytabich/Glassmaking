@@ -43,15 +43,20 @@ namespace GlassMaking.Common
 			return new GlassBlend(new AssetLocation(tree.GetString("code")), tree.GetInt("amount"));
 		}
 
-		public static GlassBlend? FromJson(CollectibleObject collectible)
+		public static GlassBlend? FromItemAttribute(CollectibleObject collectible)
 		{
 			if(collectible.Attributes == null) return null;
 			return collectible.Attributes[PROPERTY_NAME].AsObject<GlassBlend?>(null, collectible.Code.Domain);
 		}
 
-		public static GlassBlend? FromJson(ItemStack stack)
+		public static GlassBlend? FromItemAttribute(ItemStack stack)
 		{
-			return FromJson(stack.Collectible);
+			return FromItemAttribute(stack.Collectible);
+		}
+
+		public static GlassBlend? FromStackAttribute(ItemStack stack)
+		{
+			return FromItemAttribute(stack) ?? FromTreeAttributes(stack.Attributes.GetTreeAttribute(PROPERTY_NAME));
 		}
 	}
 
@@ -80,7 +85,7 @@ namespace GlassMaking.Common
 					int count = glassAmount / shardInfo.amount;
 					glassAmount -= count * shardInfo.amount;
 
-					CollectibleObject collectible = shardInfo.type == EnumItemClass.Item ? world.GetItem(shardInfo.code) : world.GetBlock(shardInfo.code);
+					CollectibleObject collectible = shardInfo.type == EnumItemClass.Item ? world.GetItem(shardInfo.code)! : world.GetBlock(shardInfo.code)!;
 					var blendInfo = new GlassBlend(glassCode, shardInfo.amount);
 					if(limitStackSize)
 					{

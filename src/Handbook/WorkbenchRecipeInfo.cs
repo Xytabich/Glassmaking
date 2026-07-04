@@ -1,5 +1,4 @@
-﻿using GlassMaking.Common;
-using GlassMaking.Workbench;
+﻿using GlassMaking.Workbench;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -7,7 +6,6 @@ using System.Linq;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
-using Vintagestory.API.Util;
 using Vintagestory.GameContent;
 
 namespace GlassMaking.Handbook
@@ -30,11 +28,11 @@ namespace GlassMaking.Handbook
 		private void GetHandbookInfo(ItemSlot inSlot, ICoreClientAPI capi, ItemStack[] allStacks, ActionConsumable<string> openDetailPageFor, HandbookItemInfoSection section, List<RichTextComponentBase> outComponents)
 		{
 			if(section != HandbookItemInfoSection.BeforeExtraSections) return;
-			var itemstack = inSlot.Itemstack;
+			var itemstack = inSlot.Itemstack!;
 			List<WorkbenchRecipe>? recipes = null;
 			foreach(var recipe in mod.GetWorkbenchRecipes())
 			{
-				if(recipe.Value.Output.ResolvedItemstack != null && recipe.Value.Output.ResolvedItemstack.Equals(capi.World, itemstack, GlobalConstants.IgnoredStackAttributes))
+				if(recipe.Value.Output.ResolvedItemStack != null && recipe.Value.Output.ResolvedItemStack.Equals(capi.World, itemstack, GlobalConstants.IgnoredStackAttributes))
 				{
 					if(recipes == null) recipes = new List<WorkbenchRecipe>();
 					recipes.Add(recipe.Value);
@@ -42,7 +40,7 @@ namespace GlassMaking.Handbook
 			}
 			if(recipes != null)
 			{
-				var toolItems = GetItemsByToolCode(capi);
+				var toolItems = WorkbenchToolUtils.GetItemsByToolCode(capi);
 
 				outComponents.Add(new ClearFloatTextComponent(capi, 7f));
 				outComponents.AddHandbookBoldRichText(capi, Lang.Get("glassmaking:Crafted at the glassmaker's workbench") + "\n", openDetailPageFor);
@@ -54,7 +52,7 @@ namespace GlassMaking.Handbook
 					}
 					var recipe = recipes[i];
 					outComponents.Add(new RichTextComponent(capi, "• " + Lang.Get("glassmaking:Input ingredient") + "\n", CairoFont.WhiteSmallText()));
-					var element = new SlideshowItemstackTextComponent(capi, new ItemStack[] { recipe.Input.ResolvedItemstack }, 40.0, EnumFloat.Inline,
+					var element = new SlideshowItemstackTextComponent(capi, [recipe.Input.ResolvedItemStack], 40.0, EnumFloat.Inline,
 						cs => openDetailPageFor(GuiHandbookItemStackPage.PageCodeForStack(cs)));
 					outComponents.Add(element);
 					outComponents.Add(new ClearFloatTextComponent(capi));
@@ -95,36 +93,6 @@ namespace GlassMaking.Handbook
 					outComponents.Add(new ClearFloatTextComponent(capi, 7f));
 				}
 			}
-		}
-
-		public static IReadOnlyDictionary<string, IReadOnlyList<ItemStack>> GetItemsByToolCode(ICoreClientAPI capi)
-		{
-			return ObjectCacheUtil.GetOrCreate(capi, "glassmaking:workbench-toolitemsbycode", () => {
-				var itemsByToolCode = new Dictionary<string, IReadOnlyList<ItemStack>>();
-				foreach(var obj in capi.World.BlockItemEnumerator())
-				{
-					if(WorkbenchToolUtils.IsTool(obj))
-					{
-						var list = obj.GetHandBookStacks(capi);
-						if(list != null)
-						{
-							foreach(var item in list)
-							{
-								if(WorkbenchToolUtils.TryGetTool(item.Collectible, out var tool))
-								{
-									var code = tool.GetToolCode(capi.World, item);
-									if(!itemsByToolCode.TryGetValue(code, out var items))
-									{
-										itemsByToolCode[code] = items = new List<ItemStack>();
-									}
-									((List<ItemStack>)items).Add(item);
-								}
-							}
-						}
-					}
-				}
-				return itemsByToolCode;
-			});
 		}
 	}
 }

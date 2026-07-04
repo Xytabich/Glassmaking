@@ -17,7 +17,7 @@ namespace GlassMaking.Blocks
 			base.OnStructureLoaded();
 			if(!isSurrogate && api.Side == EnumAppSide.Client)
 			{
-				DefaultWorkpieceTransform = Attributes["workpieceTransform"].AsObject<ModelTransform>().EnsureDefaultValues();
+				DefaultWorkpieceTransform = Attributes["workpieceTransform"].AsObject<ModelTransform>()!.EnsureDefaultValues();
 			}
 		}
 

@@ -23,7 +23,7 @@ namespace GlassMaking.Handbook
 		private void GetHandbookInfo(ItemSlot inSlot, ICoreClientAPI capi, ItemStack[] allStacks, ActionConsumable<string> openDetailPageFor, HandbookItemInfoSection section, List<RichTextComponentBase> outComponents)
 		{
 			if(section != HandbookItemInfoSection.BeforeExtraSections) return;
-			if(inSlot.Itemstack.Class != EnumItemClass.Block) return;
+			if(inSlot.Itemstack!.Class != EnumItemClass.Block) return;
 
 			var block = inSlot.Itemstack.Block;
 			if(block is BlockHorizontalStructurePlanMain mainBlock)
@@ -43,7 +43,7 @@ namespace GlassMaking.Handbook
 								{
 									if(planBlock.replacement != null)
 									{
-										var item = (planBlock.replacement.Requirement ?? planBlock.replacement.Block)?.ResolvedItemstack;
+										var item = (planBlock.replacement.Requirement ?? planBlock.replacement.Block)?.ResolvedItemStack;
 										if(item != null)
 										{
 											int index = items.FindIndex(itm => itm.Equals(capi.World, item, GlobalConstants.IgnoredStackAttributes));

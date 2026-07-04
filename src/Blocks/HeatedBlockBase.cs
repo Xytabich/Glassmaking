@@ -9,7 +9,7 @@ namespace GlassMaking.Blocks
 		{
 			if(world.BlockAccessor.GetBlock(blockSel.Position).IsReplacableBy(this))
 			{
-				return world.GetBlock(CodeWithVariant("side", side)).DoPlaceBlock(world, byPlayer, blockSel, itemstack);
+				return world.GetBlock(CodeWithVariant("side", side))!.DoPlaceBlock(world, byPlayer, blockSel, itemstack);
 			}
 			return false;
 		}

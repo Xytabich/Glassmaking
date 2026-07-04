@@ -18,7 +18,7 @@ namespace GlassMaking.Blocks
 
 		protected virtual int MaxFuelCount => 16;
 
-		private ItemStack contents => inventory[0].Itemstack;
+		private ItemStack? contents => inventory[0].Itemstack;
 		private ItemSlot contentsSlot => inventory[0];
 		private InventoryGeneric inventory = new InventoryGeneric(1, "firebox-1", null);
 
@@ -155,7 +155,7 @@ namespace GlassMaking.Blocks
 		public ItemStack[]? GetDropItems()
 		{
 			if(contentsSlot.StackSize < 1) return null;
-			return new ItemStack[] { contents.Clone() };
+			return [contents!.Clone()];
 		}
 
 		public void GetFuelStackState(out int canAddAmount, out ItemStack? stack)
@@ -171,7 +171,7 @@ namespace GlassMaking.Blocks
 
 		public bool TryAdd(IPlayer byPlayer, ItemSlot slot, int count)
 		{
-			var combustibleProps = slot.Itemstack.Collectible.CombustibleProps;
+			var combustibleProps = slot.Itemstack!.Collectible.CombustibleProps;
 			if(combustibleProps == null || combustibleProps.BurnTemperature < 100) return false;
 
 			int consume = Math.Min(MaxFuelCount - GetFuelCount(), Math.Min(slot.Itemstack.StackSize, count));
@@ -186,7 +186,7 @@ namespace GlassMaking.Blocks
 							burning = true;
 							ApplyFuelParameters();
 							fuelLevel = fuelBurnDuration;
-							contents.StackSize--;
+							contents!.StackSize--;
 						}
 						slot.MarkDirty();
 						MarkDirty(true);
@@ -210,7 +210,7 @@ namespace GlassMaking.Blocks
 				burning = true;
 				ApplyFuelParameters();
 				fuelLevel = fuelBurnDuration;
-				if(contentsSlot.StackSize > 0) contents.StackSize--;
+				if(contentsSlot.StackSize > 0) contents!.StackSize--;
 				lastTickTime = Api.World.Calendar.TotalHours;
 				UpdateRendererFull();
 				MarkDirty(true);
@@ -425,7 +425,7 @@ namespace GlassMaking.Blocks
 					fuelLevel = (float)(burnTime % fuelBurnDuration);
 					if(usedFuelCount > 0 && Api.Side == EnumAppSide.Server)
 					{
-						contents.StackSize -= usedFuelCount;
+						contents!.StackSize -= usedFuelCount;
 						if(contentsSlot.StackSize <= 0)
 						{
 							burning = fuelLevel > 0;
@@ -469,7 +469,7 @@ namespace GlassMaking.Blocks
 
 		private void ApplyFuelParameters()
 		{
-			var combustibleProps = contents.Collectible.CombustibleProps;//TODO: smoke level?
+			var combustibleProps = contents!.Collectible.CombustibleProps;//TODO: smoke level?
 			fuelTemperature = combustibleProps.BurnTemperature;
 			var calendar = Api.World.Calendar;
 			_fuelBurnDuration = combustibleProps.BurnDuration * calendar.SpeedOfTime * calendar.CalendarSpeedMul;

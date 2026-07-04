@@ -1,5 +1,4 @@
 ﻿using GlassMaking.Common;
-using GlassMaking.Items;
 using System.Collections.Generic;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
@@ -35,11 +34,11 @@ namespace GlassMaking.Blocks
 		public override bool OnBlockInteractStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)
 		{
 			ItemSlot slot = byPlayer.InventoryManager.ActiveHotbarSlot;
-			ItemStack itemstack = slot.Itemstack;
+			ItemStack? itemstack = slot.Itemstack;
 			if(itemstack != null)
 			{
-				var be = world.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityGlassSmeltery;
-				if(be != null && be.CanInteract(byPlayer.Entity, blockSel))
+				if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BlockEntityGlassSmeltery be &&
+					be.CanInteract(byPlayer.Entity, blockSel))
 				{
 					if(be.TryAdd(byPlayer, slot, byPlayer.Entity.Controls.Sneak ? (byPlayer.Entity.Controls.Sprint ? 20 : 5) : 1))
 					{
@@ -56,10 +55,11 @@ namespace GlassMaking.Blocks
 
 		public override ItemStack[] GetDrops(IWorldAccessor world, BlockPos pos, IPlayer byPlayer, float dropQuantityMultiplier = 1)
 		{
-			var items = base.GetDrops(world, pos, byPlayer, dropQuantityMultiplier);
-			if(items == null) items = new ItemStack[0];
-			var be = world.BlockAccessor.GetBlockEntity(pos) as BlockEntityGlassSmeltery;
-			if(be != null) items = items.Append(be.GetDropItems() ?? new ItemStack[0]);
+			var items = base.GetDrops(world, pos, byPlayer, dropQuantityMultiplier) ?? [];
+			if(world.BlockAccessor.GetBlockEntity(pos) is BlockEntityGlassSmeltery be)
+			{
+				items = items.Append(be.GetDropItems() ?? []);
+			}
 			return items;
 		}
 
@@ -93,7 +93,7 @@ namespace GlassMaking.Blocks
 			List<ItemStack> list = new List<ItemStack>();
 			foreach(var stack in wi.Itemstacks)
 			{
-				var blend = GlassBlend.FromJson(stack)!;
+				var blend = GlassBlend.FromItemAttribute(stack)!;
 				if(blend.Code.Equals(code) && blend.Amount * stack.StackSize <= canAddAmount)
 				{
 					list.Add(stack);
@@ -106,7 +106,7 @@ namespace GlassMaking.Blocks
 		{
 			return ObjectCacheUtil.GetOrCreate(capi, key, () => {
 				var blends = new List<ItemStack>();
-				foreach(var list in Utils.GetGlassBlends(capi).Values)
+				foreach(var list in Utils.GetBlendStacks(capi).Values)
 				{
 					blends.AddRange(list);
 				}

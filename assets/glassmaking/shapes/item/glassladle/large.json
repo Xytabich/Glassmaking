@@ -9,14 +9,14 @@
 		"iron": [32,16]
 	},
 	"textures": {
-		"ebony": "game:item/tool/material/ebony",
-		"iron": "game:item/tool/material/iron"
+		"ebony": "game:block/wood/debarked/ebony",
+		"iron": "game:block/metal/ingot/iron"
 	},
 	"elements": [
 		{
 			"name": "Cube1",
-			"from": [ 1.0, 0.0, 1.0 ], 
-			"to": [ 15.0, 1.0, 15.0 ], 
+			"from": [ 1.0, 0.0, 1.0 ],
+			"to": [ 15.0, 1.0, 15.0 ],
 			"rotationOrigin": [ 8.0, 0.0, 8.0 ],
 			"rotationY": 45.0,
 			"faces": {
@@ -30,8 +30,8 @@
 			"children": [
 				{
 					"name": "Cube2",
-					"from": [ 0.0, 1.0, 0.0 ], 
-					"to": [ 14.0, 9.0, 1.0 ], 
+					"from": [ 0.0, 1.0, 0.0 ],
+					"to": [ 14.0, 9.0, 1.0 ],
 					"rotationOrigin": [ 0.0, 1.0, 0.0 ],
 					"faces": {
 						"north": { "texture": "#iron", "uv": [ 2.0, 6.0, 16.0, 14.0 ] },
@@ -44,8 +44,8 @@
 				},
 				{
 					"name": "Cube3",
-					"from": [ 0.0, 1.0, 13.0 ], 
-					"to": [ 14.0, 9.0, 14.0 ], 
+					"from": [ 0.0, 1.0, 13.0 ],
+					"to": [ 14.0, 9.0, 14.0 ],
 					"rotationOrigin": [ 0.0, 1.0, 13.0 ],
 					"faces": {
 						"north": { "texture": "#iron", "uv": [ 3.0, 1.5, 17.0, 9.5 ] },
@@ -58,8 +58,8 @@
 				},
 				{
 					"name": "Cube4",
-					"from": [ 0.0, 1.0, 1.0 ], 
-					"to": [ 1.0, 9.0, 13.0 ], 
+					"from": [ 0.0, 1.0, 1.0 ],
+					"to": [ 1.0, 9.0, 13.0 ],
 					"rotationOrigin": [ 0.0, 1.0, 1.0 ],
 					"faces": {
 						"north": { "texture": "#iron", "uv": [ 0.0, 0.0, 1.0, 8.0 ], "enabled": false },
@@ -72,8 +72,8 @@
 				},
 				{
 					"name": "Cube5",
-					"from": [ 13.0, 1.0, 1.0 ], 
-					"to": [ 14.0, 9.0, 13.0 ], 
+					"from": [ 13.0, 1.0, 1.0 ],
+					"to": [ 14.0, 9.0, 13.0 ],
 					"rotationOrigin": [ 13.0, 1.0, 1.0 ],
 					"faces": {
 						"north": { "texture": "#iron", "uv": [ 0.0, 0.0, 1.0, 8.0 ], "enabled": false },
@@ -88,8 +88,8 @@
 		},
 		{
 			"name": "Cube6",
-			"from": [ 7.2, 4.0, -17.0 ], 
-			"to": [ 8.8, 5.6, -1.0 ], 
+			"from": [ 7.2, 4.0, -17.0 ],
+			"to": [ 8.8, 5.6, -1.0 ],
 			"rotationOrigin": [ 8.0, 4.0, -1.0 ],
 			"faces": {
 				"north": { "texture": "#iron", "uv": [ 0.0, 0.0, 1.5, 1.5 ], "enabled": false },
@@ -102,8 +102,8 @@
 			"children": [
 				{
 					"name": "Cube7",
-					"from": [ -0.1, -0.1, -24.0 ], 
-					"to": [ 1.6, 1.6, -8.0 ], 
+					"from": [ -0.1, -0.1, -24.0 ],
+					"to": [ 1.6, 1.6, -8.0 ],
 					"rotationOrigin": [ -0.1, -0.1, -24.0 ],
 					"faces": {
 						"north": { "texture": "#ebony", "uv": [ 0.0, 0.0, 1.5, 1.5 ] },
@@ -116,8 +116,8 @@
 				},
 				{
 					"name": "Cube8",
-					"from": [ 0.0, 0.0, -8.0 ], 
-					"to": [ 1.6, 1.6, 0.0 ], 
+					"from": [ 0.0, 0.0, -8.0 ],
+					"to": [ 1.6, 1.6, 0.0 ],
 					"rotationOrigin": [ 0.0, 0.0, -8.0 ],
 					"faces": {
 						"north": { "texture": "#iron", "uv": [ 0.0, 0.0, 1.5, 1.5 ], "enabled": false },

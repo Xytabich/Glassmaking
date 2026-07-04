@@ -13,7 +13,7 @@ namespace GlassMaking.Blocks
 		public override bool PutLocked { get { return true; } set { } }
 		public override bool TakeLocked { get { return true; } set { } }
 
-		private List<ItemSlot> slots = new List<ItemSlot>();
+		private readonly List<ItemSlot> slots = new List<ItemSlot>();
 
 		public GlassSmelteryInventory(string className, string instanceID, ICoreAPI api) : base(className, instanceID, api)
 		{
@@ -52,7 +52,7 @@ namespace GlassMaking.Blocks
 			if(dummy.StackSize > 0)
 			{
 				slots.Add(NewSlot(slots.Count));
-				slots[slots.Count - 1].Itemstack = dummy.Itemstack.Clone();
+				slots[slots.Count - 1].Itemstack = dummy.Itemstack!.Clone();
 			}
 		}
 
@@ -63,7 +63,7 @@ namespace GlassMaking.Blocks
 
 		public List<ItemStack> CollectItems()
 		{
-			return slots.ConvertAll(s => s.Itemstack);
+			return slots.ConvertAll(s => s.Itemstack!);
 		}
 
 		public override void FromTreeAttributes(ITreeAttribute tree)
@@ -97,7 +97,7 @@ namespace GlassMaking.Blocks
 			{
 				if(slots[i].Itemstack != null)
 				{
-					treeAttribute.SetItemstack(counter.ToString(), slots[i].Itemstack.Clone());
+					treeAttribute.SetItemstack(counter.ToString(), slots[i].Itemstack!.Clone());
 					counter++;
 				}
 			}

@@ -6,7 +6,6 @@
 			"name": "glassmaking:gbt-tooluse",
 			"properties": {
 				"tool": "stretch",
-				"minTier": 0,
 				"animation": "gwtoolstretch"
 			}
 		}

@@ -105,7 +105,7 @@ namespace GlassMaking.Blocks.Multiblock
 			{
 				if(handbookStack != null)
 				{
-					return new List<ItemStack>() { handbookStack.ResolvedItemstack };
+					return [handbookStack.ResolvedItemStack!];
 				}
 				return null;
 			}
@@ -250,7 +250,7 @@ namespace GlassMaking.Blocks.Multiblock
 			return false;
 		}
 
-		public override void OnBlockBroken(IWorldAccessor world, BlockPos pos, IPlayer byPlayer, float dropQuantityMultiplier = 1)//TODO: check claims
+		public override void OnBlockBroken(IWorldAccessor world, BlockPos pos, IPlayer byPlayer, float dropQuantityMultiplier = 1)//TODO: check claims before breaking
 		{
 			if(isSurrogate)
 			{

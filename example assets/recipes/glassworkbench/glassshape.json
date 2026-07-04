@@ -17,29 +17,39 @@
 				"glass2": { "base": "game:block/glass/violet" }
 			},
 			"tools": {
-				"blowtorch": { "temperature": 1300 }
+				"blowtorch": {
+					"recipeAttributes": {
+						"temperature": 1300
+					}
+				}
 			},
 			"useTime": 3
 		},
 		{
 			"tools": {
 				"lathe": {
-					"transform": {
-						"origin": {
-							"x": 0.5,
-							"y": 0,
-							"z": 0.5
+					"recipeAttributes": {
+						"transform": {
+							"origin": {
+								"x": 0.5,
+								"y": 0,
+								"z": 0.5
+							},
+							"rotation": {
+								"x": 0,
+								"y": 0,
+								"z": -90
+							},
+							"scale": 0.25
 						},
-						"rotation": {
-							"x": 0,
-							"y": 0,
-							"z": -90
-						},
-						"scale": 0.25
-					},
-					"size": 0.11
+						"size": 0.11
+					}
 				},
-				"blowtorch": { "temperature": 1300 }
+				"blowtorch": {
+					"recipeAttributes": {
+						"temperature": 1300
+					}
+				}
 			},
 			"useTime": 10
 		}

@@ -24,7 +24,7 @@ namespace GlassMaking.Handbook
 		private void GetHandbookInfo(ItemSlot inSlot, ICoreClientAPI capi, ItemStack[] allStacks, ActionConsumable<string> openDetailPageFor, HandbookItemInfoSection section, List<RichTextComponentBase> outComponents)
 		{
 			if(section != HandbookItemInfoSection.BeforeExtraSections) return;
-			var collectible = inSlot.Itemstack.Collectible;
+			var collectible = inSlot.Itemstack!.Collectible;
 			if(collectible.Attributes != null && collectible.Attributes.KeyExists("glassmaking:anneal"))
 			{
 				var properties = collectible.Attributes["glassmaking:anneal"];
@@ -33,12 +33,12 @@ namespace GlassMaking.Handbook
 				{
 					outComponents.Add(new ClearFloatTextComponent(capi, 7f));
 					outComponents.AddHandbookBoldRichText(capi, Lang.Get("glassmaking:Turns out when annealing") + "\n", openDetailPageFor);
-					var element = new ItemstackTextComponent(capi, output.ResolvedItemstack, 40.0, 10.0,
+					var element = new ItemstackTextComponent(capi, output.ResolvedItemStack, 40.0, 10.0,
 						EnumFloat.Inline, cs => openDetailPageFor(GuiHandbookItemStackPage.PageCodeForStack(cs)));
 					outComponents.Add(element);
 
 					outComponents.Add(new ClearFloatTextComponent(capi));
-					var annealTemperature = properties["temperature"].AsObject<MinMaxFloat>();
+					var annealTemperature = properties["temperature"].AsObject<MinMaxFloat>()!;
 					var annealTime = properties["time"].AsInt() / 3600.0;
 					outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:Heat up to {0}, then keep the temperature above {1} for {2} hours",
 						annealTemperature.Max.ToString("0"), annealTemperature.Min.ToString("0"), annealTime.ToString("G", CultureInfo.InvariantCulture)) + "\n", CairoFont.WhiteSmallText()));

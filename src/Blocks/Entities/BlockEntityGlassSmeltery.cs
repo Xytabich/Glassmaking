@@ -69,7 +69,7 @@ namespace GlassMaking.Blocks
 					return capi.Render.UploadMesh(bath);
 				});
 				renderer = new BlockRendererGlassSmeltery(capi, Pos, EnumRenderStage.Opaque, bathMesh, capi.Tesselator.GetTextureSource(Block),
-					bathSource["inside"].atlasTextureId, 0.1875f, -0.1875f, 0.625f, 0.625f);
+					(bathSource["inside"] ?? capi.BlockTextureAtlas.UnknownTexturePosition).atlasTextureId, 0.1875f, -0.1875f, 0.625f, 0.625f);
 				UpdateRendererFull();
 			}
 			RegisterGameTickListener(OnCommonTick, 1000);
@@ -207,8 +207,7 @@ namespace GlassMaking.Blocks
 			if(heatSource == null) return false;
 
 			if(glassAmount >= MaxGlassAmount) return false;
-			GlassBlend? blend = GlassBlend.FromJson(slot.Itemstack);
-			if(blend == null) blend = GlassBlend.FromTreeAttributes(slot.Itemstack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
+			GlassBlend? blend = GlassBlend.FromStackAttribute(slot.Itemstack!);
 			if(blend != null && blend.Amount > 0 && (blend.Amount + glassAmount) <= MaxGlassAmount &&
 				(glassCode == null && mod.GetGlassTypeInfo(blend.Code) != null || glassCode!.Equals(blend.Code)))
 			{
@@ -231,7 +230,7 @@ namespace GlassMaking.Blocks
 							state = SmelteryState.ContainsMix;
 						}
 					}
-					int consume = Math.Min(Math.Min(multiplier, slot.Itemstack.StackSize), (MaxGlassAmount - glassAmount) / blend.Amount);
+					int consume = Math.Min(Math.Min(multiplier, slot.Itemstack!.StackSize), (MaxGlassAmount - glassAmount) / blend.Amount);
 					var item = slot.TakeOut(consume);
 					if(state == SmelteryState.Empty || state == SmelteryState.ContainsMix)
 					{
@@ -347,6 +346,8 @@ namespace GlassMaking.Blocks
 		{
 			this.heatSource = heatSource;
 		}
+
+		public void CheckInventoryClearedMidTick() { }
 
 		private void OnCommonTick(float dt)
 		{

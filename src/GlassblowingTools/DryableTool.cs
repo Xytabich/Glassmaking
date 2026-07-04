@@ -16,14 +16,14 @@ namespace GlassMaking.GlassblowingTools
 		public override void Initialize(JsonObject properties)
 		{
 			base.Initialize(properties);
-			animation = properties["animation"].AsString();
+			animation = properties["animation"].AsString("");
 		}
 
 		public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling, ref EnumHandling handling)
 		{
-			if(firstEvent && TryGetRecipeStep(slot, byEntity, out var step, true, true) && slot.Itemstack.Collectible is IWettable wettable)
+			if(firstEvent && TryGetRecipeStep(slot, byEntity, out var step, true, true) && slot.Itemstack!.Collectible is IWettable wettable)
 			{
-				if(wettable.GetHumidity(slot.Itemstack, byEntity.World) >= step.StepAttributes!["consume"].AsFloat(0) && step.BeginStep())
+				if(wettable.GetHumidity(slot.Itemstack, byEntity.World) >= step.Ingredient.RecipeAttributes!["consume"].AsFloat() && step.BeginStep())
 				{
 					if(api.Side == EnumAppSide.Client) step.SetProgress(0);
 
@@ -39,27 +39,28 @@ namespace GlassMaking.GlassblowingTools
 
 		public override bool OnHeldInteractStep(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, ref EnumHandling handling)
 		{
-			if(TryGetRecipeStep(slot, byEntity, out var step) && slot.Itemstack.Collectible is IWettable wettable)
+			if(TryGetRecipeStep(slot, byEntity, out var step) && slot.Itemstack!.Collectible is IWettable wettable)
 			{
-				if(step.ContinueStep() && wettable.GetHumidity(slot.Itemstack, byEntity.World) >= step.StepAttributes!["consume"].AsFloat(0))
+				var attributes = step.Ingredient.RecipeAttributes!;
+				if(step.ContinueStep() && wettable.GetHumidity(slot.Itemstack, byEntity.World) >= attributes["consume"].AsFloat())
 				{
-					float time = step.StepAttributes["time"].AsFloat(1);
+					float time = attributes["time"].AsFloat(1);
 					if(api.Side == EnumAppSide.Client)
 					{
 						step.SetProgress(Math.Max(secondsUsed - 1f, 0f) / time);
 					}
 					if(byEntity.Api.Side == EnumAppSide.Server && secondsUsed >= time)
 					{
-						int damage = step.StepAttributes["damage"].AsInt(1);
-						if(damage > 0)
-						{
-							slot.Itemstack.Item.DamageItem(byEntity.World, byEntity, slot, damage);
-							slot.MarkDirty();
-						}
-						float consume = step.StepAttributes["consume"].AsFloat(0);
+						float consume = attributes["consume"].AsFloat();
 						if(consume > 0)
 						{
 							wettable.ConsumeHumidity(slot.Itemstack, consume, byEntity.World);
+							slot.MarkDirty();
+						}
+						int damage = step.Ingredient.ToolDurabilityCost;
+						if(damage > 0)
+						{
+							slot.Itemstack.Item.DamageItem(byEntity.World, byEntity, slot, damage);
 							slot.MarkDirty();
 						}
 						step.CompleteStep(byEntity);

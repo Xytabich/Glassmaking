@@ -97,7 +97,7 @@ namespace GlassMaking.Items
 			MeshData meshdata;
 			if(shape == null)
 			{
-				var stack = recipe.Input.ResolvedItemstack;
+				var stack = recipe.Input.ResolvedItemStack!;
 				if(stack.Class == EnumItemClass.Block)
 				{
 					nowTesselatingTextures = stack.Block.Textures;

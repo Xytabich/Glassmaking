@@ -22,7 +22,7 @@ namespace GlassMaking.Items
 				{
 					if(item.Resolve(api.World, "allowed liquid"))
 					{
-						(list ??= new List<ItemStack>()).Add(item.ResolvedItemstack);
+						(list ??= []).Add(item.ResolvedItemStack!);
 					}
 				}
 			}
@@ -33,7 +33,7 @@ namespace GlassMaking.Items
 			}
 		}
 
-		public override int TryPutLiquid(ItemStack containerStack, ItemStack liquidStack, float desiredLitres)
+		public override int TryPutLiquid(ItemStack containerStack, ItemStack? liquidStack, float desiredLitres)
 		{
 			if(liquidStack == null) return 0;
 

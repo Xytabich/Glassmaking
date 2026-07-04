@@ -34,13 +34,13 @@ namespace GlassMaking.Workbench.ToolBehaviors
 			if(api.Side == EnumAppSide.Client)
 			{
 				var capi = (ICoreClientAPI)api;
-				AnimUtil.GetAnimatableMesh(capi, slot.Itemstack.Collectible, new AtlasTexSource(capi, capi.BlockTextureAtlas), out var meshRef, out var shape);
+				AnimUtil.GetAnimatableMesh(capi, slot.Itemstack!.Collectible, new AtlasTexSource(capi, capi.BlockTextureAtlas), out var meshRef, out var shape);
 				animator = AnimationUtil.GetAnimator(api, "glassmaking:lathe|" + slot.Itemstack.Collectible.Code.ToString(), shape);
 
 				updater = new LatheAnimatorUpdater(animator);
 				capi.Event.RegisterRenderer(updater, EnumRenderStage.Opaque, "glassmaking:lathe");
 
-				var transform = slot.Itemstack.Collectible.Attributes?["workbenchToolTransform"].AsObject<ModelTransform>().EnsureDefaultValues();
+				var transform = slot.Itemstack.Collectible.Attributes?["workbenchToolTransform"].AsObject<ModelTransform>()?.EnsureDefaultValues();
 				renderer = new BlockAnimatableRenderer(capi, Blockentity.Pos, new Vec3f(0, Blockentity.Block.Shape.rotateY, 0), transform, animator, meshRef, false);
 
 				(transform ?? ModelTransform.NoTransform).CopyTo(updater.LocalTransform);
@@ -50,7 +50,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 
 		public override void OnIdleStart(IWorldAccessor world, WorkbenchRecipe recipe, int step)
 		{
-			SetupRenderer(recipe.Steps[step].Tools[CODE]!);
+			SetupRenderer(recipe.Steps[step].Tools[CODE]?.RecipeAttributes);
 		}
 
 		public override void OnIdleStop(IWorldAccessor world, WorkbenchRecipe? recipe, int step)
@@ -67,8 +67,8 @@ namespace GlassMaking.Workbench.ToolBehaviors
 				var useTime = recipe.Steps[step].UseTime;
 				if(useTime.HasValue)
 				{
-					var latheInfo = recipe.Steps[step].Tools[CODE];
-					updater.SetRotationSpeed(latheInfo!["rpm"].AsFloat(15));
+					var latheInfo = recipe.Steps[step].Tools[CODE]?.RecipeAttributes;
+					updater.SetRotationSpeed(latheInfo?["rpm"].AsFloat(15) ?? 15);
 					SetupRenderer(latheInfo);
 				}
 			}
@@ -117,12 +117,13 @@ namespace GlassMaking.Workbench.ToolBehaviors
 			Dispose();
 		}
 
-		private void SetupRenderer(JsonObject latheInfo)
+		private void SetupRenderer(JsonObject? latheInfo)
 		{
-			updater.SetJawSpacing(GameMath.Clamp(latheInfo["size"].AsFloat(0.1f) / Slot.Itemstack.Collectible.Attributes["latheChuckMaxSize"]?.AsFloat(0.1f) ?? 0.1f, 0f, 1f));
-			if(latheInfo.KeyExists("transform"))
+			updater.SetJawSpacing(GameMath.Clamp((latheInfo?["size"].AsFloat(0.1f) ?? 0.1f) /
+				Slot.Itemstack!.Collectible.Attributes?["latheChuckMaxSize"].AsFloat(0.1f) ?? 0.1f, 0f, 1f));
+			if(latheInfo?.KeyExists("transform") ?? false)
 			{
-				var mat = latheInfo["transform"].AsObject<ModelTransform>().EnsureDefaultValues();
+				var mat = latheInfo!["transform"].AsObject<ModelTransform>()!.EnsureDefaultValues();
 				updater.SetItemTransform(mat);
 
 				updater.TargetItemTransform = workbenchRender.WorkpieceRenderer.ItemTransform.Values;
@@ -139,7 +140,7 @@ namespace GlassMaking.Workbench.ToolBehaviors
 			}
 		}
 
-		private class LatheAnimatorUpdater : IRenderer//TODO: animations not working anymore
+		private class LatheAnimatorUpdater : IRenderer
 		{
 			public double RenderOrder => 1.0;
 

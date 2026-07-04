@@ -17,6 +17,10 @@ namespace GlassMaking.ToolDescriptors
 
 		void GetBreakDrops(IWorldAccessor world, ItemStack item, GlassBlowingRecipe recipe, int currentStepIndex, List<ItemStack> outList);
 
-		void GetWildcardMapping(IWorldAccessor world, GlassBlowingRecipe recipe, int stepIndex, Dictionary<string, string[]> outMap);
+		void GetWildcardMapping(IWorldAccessor world, GlassBlowingRecipe recipe, int stepIndex, Dictionary<string, HashSet<string>> outMap);
+
+		void FillWildcardPlaceholder(GlassBlowingRecipe recipe, int stepIndex, string variantCode, string currentVariant);
+
+		bool ResolveIngredient(IWorldAccessor world, GlassBlowingRecipe recipe, int stepIndex, string sourceForErrorLogging);
 	}
 }

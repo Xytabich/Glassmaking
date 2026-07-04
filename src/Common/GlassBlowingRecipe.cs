@@ -1,8 +1,6 @@
-﻿using GlassMaking.Common;
-using GlassMaking.Items;
+﻿using GlassMaking.Items;
 using GlassMaking.Items.Behavior;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,18 +10,16 @@ using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
+using Vintagestory.API.Util;
 
 namespace GlassMaking
 {
-	[JsonObject(MemberSerialization.OptIn)]
-	public class GlassBlowingRecipe : IRecipeBase, IByteSerializable, IRecipeBase<GlassBlowingRecipe>
+	public class GlassBlowingRecipe : RecipeBase
 	{
-		private static SmoothRadialShape EmptyShape = new SmoothRadialShape() { Segments = 1, Outer = new SmoothRadialShape.ShapePart[] { new SmoothRadialShape.ShapePart() { Vertices = new float[][] { new float[] { -1.5f, 0 } } } }, Inner = new SmoothRadialShape.ShapePart[] { new SmoothRadialShape.ShapePart() { Vertices = new float[][] { new float[] { -1.5f, 0 } } } } };
-
-		public int RecipeId;
+		private static readonly SmoothRadialShape EmptyShape = new() { Segments = 1, Outer = [new() { Vertices = [[-1.5f, 0]] }], Inner = [new() { Vertices = [[-1.5f, 0]] }] };
 
 		[JsonProperty]
-		public AssetLocation Code = default!;
+		public AssetLocation? Code { get => Name; set => Name = value; }
 
 		[JsonProperty]
 		public JsonItemStack Output = default!;
@@ -31,33 +27,51 @@ namespace GlassMaking
 		[JsonProperty]
 		public GlassBlowingRecipeStep[] Steps = default!;
 
-		public AssetLocation Name { get; set; } = default!;
+		public override IEnumerable<IRecipeIngredient> RecipeIngredients => Steps;
+		public override IRecipeOutput RecipeOutput => Output;
 
-		public bool Enabled { get; set; } = true;
+		protected GlassMakingMod? mod = null;
 
-		public IRecipeIngredient[] Ingredients => Steps;
-
-		IRecipeOutput IRecipeBase<GlassBlowingRecipe>.Output => filler;
-
-		AssetLocation IRecipeBase.Code => Code;
-
-		private readonly PlaceholderFiller filler;
-
-		public GlassBlowingRecipe()
+		public override void OnParsed(IWorldAccessor world)
 		{
-			filler = new PlaceholderFiller(this);
+			base.OnParsed(world);
+			mod = world.Api.ModLoader.GetModSystem<GlassMakingMod>();
 		}
 
-		public Dictionary<string, string[]> GetNameToCodeMapping(IWorldAccessor world)
+		protected override Dictionary<string, HashSet<string>> GetNameToCodeMapping(IWorldAccessor world)
 		{
-			var map = new Dictionary<string, string[]>();
-			var mod = world.Api.ModLoader.GetModSystem<GlassMakingMod>();
+			mod ??= world.Api.ModLoader.GetModSystem<GlassMakingMod>();
+			var map = new Dictionary<string, HashSet<string>>();
 			for(int i = 0; i < Steps.Length; i++)
 			{
-				var descriptor = mod.GetPipeToolDescriptor(Steps[i].Tool);
-				descriptor?.GetWildcardMapping(world, this, i, map);
+				var step = Steps[i];
+				var matchingType = IRecipeIngredient.GetMatchType(step.Code?.ToString(), step.Name != null);
+				switch(matchingType)
+				{
+					case EnumRecipeMatchType.NamedWildcard:
+					case EnumRecipeMatchType.AdvancedWildcard:
+						step.MatchingType = matchingType;
+						var descriptor = mod.GetPipeToolDescriptor(step.Tool);
+						descriptor?.GetWildcardMapping(world, this, i, map);
+						break;
+				}
 			}
 			return map;
+		}
+
+		protected override void FillPlaceHolder(string variantCode, string currentVariant)
+		{
+			Code = Code!.CopyWithPath(Code!.Path.Replace("{" + variantCode + "}", currentVariant).DeDuplicate());
+
+			for(int i = 0; i < Steps.Length; i++)
+			{
+				var descriptor = mod!.GetPipeToolDescriptor(Steps[i].Tool);
+				descriptor?.FillWildcardPlaceholder(this, i, variantCode, currentVariant);
+				Steps[i].SkipVariants = null;
+				Steps[i].AllowedVariants = null;
+			}
+
+			Output.FillPlaceHolder(variantCode, currentVariant);
 		}
 
 		public int GetStepIndex(ITreeAttribute recipeAttribute)
@@ -79,7 +93,7 @@ namespace GlassMaking
 			progress = GameMath.Clamp(recipeAttribute.GetFloat("progress", 0), 0, 1);
 		}
 
-		public bool Resolve(IWorldAccessor world, string sourceForErrorLogging)
+		public override bool Resolve(IWorldAccessor world, string sourceForErrorLogging)
 		{
 			if(Code == null || string.IsNullOrEmpty(Code.ToShortString()))
 			{
@@ -91,9 +105,20 @@ namespace GlassMaking
 				world.Logger.Error("Glassblowing recipe with output {0} has no steps or missing output. Ignoring recipe.", Output);
 				return false;
 			}
-			foreach(var step in Steps)
+			var mod = world.Api.ModLoader.GetModSystem<GlassMakingMod>();
+			for(int i = 0; i < Steps.Length; i++)
 			{
-				step.Tool = step.Tool.ToLowerInvariant();
+				Steps[i].Tool = Steps[i].Tool.ToLowerInvariant();
+				var descriptor = mod.GetPipeToolDescriptor(Steps[i].Tool);
+				if(descriptor == null)
+				{
+					world.Logger.Error("Glassblowing recipe with output {0} uses unknown tool '{1}'. Ignoring recipe.", Output?.Code, Steps[i].Tool);
+					return false;
+				}
+				if(!descriptor.ResolveIngredient(world, this, i, sourceForErrorLogging))
+				{
+					return false;
+				}
 			}
 			if(!Output.Resolve(world, sourceForErrorLogging))
 			{
@@ -104,7 +129,7 @@ namespace GlassMaking
 
 		public void GetRecipeInfo(ItemStack item, ITreeAttribute recipeAttribute, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
 		{
-			dsc.AppendLine(Lang.Get("glassmaking:Recipe: {0}", Output.ResolvedItemstack.Collectible.GetHeldItemName(Output.ResolvedItemstack)));
+			dsc.AppendLine(Lang.Get("glassmaking:Recipe: {0}", Output.ResolvedItemStack!.Collectible.GetHeldItemName(Output.ResolvedItemStack)));
 			int step = recipeAttribute.GetInt("step", 0);
 			dsc.AppendLine(Lang.Get("glassmaking:Step {0}/{1}", step + 1, Steps.Length));
 			var descriptor = world.Api.ModLoader.GetModSystem<GlassMakingMod>().GetPipeToolDescriptor(Steps[step].Tool);
@@ -134,7 +159,7 @@ namespace GlassMaking
 			{
 				tools.Add(Steps[i].Tool);
 			}
-			var mod = world.Api.ModLoader.GetModSystem<GlassMakingMod>();
+			mod ??= world.Api.ModLoader.GetModSystem<GlassMakingMod>();
 			foreach(var tool in tools)
 			{
 				var descriptor = mod.GetPipeToolDescriptor(tool);
@@ -154,8 +179,8 @@ namespace GlassMaking
 				tools.Add(Steps[i].Tool);
 			}
 
+			mod ??= world.Api.ModLoader.GetModSystem<GlassMakingMod>();
 			float maxTemperature = 0f;
-			var mod = world.Api.ModLoader.GetModSystem<GlassMakingMod>();
 			foreach(var tool in tools)
 			{
 				var descriptor = mod.GetPipeToolDescriptor(tool);
@@ -172,7 +197,7 @@ namespace GlassMaking
 
 		public bool TryBeginStep(ItemSlot slot, int index)
 		{
-			int current = slot.Itemstack.TempAttributes.GetInt("glassmaking:blowingStep", 0);
+			int current = slot.Itemstack!.TempAttributes.GetInt("glassmaking:blowingStep", 0);
 			if(current <= index)
 			{
 				if(current < index)
@@ -187,12 +212,12 @@ namespace GlassMaking
 
 		public bool IsCurrentStep(ItemSlot slot, int index)
 		{
-			return slot.Itemstack.TempAttributes.GetInt("glassmaking:blowingStep", 0) == index;
+			return slot.Itemstack!.TempAttributes.GetInt("glassmaking:blowingStep", 0) == index;
 		}
 
 		public void OnStepProgress(ItemSlot slot, float progress)
 		{
-			var beh = GetRecipeBehavior(slot.Itemstack.Collectible);
+			var beh = GetRecipeBehavior(slot.Itemstack!.Collectible);
 			if(beh == null) return;
 			if(beh.TryGetRecipeAttribute(slot.Itemstack, out var recipeAttribute))
 			{
@@ -205,14 +230,14 @@ namespace GlassMaking
 		public void OnStepComplete(ItemSlot slot, EntityAgent byEntity)
 		{
 			if(byEntity.Api.Side != EnumAppSide.Server) return;
-			var beh = GetRecipeBehavior(slot.Itemstack.Collectible);
+			var beh = GetRecipeBehavior(slot.Itemstack!.Collectible);
 			if(beh == null) return;
 			if(beh.TryGetRecipeAttribute(slot.Itemstack, out var recipeAttribute))
 			{
 				int step = recipeAttribute.GetInt("step", 0) + 1;
 				if(step >= Steps.Length)
 				{
-					var item = Output.ResolvedItemstack.Clone();
+					var item = Output.ResolvedItemStack!.Clone();
 					var pipe = (ItemGlassworkPipe)slot.Itemstack.Collectible;
 					item.Collectible.SetTemperature(byEntity.World, item, pipe.GetGlassTemperature(byEntity.World, slot.Itemstack));
 					if(!byEntity.TryGiveItemStack(item))
@@ -263,43 +288,51 @@ namespace GlassMaking
 			container.EndMeshChange();
 		}
 
-		public void ToBytes(BinaryWriter writer)
+		public override void ToBytes(BinaryWriter writer)
 		{
-			writer.Write(RecipeId);
-			writer.Write(Code);
+			base.ToBytes(writer);
+
 			writer.Write(Steps.Length);
 			for(int i = 0; i < Steps.Length; i++)
 			{
 				Steps[i].ToBytes(writer);
 			}
+
 			Output.ToBytes(writer);
 		}
 
-		public void FromBytes(BinaryReader reader, IWorldAccessor resolver)
+		public override void FromBytes(BinaryReader reader, IWorldAccessor resolver)
 		{
-			RecipeId = reader.ReadInt32();
-			Code = reader.ReadAssetLocation();
+			base.FromBytes(reader, resolver);
+
 			Steps = new GlassBlowingRecipeStep[reader.ReadInt32()];
 			for(int i = 0; i < Steps.Length; i++)
 			{
 				Steps[i] = new GlassBlowingRecipeStep();
-				Steps[i].FromBytes(reader);
+				Steps[i].FromBytes(reader, resolver);
 			}
+
 			Output = new JsonItemStack();
 			Output.FromBytes(reader, resolver.ClassRegistry);
 			Output.Resolve(resolver, "[FromBytes]");
 		}
 
-		public GlassBlowingRecipe Clone()
+		protected override void CloneTo(object cloneTo)
 		{
-			return new GlassBlowingRecipe() {
-				RecipeId = RecipeId,
-				Code = Code.Clone(),
-				Output = Output.Clone(),
-				Steps = Array.ConvertAll(Steps, CloneStep),
-				Name = Name.Clone(),
-				Enabled = Enabled
-			};
+			base.CloneTo(cloneTo);
+			if(cloneTo is GlassBlowingRecipe recipe)
+			{
+				recipe.mod = mod;
+				recipe.Output = Output.Clone();
+				recipe.Steps = Array.ConvertAll(Steps, s => s.Clone());
+			}
+		}
+
+		public override RecipeBase Clone()
+		{
+			var recipe = new GlassBlowingRecipe();
+			CloneTo(recipe);
+			return recipe;
 		}
 
 		private static GlasspipeRecipeBehavior? GetRecipeBehavior(CollectibleObject collectible)
@@ -310,31 +343,9 @@ namespace GlassMaking
 			}
 			return null;
 		}
-
-		private static GlassBlowingRecipeStep CloneStep(GlassBlowingRecipeStep other)
-		{
-			return other.Clone();
-		}
-
-		private class PlaceholderFiller : IRecipeOutput
-		{
-			private GlassBlowingRecipe recipe;
-
-			public PlaceholderFiller(GlassBlowingRecipe recipe)
-			{
-				this.recipe = recipe;
-			}
-
-			public void FillPlaceHolder(string key, string value)
-			{
-				recipe.Output.FillPlaceHolder(key, value);
-				recipe.Code = recipe.Code.CopyWithPath(recipe.Code.Path.Replace("{" + key + "}", value));
-			}
-		}
 	}
 
-	[JsonObject(MemberSerialization.OptIn)]
-	public sealed class GlassBlowingRecipeStep : IRecipeIngredient
+	public sealed class GlassBlowingRecipeStep : CraftingRecipeIngredient, IConcreteCloneable<GlassBlowingRecipeStep>
 	{
 		[JsonProperty(Required = Required.Always)]
 		public string Tool = default!;
@@ -343,55 +354,50 @@ namespace GlassMaking
 		public SmoothRadialShape? Shape = null;
 
 		[JsonProperty]
-		[JsonConverter(typeof(JsonAttributesConverter))]
-		public JsonObject? Attributes;
+		public int Amount { get => Quantity; set => Quantity = value; }
 
-		[JsonProperty]
-		public string Name { get; set; } = "";
-
-		/// <summary>
-		/// This property is initialized and used by some tools
-		/// </summary>
-		public AssetLocation? Code { get; set; } = null;
-
-		public void ToBytes(BinaryWriter writer)
+		public GlassBlowingRecipeStep()
 		{
-			writer.Write(Tool);
-			writer.Write(Code != null);
-			if(Code != null) writer.Write(Code.ToShortString());
-			writer.Write(Shape != null);
-			if(Shape != null) Shape.ToBytes(writer);
-			writer.Write(Attributes != null);
-			if(Attributes != null) writer.Write(Attributes.Token.ToString());
+			MatchingType = EnumRecipeMatchType.Exact;
 		}
 
-		public void FromBytes(BinaryReader reader)
+		public override void ToBytes(BinaryWriter writer)
 		{
+			base.ToBytes(writer);
+
+			writer.Write(Tool);
+
+			writer.Write(Shape != null);
+			Shape?.ToBytes(writer);
+		}
+
+		public override void FromBytes(BinaryReader reader, IWorldAccessor resolver)
+		{
+			base.FromBytes(reader, resolver);
+
 			Tool = reader.ReadString().ToLowerInvariant();
-			if(reader.ReadBoolean())
-			{
-				Code = new AssetLocation(reader.ReadString());
-			}
 			if(reader.ReadBoolean())
 			{
 				Shape = new SmoothRadialShape();
 				Shape.FromBytes(reader);
 			}
-			if(reader.ReadBoolean())
+		}
+
+		protected override void CloneTo(object cloneTo)
+		{
+			base.CloneTo(cloneTo);
+			if(cloneTo is GlassBlowingRecipeStep ingredient)
 			{
-				Attributes = new JsonObject(JToken.Parse(reader.ReadString()));
+				ingredient.Tool = Tool;
+				ingredient.Shape = Shape?.Clone();
 			}
 		}
 
-		public GlassBlowingRecipeStep Clone()
+		public new GlassBlowingRecipeStep Clone()
 		{
-			return new GlassBlowingRecipeStep() {
-				Tool = Tool,
-				Name = Name,
-				Code = Code?.Clone(),
-				Shape = Shape?.Clone(),
-				Attributes = Attributes?.Clone()
-			};
+			var ingredient = new GlassBlowingRecipeStep();
+			CloneTo(ingredient);
+			return ingredient;
 		}
 	}
 }

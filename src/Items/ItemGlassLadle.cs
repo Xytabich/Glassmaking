@@ -30,21 +30,21 @@ namespace GlassMaking.Items
 			maxGlassAmount = Attributes["maxGlass"].AsInt();
 			amountThreshold = Attributes["glassThreshold"].AsInt();
 			pourAnimationPrepare = Attributes["pourAnimationPrepare"].AsFloat();
-			pourAnimation = Attributes["pourAnimation"].AsString();
-			takeAnimation = Attributes["takeAnimation"].AsString();
+			pourAnimation = Attributes["pourAnimation"].AsString("");
+			takeAnimation = Attributes["takeAnimation"].AsString("");
 
 			if(api.Side == EnumAppSide.Client)
 			{
-				GlassTransform = Attributes["glassTransform"].AsObject<ModelTransform>();
+				GlassTransform = Attributes["glassTransform"].AsObject<ModelTransform>()!;
 				GlassTransform.EnsureDefaultValues();
 
-				interactions = new WorldInteraction[] {
+				interactions = [
 					new WorldInteraction() {
 						ActionLangCode = "glassmaking:heldhelp-ladle-intake",
 						MouseButton = EnumMouseButton.Right,
 						Itemstacks = Utils.GetGlassmeltSources(api)
 					}
-				};
+				];
 			}
 		}
 
@@ -59,7 +59,7 @@ namespace GlassMaking.Items
 
 			dsc.AppendLine(Lang.Get("glassmaking:glassladle", maxGlassAmount, amountThreshold));
 
-			var itemstack = inSlot.Itemstack;
+			var itemstack = inSlot.Itemstack!;
 			var glassmelt = itemstack.Attributes.GetTreeAttribute("glassmelt");
 			if(glassmelt != null)
 			{
@@ -67,7 +67,7 @@ namespace GlassMaking.Items
 				var amount = glassmelt.GetInt("amount");
 
 				dsc.AppendFormat(IsWorkingTemperature(world, itemstack) ? "Contains {0} units of molten {1} glass" : "Contains {0} units of {1} glass", amount, Lang.Get(GlassBlend.GetBlendNameCode(code))).AppendLine();
-				dsc.AppendLine(Lang.Get("Temperature: {0}°C", GetGlassTemperature(world, inSlot.Itemstack).ToString("0")));
+				dsc.AppendLine(Lang.Get("Temperature: {0}°C", GetGlassTemperature(world, itemstack).ToString("0")));
 
 				bool showHeader = true;
 				foreach(var item in mod.GetShardsList(world, code, amount))
@@ -104,7 +104,7 @@ namespace GlassMaking.Items
 				var be = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position);
 				if(be != null)
 				{
-					var itemstack = slot.Itemstack;
+					var itemstack = slot.Itemstack!;
 
 					var mold = be as IGlassmeltSink;
 					if(mold != null)
@@ -192,7 +192,7 @@ namespace GlassMaking.Items
 			var be = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position);
 			if(be != null)
 			{
-				var itemstack = slot.Itemstack;
+				var itemstack = slot.Itemstack!;
 
 				var mold = be as IGlassmeltSink;
 				if(mold != null)
@@ -300,8 +300,8 @@ namespace GlassMaking.Items
 		public override void OnHeldInteractStop(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel)
 		{
 			base.OnHeldInteractStop(secondsUsed, slot, byEntity, blockSel, entitySel);
-			slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:glassFlag");
-			slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:prevTakeTime");
+			slot.Itemstack!.TempAttributes.RemoveAttribute("glassmaking:glassFlag");
+			slot.Itemstack!.TempAttributes.RemoveAttribute("glassmaking:prevTakeTime");
 			byEntity.StopAnimation(pourAnimation);
 			byEntity.StopAnimation(takeAnimation);
 
@@ -315,8 +315,8 @@ namespace GlassMaking.Items
 
 		public override bool OnHeldInteractCancel(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, EnumItemUseCancelReason cancelReason)
 		{
-			slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:glassFlag");
-			slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:prevTakeTime");
+			slot.Itemstack!.TempAttributes.RemoveAttribute("glassmaking:glassFlag");
+			slot.Itemstack!.TempAttributes.RemoveAttribute("glassmaking:prevTakeTime");
 			byEntity.StopAnimation(pourAnimation);
 			byEntity.StopAnimation(takeAnimation);
 			return true;
@@ -336,13 +336,15 @@ namespace GlassMaking.Items
 			base.OnBeforeRender(capi, itemstack, target, ref renderinfo);
 		}
 
-		public override void OnConsumedByCrafting(ItemSlot[] allInputSlots, ItemSlot stackInSlot, GridRecipe gridRecipe, CraftingRecipeIngredient fromIngredient, IPlayer byPlayer, int quantity)
+		public override void OnConsumedByCrafting(ItemSlot[] allInputSlots, ItemSlot stackInSlot, Vintagestory.API.Common.IRecipeBase recipe, IRecipeIngredient fromIngredient, IPlayer byPlayer, int quantity)
 		{
-			if(gridRecipe.Output.ResolvedItemstack?.Item is ItemGlassLadle && gridRecipe.Attributes?.IsTrue("breakglass") == true)
+			if(recipe is GridRecipe gridRecipe &&
+				gridRecipe.Output!.ResolvedItemStack?.Item is ItemGlassLadle &&
+				gridRecipe.Attributes?.IsTrue("breakglass") == true)
 			{
 				if(api.Side == EnumAppSide.Server)
 				{
-					var glassmelt = stackInSlot.Itemstack.Attributes.GetTreeAttribute("glassmelt");
+					var glassmelt = stackInSlot.Itemstack!.Attributes.GetTreeAttribute("glassmelt");
 					if(glassmelt != null)
 					{
 						var entity = byPlayer.Entity;
@@ -356,17 +358,19 @@ namespace GlassMaking.Items
 					}
 				}
 			}
-			base.OnConsumedByCrafting(allInputSlots, stackInSlot, gridRecipe, fromIngredient, byPlayer, quantity);
+			base.OnConsumedByCrafting(allInputSlots, stackInSlot, recipe, fromIngredient, byPlayer, quantity);
 		}
 
-		public override bool MatchesForCrafting(ItemStack inputStack, GridRecipe gridRecipe, CraftingRecipeIngredient ingredient)
+		public override bool MatchesForCrafting(ItemStack inputStack, Vintagestory.API.Common.IRecipeBase recipe, IRecipeIngredient ingredient)
 		{
-			if(gridRecipe.Output.ResolvedItemstack?.Item is ItemGlassLadle && ingredient.ResolvedItemstack?.Item is ItemGlassLadle &&
+			if(recipe is GridRecipe gridRecipe &&
+				gridRecipe.Output!.ResolvedItemStack?.Item is ItemGlassLadle &&
+				ingredient.ResolvedItemStack?.Item is ItemGlassLadle &&
 				gridRecipe.Attributes?.IsTrue("breakglass") == true)
 			{
 				return inputStack.Attributes.HasAttribute("glassmelt");
 			}
-			return base.MatchesForCrafting(inputStack, gridRecipe, ingredient);
+			return base.MatchesForCrafting(inputStack, recipe, ingredient);
 		}
 
 		public bool IsWorkingTemperature(IWorldAccessor world, ItemStack item)
@@ -418,7 +422,7 @@ namespace GlassMaking.Items
 
 		private void AddGlass(EntityAgent byEntity, ItemSlot slot, int amount, AssetLocation code, float temperature, out int consumed)
 		{
-			var glassmelt = slot.Itemstack.Attributes.GetOrAddTreeAttribute("glassmelt");
+			var glassmelt = slot.Itemstack!.Attributes.GetOrAddTreeAttribute("glassmelt");
 
 			int currentAmount = glassmelt.GetInt("amount", 0);
 			string glassCode = code.ToShortString();

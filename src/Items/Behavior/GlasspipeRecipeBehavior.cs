@@ -29,21 +29,21 @@ namespace GlassMaking.Items.Behavior
 		{
 			if(glassMaking.GetGlassBlowingRecipes().Count > 0)
 			{
-				var beh = glassworkPipe.GetActiveCraft(inSlot.Itemstack);
+				var itemStack = inSlot.Itemstack!;
+				var beh = glassworkPipe.GetActiveCraft(itemStack);
 				if(beh == null)
 				{
-					return new WorldInteraction[] {
+					return [
 						new WorldInteraction() {
 							ActionLangCode = "glassmaking:heldhelp-glasspipe-recipe",
 							HotKeyCode = GlassMakingMod.RECIPE_SELECT_HOTKEY,
 							MouseButton = EnumMouseButton.None
 						}
-					};
+					];
 				}
-				else if(beh == this && IsHeated(api.World, inSlot.Itemstack))
+				else if(beh == this && IsHeated(api.World, itemStack))
 				{
 					var interactions = new List<WorldInteraction>();
-					var itemStack = inSlot.Itemstack;
 					var recipe = GetRecipe(itemStack, out var recipeAttribute);
 					recipe?.GetInteractionHelp(itemStack, recipeAttribute, interactions, api.World, glassMaking);
 					return interactions.ToArray();
@@ -55,7 +55,7 @@ namespace GlassMaking.Items.Behavior
 		public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
 		{
 			base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
-			var itemStack = inSlot.Itemstack;
+			var itemStack = inSlot.Itemstack!;
 			var recipe = GetRecipe(itemStack, out var recipeAttribute);
 			if(recipe != null)
 			{
@@ -95,8 +95,8 @@ namespace GlassMaking.Items.Behavior
 
 		public bool MatchesForCrafting(ItemStack inputStack, GridRecipe gridRecipe, CraftingRecipeIngredient ingredient, ref EnumHandling handling)
 		{
-			if(gridRecipe.Output.ResolvedItemstack?.Item is ItemGlassworkPipe &&
-				ingredient.ResolvedItemstack?.Item is ItemGlassworkPipe &&
+			if(gridRecipe.Output!.ResolvedItemStack?.Item is ItemGlassworkPipe &&
+				ingredient.ResolvedItemStack?.Item is ItemGlassworkPipe &&
 				gridRecipe.Attributes?.IsTrue("breakglass") == true)
 			{
 				handling = EnumHandling.Handled;
@@ -107,11 +107,11 @@ namespace GlassMaking.Items.Behavior
 
 		public void OnConsumedByCrafting(ItemSlot[] allInputSlots, ItemSlot stackInSlot, GridRecipe gridRecipe, CraftingRecipeIngredient fromIngredient, IPlayer byPlayer, int quantity, ref EnumHandling handling)
 		{
-			if(gridRecipe.Output.ResolvedItemstack?.Item is ItemGlassworkPipe && gridRecipe.Attributes?.IsTrue("breakglass") == true)
+			if(gridRecipe.Output!.ResolvedItemStack?.Item is ItemGlassworkPipe && gridRecipe.Attributes?.IsTrue("breakglass") == true)
 			{
 				if(api.Side == EnumAppSide.Server)
 				{
-					var itemStack = stackInSlot.Itemstack;
+					var itemStack = stackInSlot.Itemstack!;
 					var recipe = GetRecipe(itemStack, out var recipeAttribute);
 					if(recipe != null)
 					{
@@ -146,7 +146,7 @@ namespace GlassMaking.Items.Behavior
 		{
 			if(isComplete)
 			{
-				slot.Itemstack.Attributes.RemoveAttribute(ATTRIB_KEY);
+				slot.Itemstack!.Attributes.RemoveAttribute(ATTRIB_KEY);
 				glassworkPipe.ResetGlassTemperature(api.World, slot.Itemstack);
 				slot.MarkDirty();
 			}
@@ -157,7 +157,8 @@ namespace GlassMaking.Items.Behavior
 			return glassworkPipe.GetActiveCraft(item) != null;
 		}
 
-		bool IItemCrafter.TryGetRecipeOutputs(IClientPlayer player, ItemStack item, [NotNullWhen(true)] out KeyValuePair<IAttribute, ItemStack>[]? recipeOutputs)
+		bool IItemCrafter.TryGetRecipeOutputs(IClientPlayer player, ItemStack item,
+			[NotNullWhen(true)] out KeyValuePair<IAttribute, ItemStack>[]? recipeOutputs)
 		{
 			var recipes = glassMaking.GetGlassBlowingRecipes();
 			recipeOutputs = default;
@@ -167,7 +168,7 @@ namespace GlassMaking.Items.Behavior
 			int index = 0;
 			foreach(var pair in recipes)
 			{
-				recipeOutputs[index++] = new KeyValuePair<IAttribute, ItemStack>(new StringAttribute(pair.Key), pair.Value.Output.ResolvedItemstack);
+				recipeOutputs[index++] = new KeyValuePair<IAttribute, ItemStack>(new StringAttribute(pair.Key), pair.Value.Output.ResolvedItemStack!);
 			}
 			return index > 0;
 		}

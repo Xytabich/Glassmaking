@@ -27,7 +27,7 @@ namespace GlassMaking.Items.Behavior
 		public override void Initialize(JsonObject properties)
 		{
 			base.Initialize(properties);
-			animation = properties["animation"].AsString();
+			animation = properties["animation"].AsString("");
 		}
 
 		public override void OnLoaded(ICoreAPI api)
@@ -38,16 +38,16 @@ namespace GlassMaking.Items.Behavior
 
 		public override WorldInteraction[] GetHeldInteractionHelp(ItemSlot inSlot, ref EnumHandling handling)
 		{
-			if(glassworkPipe.GetActiveCraft(inSlot.Itemstack) != null)
+			if(glassworkPipe.GetActiveCraft(inSlot.Itemstack!) != null)
 			{
-				return new WorldInteraction[] {
+				return [
 					new WorldInteraction() {
 						ActionLangCode = "glassmaking:heldhelp-glasspipe-heatup",
 						MouseButton = EnumMouseButton.Right,
 						HotKeyCode = "sprint",
 						Itemstacks = Utils.GetGlassmeltSources(api)
 					}
-				};
+				];
 			}
 			return Array.Empty<WorldInteraction>();
 		}
@@ -56,12 +56,12 @@ namespace GlassMaking.Items.Behavior
 		{
 			if(firstEvent && blockSel != null)
 			{
-				var itemstack = slot.Itemstack;
+				var itemstack = slot.Itemstack!;
 				var activeCraft = glassworkPipe.GetActiveCraft(itemstack);
 				if(activeCraft != null)
 				{
-					var source = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position) as IGlassmeltSource;
-					if(source != null && source.CanInteract(byEntity, blockSel))
+					if(byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position) is IGlassmeltSource source &&
+						source.CanInteract(byEntity, blockSel))
 					{
 						if(byEntity.Controls.Sprint)
 						{
@@ -92,12 +92,11 @@ namespace GlassMaking.Items.Behavior
 		{
 			if(blockSel == null) return false;
 
-			var itemstack = slot.Itemstack;
+			var itemstack = slot.Itemstack!;
 			var activeCraft = glassworkPipe.GetActiveCraft(itemstack);
 			if(activeCraft == null) return false;
 
-			var source = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position) as IGlassmeltSource;
-			if(source != null && source.CanInteract(byEntity, blockSel))
+			if(byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position) is IGlassmeltSource source && source.CanInteract(byEntity, blockSel))
 			{
 				if(byEntity.Controls.Sprint)
 				{
@@ -125,7 +124,7 @@ namespace GlassMaking.Items.Behavior
 
 		public override void OnHeldInteractStop(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, ref EnumHandling handling)
 		{
-			var itemstack = slot.Itemstack;
+			var itemstack = slot.Itemstack!;
 			if(itemstack.TempAttributes.HasAttribute(LASTHEAT_ATTRIB))
 			{
 				handling = EnumHandling.PreventSubsequent;
@@ -136,7 +135,7 @@ namespace GlassMaking.Items.Behavior
 
 		public override bool OnHeldInteractCancel(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, EnumItemUseCancelReason cancelReason, ref EnumHandling handling)
 		{
-			var itemstack = slot.Itemstack;
+			var itemstack = slot.Itemstack!;
 			if(itemstack.TempAttributes.HasAttribute(LASTHEAT_ATTRIB))
 			{
 				handling = EnumHandling.PreventSubsequent;

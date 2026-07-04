@@ -2,7 +2,6 @@
 using GlassMaking.Blocks.Multiblock;
 using GlassMaking.Common;
 using GlassMaking.GlassblowingTools;
-using GlassMaking.Gui;
 using GlassMaking.Handbook;
 using GlassMaking.ItemRender;
 using GlassMaking.Items;
@@ -130,6 +129,12 @@ namespace GlassMaking
 			AddWorkbenchToolBehavior(new ItemUseBehavior(true));
 			AddWorkbenchToolBehavior(new ItemUseBehavior(false));
 			AddWorkbenchToolBehavior(new LiquidUseBehavior());
+
+			AddWorkbenchToolDescriptor(ItemUseBehavior.CODE, new ItemUseDescriptor());
+			AddWorkbenchToolDescriptor(ItemUseBehavior.OTHER_CODE, new ItemUseDescriptor());
+			AddWorkbenchToolDescriptor(LiquidUseBehavior.CODE, new LiquidUseDescriptor());
+			AddWorkbenchToolDescriptor(LatheToolBehavior.CODE, new ItemToolDescriptor(LatheToolBehavior.CODE));
+			AddWorkbenchToolDescriptor(BlowtorchToolBehavior.CODE, new BlowtorchToolDescriptor());
 		}
 
 		public override double ExecuteOrder()
@@ -181,10 +186,6 @@ namespace GlassMaking
 			handbookInfoList.Add(new WorkbenchRecipeInfo(this));
 			handbookInfoList.Add(new MultiblockPlanMaterials());
 
-			AddWorkbenchToolDescriptor(ItemUseBehavior.CODE, new ItemUseDescriptor());
-			AddWorkbenchToolDescriptor(ItemUseBehavior.OTHER_CODE, new ItemUseDescriptor());
-			AddWorkbenchToolDescriptor(LiquidUseBehavior.CODE, new LiquidUseDescriptor());
-
 			blowingMolds = new List<Block>();
 			castingMolds = new List<Block>();
 			blowingMoldsOutput = new HashSet<AssetLocation>();
@@ -211,7 +212,7 @@ namespace GlassMaking
 				{
 					try
 					{
-						var property = pair.Value.ToObject<GlassTypeProperty>(pair.Key.Domain);
+						var property = pair.Value.ToObject<GlassTypeProperty>(pair.Key.Domain)!;
 						foreach(var type in property.Variants)
 						{
 							glassTypes[type.Code.Clone()] = type;
@@ -384,7 +385,7 @@ namespace GlassMaking
 					var mold = (IGlassBlowingMold)block;
 					foreach(var recipe in mold.GetRecipes())
 					{
-						if(recipe.Output.Code.Equals(item.Code))
+						if(recipe.Output.Code!.Equals(item.Code))
 						{
 							list.Add(block);
 						}
@@ -494,7 +495,7 @@ namespace GlassMaking
 					var output = properties["output"].AsObject<JsonItemStack?>(null, collectible.Code.Domain);
 					if(output!.Resolve(capi.World, "recipes collect"))
 					{
-						var outputItem = output.ResolvedItemstack;
+						var outputItem = output.ResolvedItemStack!;
 						annealRecipes!.Add((collectible.ItemClass, collectible.Id), outputItem);
 						annealOutputs!.Add(outputItem.Collectible.Code);
 					}
@@ -521,7 +522,7 @@ namespace GlassMaking
 						blowingMolds.Add(block);
 						foreach(var recipe in recipes)
 						{
-							blowingMoldsOutput.Add(recipe.Output.Code);
+							blowingMoldsOutput.Add(recipe.Output.Code!);
 						}
 					}
 				}

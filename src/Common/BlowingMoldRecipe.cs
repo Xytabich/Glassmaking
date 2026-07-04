@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using GlassMaking.Common;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using Vintagestory.API.Common;
@@ -7,86 +8,79 @@ using Vintagestory.API.Util;
 namespace GlassMaking
 {
 	[JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-	public class BlowingMoldRecipe : IRecipeBase<BlowingMoldRecipe>
+	public class BlowingMoldRecipe : RecipeBase
 	{
 		[JsonProperty(Required = Required.DisallowNull)]
 		public CraftingRecipeIngredient Output = default!;
 		[JsonProperty(Required = Required.Always)]
-		public GlassAmount[] Recipe = default!;
+		public GlassIngredient[] Recipe = default!;
 		[JsonProperty]
 		public float FillTime = 3f;
 
-		[JsonProperty]
-		public AssetLocation? Name { get; set; }
+		public override IEnumerable<IRecipeIngredient> RecipeIngredients => Recipe;
+		public override IRecipeOutput RecipeOutput => Output;
 
-		public bool Enabled { get; set; } = true;
-		public IRecipeIngredient[] Ingredients => Recipe;
-		IRecipeOutput IRecipeBase<BlowingMoldRecipe>.Output => Output.ReturnedStack;
-
-		public Dictionary<string, string[]> GetNameToCodeMapping(IWorldAccessor world)
+		public override RecipeBase Clone()
 		{
-			Dictionary<string, string[]> mappings = new Dictionary<string, string[]>();
-
-			var mod = world.Api.ModLoader.GetModSystem<GlassMakingMod>();
-			for(int i = 0; i < Recipe.Length; i++)
-			{
-				if(!string.IsNullOrEmpty(Recipe[i].Name))
-				{
-					var part = Recipe[i];
-					int wildcardStartLen = part.Code.Path.IndexOf("*");
-					if(wildcardStartLen >= 0)
-					{
-						List<string> codes = new List<string>();
-						int wildcardEndLen = part.Code.Path.Length - wildcardStartLen - 1;
-						foreach(var pair in mod.GetGlassTypes())
-						{
-							if(WildcardUtil.Match(part.Code, pair.Key))
-							{
-								string code = pair.Key.Path.Substring(wildcardStartLen);
-								string codepart = code.Substring(0, code.Length - wildcardEndLen);
-								if(part.AllowedVariants == null || part.AllowedVariants.Contains(codepart))
-								{
-									codes.Add(codepart);
-								}
-							}
-						}
-						mappings[part.Name] = codes.ToArray();
-					}
-				}
-			}
-
-			return mappings;
+			var recipe = new BlowingMoldRecipe();
+			CloneTo(recipe);
+			return recipe;
 		}
 
-		public bool Resolve(IWorldAccessor world, string sourceForErrorLogging)
+		public override bool Resolve(IWorldAccessor world, string sourceForErrorLogging)
 		{
+			var types = world.Api.ModLoader.GetModSystem<GlassMakingMod>().GetGlassTypes();
+			foreach(var ingredient in Recipe)
+			{
+				var code = ingredient.Code;
+				if(code == null || !types.ContainsKey(code))
+				{
+					world.Logger.Warning("Failed resolving a glass type with code '{0}' in {1}", code, sourceForErrorLogging);
+					return false;
+				}
+			}
 			return Output.Resolve(world, sourceForErrorLogging);
 		}
 
-		public BlowingMoldRecipe Clone()
+		protected override Dictionary<string, HashSet<string>> GetNameToCodeMapping(IWorldAccessor world)
 		{
-			return new BlowingMoldRecipe() {
-				Output = Output.Clone(),
-				Recipe = Array.ConvertAll(Recipe, r => r.Clone()),
-				FillTime = FillTime,
-				Name = Name?.Clone()
-			};
+			IReadOnlyDictionary<AssetLocation, GlassTypeVariant>? types = null;
+			var mapping = new Dictionary<string, HashSet<string>>();
+			foreach(var ingredient in Recipe)
+			{
+				ingredient.MatchingType = IRecipeIngredient.GetMatchType(ingredient.Code?.ToString(), ingredient.Name != null);
+				switch(ingredient.MatchingType)
+				{
+					case EnumRecipeMatchType.NamedWildcard:
+						types ??= world.Api.ModLoader.GetModSystem<GlassMakingMod>().GetGlassTypes();
+						var list = Utils.WildcardMatches(ingredient.Code!, types.Keys, ingredient.AllowedVariants);
+						if(list.Count != 0)
+						{
+							mapping[ingredient.Name!] = list;
+						}
+						break;
+				}
+			}
+
+			return mapping;
+		}
+
+		protected override void CloneTo(object cloneTo)
+		{
+			base.CloneTo(cloneTo);
+			if(cloneTo is BlowingMoldRecipe recipe)
+			{
+				recipe.Output = Output.Clone();
+				recipe.Recipe = Array.ConvertAll(Recipe, r => r.Clone());
+				recipe.FillTime = FillTime;
+			}
 		}
 
 		[JsonObject]
-		public class GlassAmount : IRecipeIngredient
+		public class GlassIngredient : CraftingRecipeIngredient, IConcreteCloneable<GlassIngredient>
 		{
 			[JsonProperty]
-			public string Name { get; set; } = default!;
-
-			[JsonProperty(Required = Required.DisallowNull)]
-			public AssetLocation Code { get; set; } = default!;
-
-			[JsonProperty]
-			public string[]? AllowedVariants;
-
-			[JsonProperty(Required = Required.Always)]
-			public int Amount;
+			public int Amount { get => Quantity; set => Quantity = value; }
 
 			[JsonProperty]
 			public int Var = -1;
@@ -98,15 +92,20 @@ namespace GlassMaking
 				return true;
 			}
 
-			public GlassAmount Clone()
+			public new GlassIngredient Clone()
 			{
-				return new GlassAmount() {
-					Code = Code.Clone(),
-					Amount = Amount,
-					Var = Var,
-					Name = Name,
-					AllowedVariants = (string[]?)(AllowedVariants?.Clone())
-				};
+				var ingredient = new GlassIngredient();
+				CloneTo(ingredient);
+				return ingredient;
+			}
+
+			protected override void CloneTo(object cloneTo)
+			{
+				base.CloneTo(cloneTo);
+				if(cloneTo is GlassIngredient ingredient)
+				{
+					ingredient.Var = Var;
+				}
 			}
 		}
 	}

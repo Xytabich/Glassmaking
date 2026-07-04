@@ -24,7 +24,7 @@ namespace GlassMaking.Handbook
 		private void GetHandbookInfo(ItemSlot inSlot, ICoreClientAPI capi, ItemStack[] allStacks, ActionConsumable<string> openDetailPageFor, HandbookItemInfoSection section, List<RichTextComponentBase> outComponents)
 		{
 			if(section != HandbookItemInfoSection.BeforeExtraSections) return;
-			if(inSlot.Itemstack.Collectible is StrictLiquidContainer container)
+			if(inSlot.Itemstack!.Collectible is StrictLiquidContainer container)
 			{
 				outComponents.Add(new ClearFloatTextComponent(capi, 7f));
 				outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:Allowed liquids") + "\n", CairoFont.WhiteSmallText().WithWeight(FontWeight.Bold)));

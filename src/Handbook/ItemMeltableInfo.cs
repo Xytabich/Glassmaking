@@ -27,8 +27,7 @@ namespace GlassMaking.Handbook
 		{
 			if(section != HandbookItemInfoSection.AfterItemHeader) return;
 
-			GlassBlend? blend = GlassBlend.FromJson(inSlot.Itemstack);
-			if(blend == null) blend = GlassBlend.FromTreeAttributes(inSlot.Itemstack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
+			GlassBlend? blend = GlassBlend.FromStackAttribute(inSlot.Itemstack!);
 			if(blend != null && blend.Amount > 0)
 			{
 				outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:Melting in the glass smeltery") + "\n", CairoFont.WhiteSmallText().WithWeight(FontWeight.Bold)));

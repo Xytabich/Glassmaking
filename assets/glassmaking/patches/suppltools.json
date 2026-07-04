@@ -20,18 +20,12 @@
         "side": "Server",
         "file": "game:itemtypes/tool/shears",
         "op": "add",
-        "path": "/behaviors",
-        "value": []
-    },
-    {
-        "side": "Server",
-        "file": "game:itemtypes/tool/shears",
-        "op": "add",
-        "path": "/behaviors/-",
+        "path": "/behaviorsByType/@(.*-steel|.*-meteoriciron|.*-iron)/-",
         "value": {
             "name": "glassmaking:gbt-tooluse",
             "properties": {
                 "tool": "cutoff",
+				"minTier": 4,
                 "animation": "gwtoolcutoff"
             }
         }
@@ -40,11 +34,12 @@
         "side": "Server",
         "file": "game:itemtypes/tool/shears",
         "op": "add",
-        "path": "/behaviors/-",
+        "path": "/behaviorsByType/@(.*-steel|.*-meteoriciron|.*-iron)/-",
         "value": {
             "name": "glassmaking:gbt-tooluse",
             "properties": {
                 "tool": "incise",
+				"minTier": 4,
                 "animation": "gwtoolincise"
             }
         }

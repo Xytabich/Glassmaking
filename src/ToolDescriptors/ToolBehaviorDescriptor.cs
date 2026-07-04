@@ -1,6 +1,5 @@
 ﻿using GlassMaking.Common;
 using GlassMaking.GlassblowingTools;
-using System;
 using System.Collections.Generic;
 using System.Text;
 using Vintagestory.API.Client;
@@ -53,9 +52,19 @@ namespace GlassMaking.ToolDescriptors
 
 		}
 
-		public virtual void GetWildcardMapping(IWorldAccessor world, GlassBlowingRecipe recipe, int stepIndex, Dictionary<string, string[]> outMap)
+		public virtual void GetWildcardMapping(IWorldAccessor world, GlassBlowingRecipe recipe, int stepIndex, Dictionary<string, HashSet<string>> outMap)
 		{
 
+		}
+
+		public virtual void FillWildcardPlaceholder(GlassBlowingRecipe recipe, int stepIndex, string variantCode, string currentVariant)
+		{
+
+		}
+
+		public virtual bool ResolveIngredient(IWorldAccessor world, GlassBlowingRecipe recipe, int stepIndex, string sourceForErrorLogging)
+		{
+			return true;
 		}
 
 		public abstract void GetStepInfoForHandbook(ICoreClientAPI capi, ItemStack item, GlassBlowingRecipe recipe, int stepIndex, ActionConsumable<string> openDetailPageFor, List<RichTextComponentBase> outComponents);

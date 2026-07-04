@@ -1,5 +1,6 @@
 [
 	{
+		"code": "jacks-{metal}",
 		"ingredient": {
 			"name": "metal",
 			"type": "item",
@@ -19,6 +20,7 @@
 		}
 	},
 	{
+		"code": "tweezers-{metal}",
 		"ingredient": {
 			"name": "metal",
 			"type": "item",

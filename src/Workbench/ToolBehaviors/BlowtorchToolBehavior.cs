@@ -1,4 +1,5 @@
-﻿using GlassMaking.Items;
+﻿using System.Runtime.CompilerServices;
+using GlassMaking.Items;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 
@@ -15,10 +16,9 @@ namespace GlassMaking.Workbench.ToolBehaviors
 		public override bool OnUseStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, WorkbenchRecipe recipe, int step)
 		{
 			var useTime = recipe.Steps[step].UseTime;
-			if(useTime.HasValue)
+			if(useTime.HasValue && Slot.Itemstack!.Item is ItemBlowtorch item)
 			{
-				var item = (ItemBlowtorch)Slot.Itemstack.Item;
-				if(recipe.Steps[step].Tools[CODE]!["temperature"].AsFloat() <= item.flameTemperature)
+				if(GetTemparature(recipe.Steps[step]) <= item.flameTemperature)
 				{
 					isUsing = true;
 					var useLitres = item.consumptionPerSecond;
@@ -32,10 +32,9 @@ namespace GlassMaking.Workbench.ToolBehaviors
 		public override bool OnUseStep(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, WorkbenchRecipe recipe, int step)
 		{
 			var useTime = recipe.Steps[step].UseTime;
-			if(useTime.HasValue)
+			if(useTime.HasValue && Slot.Itemstack!.Item is ItemBlowtorch item)
 			{
-				var item = (ItemBlowtorch)Slot.Itemstack.Item;
-				if(recipe.Steps[step].Tools[CODE]!["temperature"].AsFloat() <= item.flameTemperature)
+				if(GetTemparature(recipe.Steps[step]) <= item.flameTemperature)
 				{
 					var useLitres = item.consumptionPerSecond;
 					return item.GetCurrentLitres(Slot.Itemstack) >= useLitres * useTime.Value;
@@ -49,14 +48,19 @@ namespace GlassMaking.Workbench.ToolBehaviors
 		{
 			isUsing = false;
 			var useTime = recipe.Steps[step].UseTime;
-			if(useTime.HasValue)
+			if(useTime.HasValue && Slot.Itemstack!.Item is ItemBlowtorch item)
 			{
-				var item = (ItemBlowtorch)Slot.Itemstack.Item;
 				var useLitres = item.consumptionPerSecond;
 				item.TryTakeLiquid(Slot.Itemstack, useLitres * useTime.Value);
 				Slot.MarkDirty();
 			}
 			base.OnUseComplete(secondsUsed, world, byPlayer, blockSel, recipe, step);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static float GetTemparature(WorkbenchRecipeStep step)
+		{
+			return step.Tools[CODE]!.RecipeAttributes!["temperature"].AsFloat();
 		}
 	}
 }

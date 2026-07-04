@@ -77,8 +77,7 @@ namespace GlassMaking.Items
 		public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
 		{
 			base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
-			GlassBlend? blend = GlassBlend.FromJson(inSlot.Itemstack);
-			if(blend == null) blend = GlassBlend.FromTreeAttributes(inSlot.Itemstack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
+			GlassBlend? blend = GlassBlend.FromStackAttribute(inSlot.Itemstack!);
 			if(blend != null && blend.Amount > 0)
 			{
 				dsc.AppendLine(Lang.Get("glassmaking:Melts into {0} units of {1} glass", blend.Amount, Lang.Get(GlassBlend.GetBlendNameCode(blend.Code))));
@@ -87,8 +86,7 @@ namespace GlassMaking.Items
 
 		public override string GetHeldItemName(ItemStack itemStack)
 		{
-			GlassBlend? blend = GlassBlend.FromJson(itemStack);
-			if(blend == null) blend = GlassBlend.FromTreeAttributes(itemStack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
+			GlassBlend? blend = GlassBlend.FromStackAttribute(itemStack);
 			if(blend != null)
 			{
 				return Lang.Get(GetItemBaseCode(Code), Lang.Get(GlassBlend.GetBlendNameCode(blend.Code)));
@@ -98,7 +96,7 @@ namespace GlassMaking.Items
 
 		public override void OnBeforeRender(ICoreClientAPI capi, ItemStack itemstack, EnumItemRenderTarget target, ref ItemRenderInfo renderinfo)
 		{
-			GlassBlend? blend = GlassBlend.FromTreeAttributes(itemstack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
+			GlassBlend? blend = GlassBlend.FromStackAttribute(itemstack);
 			if(blend == null) return;
 
 			var blendMeshrefs = ObjectCacheUtil.GetOrCreate(capi, "glassmaking:blendMeshRefs", () => new Dictionary<string, MultiTextureMeshRef>());
@@ -107,24 +105,24 @@ namespace GlassMaking.Items
 			MultiTextureMeshRef? meshRef;
 			if(!blendMeshrefs.TryGetValue(key, out meshRef))
 			{
-				var mesh = GenMesh(itemstack, capi.ItemTextureAtlas);
+				var mesh = GenMesh(new DummySlot(itemstack), capi.ItemTextureAtlas);
 				meshRef = mesh == null ? renderinfo.ModelRef : capi.Render.UploadMultiTextureMesh(mesh);
 				blendMeshrefs[key] = meshRef;
 			}
 			renderinfo.ModelRef = meshRef;
 		}
 
-		public MeshData GenMesh(ItemStack itemstack, ITextureAtlasAPI targetAtlas, BlockPos? forBlockPos = null)
+		public MeshData GenMesh(ItemSlot slot, ITextureAtlasAPI targetAtlas, BlockPos? forBlockPos = null)
 		{
 			curAtlas = targetAtlas;
-			MeshData mesh = GenMesh((ICoreClientAPI)api, itemstack);
+			MeshData mesh = GenMesh((ICoreClientAPI)api, slot.Itemstack!);
 			mesh.RenderPassesAndExtraBits.Fill((short)EnumChunkRenderPass.BlendNoCull);
 			return mesh;
 		}
 
-		public string GetMeshCacheKey(ItemStack itemstack)
+		public string GetMeshCacheKey(ItemSlot slot)
 		{
-			GlassBlend? blend = GlassBlend.FromTreeAttributes(itemstack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
+			GlassBlend? blend = GlassBlend.FromStackAttribute(slot.Itemstack!);
 			if(blend != null)
 			{
 				return GetItemBaseCode(Code) + "|" + blend.Code.ToString();

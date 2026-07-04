@@ -82,9 +82,9 @@ namespace GlassMaking.Blocks
 			base.LateInitialize(inventoryID, api);
 			for(int i = 0; i < toolsCount; i++)
 			{
-				if(!slots[i].Empty && WorkbenchToolUtils.TryGetTool(slots[i].Itemstack.Collectible, out var tool))
+				if(!slots[i].Empty && WorkbenchToolUtils.TryGetTool(slots[i].Itemstack!.Collectible, out var tool))
 				{
-					behaviors[i] = tool.CreateToolBehavior(Api.World, slots[i].Itemstack, blockentity);
+					behaviors[i] = tool.CreateToolBehavior(Api.World, slots[i].Itemstack!, blockentity);
 					behaviors[i]!.OnLoaded(api, slots[i]);
 					behaviors[i]!.FromAttribute(cachedAttributes[i], api.World);
 				}

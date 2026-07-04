@@ -31,8 +31,8 @@ namespace GlassMaking.Items.Behavior
 		public override void Initialize(JsonObject properties)
 		{
 			base.Initialize(properties);
-			blowAnimation = properties["blowAnimation"].AsString();
-			intakeAnimation = properties["intakeAnimation"].AsString();
+			blowAnimation = properties["blowAnimation"].AsString("");
+			intakeAnimation = properties["intakeAnimation"].AsString("");
 		}
 
 		public override void OnLoaded(ICoreAPI api)
@@ -49,7 +49,7 @@ namespace GlassMaking.Items.Behavior
 
 		public override WorldInteraction[] GetHeldInteractionHelp(ItemSlot inSlot, ref EnumHandling handling)
 		{
-			if(glassworkPipe.GetActiveCraft(inSlot.Itemstack) == null)
+			if(glassworkPipe.GetActiveCraft(inSlot.Itemstack!) == null)
 			{
 				var sources = Utils.GetGlassmeltSources(api);
 				return new WorldInteraction[] {
@@ -72,7 +72,7 @@ namespace GlassMaking.Items.Behavior
 		public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
 		{
 			base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
-			var itemstack = inSlot.Itemstack;
+			var itemstack = inSlot.Itemstack!;
 			var glasslayers = itemstack.Attributes.GetTreeAttribute(ATTRIB_KEY);
 			if(glasslayers != null)
 			{
@@ -108,7 +108,7 @@ namespace GlassMaking.Items.Behavior
 		{
 			if(firstEvent && blockSel != null)
 			{
-				var itemstack = slot.Itemstack;
+				var itemstack = slot.Itemstack!;
 				if((glassworkPipe.GetActiveCraft(itemstack) ?? this) != this)
 				{
 					return;
@@ -142,7 +142,7 @@ namespace GlassMaking.Items.Behavior
 		public override bool OnHeldInteractStep(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, ref EnumHandling handling)
 		{
 			if(blockSel == null) return false;
-			var itemstack = slot.Itemstack;
+			var itemstack = slot.Itemstack!;
 			if((glassworkPipe.GetActiveCraft(itemstack) ?? this) != this)
 			{
 				return false;
@@ -176,7 +176,7 @@ namespace GlassMaking.Items.Behavior
 
 		public override void OnHeldInteractStop(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, ref EnumHandling handling)
 		{
-			var itemstack = slot.Itemstack;
+			var itemstack = slot.Itemstack!;
 			byEntity?.AnimManager.StopAnimation(blowAnimation);
 			if(itemstack.TempAttributes.HasAttribute(ADDTIME_ATTRIB))
 			{
@@ -188,7 +188,7 @@ namespace GlassMaking.Items.Behavior
 
 		public override bool OnHeldInteractCancel(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, EnumItemUseCancelReason cancelReason, ref EnumHandling handling)
 		{
-			var itemstack = slot.Itemstack;
+			var itemstack = slot.Itemstack!;
 			byEntity?.AnimManager.StopAnimation(blowAnimation);
 			if(itemstack.TempAttributes.HasAttribute(ADDTIME_ATTRIB))
 			{
@@ -217,8 +217,8 @@ namespace GlassMaking.Items.Behavior
 
 		public bool MatchesForCrafting(ItemStack inputStack, GridRecipe gridRecipe, CraftingRecipeIngredient ingredient, ref EnumHandling handling)
 		{
-			if(gridRecipe.Output.ResolvedItemstack?.Item is ItemGlassworkPipe &&
-				ingredient.ResolvedItemstack?.Item is ItemGlassworkPipe &&
+			if(gridRecipe.Output!.ResolvedItemStack?.Item is ItemGlassworkPipe &&
+				ingredient.ResolvedItemStack?.Item is ItemGlassworkPipe &&
 				gridRecipe.Attributes?.IsTrue("breakglass") == true)
 			{
 				handling = EnumHandling.Handled;
@@ -229,11 +229,11 @@ namespace GlassMaking.Items.Behavior
 
 		public void OnConsumedByCrafting(ItemSlot[] allInputSlots, ItemSlot stackInSlot, GridRecipe gridRecipe, CraftingRecipeIngredient fromIngredient, IPlayer byPlayer, int quantity, ref EnumHandling handling)
 		{
-			if(gridRecipe.Output.ResolvedItemstack?.Item is ItemGlassworkPipe && gridRecipe.Attributes?.IsTrue("breakglass") == true)
+			if(gridRecipe.Output!.ResolvedItemStack?.Item is ItemGlassworkPipe && gridRecipe.Attributes?.IsTrue("breakglass") == true)
 			{
 				if(api.Side == EnumAppSide.Server)
 				{
-					var itemstack = stackInSlot.Itemstack;
+					var itemstack = stackInSlot.Itemstack!;
 					var glasslayers = itemstack.Attributes.GetTreeAttribute(ATTRIB_KEY);
 					if(glasslayers != null)
 					{
@@ -322,7 +322,7 @@ namespace GlassMaking.Items.Behavior
 
 		private bool? StepMoldInteraction(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, IEntityGlassBlowingMold mold, float secondsUsed)
 		{
-			var itemstack = slot.Itemstack;
+			var itemstack = slot.Itemstack!;
 			var glasslayers = itemstack.Attributes.GetTreeAttribute(ATTRIB_KEY);
 			if(glasslayers != null)
 			{
@@ -416,7 +416,7 @@ namespace GlassMaking.Items.Behavior
 		{
 			if(source.CanInteract(byEntity, blockSel))
 			{
-				var itemstack = slot.Itemstack;
+				var itemstack = slot.Itemstack!;
 				if(itemstack.TempAttributes.HasAttribute(ADDTIME_ATTRIB))
 				{
 					int amount = source.GetGlassAmount();
@@ -478,7 +478,7 @@ namespace GlassMaking.Items.Behavior
 
 		private void AddGlass(EntityAgent byEntity, ItemSlot slot, int amount, AssetLocation code, int multiplier, float temperature, out int consumed)
 		{
-			var glasslayers = slot.Itemstack.Attributes.GetOrAddTreeAttribute(ATTRIB_KEY);
+			var glasslayers = slot.Itemstack!.Attributes.GetOrAddTreeAttribute(ATTRIB_KEY);
 			var codesAttrib = glasslayers["code"] as StringArrayAttribute;
 			var amountsAttrib = glasslayers["amount"] as IntArrayAttribute;
 			if(codesAttrib == null)

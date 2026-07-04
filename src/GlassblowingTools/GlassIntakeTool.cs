@@ -20,24 +20,24 @@ namespace GlassMaking.GlassblowingTools
 		public override void Initialize(JsonObject properties)
 		{
 			base.Initialize(properties);
-			animation = properties["animation"].AsString();
+			animation = properties["animation"].AsString("");
 		}
 
 		public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling, ref EnumHandling handling)
 		{
 			if(firstEvent && blockSel != null && TryGetRecipeStep(slot, byEntity, out var step, true, true))
 			{
-				var source = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position) as IGlassmeltSource;
-				if(source != null && source.CanInteract(byEntity, blockSel))
+				if(byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position) is IGlassmeltSource source &&
+					source.CanInteract(byEntity, blockSel))
 				{
 					int sourceAmount = source.GetGlassAmount();
 					var sourceGlassCode = source.GetGlassCode();
-					if(sourceAmount > 0 && sourceGlassCode!.Equals(new AssetLocation(step.StepAttributes!["code"].AsString())))
+					if(sourceAmount > 0 && sourceGlassCode!.Equals(step.Ingredient.Code))
 					{
 						if(step.BeginStep())
 						{
-							int intake = slot.Itemstack.Attributes.GetInt("glassmaking:toolIntakeAmount", 0);
-							if(sourceAmount > 0 && intake < step.StepAttributes["amount"].AsInt())
+							int intake = slot.Itemstack!.Attributes.GetInt("glassmaking:toolIntakeAmount", 0);
+							if(sourceAmount > 0 && intake < step.Ingredient.Quantity)
 							{
 								if(byEntity.World.Side == EnumAppSide.Server)
 								{
@@ -61,17 +61,17 @@ namespace GlassMaking.GlassblowingTools
 		{
 			if(blockSel != null && TryGetRecipeStep(slot, byEntity, out var step))
 			{
-				if(slot.Itemstack.TempAttributes.GetBool("glassmaking:intakeStarted", false) && step.ContinueStep())
+				if(slot.Itemstack!.TempAttributes.GetBool("glassmaking:intakeStarted", false) && step.ContinueStep())
 				{
 					var source = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position) as IGlassmeltSource;
 					if(source != null && source.CanInteract(byEntity, blockSel))
 					{
 						int sourceAmount = source.GetGlassAmount();
 						var sourceGlassCode = source.GetGlassCode();
-						if(sourceAmount > 0 && sourceGlassCode!.Equals(new AssetLocation(step.StepAttributes!["code"].AsString())))
+						if(sourceAmount > 0 && sourceGlassCode!.Equals(step.Ingredient.Code))
 						{
 							int intake = slot.Itemstack.Attributes.GetInt("glassmaking:toolIntakeAmount", 0);
-							int amount = step.StepAttributes["amount"].AsInt();
+							int amount = step.Ingredient.Quantity;
 							if(intake < amount)
 							{
 								const float speed = 1.5f;
@@ -125,7 +125,7 @@ namespace GlassMaking.GlassblowingTools
 
 		public override void OnHeldInteractStop(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, ref EnumHandling handling)
 		{
-			if(slot.Itemstack.TempAttributes.HasAttribute("glassmaking:intakeStarted"))
+			if(slot.Itemstack!.TempAttributes.HasAttribute("glassmaking:intakeStarted"))
 			{
 				slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:lastAddGlassTime");
 				slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:intakeStarted");
@@ -136,7 +136,7 @@ namespace GlassMaking.GlassblowingTools
 
 		public override bool OnHeldInteractCancel(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, EnumItemUseCancelReason cancelReason, ref EnumHandling handled)
 		{
-			if(slot.Itemstack.TempAttributes.HasAttribute("glassmaking:intakeStarted"))
+			if(slot.Itemstack!.TempAttributes.HasAttribute("glassmaking:intakeStarted"))
 			{
 				slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:lastAddGlassTime");
 				slot.Itemstack.TempAttributes.RemoveAttribute("glassmaking:intakeStarted");
@@ -153,7 +153,7 @@ namespace GlassMaking.GlassblowingTools
 			{
 				if(steps[i].Tool == ToolCode)
 				{
-					amount += steps[i].Attributes!["amount"].AsInt();
+					amount += steps[i].Quantity;
 				}
 			}
 			return amount;

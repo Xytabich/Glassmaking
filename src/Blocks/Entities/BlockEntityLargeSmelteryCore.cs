@@ -233,8 +233,7 @@ namespace GlassMaking.Blocks
 		{
 			if(!isStructureComplete || glassAmount >= MaxGlassAmount) return false;
 
-			GlassBlend? blend = GlassBlend.FromJson(slot.Itemstack);
-			if(blend == null) blend = GlassBlend.FromTreeAttributes(slot.Itemstack.Attributes.GetTreeAttribute(GlassBlend.PROPERTY_NAME));
+			GlassBlend? blend = GlassBlend.FromStackAttribute(slot.Itemstack!);
 			if(blend != null && blend.Amount > 0 && (blend.Amount + glassAmount) <= MaxGlassAmount &&
 				(glassCode?.Equals(blend.Code) ?? mod.GetGlassTypeInfo(blend.Code) != null))
 			{
@@ -257,7 +256,7 @@ namespace GlassMaking.Blocks
 							state = SmelteryState.ContainsMix;
 						}
 					}
-					int consume = Math.Min(Math.Min(multiplier, slot.Itemstack.StackSize), (MaxGlassAmount - glassAmount) / blend.Amount);
+					int consume = Math.Min(Math.Min(multiplier, slot.Itemstack!.StackSize), (MaxGlassAmount - glassAmount) / blend.Amount);
 					var item = slot.TakeOut(consume);
 					if(state == SmelteryState.Empty || state == SmelteryState.ContainsMix)
 					{
@@ -491,7 +490,8 @@ namespace GlassMaking.Blocks
 			{
 				prevLightLevel = newLightLevel;
 
-				int newId = world.GetBlock(smelteryBlock.GetStructureBlock(smelteryBlock.LightOffset)!.CodeWithVariant("level", newLightLevel.ToString())).Id;
+				var structureBlock = smelteryBlock.GetStructureBlock(smelteryBlock.LightOffset);
+				int newId = world.GetBlock(structureBlock!.CodeWithVariant("level", newLightLevel.ToString()))!.Id;
 				world.BlockAccessor.ExchangeBlock(newId, Pos.AddCopy(smelteryBlock.LightOffset));
 			}
 		}
@@ -510,7 +510,7 @@ namespace GlassMaking.Blocks
 						return capi.Render.UploadMesh(bath);
 					});
 					renderer = new BlockRendererGlassSmeltery(capi, Pos, EnumRenderStage.Opaque, bathMesh, capi.Tesselator.GetTextureSource(Block),
-						bathSource["inside"].atlasTextureId, 0.4375f, 0.6875f, 0.375f, 2f, 0.0001f);
+						(bathSource["inside"] ?? capi.BlockTextureAtlas.UnknownTexturePosition).atlasTextureId, 0.4375f, 0.6875f, 0.375f, 2f, 0.0001f);
 				}
 				if(renderer != null)
 				{

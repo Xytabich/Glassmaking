@@ -23,14 +23,14 @@ namespace GlassMaking.ToolDescriptors
 			outComponents.Add(new SlideshowItemstackTextComponent(capi, handbookItemsByType[step.Tool], 40.0, EnumFloat.Inline,
 				cs => openDetailPageFor(GuiHandbookItemStackPage.PageCodeForStack(cs))));
 
-			var consume = step.Attributes?["consume"]?.AsFloat(0);
+			var consume = step.RecipeAttributes!["consume"].AsFloat();
 			if(consume > 0)
 			{
 				var waterItem = capi.World.GetItem(ItemWettable.WaterCode);
 				var waterProps = waterItem?.Attributes?["waterTightContainerProps"].AsObject<WaterTightContainableProps>();
 				if(waterProps != null)
 				{
-					var stackSize = (int)Math.Ceiling(waterProps.ItemsPerLitre * consume.Value);
+					var stackSize = (int)Math.Ceiling(waterProps.ItemsPerLitre * consume);
 					if(stackSize < 1) stackSize = 1;
 
 					outComponents.Add(new ItemstackTextComponent(capi, new ItemStack(waterItem, stackSize), 40.0, 0.0, EnumFloat.Inline,
@@ -45,7 +45,7 @@ namespace GlassMaking.ToolDescriptors
 		{
 			var step = recipe.Steps[stepIndex];
 			dsc.AppendLine("• " + Lang.Get("glassmaking:{0} for {1} seconds", Lang.Get("glassmaking:glassblowingtool-" + step.Tool),
-				step.Attributes!["time"].AsFloat(1).ToString("G", CultureInfo.InvariantCulture)));
+				step.RecipeAttributes!["time"].AsFloat(1).ToString("G", CultureInfo.InvariantCulture)));
 		}
 
 		public override void GetInteractionHelp(IWorldAccessor world, ItemStack item, GlassBlowingRecipe recipe, int stepIndex, List<WorldInteraction> interactions)
@@ -56,6 +56,16 @@ namespace GlassMaking.ToolDescriptors
 				MouseButton = EnumMouseButton.Right,
 				Itemstacks = handbookItemsByType[step.Tool]
 			});
+		}
+
+		public override bool ResolveIngredient(IWorldAccessor world, GlassBlowingRecipe recipe, int stepIndex, string sourceForErrorLogging)
+		{
+			if(!(recipe.Steps[stepIndex].RecipeAttributes?.KeyExists("consume") ?? false))
+			{
+				world.Logger.Log(EnumLogType.Warning, "The liquid consumption amount should be spicified");
+				return false;
+			}
+			return true;
 		}
 	}
 }

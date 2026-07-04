@@ -29,25 +29,24 @@ namespace GlassMaking.GlassblowingTools
 		public override void Initialize(JsonObject properties)
 		{
 			base.Initialize(properties);
-			ToolCode = properties["tool"].AsString();
+			ToolCode = properties["tool"].AsString("");
 		}
 
 		protected bool TryGetRecipeStep(ItemSlot slot, EntityAgent byEntity, [NotNullWhen(true)] out ToolRecipeStep? stepInfo, bool workingTemperatureRequired = true, bool showWarning = false)
 		{
 			ItemSlot? pipeSlot = null;
-			if(slot.Itemstack.Collectible is ItemGlassworkPipe)
+			if(slot.Itemstack?.Collectible is ItemGlassworkPipe)
 			{
 				pipeSlot = slot;
 			}
 			else
 			{
-				var leftStack = byEntity.LeftHandItemSlot?.Itemstack;
-				if(leftStack != null && leftStack.Collectible is ItemGlassworkPipe)
+				if(byEntity.LeftHandItemSlot?.Itemstack?.Collectible is ItemGlassworkPipe)
 				{
 					pipeSlot = byEntity.LeftHandItemSlot;
 				}
 			}
-			if(pipeSlot?.Itemstack.Collectible is ItemGlassworkPipe glassworkPipe)
+			if(pipeSlot?.Itemstack!.Collectible is ItemGlassworkPipe glassworkPipe)
 			{
 				if(glassworkPipe.GetActiveCraft(pipeSlot.Itemstack) is GlasspipeRecipeBehavior recipeBehavior)
 				{
@@ -61,7 +60,7 @@ namespace GlassMaking.GlassblowingTools
 								var step = recipe.GetStepIndex(recipeAttribute);
 								if(step >= 0 && recipe.Steps[step].Tool == ToolCode)
 								{
-									stepInfo = new ToolRecipeStep(step, pipeSlot, recipe, recipe.Steps[step].Attributes);
+									stepInfo = new ToolRecipeStep(step, pipeSlot, recipe, recipe.Steps[step]);
 									return true;
 								}
 							}
@@ -82,16 +81,16 @@ namespace GlassMaking.GlassblowingTools
 			public int Index;
 			public ItemSlot PipeSlot;
 			public GlassBlowingRecipe Recipe;
-			public JsonObject? StepAttributes;
+			public CraftingRecipeIngredient Ingredient;
 
 			private bool isComplete = false;
 
-			public ToolRecipeStep(int index, ItemSlot pipeSlot, GlassBlowingRecipe recipe, JsonObject? stepAttributes)
+			public ToolRecipeStep(int index, ItemSlot pipeSlot, GlassBlowingRecipe recipe, CraftingRecipeIngredient stepIngredient)
 			{
 				Index = index;
 				PipeSlot = pipeSlot;
 				Recipe = recipe;
-				StepAttributes = stepAttributes;
+				Ingredient = stepIngredient;
 			}
 
 			public bool BeginStep()
