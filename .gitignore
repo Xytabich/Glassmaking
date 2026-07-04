@@ -3,3 +3,6 @@
 *.csproj.user
 /bin/
 /obj/
+/.vs
+/Properties
+/Releases
