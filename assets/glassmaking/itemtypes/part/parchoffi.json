@@ -1,5 +1,11 @@
 {
 	"code": "parchoffipart",
+	"variantgroups": [
+		{ "code": "material", "states": [ "tinbronze", "bismuthbronze", "blackbronze", "iron", "steel" ] }
+	],
+	"textures": {
+		"metal": { "base": "game:block/metal/ingot/{material}" }
+	},
 	"behaviors": [
 		{
 			"name": "GroundStorable",

@@ -1,5 +1,8 @@
 {
 	"code": "tweezers",
+	"variantgroups": [
+		{ "code": "material", "states": [ "tinbronze", "bismuthbronze", "blackbronze", "iron", "steel" ] }
+	],
 	"damagedby": [ "attacking" ],
 	"behaviors": [
 		{
@@ -35,9 +38,18 @@
 		}
 	},
 	"shape": { "base": "item/tool/tweezers" },
+	"textures": {
+		"metal": { "base": "game:block/metal/ingot/{material}" }
+	},
 	"heldTpHitAnimation": "shears",
 	"attackpower": 1,
-	"durability": 5000,
+	"durabilityByType": {
+		"*-steel": 5000,
+		"*-iron": 3000,
+		"*-tinbronze": 1500,
+		"*-bismuthbronze": 1500,
+		"*-blackbronze": 1500
+	},
 	"creativeinventory": {
 		"general": [ "*" ],
 		"items": [ "*" ],

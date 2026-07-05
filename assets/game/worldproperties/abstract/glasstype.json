@@ -4,7 +4,7 @@
 	"variants": [
 		{
 			"code": "plain",
-			"meltingPoint": 1300
+			"meltingPoint": 1150
 		},
 		{
 			"code": "quartz",
@@ -12,39 +12,39 @@
 		},
 		{
 			"code": "smoky",
-			"meltingPoint": 1600
+			"meltingPoint": 1150
 		},
 		{
 			"code": "red",
-			"meltingPoint": 1300
+			"meltingPoint": 1150
 		},
 		{
 			"code": "green",
-			"meltingPoint": 1400
+			"meltingPoint": 1150
 		},
 		{
 			"code": "blue",
-			"meltingPoint": 1300
+			"meltingPoint": 1150
 		},
 		{
 			"code": "yellow",
-			"meltingPoint": 1300
+			"meltingPoint": 1150
 		},
 		{
 			"code": "brown",
-			"meltingPoint": 1300
+			"meltingPoint": 1150
 		},
 		{
 			"code": "pink",
-			"meltingPoint": 1600
+			"meltingPoint": 1150
 		},
 		{
 			"code": "violet",
-			"meltingPoint": 1400
+			"meltingPoint": 1150
 		},
 		{
 			"code": "vintage",
-			"meltingPoint": 1300
+			"meltingPoint": 1150
 		}
 	]
 }

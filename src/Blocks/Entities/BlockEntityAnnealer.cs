@@ -1,4 +1,4 @@
-﻿using GlassMaking.Common;
+using GlassMaking.Common;
 using System;
 using System.Text;
 using Vintagestory.API.Client;
@@ -26,10 +26,21 @@ namespace GlassMaking.Blocks
 		private ITimeBasedHeatSourceControl? heatSource = null;
 		private readonly ItemProcessInfo?[] processes;
 
+		// gridSize = columns per row; gridRows = number of rows.
+		// Both are 0 when the annealer is empty.
 		private int gridSize = 0;
+		private int gridRows = 0;
 		private float gridCellSize;
 
 		private bool preventMeshUpdate = false;
+		private volatile AnnealerGlowRenderer? glowRenderer = null;
+
+		/// <summary>Number of inventory slots that the glow renderer should cover.</summary>
+		public int GlowItemCount => ItemCapacity;
+		/// <summary>Per-slot transformation matrices (pure translation). Null until first tessellation.</summary>
+		public float[][]? GlowTfMatrices => tfMatrices;
+		/// <summary>Returns the cached mesh for a slot, or null if not yet tessellated.</summary>
+		public MeshData? GetSlotMesh(ItemSlot slot) => getMesh(slot);
 
 		public BlockEntityAnnealer()
 		{
@@ -98,6 +109,7 @@ namespace GlassMaking.Blocks
 					if(inventory.Empty)
 					{
 						gridSize = 0;
+						gridRows = 0;
 						lastRemoved = null;
 					}
 					if(Api.Side == EnumAppSide.Client) updateMeshes();
@@ -117,7 +129,7 @@ namespace GlassMaking.Blocks
 						float size = slot.Itemstack.Collectible.Attributes?["annealerSize"].AsFloat(1f) ?? 1f;
 						if(size > gridCellSize) return false;
 
-						int len = gridSize * gridSize;
+						int len = gridSize * gridRows;
 						for(int i = 0; i < len; i++)
 						{
 							if(inventory[i].Empty)
@@ -136,21 +148,7 @@ namespace GlassMaking.Blocks
 					{
 						float size = slot.Itemstack.Collectible.Attributes?["annealerSize"].AsFloat(1f) ?? 1f;
 						if(size > 1) return false;
-						if(size <= 1f / 3f)
-						{
-							gridCellSize = 1f / 3f;
-							gridSize = 3;
-						}
-						else if(size <= 0.5f)
-						{
-							gridCellSize = 0.5f;
-							gridSize = 2;
-						}
-						else
-						{
-							gridCellSize = 1f;
-							gridSize = 1;
-						}
+						SetGridForSize(size);
 						inventory[0].Itemstack = slot.TakeOut(1);
 						lastRemoved = null;
 						processes[0] = new ItemProcessInfo() { IsHeated = false, Time = 0 };
@@ -164,10 +162,48 @@ namespace GlassMaking.Blocks
 			return false;
 		}
 
+		/// <summary>Sets gridSize, gridRows, and gridCellSize for the given item size value.</summary>
+		private void SetGridForSize(float size)
+		{
+			if(size <= 0.16f)
+			{
+				// 6-column × 1-row layout — up to 6 items
+				gridCellSize = 1f / 6f;
+				gridSize = 6;
+				gridRows = 1;
+			}
+			else if(size <= 0.25f)
+			{
+				// 4-column × 2-row layout — up to 8 items
+				gridCellSize = 0.25f;
+				gridSize = 4;
+				gridRows = 2;
+			}
+			else if(size <= 1f / 3f)
+			{
+				gridCellSize = 1f / 3f;
+				gridSize = 3;
+				gridRows = 3;
+			}
+			else if(size <= 0.5f)
+			{
+				gridCellSize = 0.5f;
+				gridSize = 2;
+				gridRows = 2;
+			}
+			else
+			{
+				gridCellSize = 1f;
+				gridSize = 1;
+				gridRows = 1;
+			}
+		}
+
 		public override void ToTreeAttributes(ITreeAttribute tree)
 		{
 			base.ToTreeAttributes(tree);
 			inventory.ToTreeAttributes(tree);
+			tree.SetInt("gridRows", gridRows);
 			for(int i = 0; i < processes.Length; i++)
 			{
 				var process = processes[i];
@@ -185,6 +221,7 @@ namespace GlassMaking.Blocks
 			preventMeshUpdate = true;
 			base.FromTreeAttributes(tree, worldForResolving);
 			preventMeshUpdate = false;
+			gridRows = tree.GetInt("gridRows", 0);
 			for(int i = 0; i < processes.Length; i++)
 			{
 				var attrib = tree.GetTreeAttribute("process" + i);
@@ -222,10 +259,13 @@ namespace GlassMaking.Blocks
 				tmpMat.Identity();
 				if(gridSize != 0)
 				{
-					int x = i % gridSize;
-					int z = i / gridSize;
+					int col = i % gridSize;
+					int row = i / gridSize;
 
-					tmpMat.Translate(transform.Translation.X + (x + 0.5f) / gridSize * transform.ScaleXYZ.X, transform.Translation.Y, transform.Translation.Z + (z + 0.5f) / gridSize * transform.ScaleXYZ.Z);
+					tmpMat.Translate(
+						transform.Translation.X + (col + 0.5f) / gridSize * transform.ScaleXYZ.X,
+						transform.Translation.Y,
+						transform.Translation.Z + (row + 0.5f) / gridRows * transform.ScaleXYZ.Z);
 				}
 				tfMatrices[i] = (float[])tmpMat.Values.Clone();
 			}
@@ -236,6 +276,57 @@ namespace GlassMaking.Blocks
 		{
 			if(preventMeshUpdate) return;
 			base.updateMeshes();
+
+			if(Api?.Side != EnumAppSide.Client) return;
+
+			bool anyHot = false;
+			for(int i = 0; i < ItemCapacity; i++)
+			{
+				var slot = inventory[i];
+				if(!slot.Empty)
+				{
+					float temp = (slot.Itemstack.Attributes["temperature"] as ITreeAttribute)
+						?.GetFloat("temperature", 20f) ?? 20f;
+					if(temp >= 500f) { anyHot = true; break; }
+				}
+			}
+
+			if(anyHot)
+			{
+				if(glowRenderer == null)
+					glowRenderer = new AnnealerGlowRenderer((ICoreClientAPI)Api, this);
+				else
+					glowRenderer.UpdateMeshRefs();
+			}
+			else
+			{
+				glowRenderer?.Dispose();
+				glowRenderer = null;
+			}
+		}
+
+		public override bool OnTesselation(ITerrainMeshPool mesher, ITesselatorAPI tessThreadTesselator)
+		{
+			// When the glow renderer is active it draws all items per-frame with incandescence
+			// uniforms, so we skip adding them to the chunk mesh here. The block model itself
+			// still tessellates normally (return false, not true).
+			if(glowRenderer != null) return false;
+
+			return base.OnTesselation(mesher, tessThreadTesselator);
+		}
+
+		public override void OnBlockRemoved()
+		{
+			base.OnBlockRemoved();
+			glowRenderer?.Dispose();
+			glowRenderer = null;
+		}
+
+		public override void OnBlockUnloaded()
+		{
+			base.OnBlockUnloaded();
+			glowRenderer?.Dispose();
+			glowRenderer = null;
 		}
 
 		void ITimeBasedHeatReceiver.SetHeatSource(ITimeBasedHeatSourceControl? heatSource)
@@ -245,7 +336,12 @@ namespace GlassMaking.Blocks
 
 		private void OnCommonTick(float dt)
 		{
+			// Runs before the heatSource guard; raw glass can shatter even with no heat source attached.
+			if(Api.Side == EnumAppSide.Server) ShatterCooledItems();
+
 			if(heatSource == null) return;
+
+			bool anyHot = false;
 
 			if(gridSize != 0)
 			{
@@ -265,9 +361,15 @@ namespace GlassMaking.Blocks
 							{
 								if(Api.Side == EnumAppSide.Server)
 								{
+									// Only start annealing when the item is within the valid temperature range.
+									// A too-hot item must cool down to [Min, Max] first.
 									double? time;
-									if(temperature >= process.AnnealTemperature.Max) time = 0;
-									else time = graph.ReachValue(temperature, process.AnnealTemperature.Max, 1000f, 90f);
+									if(temperature >= process.AnnealTemperature.Min && temperature <= process.AnnealTemperature.Max)
+										time = 0;
+									else if(temperature < process.AnnealTemperature.Min)
+										time = graph.ReachValue(temperature, process.AnnealTemperature.Min, 1000f, 90f);
+									else
+										time = null; // too hot — wait for it to cool
 									if(time.HasValue)
 									{
 										process.IsHeated = true;
@@ -278,7 +380,11 @@ namespace GlassMaking.Blocks
 							}
 							if(process.IsHeated)
 							{
-								process.Time += Math.Max(0, Math.Min((temperature - process.AnnealTemperature.Min) / 90f, totalHours - heatSource.GetLastTickTime()) - timeOffset);
+								// Only accumulate annealing time while temperature stays within [Min, Max].
+								if(temperature >= process.AnnealTemperature.Min && temperature <= process.AnnealTemperature.Max)
+								{
+									process.Time += Math.Max(0, Math.Min((temperature - process.AnnealTemperature.Min) / 90f, totalHours - heatSource.GetLastTickTime()) - timeOffset);
+								}
 								if(process.Time >= process.AnnealTime && Api.Side == EnumAppSide.Server)
 								{
 									processes[i] = null;
@@ -287,8 +393,10 @@ namespace GlassMaking.Blocks
 								}
 							}
 						}
-						temperature = Math.Max((float)graph.CalculateFinalValue(temperature, 1000f, 90f), 20f);
+						temperature = Math.Max((float)graph.CalculateFinalValue(temperature, 1000f, 270f), 20f);
 						slot.Itemstack.Collectible.SetTemperature(Api.World, slot.Itemstack, temperature);
+
+						if(temperature > 200f) anyHot = true;
 					}
 				}
 			}
@@ -297,8 +405,46 @@ namespace GlassMaking.Blocks
 			{
 				if(heatSource.IsBurning()) EmitParticles();
 			}
+			else if(anyHot)
+			{
+				// Sync temperatures to clients every tick so they can show the correct glow.
+				MarkDirty(true);
+			}
 
 			heatSource.OnTick(dt);
+		}
+
+		/// <summary>
+		/// Breaks any raw glass that has cooled below the shatter threshold.
+		/// Shards are dropped as item entities because a slot cannot hold the original item and new shards simultaneously.
+		/// </summary>
+		private void ShatterCooledItems()
+		{
+			bool changed = false;
+			for(int i = 0; i < ItemCapacity; i++)
+			{
+				var slot = inventory[i];
+				if(slot.Empty) continue;
+				var stack = slot.Itemstack;
+				if(!GlassShatter.ShouldShatter(Api.World, stack)) continue;
+
+				slot.Itemstack = null;
+				processes[i] = null;
+				changed = true;
+
+				var spawnPos = new Vec3d(Pos.X + 0.5, Pos.Y + 0.5, Pos.Z + 0.5);
+				foreach(var shardStack in GlassShatter.CreateShardStacks(Api.World, stack))
+				{
+					Api.World.SpawnItemEntity(shardStack, spawnPos);
+				}
+				Api.World.PlaySoundAt(new AssetLocation("game", "sounds/block/glass"), Pos.X + 0.5, Pos.Y + 0.5, Pos.Z + 0.5, null, true, 16f);
+			}
+
+			if(changed)
+			{
+				UpdateGrid();
+				MarkDirty(true);
+			}
 		}
 
 		private void ResolveProcessInfo(int index)
@@ -337,24 +483,15 @@ namespace GlassMaking.Blocks
 			}
 			if(itemsCount > 0 && gridSize == 0)
 			{
-				maxSize = Math.Min(maxSize, itemsCount > 4 ? (1 / 3f) : (itemsCount > 1 ? 0.5f : 1f));
-				if(maxSize <= 1f / 3f)
-				{
-					gridCellSize = 1f / 3f;
-					gridSize = 3;
-				}
-				else if(maxSize <= 0.5f)
-				{
-					gridCellSize = 0.5f;
-					gridSize = 2;
-				}
-				else
-				{
-					gridCellSize = 1f;
-					gridSize = 1;
-				}
+				int maxSlots = itemsCount > 4 ? 8 : (itemsCount > 1 ? 4 : 1);
+				maxSize = Math.Min(maxSize, maxSlots >= 8 ? 0.25f : (maxSlots >= 4 ? 0.5f : 1f));
+				SetGridForSize(maxSize);
 			}
-			if(itemsCount == 0) gridSize = 0;
+			if(itemsCount == 0)
+			{
+				gridSize = 0;
+				gridRows = 0;
+			}
 		}
 
 		private void EmitParticles()

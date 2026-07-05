@@ -122,6 +122,7 @@ namespace GlassMaking
 			}
 			if(!Output.Resolve(world, sourceForErrorLogging))
 			{
+				world.Logger.Error("Glassblowing recipe '{0}': failed to resolve output {1} '{2}'. Check that the block/item code is correct and the mod providing it is loaded. Recipe will be skipped.", Code, Output.Type, Output.Code);
 				return false;
 			}
 			return true;
