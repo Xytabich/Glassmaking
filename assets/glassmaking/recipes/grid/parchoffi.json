@@ -4,7 +4,8 @@
     "ingredientPattern": "SWK",
     "ingredients": {
         "S": {
-            "code": "parchoffipart",
+            "code": "parchoffipart-*",
+            "name": "material",
             "type": "item"
         },
         "W": {
@@ -19,7 +20,7 @@
     },
     "shapeless": true,
     "output": {
-        "code": "parchoffi",
+        "code": "parchoffi-{material}",
         "type": "item"
     }
 }

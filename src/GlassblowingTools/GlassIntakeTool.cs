@@ -2,7 +2,9 @@
 using GlassMaking.Items;
 using GlassMaking.Items.Behavior;
 using System;
+using Vintagestory.API.Client;
 using Vintagestory.API.Common;
+using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 
 namespace GlassMaking.GlassblowingTools
@@ -30,6 +32,10 @@ namespace GlassMaking.GlassblowingTools
 				if(byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position) is IGlassmeltSource source &&
 					source.CanInteract(byEntity, blockSel))
 				{
+					// Claim the interaction before inner checks so mold/heatup behaviors cannot run when a blowing recipe step is active.
+					handHandling = EnumHandHandling.PreventDefault;
+					handling = EnumHandling.PreventSubsequent;
+
 					int sourceAmount = source.GetGlassAmount();
 					var sourceGlassCode = source.GetGlassCode();
 					if(sourceAmount > 0 && sourceGlassCode!.Equals(step.Ingredient.Code))
@@ -46,13 +52,24 @@ namespace GlassMaking.GlassblowingTools
 								slot.Itemstack.TempAttributes.SetBool("glassmaking:intakeStarted", true);
 
 								byEntity.AnimManager.StartAnimation(animation);
-
-								handHandling = EnumHandHandling.PreventDefault;
-								handling = EnumHandling.PreventSubsequent;
 							}
 						}
 					}
 				}
+			}
+			else if(firstEvent && blockSel != null
+				&& slot.Itemstack?.Collectible is ItemGlassworkPipe pipe
+				&& pipe.GetActiveCraft(slot.Itemstack) == null
+				&& byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position) is IGlassmeltSource glassSrc
+				&& glassSrc.CanInteract(byEntity, blockSel)
+				&& glassSrc.GetGlassAmount() > 0)
+			{
+				if(api.Side == EnumAppSide.Client)
+				{
+					((ICoreClientAPI)api).TriggerIngameError(this, "norecipe", Lang.Get("glassmaking:Select a glassblowing recipe first (press F)"));
+				}
+				handHandling = EnumHandHandling.PreventDefault;
+				handling = EnumHandling.PreventSubsequent;
 			}
 			base.OnHeldInteractStart(slot, byEntity, blockSel, entitySel, firstEvent, ref handHandling, ref handling);
 		}
@@ -119,6 +136,15 @@ namespace GlassMaking.GlassblowingTools
 				{
 					return false;
 				}
+			}
+			else if(blockSel != null
+				&& slot.Itemstack?.Collectible is ItemGlassworkPipe pipe
+				&& pipe.GetActiveCraft(slot.Itemstack) == null
+				&& byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position) is IGlassmeltSource)
+			{
+				// Prevents stale GlasspipeMoldBehavior ADDTIME_ATTRIB from causing glass intake with no recipe active.
+				handling = EnumHandling.PreventSubsequent;
+				return false;
 			}
 			return base.OnHeldInteractStep(secondsUsed, slot, byEntity, blockSel, entitySel, ref handling);
 		}

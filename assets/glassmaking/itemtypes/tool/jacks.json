@@ -1,5 +1,8 @@
 {
 	"code": "jacks",
+	"variantgroups": [
+		{ "code": "material", "states": [ "tinbronze", "bismuthbronze", "blackbronze", "iron", "steel" ] }
+	],
 	"damagedby": [ "attacking" ],
 	"behaviors": [
 		{
@@ -42,9 +45,18 @@
 		}
 	},
 	"shape": { "base": "item/tool/jacks" },
+	"textures": {
+		"metal": { "base": "game:block/metal/ingot/{material}" }
+	},
 	"heldTpHitAnimation": "shears",
 	"attackpower": 2.5,
-	"durability": 4000,
+	"durabilityByType": {
+		"*-steel": 4000,
+		"*-iron": 2400,
+		"*-tinbronze": 1200,
+		"*-bismuthbronze": 1200,
+		"*-blackbronze": 1200
+	},
 	"creativeinventory": {
 		"general": [ "*" ],
 		"items": [ "*" ],

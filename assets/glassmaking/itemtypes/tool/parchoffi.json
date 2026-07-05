@@ -1,5 +1,8 @@
 {
 	"code": "parchoffi",
+	"variantgroups": [
+		{ "code": "material", "states": [ "tinbronze", "bismuthbronze", "blackbronze", "iron", "steel" ] }
+	],
 	"class": "glassmaking:wettable",
 	"behaviors": [
 		{
@@ -37,7 +40,16 @@
 		"evaporation": 0.01
 	},
 	"shape": { "base": "item/tool/parchoffi" },
-	"durability": 300,
+	"textures": {
+		"metal": { "base": "game:block/metal/ingot/{material}" }
+	},
+	"durabilityByType": {
+		"*-steel": 300,
+		"*-iron": 180,
+		"*-tinbronze": 90,
+		"*-bismuthbronze": 90,
+		"*-blackbronze": 90
+	},
 	"creativeinventory": {
 		"general": [ "*" ],
 		"items": [ "*" ],

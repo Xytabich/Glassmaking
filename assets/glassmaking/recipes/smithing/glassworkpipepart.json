@@ -4,7 +4,7 @@
 		"name": "metal",
 		"type": "item",
 		"code": "game:ingot-*",
-		"allowedVariants": [ "steel" ]
+		"allowedVariants": [ "iron", "steel" ]
 	},
 	"pattern": [
 		[
