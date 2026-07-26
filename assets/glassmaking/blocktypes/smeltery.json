@@ -1,5 +1,6 @@
 {
 	"code": "smeltery",
+	"enabled": false,
 	"class": "glassmaking:smeltery",
 	"entityclass": "glassmaking:smeltery",
 	"blockmaterial": "Ceramic",

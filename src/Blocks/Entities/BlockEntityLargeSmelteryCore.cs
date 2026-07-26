@@ -17,7 +17,7 @@ namespace GlassMaking.Blocks
 	{
 		private const int PROGRESS_PACKET_ID = 2005;
 
-		private static readonly ValueGraph defaultGraph = new ValueGraph(new ValueGraph.Point(0, 20));
+		private static readonly ValueGraph defaultGraph = new ValueGraph(new ValueGraph.Point(0, GlobalConstants.CollectibleDefaultTemperature));
 		private static SimpleParticleProperties smokeParticles;
 
 		public float FuelRateModifier => isStructureComplete ? 0.9f : 1;

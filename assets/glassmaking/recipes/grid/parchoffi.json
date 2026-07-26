@@ -1,25 +1,27 @@
 {
-    "width": 3,
-    "height": 1,
-    "ingredientPattern": "SWK",
-    "ingredients": {
-        "S": {
-            "code": "parchoffipart",
-            "type": "item"
-        },
-        "W": {
-            "code": "game:plank-*",
-            "type": "item"
-        },
-        "K": {
-            "type": "item",
-            "code": "game:knife-*",
-            "isTool": true
-        }
-    },
-    "shapeless": true,
-    "output": {
-        "code": "parchoffi",
-        "type": "item"
-    }
+	"code": "parchoffi-{metal}",
+	"width": 3,
+	"height": 1,
+	"ingredientPattern": "SWK",
+	"ingredients": {
+		"S": {
+			"name": "metal",
+			"code": "parchoffipart-*",
+			"type": "item"
+		},
+		"W": {
+			"code": "game:plank-*",
+			"type": "item"
+		},
+		"K": {
+			"type": "item",
+			"code": "game:knife-*",
+			"isTool": true
+		}
+	},
+	"shapeless": true,
+	"output": {
+		"code": "parchoffi-{metal}",
+		"type": "item"
+	}
 }

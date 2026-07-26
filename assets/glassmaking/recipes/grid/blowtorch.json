@@ -6,7 +6,7 @@
 		"B": {
 			"type": "item",
 			"code": "game:metalbit-*",
-			"allowedVariants": [ "steel" ]
+			"allowedVariants": [ "iron", "meteoriciron", "steel" ]
 		},
 		"P": {
 			"type": "item",

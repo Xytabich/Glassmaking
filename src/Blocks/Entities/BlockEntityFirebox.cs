@@ -31,7 +31,7 @@ namespace GlassMaking.Blocks
 		private ILoadedSound? ambientSound = null;
 
 		private bool burning = false;
-		private float temperature = 20;
+		private float temperature = GlobalConstants.CollectibleDefaultTemperature;
 		/// <summary>
 		/// How much burning time is left
 		/// </summary>
@@ -107,7 +107,7 @@ namespace GlassMaking.Blocks
 			base.FromTreeAttributes(tree, worldAccessForResolve);
 			inventory.FromTreeAttributes(tree);
 			fuelLevel = tree.GetFloat("fuelLevel");
-			temperature = tree.GetFloat("temperature", 20);
+			temperature = tree.GetFloat("temperature", GlobalConstants.CollectibleDefaultTemperature);
 			burning = tree.GetBool("burning");
 			if(initTickTime)
 			{
@@ -294,7 +294,7 @@ namespace GlassMaking.Blocks
 			}
 			if(hours > 0)
 			{
-				coolingTime = Math.Min((temp - 20) / fireboxBlock.tempDecreasePerHour, hours);
+				coolingTime = Math.Min((temp - GlobalConstants.CollectibleDefaultTemperature) / fireboxBlock.tempDecreasePerHour, hours);
 				temp -= (float)(coolingTime * fireboxBlock.tempDecreasePerHour);
 				if(coolingTime > 0)
 				{
@@ -364,7 +364,7 @@ namespace GlassMaking.Blocks
 			}
 			if(hours > 0)
 			{
-				temp -= (float)(Math.Min((temp - 20) / fireboxBlock.tempDecreasePerHour, hours) * fireboxBlock.tempDecreasePerHour);
+				temp -= (float)(Math.Min((temp - GlobalConstants.CollectibleDefaultTemperature) / fireboxBlock.tempDecreasePerHour, hours) * fireboxBlock.tempDecreasePerHour);
 			}
 			return temp * temperatureModifier;
 		}
@@ -448,10 +448,10 @@ namespace GlassMaking.Blocks
 					}
 				}
 			}
-			if(!burning && temperature > 20)
+			if(!burning && temperature > GlobalConstants.CollectibleDefaultTemperature)
 			{
 				double hours = totalHours - lastTickTime;
-				temperature = Math.Max(20, temperature - (float)(hours * fireboxBlock.tempDecreasePerHour));
+				temperature = Math.Max(GlobalConstants.CollectibleDefaultTemperature, temperature - (float)(hours * fireboxBlock.tempDecreasePerHour));
 			}
 			lastTickTime = totalHours;
 

@@ -62,10 +62,9 @@ namespace GlassMaking.Handbook
 
 						foreach(var item in items)
 						{
-							var element = new SlideshowItemstackTextComponent(capi, new ItemStack[] { item }, 40.0,
+							var element = new ItemstackTextComponent(capi, item, 40.0, 10.0,
 								EnumFloat.Inline, cs => openDetailPageFor(GuiHandbookItemStackPage.PageCodeForStack(cs)));
-							element.ShowStackSize = item.StackSize > 1;
-							element.PaddingRight = GuiElement.scaled(10.0);
+							element.ShowStacksize = item.StackSize > 1;
 							outComponents.Add(element);
 						}
 

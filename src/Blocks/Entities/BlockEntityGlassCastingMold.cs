@@ -342,7 +342,7 @@ namespace GlassMaking.Blocks
 					temperature = 20f;
 					return;
 				}
-				temperature = attr.GetFloat("temperature", 20);
+				temperature = attr.GetFloat("temperature", GlobalConstants.CollectibleDefaultTemperature);
 				lastUpdate = attr.GetDouble("temperatureLastUpdate");
 			}
 

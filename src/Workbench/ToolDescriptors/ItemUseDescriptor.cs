@@ -11,11 +11,16 @@ namespace GlassMaking.Workbench.ToolDescriptors
 		public void GetStepInfoForHandbook(ICoreClientAPI capi, ItemStack item, WorkbenchRecipe recipe, int stepIndex,
 			CraftingRecipeIngredient? ingredient, ActionConsumable<string> openDetailPageFor, List<RichTextComponentBase> outComponents)
 		{
-			var element = new SlideshowItemstackTextComponent(capi, [ingredient!.ResolvedItemStack], 40.0, EnumFloat.Inline,
+			if(outComponents.Count > 0 && outComponents[^1] is not ClearFloatTextComponent)
+			{
+				outComponents.Add(new ClearFloatTextComponent(capi));
+			}
+			var element = new ItemstackTextComponent(capi, ingredient!.ResolvedItemStack, 40.0, 0.0, EnumFloat.Inline,
 				cs => openDetailPageFor(GuiHandbookItemStackPage.PageCodeForStack(cs)));
-			element.ShowStackSize = ingredient.ResolvedItemStack!.StackSize > 1;
+			element.ShowStacksize = ingredient.ResolvedItemStack!.StackSize > 1;
 			outComponents.Add(element);
 			outComponents.Add(new RichTextComponent(capi, Lang.Get("glassmaking:Hold in your hands"), CairoFont.WhiteSmallText()));
+			outComponents.Add(new ClearFloatTextComponent(capi));
 		}
 
 		public bool ResolveIngredient(IWorldAccessor world, WorkbenchRecipe recipe, CraftingRecipeIngredient? ingredient, string sourceForErrorLogging)

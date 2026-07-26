@@ -1,4 +1,5 @@
 ﻿using Vintagestory.API.Common;
+using Vintagestory.API.Config;
 using Vintagestory.API.MathTools;
 
 namespace GlassMaking.Blocks
@@ -69,7 +70,7 @@ namespace GlassMaking.Blocks
 
 		float IGlassmeltSource.GetTemperature()
 		{
-			return smelteryCore?.GetTemperature() ?? 20;
+			return smelteryCore?.GetTemperature() ?? GlobalConstants.CollectibleDefaultTemperature;
 		}
 
 		int IGlassmeltSource.GetGlassAmount()

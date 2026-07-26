@@ -1,0 +1,9 @@
+[
+	{
+		"side": "Server",
+		"file": "game:entities/item",
+		"op": "add",
+		"path": "/server/behaviors/-",
+		"value": { "code": "glassmaking:itemtick" }
+	}
+]

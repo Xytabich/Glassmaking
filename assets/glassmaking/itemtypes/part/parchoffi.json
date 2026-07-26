@@ -16,6 +16,9 @@
 			}
 		}
 	],
+	"variantgroups": [
+		{ "code": "metal", "states": [ "tinbronze", "bismuthbronze", "blackbronze", "iron", "meteoriciron", "steel" ] }
+	],
 	"attributes": {
 		"groundStorageTransform": {
 			"translation": {
@@ -37,6 +40,9 @@
 	},
 	"maxstacksize": 4,
 	"shape": { "base": "item/part/parchoffi" },
+	"textures": {
+		"metal": { "base": "game:block/metal/ingot/{metal}" }
+	},
 	"creativeinventory": {
 		"general": [ "*" ],
 		"items": [ "*" ],

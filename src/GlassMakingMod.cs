@@ -1,6 +1,7 @@
 ﻿using GlassMaking.Blocks;
 using GlassMaking.Blocks.Multiblock;
 using GlassMaking.Common;
+using GlassMaking.Entities.Behavior;
 using GlassMaking.GlassblowingTools;
 using GlassMaking.Handbook;
 using GlassMaking.ItemRender;
@@ -74,6 +75,8 @@ namespace GlassMaking
 
 			recipeLoader = api.ModLoader.GetModSystem<GlassMakingRecipeLoader>();
 
+			api.RegisterEntityBehaviorClass("glassmaking:itemtick", typeof(ItemTickBehavior));
+
 			api.RegisterItemClass("glassmaking:glassworkpipe", typeof(ItemGlassworkPipe));
 			api.RegisterItemClass("glassmaking:glassblend", typeof(ItemGlassBlend));
 			api.RegisterItemClass("glassmaking:wettable", typeof(ItemWettable));
@@ -115,6 +118,7 @@ namespace GlassMaking
 			api.RegisterCollectibleBehaviorClass("glassmaking:gp-mold", typeof(GlasspipeMoldBehavior));
 			api.RegisterCollectibleBehaviorClass("glassmaking:gp-recipe", typeof(GlasspipeRecipeBehavior));
 
+			api.RegisterCollectibleBehaviorClass("glassmaking:shatterable", typeof(GlassShatteringBehavior));
 			api.RegisterCollectibleBehaviorClass("glassmaking:glassblend", typeof(ItemBehaviorGlassBlend));
 			api.RegisterCollectibleBehaviorClass("glassmaking:workbenchtool", typeof(ItemBehaviorWorkbenchTool));
 

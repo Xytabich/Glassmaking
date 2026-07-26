@@ -35,10 +35,9 @@ namespace GlassMaking.Handbook
 					{
 						if(recipe.Output.ResolvedItemStack != null)
 						{
-							var element = new SlideshowItemstackTextComponent(capi, new ItemStack[] { recipe.Output.ResolvedItemStack }, 40.0,
+							var element = new ItemstackTextComponent(capi, recipe.Output.ResolvedItemStack, 40.0, 10.0,
 								EnumFloat.Inline, cs => openDetailPageFor(GuiHandbookItemStackPage.PageCodeForStack(cs)));
-							element.ShowStackSize = recipe.Output.ResolvedItemStack.StackSize > 1;
-							element.PaddingRight = GuiElement.scaled(10.0);
+							element.ShowStacksize = recipe.Output.ResolvedItemStack.StackSize > 1;
 							outComponents.Add(element);
 
 							outComponents.Add(new ClearFloatTextComponent(capi));

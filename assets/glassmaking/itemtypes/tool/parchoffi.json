@@ -10,6 +10,9 @@
 			}
 		}
 	],
+	"variantgroups": [
+		{ "code": "metal", "states": [ "tinbronze", "bismuthbronze", "blackbronze", "iron", "meteoriciron", "steel" ] }
+	],
 	"attributes": {
 		"rackable": true,
 		"toolrackTransform": {
@@ -37,7 +40,17 @@
 		"evaporation": 0.01
 	},
 	"shape": { "base": "item/tool/parchoffi" },
-	"durability": 300,
+	"textures": {
+		"metal": { "base": "game:block/metal/ingot/{metal}" }
+	},
+	"durabilityByType": {
+		"parchoffi-tinbronze": 95,
+		"parchoffi-bismuthbronze": 100,
+		"parchoffi-blackbronze": 110,
+		"parchoffi-iron": 165,
+		"parchoffi-meteoriciron": 200,
+		"parchoffi-steel": 420
+	},
 	"creativeinventory": {
 		"general": [ "*" ],
 		"items": [ "*" ],
